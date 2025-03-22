@@ -1,0 +1,75 @@
+CREATE TABLE "USER" (
+    id SERIAL PRIMARY KEY,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    profile_image VARCHAR(255)
+);
+
+CREATE TABLE STUDENT (
+    user_id INT UNIQUE NOT NULL REFERENCES "USER"(id),
+    primary key (user_id)
+
+);
+
+CREATE TABLE TEACHER (
+     user_id INT UNIQUE NOT NULL REFERENCES "USER"(id),
+     primary key (user_id)
+);
+
+CREATE TABLE TECHNICAL_SERVICES (
+    user_id INT UNIQUE NOT NULL REFERENCES "USER"(id),
+    primary key (user_id)
+);
+
+CREATE TABLE ADMIN (
+    user_id INT UNIQUE NOT NULL REFERENCES "USER"(id),
+    primary key (user_id)
+);
+
+CREATE TABLE SUBJECT (
+     id SERIAL PRIMARY KEY,
+     name VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE CLASS (
+    id SERIAL PRIMARY KEY,
+    subject_id INT NOT NULL REFERENCES SUBJECT(id),
+    type VARCHAR(20) CHECK (type IN ('theoretical', 'practical')),
+    start_time bigint NOT NULL,
+    end_time bigint NOT NULL,
+    CHECK (end_time > start_time)
+);
+
+
+
+CREATE TABLE ROOM (
+   id SERIAL PRIMARY KEY,
+   capacity INT NOT NULL
+);
+
+CREATE TABLE STUDY_ROOM (
+    id SERIAL PRIMARY KEY REFERENCES ROOM(id)
+);
+
+CREATE TABLE CLASSROOM (
+    id SERIAL PRIMARY KEY REFERENCES ROOM(id)
+);
+
+CREATE TABLE OFFICE_ROOM (
+    id SERIAL PRIMARY KEY REFERENCES ROOM(id)
+);
+
+CREATE TABLE CLASS_SESSION (
+    id SERIAL PRIMARY KEY,
+    class_id INT NOT NULL REFERENCES CLASS(id),
+    room_id INT NOT NULL REFERENCES ROOM(id),
+    duration INTERVAL NOT NULL
+);
+
+CREATE TABLE ISSUE_REPORT (
+    id SERIAL PRIMARY KEY,
+    room_id INT NOT NULL REFERENCES ROOM(id),
+    description TEXT NOT NULL
+);
+
