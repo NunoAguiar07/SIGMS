@@ -28,6 +28,7 @@ dependencies {
     implementation("io.ktor:ktor-server-config-yaml")
     implementation("org.ktorm:ktorm-core:${ktorm_version}")
     implementation("io.ktor:ktor-server-websockets")
+    implementation("de.mkammerer:argon2-jvm:latest.release")
     testImplementation("io.ktor:ktor-server-test-host")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
 }
