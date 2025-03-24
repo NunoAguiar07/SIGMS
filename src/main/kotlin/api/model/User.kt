@@ -1,4 +1,4 @@
-package isel.leic.group25.model
+package isel.leic.group25.api.model
 
 import de.mkammerer.argon2.Argon2
 import de.mkammerer.argon2.Argon2Factory
