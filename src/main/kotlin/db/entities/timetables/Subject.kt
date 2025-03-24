@@ -1,8 +1,10 @@
 package isel.leic.group25.db.entities.timetables
 
+import kotlinx.serialization.Serializable
 import org.ktorm.entity.Entity
 
-interface Subject: Entity<Subject> {
+@Serializable
+sealed interface Subject: Entity<Subject> {
     val id: Int
     var name: String
 }

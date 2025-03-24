@@ -1,7 +1,9 @@
 package isel.leic.group25.db.entities.rooms
 
+import kotlinx.serialization.Serializable
 import org.ktorm.entity.Entity
 
-interface OfficeRoom: Entity<OfficeRoom> {
+@Serializable
+sealed interface OfficeRoom: Entity<OfficeRoom> {
     val room: Room
 }

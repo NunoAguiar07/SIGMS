@@ -1,8 +1,10 @@
 val kotlin_version: String by project
 val logback_version: String by project
 val ktorm_version: String by project
+
 plugins {
     kotlin("jvm") version "2.1.20"
+    kotlin("plugin.serialization") version "2.1.20"
     id("io.ktor.plugin") version "3.1.1"
 }
 
@@ -11,7 +13,6 @@ version = "0.0.1"
 
 application {
     mainClass = "io.ktor.server.jetty.jakarta.EngineMain"
-
     val isDevelopment: Boolean = project.ext.has("development")
     applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
 }
@@ -31,4 +32,5 @@ dependencies {
     implementation("de.mkammerer:argon2-jvm:latest.release")
     testImplementation("io.ktor:ktor-server-test-host")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
+    testImplementation("org.junit.platform:junit-platform-suite:1.9.3")
 }

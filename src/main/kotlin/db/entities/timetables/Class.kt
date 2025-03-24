@@ -1,12 +1,14 @@
 package isel.leic.group25.db.entities.timetables
 
 import isel.leic.group25.db.entities.types.ClassType
+import kotlinx.serialization.Serializable
 import org.ktorm.entity.Entity
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 
-interface Class: Entity<Class> {
+@Serializable
+sealed interface Class: Entity<Class> {
     val id: Int
     val subject: Subject
     val type: ClassType
