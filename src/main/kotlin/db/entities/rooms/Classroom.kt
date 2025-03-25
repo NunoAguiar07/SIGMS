@@ -5,5 +5,6 @@ import org.ktorm.entity.Entity
 
 @Serializable
 sealed interface Classroom: Entity<Classroom> {
+    companion object: Entity.Factory<Classroom>()
     val room: Room
 }

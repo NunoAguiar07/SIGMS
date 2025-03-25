@@ -8,9 +8,6 @@ plugins {
     id("io.ktor.plugin") version "3.1.1"
 }
 
-group = "isel.leic.group25"
-version = "0.0.1"
-
 application {
     mainClass = "io.ktor.server.jetty.jakarta.EngineMain"
     val isDevelopment: Boolean = project.ext.has("development")
@@ -32,5 +29,5 @@ dependencies {
     implementation("de.mkammerer:argon2-jvm:latest.release")
     testImplementation("io.ktor:ktor-server-test-host")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
-    testImplementation("org.junit.platform:junit-platform-suite:1.9.3")
+    testImplementation("com.h2database:h2:2.3.232")
 }

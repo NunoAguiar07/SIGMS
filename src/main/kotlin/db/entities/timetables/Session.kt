@@ -7,6 +7,7 @@ import kotlin.time.Duration
 
 @Serializable
 sealed interface Session: Entity<Session> {
+    companion object: Entity.Factory<Session>()
     val id: Int
     var schoolClass: Class
     var room: Room

@@ -9,6 +9,7 @@ import kotlin.time.toDuration
 
 @Serializable
 sealed interface Class: Entity<Class> {
+    companion object: Entity.Factory<Class>()
     val id: Int
     val subject: Subject
     val type: ClassType

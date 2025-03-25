@@ -2,6 +2,8 @@ package isel.leic.group25.db.tables.issues
 
 import isel.leic.group25.db.entities.issues.IssueReport
 import isel.leic.group25.db.tables.rooms.Rooms
+import org.ktorm.database.Database
+import org.ktorm.entity.sequenceOf
 import org.ktorm.schema.Table
 import org.ktorm.schema.int
 import org.ktorm.schema.text

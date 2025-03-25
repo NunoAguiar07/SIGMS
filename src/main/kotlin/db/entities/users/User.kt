@@ -9,11 +9,11 @@ import org.ktorm.entity.Entity
 sealed interface User: Entity<User> {
     val id: Int
     var email: String
-    var name: String
+    var username: String
     var password: String
     var profileImage: ByteArray
 
-    companion object {
+    companion object: Entity.Factory<User>() {
 
         private val argon2: Argon2 = Argon2Factory.create(Argon2Factory.Argon2Types.ARGON2id)
 

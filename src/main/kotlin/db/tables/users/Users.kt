@@ -6,12 +6,12 @@ import org.ktorm.schema.int
 import org.ktorm.schema.varchar
 import java.util.*
 
-object Users: Table<User>("\"USER\"") {
+object Users: Table<User>("USERS") {
     val id = int("id").primaryKey().bindTo { it.id }
     val email = varchar("email").bindTo { it.email }
-    var name = varchar("name").bindTo { it.name }
+    val username = varchar("username").bindTo { it.username }
     var password = varchar("password").bindTo { it.password }
-    var image = varchar("image")
+    var image = varchar("profile_image")
         .transform({Base64.getDecoder().decode(it)},{Base64.getEncoder().encodeToString(it)})
         .bindTo { it.profileImage }
 

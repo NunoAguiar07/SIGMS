@@ -6,6 +6,7 @@ import org.ktorm.entity.Entity
 
 @Serializable
 sealed interface IssueReport: Entity<IssueReport> {
+    companion object: Entity.Factory<IssueReport>()
     val id: Int
     var room: Room
     val description: String

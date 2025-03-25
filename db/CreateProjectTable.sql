@@ -1,29 +1,29 @@
-CREATE TABLE "USER" (
+CREATE TABLE USERS (
     id SERIAL PRIMARY KEY,
     email VARCHAR(255) UNIQUE NOT NULL,
-    name VARCHAR(255) NOT NULL,
+    username VARCHAR(255) NOT NULL,
     password VARCHAR(255) NOT NULL,
     profile_image VARCHAR(255)
 );
 
 CREATE TABLE STUDENT (
-    user_id INT UNIQUE NOT NULL REFERENCES "USER"(id),
+    user_id INT UNIQUE NOT NULL REFERENCES USERS(id),
     primary key (user_id)
 
 );
 
 CREATE TABLE TEACHER (
-     user_id INT UNIQUE NOT NULL REFERENCES "USER"(id),
+     user_id INT UNIQUE NOT NULL REFERENCES USERS(id),
      primary key (user_id)
 );
 
 CREATE TABLE TECHNICAL_SERVICES (
-    user_id INT UNIQUE NOT NULL REFERENCES "USER"(id),
+    user_id INT UNIQUE NOT NULL REFERENCES USERS(id),
     primary key (user_id)
 );
 
 CREATE TABLE ADMIN (
-    user_id INT UNIQUE NOT NULL REFERENCES "USER"(id),
+    user_id INT UNIQUE NOT NULL REFERENCES USERS(id),
     primary key (user_id)
 );
 
