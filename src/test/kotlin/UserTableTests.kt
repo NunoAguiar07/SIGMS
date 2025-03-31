@@ -9,14 +9,11 @@ import isel.leic.group25.db.tables.Tables.Companion.students
 import isel.leic.group25.db.tables.Tables.Companion.teachers
 import isel.leic.group25.db.tables.Tables.Companion.technicalServices
 import isel.leic.group25.db.tables.Tables.Companion.users
+import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertNull
 import org.ktorm.dsl.eq
-import org.ktorm.entity.add
-import org.ktorm.entity.first
-import org.ktorm.entity.firstOrNull
-import org.ktorm.entity.update
-import kotlin.test.Test
-import kotlin.test.assertEquals
+import org.ktorm.entity.*
+import kotlin.test.*
 
 class UserTablesTest {
     private lateinit var connection: Connection
@@ -74,6 +71,50 @@ class UserTablesTest {
 
         val retrievedUser = database.users.first { it.id eq newUser.id }
         assertEquals(newUser.id, retrievedUser.id)
+    }
+
+
+    @Test
+    fun `Should create a new user and login afterwards`() {
+        // Arrange
+        val testEmail = "testemail@email.com"
+        val testUsername = "jhondoe123"
+        val testPassword = "supersecretpassword123"
+
+        // Create new user with hashed password
+        val newUser = User {
+            email = testEmail
+            username = testUsername
+            password = User.hashPassword(testPassword)
+            profileImage = byteArrayOf()
+        }
+
+
+        database.users.add(newUser)
+
+        // Assert - Verify user exists in database
+        val retrievedUser = database.users.find { it.email eq newUser.email }
+        assertNotNull(retrievedUser, "User should exist in database")
+        assertEquals(testEmail, retrievedUser.email)
+        assertEquals(testUsername, retrievedUser.username)
+
+        // Verify password
+        assertTrue(
+            User.verifyPassword(retrievedUser.password, testPassword),
+            "Password verification should succeed"
+        )
+
+        // Verify login with correct credentials
+        assertDoesNotThrow {
+            val loginSuccess = User.verifyPassword(retrievedUser.password, testPassword)
+            assertTrue(loginSuccess, "Login with correct credentials should succeed")
+        }
+
+        // Verify login with wrong password fails
+        assertFalse(
+            User.verifyPassword(retrievedUser.password, "wrongpassword"),
+            "Login with wrong password should fail"
+        )
     }
 
     @Test
