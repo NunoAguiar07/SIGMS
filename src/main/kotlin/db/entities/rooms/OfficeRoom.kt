@@ -6,5 +6,5 @@ import org.ktorm.entity.Entity
 @Serializable
 sealed interface OfficeRoom: Entity<OfficeRoom> {
     companion object: Entity.Factory<OfficeRoom>()
-    val room: Room
+    var room: Room
 }
