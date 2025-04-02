@@ -87,7 +87,7 @@ class UserTableTests {
     @Test
     fun `Should create a new user and login afterwards`() {
         // Arrange
-        val testEmail = "testemail@email.com"
+        val testEmail = "teste69mail@email.com"
         val testUsername = "jhondoe123"
         val testPassword = "supersecretpassword123"
 

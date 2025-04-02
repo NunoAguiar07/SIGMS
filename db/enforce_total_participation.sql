@@ -16,5 +16,5 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE TRIGGER enforce_total_participation_trigger
-    AFTER INSERT ON "USER"
+    AFTER INSERT ON USERS
     FOR EACH ROW EXECUTE FUNCTION enforce_total_participation();
