@@ -12,6 +12,11 @@ services:
       - ../db:/docker-entrypoint-initdb.d
     networks:
       - sigms-network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U user -d sigms" ]
+      interval: 5s
+      retries: 5
+      start_period: 10s
 
   backend:
     build:
@@ -21,7 +26,8 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     networks:
       - sigms-network
 

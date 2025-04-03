@@ -23,10 +23,10 @@ fun Application.module() {
         json()
     }
     val db = Database.connect(url = "jdbc:postgresql://db:5432/sigms", user = "user", password = "password123", driver = "org.postgresql.Driver")
-    val secret = environment.config.property("jwt.secret").getString()
-    val issuer = environment.config.property("jwt.issuer").getString()
-    val audience = environment.config.property("jwt.audience").getString()
-    val myRealm = environment.config.property("jwt.realm").getString()
+    val secret = environment.config.property("ktor.security.jwt.secret").getString()
+    val issuer = environment.config.property("ktor.security.jwt.issuer").getString()
+    val audience = environment.config.property("ktor.security.jwt.audience").getString()
+    val myRealm = environment.config.property("ktor.security.jwt.realm").getString()
     val jwtConfig = JwtConfig(secret, issuer, audience, myRealm)
     val authService = AuthService(db, jwtConfig)
     install(Authentication) {
