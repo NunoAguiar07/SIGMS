@@ -20,6 +20,8 @@ repositories {
 }
 
 dependencies {
+    implementation("io.ktor:ktor-server-auth:$ktor_version")
+    implementation("io.ktor:ktor-server-auth-jwt:$ktor_version")
     implementation("io.ktor:ktor-server-core-jvm")
     implementation("io.ktor:ktor-server-jetty-jakarta")
     implementation("ch.qos.logback:logback-classic:$logback_version")
@@ -28,6 +30,7 @@ dependencies {
     implementation("io.ktor:ktor-server-content-negotiation:$ktor_version")
     implementation("io.ktor:ktor-serialization-kotlinx-json:$ktor_version")
     implementation("org.ktorm:ktorm-core:${ktorm_version}")
+    implementation("org.postgresql:postgresql:42.7.3")
     implementation("io.ktor:ktor-server-websockets")
     implementation("de.mkammerer:argon2-jvm:latest.release")
     implementation("io.ktor:ktor-serialization-gson:3.1.1")

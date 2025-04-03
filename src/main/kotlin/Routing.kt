@@ -1,12 +1,16 @@
 package isel.leic.group25
 
+import io.ktor.http.*
 import io.ktor.server.application.*
+import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import isel.leic.group25.api.model.Link
-import isel.leic.group25.api.model.WelcomePageResponse
+import isel.leic.group25.api.http.respondEither
+import isel.leic.group25.api.http.toProblem
+import isel.leic.group25.api.model.*
+import isel.leic.group25.services.AuthService
 
-fun Application.configureRouting() {
+fun Application.configureRouting(authService: AuthService) {
     routing {
         get("/") {
             call.respond(
@@ -21,6 +25,28 @@ fun Application.configureRouting() {
                 )
             )
         }
-
+        route("/auth") {
+            post("/register") {
+                val credentials = call.receive<UserCredentials>()
+                val result = authService.register(
+                    email = credentials.email,
+                    username = credentials.username,
+                    password = credentials.password
+                )
+                call.respondEither(
+                    either = result,
+                    transformError = { error -> error.toProblem() },
+                    transformSuccess = { user ->
+                        UserOutput(
+                            id = user.id,
+                            email = user.email,
+                            username = user.username
+                        )
+                    },
+                    successStatus = HttpStatusCode.Created
+                )
+            }
+        }
     }
+
 }

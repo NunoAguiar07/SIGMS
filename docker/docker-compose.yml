@@ -1,16 +1,4 @@
-version: '3.8'
-
 services:
-  backend:
-    build:
-      context: ..
-      dockerfile: docker/Dockerfile
-    container_name: backend
-    ports:
-      - "8080:8080"
-    networks:
-      - sigms-network
-
   db:
     image: postgres:latest
     container_name: db
@@ -21,9 +9,21 @@ services:
     ports:
       - "5432:5432"
     volumes:
-        - ../db:/docker-entrypoint-initdb.d
+      - ../db:/docker-entrypoint-initdb.d
     networks:
-        - sigms-network
+      - sigms-network
+
+  backend:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: backend
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    networks:
+      - sigms-network
 
 networks:
   sigms-network:
