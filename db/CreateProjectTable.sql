@@ -29,13 +29,13 @@ CREATE TABLE IF NOT EXISTS ADMIN (
 
 CREATE TABLE IF NOT EXISTS SUBJECT (
      id SERIAL PRIMARY KEY,
-     name VARCHAR(255) NOT NULL
+     subject_name VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS CLASS (
     id SERIAL PRIMARY KEY,
     subject_id INT NOT NULL REFERENCES SUBJECT(id) ON DELETE CASCADE,
-    type VARCHAR(20) CHECK (type IN ('theoretical', 'practical')),
+    class_type VARCHAR(20) CHECK (class_type IN ('theoretical', 'practical')),
     start_time bigint NOT NULL,
     end_time bigint NOT NULL,
     CHECK (end_time > start_time)

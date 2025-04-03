@@ -7,5 +7,5 @@ import org.ktorm.schema.varchar
 
 object Subjects: Table<Subject>("SUBJECT") {
     val id = int("id").primaryKey().bindTo { it.id }
-    val name = varchar("name").bindTo { it.name }
+    val name = varchar("subject_name").bindTo { it.name }
 }

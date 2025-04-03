@@ -1,20 +1,19 @@
 package isel.leic.group25.db.entities.timetables
 
 import isel.leic.group25.db.entities.types.ClassType
+import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 import org.ktorm.entity.Entity
 import kotlin.time.Duration
-import kotlin.time.DurationUnit
-import kotlin.time.toDuration
 
 @Serializable
 sealed interface Class: Entity<Class> {
     companion object: Entity.Factory<Class>()
     val id: Int
-    val subject: Subject
-    val type: ClassType
-    val startTime: Long
-    val endTime: Long
+    var subject: Subject
+    var type: ClassType
+    var startTime: Instant
+    var endTime: Instant
     val duration: Duration
-        get() = endTime.toDuration(DurationUnit.SECONDS) - startTime.toDuration(DurationUnit.SECONDS)
+        get() = endTime - startTime
 }

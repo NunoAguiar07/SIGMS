@@ -31,6 +31,7 @@ dependencies {
     implementation("io.ktor:ktor-server-websockets")
     implementation("de.mkammerer:argon2-jvm:latest.release")
     implementation("io.ktor:ktor-serialization-gson:3.1.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.2")
     testImplementation("io.ktor:ktor-server-test-host")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
     testImplementation("com.h2database:h2:2.3.232")
