@@ -1,7 +1,9 @@
 package isel.leic.group25.services
 
 import isel.leic.group25.api.jwt.JwtConfig
+import isel.leic.group25.db.entities.users.Student
 import isel.leic.group25.db.entities.users.User
+import isel.leic.group25.db.tables.Tables.Companion.students
 import isel.leic.group25.db.tables.Tables.Companion.users
 import isel.leic.group25.services.errors.AuthError
 import isel.leic.group25.utils.Either
@@ -35,9 +37,14 @@ class AuthService(private val database: Database, private val jwtConfig: JwtConf
                 this.email = email
                 this.username = username
                 this.password = User.hashPassword(password)
+                this.profileImage = ByteArray(0)
+            }
+            database.users.add(newUser)
+            val student = Student {
+                this.user = newUser
             }
 
-            database.users.add(newUser)
+            database.students.add(student)
             return@useTransaction success(newUser)
         }
     }

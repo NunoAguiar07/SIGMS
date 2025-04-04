@@ -15,6 +15,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER enforce_total_participation_trigger
+CREATE CONSTRAINT TRIGGER enforce_total_participation_trigger
     AFTER INSERT ON USERS
+    DEFERRABLE INITIALLY DEFERRED
     FOR EACH ROW EXECUTE FUNCTION enforce_total_participation();
