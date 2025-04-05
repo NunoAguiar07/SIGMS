@@ -6,7 +6,7 @@ import isel.leic.group25.db.tables.rooms.OfficeRooms
 import isel.leic.group25.db.tables.rooms.Rooms
 import isel.leic.group25.db.tables.rooms.StudyRooms
 import isel.leic.group25.db.tables.timetables.Classes
-import isel.leic.group25.db.tables.timetables.Sessions
+import isel.leic.group25.db.tables.timetables.Lectures
 import isel.leic.group25.db.tables.timetables.Subjects
 import isel.leic.group25.db.tables.users.*
 import org.ktorm.database.Database
@@ -20,7 +20,7 @@ class Tables {
         val Database.rooms get() = this.sequenceOf(Rooms)
         val Database.studyRooms get() = this.sequenceOf(StudyRooms)
         val Database.classes get() = this.sequenceOf(Classes)
-        val Database.sessions get() = this.sequenceOf(Sessions)
+        val Database.lectures get() = this.sequenceOf(Lectures)
         val Database.subjects get() = this.sequenceOf(Subjects)
         val Database.admins get() = this.sequenceOf(Admins)
         val Database.students get() = this.sequenceOf(Students)

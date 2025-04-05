@@ -9,5 +9,5 @@ sealed interface IssueReport: Entity<IssueReport> {
     companion object: Entity.Factory<IssueReport>()
     val id: Int
     var room: Room
-    val description: String
+    var description: String
 }

@@ -21,7 +21,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 
-class RoomTableTests {
+class RoomTableTest {
     private val connection: Connection
     private val database: Database
 
