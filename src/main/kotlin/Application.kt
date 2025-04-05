@@ -11,6 +11,7 @@ import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*
 import io.ktor.server.response.*
 import isel.leic.group25.api.jwt.JwtConfig
+import isel.leic.group25.db.repositories.users.UserRepository
 import isel.leic.group25.services.AuthService
 import org.ktorm.database.Database
 
@@ -27,8 +28,11 @@ fun Application.module() {
     val issuer = environment.config.property("ktor.security.jwt.issuer").getString()
     val audience = environment.config.property("ktor.security.jwt.audience").getString()
     val myRealm = environment.config.property("ktor.security.jwt.realm").getString()
+
     val jwtConfig = JwtConfig(secret, issuer, audience, myRealm)
-    val authService = AuthService(db, jwtConfig)
+    val userRepository = UserRepository(db)
+    val authService = AuthService(userRepository, db, jwtConfig)
+
     install(Authentication) {
         jwt("auth-jwt") {
             realm = myRealm
