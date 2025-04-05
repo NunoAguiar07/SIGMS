@@ -2,6 +2,7 @@ package isel.leic.group25.db.repositories.users
 
 import isel.leic.group25.db.entities.types.Role
 import isel.leic.group25.db.entities.users.*
+import isel.leic.group25.db.repositories.users.interfaces.UserRepositoryInterface
 import isel.leic.group25.db.tables.Tables.Companion.admins
 import isel.leic.group25.db.tables.Tables.Companion.students
 import isel.leic.group25.db.tables.Tables.Companion.teachers
@@ -13,16 +14,16 @@ import org.ktorm.entity.add
 import org.ktorm.entity.first
 import org.ktorm.entity.firstOrNull
 
-class UserRepository(private val database: Database) {
-    fun findById(id: Int): User? {
+class UserRepository(private val database: Database): UserRepositoryInterface {
+    override fun findById(id: Int): User? {
         return database.users.firstOrNull { it.id eq id }
     }
 
-    fun findByEmail(email:String): User? {
+    override fun findByEmail(email:String): User? {
         return database.users.firstOrNull { it.email eq email }
     }
 
-    fun create(newUser: User, role: Role): User {
+    override fun create(newUser: User, role: Role): User {
         database.users.add(newUser)
         when(role){
             Role.ADMIN -> {
@@ -41,19 +42,19 @@ class UserRepository(private val database: Database) {
         return newUser
     }
 
-    fun Admin.toUser(): User {
+    override fun Admin.toUser(): User {
         return database.users.first{ it.id eq user.id }
     }
 
-    fun Student.toUser(): User {
+    override fun Student.toUser(): User {
         return database.users.first{ it.id eq user.id }
     }
 
-    fun Teacher.toUser(): User {
+    override fun Teacher.toUser(): User {
         return database.users.first{ it.id eq user.id }
     }
 
-    fun TechnicalService.toUser(): User {
+    override fun TechnicalService.toUser(): User {
         return database.users.first{ it.id eq user.id }
     }
 }
