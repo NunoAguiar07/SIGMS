@@ -8,7 +8,6 @@ data class UserResponse(
     val id: Int,
     val name: String,
     val email: String,
-    val password: String,
     val image: ByteArray? = null,
 ) {
     companion object {
@@ -17,7 +16,6 @@ data class UserResponse(
                 id = user.id,
                 name = user.username,
                 email = user.email,
-                password = user.password,
                 image = user.profileImage
             )
         }

@@ -6,7 +6,6 @@ import isel.leic.group25.db.repositories.ktorm.KTransaction
 import isel.leic.group25.db.repositories.users.UserRepository
 import org.h2.jdbcx.JdbcDataSource
 import org.h2.tools.RunScript
-import org.junit.jupiter.api.assertDoesNotThrow
 import org.ktorm.database.Database
 import java.io.StringReader
 import java.sql.Connection
@@ -139,6 +138,24 @@ class UserRepositoryTest {
             assertEquals(newUser.email, user.email)
             assertEquals(newUser.username, user.username)
             assertContentEquals(newUser.profileImage, user.profileImage)
+        }
+    }
+
+    @Test
+    fun `Should update the user username`(){
+        kTransaction.useTransaction {
+            val newUser = User {
+                email = "testemail@test.com"
+                username = "tester"
+                password = User.hashPassword("test")
+                profileImage = byteArrayOf()
+            }.let { userRepository.create(it, Role.STUDENT) }
+            val newUsername = "newTester"
+            newUser.username = newUsername
+            userRepository.update(newUser)
+            val user = userRepository.findById(newUser.id)
+            assertNotNull(user)
+            assertEquals(newUsername, user.username)
         }
     }
 }

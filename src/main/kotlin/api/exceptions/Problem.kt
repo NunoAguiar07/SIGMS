@@ -1,4 +1,4 @@
-package isel.leic.group25.api.http
+package isel.leic.group25.api.exceptions
 
 import io.ktor.http.*
 import io.ktor.server.application.*
@@ -72,6 +72,12 @@ class Problem private constructor(
             status = HttpStatusCode.Unauthorized,
             detail = "The token provided is expired"
         )
+        val UserChangesFailed = Problem(
+            typeUri = URI("https://example.com/problems/user-changes-failed"),
+            title = "User changes failed",
+            status = HttpStatusCode.InternalServerError,
+            detail = "The user changes failed"
+        )
     }
 
     suspend fun respond(call: ApplicationCall) {
@@ -109,5 +115,6 @@ fun AuthError.toProblem(): Problem {
         AuthError.InvalidCredentials -> Problem.InvalidCredentials
         AuthError.TokenCreationFailed -> Problem.InvalidToken
         AuthError.TokenValidationFailed -> Problem.ExpiredToken
+        AuthError.UserChangesFailed -> Problem.UserChangesFailed
     }
 }

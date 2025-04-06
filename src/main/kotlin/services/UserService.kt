@@ -21,7 +21,7 @@ class UserService(private val repository: UserRepository,
                   private val database: Database,
                   private val jwtConfig: JwtConfig) {
 
-    fun register(email: String, username: String, password: String): UserResult {
+    fun register(email: String, username: String, password: String): TokenResult {
         if(email.isBlank() || username.isBlank() || password.isBlank()) {
             return failure(AuthError.MissingCredentials)
         }
@@ -39,7 +39,8 @@ class UserService(private val repository: UserRepository,
                 this.profileImage = ByteArray(0)
             }
             repository.create(newUser, Role.STUDENT)
-            return@useTransaction success(newUser)
+            val token = jwtConfig.generateToken(newUser.id)
+            return@useTransaction success(token)
         }
     }
 
@@ -53,7 +54,7 @@ class UserService(private val repository: UserRepository,
             if(!User.verifyPassword(user.password, password)) {
                 return@useTransaction failure(AuthError.InvalidCredentials)
             }
-            val token = jwtConfig.generateToken(user.id.toString())
+            val token = jwtConfig.generateToken(user.id)
             return@useTransaction success(token)
         }
     }
@@ -62,6 +63,24 @@ class UserService(private val repository: UserRepository,
         return database.useTransaction {
             val user = repository.findById(id)
                 ?: return@useTransaction failure(AuthError.UserNotFound)
+            return@useTransaction success(user)
+        }
+    }
+
+    fun updateUser(id: Int, username: String?, image: ByteArray?): UserResult {
+        return database.useTransaction {
+            val user = repository.findById(id)
+                ?: return@useTransaction failure(AuthError.UserNotFound)
+            if (username != null) {
+                user.username = username
+            }
+            if (image != null) {
+                user.profileImage = image
+            }
+            val rowsChanged = repository.update(user)
+            if (rowsChanged == 0) {
+                return@useTransaction failure(AuthError.UserChangesFailed)
+            }
             return@useTransaction success(user)
         }
     }

@@ -1,7 +1,5 @@
 package isel.leic.group25
 
-import com.auth0.jwt.JWT
-import com.auth0.jwt.algorithms.Algorithm
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.jetty.jakarta.*
@@ -10,6 +8,7 @@ import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*
 import io.ktor.server.response.*
+import isel.leic.group25.api.http.configureRouting
 import isel.leic.group25.api.jwt.JwtConfig
 import isel.leic.group25.db.repositories.users.UserRepository
 import isel.leic.group25.services.UserService
@@ -37,14 +36,10 @@ fun Application.module() {
         jwt("auth-jwt") {
             realm = myRealm
             verifier(
-                JWT
-                    .require(Algorithm.HMAC256(secret))
-                    .withAudience(audience)
-                    .withIssuer(issuer)
-                    .build()
+                jwtConfig.buildVerifier()
             )
             validate { credential ->
-                if (credential.payload.getClaim("userId").asString() != "") {
+                if (credential.payload.getClaim("userId").asInt() != null) {
                     JWTPrincipal(credential.payload)
                 } else {
                     null

@@ -12,6 +12,7 @@ import org.ktorm.database.Database
 import org.ktorm.dsl.*
 import org.ktorm.entity.add
 import org.ktorm.entity.firstOrNull
+import org.ktorm.entity.update
 
 class UserRepository(private val database: Database): UserRepositoryInterface {
     override fun findById(id: Int): User? {
@@ -39,5 +40,9 @@ class UserRepository(private val database: Database): UserRepositoryInterface {
             }
         }
         return newUser
+    }
+
+    override fun update(user: User): Int {
+        return database.users.update(user)
     }
 }
