@@ -20,14 +20,14 @@ fun Application.configureRouting(authService: AuthService) {
                     version = "0.0.1",
                     links = listOf(
                         Link("login", "/auth/login"),
-                        Link("signup", "/auth/signup"),
+                        Link("signup", "/auth/register"),
                     )
                 )
             )
         }
         route("/auth") {
             post("/register") {
-                val credentials = call.receive<UserCredentials>()
+                val credentials = call.receive<UserCredentialsRequest>()
                 val result = authService.register(
                     email = credentials.email,
                     username = credentials.username,
@@ -37,13 +37,35 @@ fun Application.configureRouting(authService: AuthService) {
                     either = result,
                     transformError = { error -> error.toProblem() },
                     transformSuccess = { user ->
-                        UserOutput(
+                        UserResponse(
                             id = user.id,
                             email = user.email,
-                            username = user.username
+                            username = user.username,
+                            link = listOf(
+                                Link("login", "/auth/login"),
+                            )
                         )
                     },
                     successStatus = HttpStatusCode.Created
+                )
+            }
+            post("/login") {
+                val credentials = call.receive<LoginCredentialsRequest>()
+                val result = authService.login(
+                    email = credentials.email,
+                    password = credentials.password
+                )
+                call.respondEither(
+                    either = result,
+                    transformError = { error -> error.toProblem() },
+                    transformSuccess = { token ->
+                        LoginResponse(
+                            token = token,
+                            links = listOf(
+                                Link("home", "/home"),
+                            )
+                        )
+                    }
                 )
             }
         }
