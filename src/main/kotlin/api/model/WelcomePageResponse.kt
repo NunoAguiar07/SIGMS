@@ -14,6 +14,5 @@ import kotlinx.serialization.Serializable
 data class WelcomePageResponse(
     val title: String,
     val description: String,
-    val version: String,
-    val links: List<Link>
+    val version: String
 )

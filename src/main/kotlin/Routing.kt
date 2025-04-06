@@ -2,6 +2,8 @@ package isel.leic.group25
 
 import io.ktor.http.*
 import io.ktor.server.application.*
+import io.ktor.server.auth.*
+import io.ktor.server.auth.jwt.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
@@ -17,11 +19,7 @@ fun Application.configureRouting(userService: UserService) {
                 WelcomePageResponse(
                     title = "Welcome to SIGMS",
                     description = "An application to manage classes and schedules",
-                    version = "0.0.1",
-                    links = listOf(
-                        Link("login", "/auth/login"),
-                        Link("signup", "/auth/register"),
-                    )
+                    version = "0.0.1"
                 )
             )
         }
@@ -37,13 +35,10 @@ fun Application.configureRouting(userService: UserService) {
                     either = result,
                     transformError = { error -> error.toProblem() },
                     transformSuccess = { user ->
-                        UserResponse(
+                        RegisterResponse(
                             id = user.id,
                             email = user.email,
-                            username = user.username,
-                            link = listOf(
-                                Link("login", "/auth/login"),
-                            )
+                            username = user.username
                         )
                     },
                     successStatus = HttpStatusCode.Created
@@ -60,10 +55,7 @@ fun Application.configureRouting(userService: UserService) {
                     transformError = { error -> error.toProblem() },
                     transformSuccess = { token ->
                         LoginResponse(
-                            token = token,
-                            links = listOf(
-                                Link("home", "/home"),
-                            )
+                            token = token
                         )
                     }
                 )

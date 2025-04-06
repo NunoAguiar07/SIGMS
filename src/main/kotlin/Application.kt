@@ -44,7 +44,7 @@ fun Application.module() {
                     .build()
             )
             validate { credential ->
-                if (credential.payload.getClaim("username").asString() != "") {
+                if (credential.payload.getClaim("userId").asString() != "") {
                     JWTPrincipal(credential.payload)
                 } else {
                     null

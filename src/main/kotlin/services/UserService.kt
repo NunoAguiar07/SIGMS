@@ -57,4 +57,12 @@ class UserService(private val repository: UserRepository,
             return@useTransaction success(token)
         }
     }
+
+    fun getUserById(id: Int): UserResult {
+        return database.useTransaction {
+            val user = repository.findById(id)
+                ?: return@useTransaction failure(AuthError.UserNotFound)
+            return@useTransaction success(user)
+        }
+    }
 }
