@@ -9,13 +9,4 @@ interface UserRepositoryInterface {
     fun findByEmail(email: String): User?
 
     fun create(newUser: User, role: Role): User
-
-    fun Admin.toUser(): User
-
-    fun Student.toUser(): User
-
-    fun Teacher.toUser(): User
-
-    fun TechnicalService.toUser(): User
-
 }

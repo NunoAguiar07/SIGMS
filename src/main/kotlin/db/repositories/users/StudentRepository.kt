@@ -2,7 +2,6 @@ package isel.leic.group25.db.repositories.users
 
 import isel.leic.group25.db.entities.users.Student
 import isel.leic.group25.db.entities.users.User
-import isel.leic.group25.db.exceptions.users.UserNotInRole
 import isel.leic.group25.db.repositories.users.interfaces.StudentRepositoryInterface
 import isel.leic.group25.db.tables.Tables.Companion.students
 import isel.leic.group25.db.tables.Tables.Companion.users
@@ -23,10 +22,5 @@ class StudentRepository(private val database: Database): StudentRepositoryInterf
 
     override fun isStudent(user: User): Boolean {
         return database.students.any { it.user eq user.id }
-    }
-
-    override fun User.toStudent(): Student {
-        val student = database.students.firstOrNull { it.user eq id } ?: throw UserNotInRole()
-        return student
     }
 }

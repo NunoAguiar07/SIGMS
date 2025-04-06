@@ -1,3 +1,5 @@
+package tables
+
 import isel.leic.group25.db.entities.rooms.*
 import isel.leic.group25.db.tables.Tables.Companion.classrooms
 import isel.leic.group25.db.tables.Tables.Companion.officeRooms

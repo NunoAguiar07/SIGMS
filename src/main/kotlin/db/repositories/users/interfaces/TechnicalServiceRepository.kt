@@ -9,6 +9,4 @@ interface TechnicalServiceRepository {
     fun findTechnicalServiceByEmail(email: String): TechnicalService?
 
     fun isTechnicalService(user: User): Boolean
-
-    fun User.toTechnicalService(): TechnicalService
 }

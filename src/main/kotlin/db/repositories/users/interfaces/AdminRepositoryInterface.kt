@@ -9,6 +9,4 @@ interface AdminRepositoryInterface {
      fun findAdminByEmail(email: String): Admin?
 
      fun isAdmin(user: User): Boolean
-
-     fun User.toAdmin(): Admin
 }

@@ -2,7 +2,6 @@ package isel.leic.group25.db.repositories.users
 
 import isel.leic.group25.db.entities.users.Teacher
 import isel.leic.group25.db.entities.users.User
-import isel.leic.group25.db.exceptions.users.UserNotInRole
 import isel.leic.group25.db.repositories.users.interfaces.TeacherRepositoryInterface
 import isel.leic.group25.db.tables.Tables.Companion.teachers
 import isel.leic.group25.db.tables.Tables.Companion.users
@@ -23,10 +22,5 @@ class TeacherRepository(private val database: Database): TeacherRepositoryInterf
 
     override fun isTeacher(user: User): Boolean {
         return database.teachers.any { it.user eq user.id }
-    }
-
-    override fun User.toTeacher(): Teacher {
-        val teacher = database.teachers.firstOrNull { it.user eq id } ?: throw UserNotInRole()
-        return teacher
     }
 }

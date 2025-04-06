@@ -2,7 +2,6 @@ package isel.leic.group25.db.repositories.users
 
 import isel.leic.group25.db.entities.users.Admin
 import isel.leic.group25.db.entities.users.User
-import isel.leic.group25.db.exceptions.users.UserNotInRole
 import isel.leic.group25.db.repositories.users.interfaces.AdminRepositoryInterface
 import isel.leic.group25.db.tables.Tables.Companion.admins
 import isel.leic.group25.db.tables.Tables.Companion.users
@@ -17,16 +16,13 @@ class AdminRepository(private val database: Database): AdminRepositoryInterface 
     }
 
     override fun findAdminByEmail(email:String): Admin? {
-        val user = database.users.firstOrNull { it.email eq email } ?: return null
-        return database.admins.firstOrNull { it.user eq user.id }
+        database.useTransaction {
+            val user = database.users.firstOrNull { it.email eq email } ?: return null
+            return database.admins.firstOrNull { it.user eq user.id }
+        }
     }
 
     override fun isAdmin(user: User): Boolean {
         return database.admins.any { it.user eq user.id }
-    }
-
-    override fun User.toAdmin(): Admin {
-        val admin = database.admins.firstOrNull { it.user eq id } ?: throw UserNotInRole()
-        return admin
     }
 }

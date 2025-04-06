@@ -1,3 +1,5 @@
+package tables
+
 import isel.leic.group25.db.entities.timetables.Subject
 import isel.leic.group25.db.tables.Tables.Companion.subjects
 import org.h2.jdbcx.JdbcDataSource

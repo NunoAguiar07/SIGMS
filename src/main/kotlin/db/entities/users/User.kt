@@ -2,8 +2,15 @@ package isel.leic.group25.db.entities.users
 
 import de.mkammerer.argon2.Argon2
 import de.mkammerer.argon2.Argon2Factory
+import isel.leic.group25.db.tables.Tables.Companion.admins
+import isel.leic.group25.db.tables.Tables.Companion.students
+import isel.leic.group25.db.tables.Tables.Companion.teachers
+import isel.leic.group25.db.tables.Tables.Companion.technicalServices
 import kotlinx.serialization.Serializable
+import org.ktorm.database.Database
+import org.ktorm.dsl.eq
 import org.ktorm.entity.Entity
+import org.ktorm.entity.first
 
 @Serializable
 sealed interface User: Entity<User> {
@@ -39,4 +46,8 @@ sealed interface User: Entity<User> {
         }
 
     }
+    fun toAdmin(database: Database): Admin = database.admins.first{ it.user eq id}
+    fun toStudent(database: Database): Student = database.students.first{ it.user eq id}
+    fun toTeacher(database: Database): Teacher = database.teachers.first{ it.user eq id}
+    fun toTechnicalService(database: Database): TechnicalService = database.technicalServices.first{ it.user eq id}
 }

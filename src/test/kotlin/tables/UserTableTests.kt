@@ -1,3 +1,5 @@
+package tables
+
 import isel.leic.group25.db.entities.users.*
 import org.h2.jdbcx.JdbcDataSource
 import org.h2.tools.RunScript

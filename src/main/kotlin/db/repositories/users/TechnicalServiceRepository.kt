@@ -2,8 +2,6 @@ package isel.leic.group25.db.repositories.users
 
 import isel.leic.group25.db.entities.users.TechnicalService
 import isel.leic.group25.db.entities.users.User
-import isel.leic.group25.db.exceptions.users.UserNotInRole
-import isel.leic.group25.db.repositories.users.interfaces.TeacherRepositoryInterface
 import isel.leic.group25.db.repositories.users.interfaces.TechnicalServiceRepository
 import isel.leic.group25.db.tables.Tables.Companion.technicalServices
 import isel.leic.group25.db.tables.Tables.Companion.users
@@ -24,10 +22,5 @@ class TechnicalServiceRepository(private val database: Database): TechnicalServi
 
     override fun isTechnicalService(user: User): Boolean {
         return database.technicalServices.any { it.user eq user.id }
-    }
-
-    override fun User.toTechnicalService(): TechnicalService {
-        val technicalService = database.technicalServices.firstOrNull { it.user eq id } ?: throw UserNotInRole()
-        return technicalService
     }
 }

@@ -9,6 +9,4 @@ interface TeacherRepositoryInterface {
     fun findTeacherByEmail(email: String): Teacher?
 
     fun isTeacher(user: User): Boolean
-
-    fun User.toTeacher(): Teacher
 }

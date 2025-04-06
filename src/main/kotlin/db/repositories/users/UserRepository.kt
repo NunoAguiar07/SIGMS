@@ -11,7 +11,6 @@ import isel.leic.group25.db.tables.Tables.Companion.users
 import org.ktorm.database.Database
 import org.ktorm.dsl.*
 import org.ktorm.entity.add
-import org.ktorm.entity.first
 import org.ktorm.entity.firstOrNull
 
 class UserRepository(private val database: Database): UserRepositoryInterface {
@@ -40,21 +39,5 @@ class UserRepository(private val database: Database): UserRepositoryInterface {
             }
         }
         return newUser
-    }
-
-    override fun Admin.toUser(): User {
-        return database.users.first{ it.id eq user.id }
-    }
-
-    override fun Student.toUser(): User {
-        return database.users.first{ it.id eq user.id }
-    }
-
-    override fun Teacher.toUser(): User {
-        return database.users.first{ it.id eq user.id }
-    }
-
-    override fun TechnicalService.toUser(): User {
-        return database.users.first{ it.id eq user.id }
     }
 }

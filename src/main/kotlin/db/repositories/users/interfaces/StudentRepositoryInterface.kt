@@ -9,6 +9,4 @@ interface StudentRepositoryInterface {
      fun findStudentByEmail(email: String): Student?
 
      fun isStudent(user: User): Boolean
-
-     fun User.toStudent(): Student
 }
