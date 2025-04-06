@@ -29,6 +29,7 @@ dependencies {
     implementation("io.ktor:ktor-server-config-yaml")
     implementation("io.ktor:ktor-server-content-negotiation:$ktor_version")
     implementation("io.ktor:ktor-serialization-kotlinx-json:$ktor_version")
+    implementation("org.apache.poi:poi-ooxml:5.2.3") // just for excel readability
     implementation("org.ktorm:ktorm-core:${ktorm_version}")
     implementation("org.postgresql:postgresql:42.7.3")
     implementation("io.ktor:ktor-server-websockets")
