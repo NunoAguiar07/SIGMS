@@ -8,9 +8,9 @@ import io.ktor.server.routing.*
 import isel.leic.group25.api.http.respondEither
 import isel.leic.group25.api.http.toProblem
 import isel.leic.group25.api.model.*
-import isel.leic.group25.services.AuthService
+import isel.leic.group25.services.UserService
 
-fun Application.configureRouting(authService: AuthService) {
+fun Application.configureRouting(userService: UserService) {
     routing {
         get("/") {
             call.respond(
@@ -28,7 +28,7 @@ fun Application.configureRouting(authService: AuthService) {
         route("/auth") {
             post("/register") {
                 val credentials = call.receive<UserCredentialsRequest>()
-                val result = authService.register(
+                val result = userService.register(
                     email = credentials.email,
                     username = credentials.username,
                     password = credentials.password
@@ -51,7 +51,7 @@ fun Application.configureRouting(authService: AuthService) {
             }
             post("/login") {
                 val credentials = call.receive<LoginCredentialsRequest>()
-                val result = authService.login(
+                val result = userService.login(
                     email = credentials.email,
                     password = credentials.password
                 )
@@ -67,6 +67,22 @@ fun Application.configureRouting(authService: AuthService) {
                         )
                     }
                 )
+            }
+            authenticate("auth-jwt") {
+                get("/me") {
+                    val principal = call.principal<JWTPrincipal>()
+                        ?: return@get call.respond(HttpStatusCode.Unauthorized, "Missing JWT principal")
+                    val userId = principal.payload.getClaim("userId").asString()
+                        ?: return@get call.respond(HttpStatusCode.Unauthorized, "User ID claim missing")
+                    val result = userService.getUserById(userId.toInt())
+                    call.respondEither(
+                        either = result,
+                        transformError = { error -> error.toProblem() },
+                        transformSuccess = { user ->
+                            UserResponse.fromUser(user)
+                        }
+                    )
+                }
             }
         }
     }

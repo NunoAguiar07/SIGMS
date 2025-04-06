@@ -17,7 +17,7 @@ typealias UserResult = Either<AuthError, User>
 
 typealias TokenResult = Either<AuthError, String>
 
-class AuthService(private val repository: UserRepository,
+class UserService(private val repository: UserRepository,
                   private val database: Database,
                   private val jwtConfig: JwtConfig) {
 
@@ -44,16 +44,16 @@ class AuthService(private val repository: UserRepository,
     }
 
     fun login(email: String, password: String): TokenResult {
+        if(email.isBlank() || password.isBlank()) {
+            return failure(AuthError.MissingCredentials)
+        }
         return database.useTransaction {
-            if(email.isBlank() || password.isBlank()) {
-                return@useTransaction failure(AuthError.MissingCredentials)
-            }
             val user = repository.findByEmail(email)
                 ?: return@useTransaction failure(AuthError.UserNotFound)
             if(!User.verifyPassword(user.password, password)) {
                 return@useTransaction failure(AuthError.InvalidCredentials)
             }
-            val token = jwtConfig.generateToken(user.username)
+            val token = jwtConfig.generateToken(user.id.toString())
             return@useTransaction success(token)
         }
     }

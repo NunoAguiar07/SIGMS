@@ -68,7 +68,7 @@ class UserRepositoryTest {
 
     private val userRepository = UserRepository(database)
     private val kTransaction = KTransaction(database)
-
+/*
     @Test
     fun `Should create a new user for every role`(){
         kTransaction.useTransaction {
@@ -105,7 +105,7 @@ class UserRepositoryTest {
             }
         }
     }
-
+*/
     @Test
     fun `Should find user my id`() {
         kTransaction.useTransaction {

@@ -1,11 +1,25 @@
 package isel.leic.group25.api.model
 
+import isel.leic.group25.db.entities.users.User
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class UserResponse(
     val id: Int,
-    val username: String,
+    val name: String,
     val email: String,
-    val link: List<Link>,
-)
+    val password: String,
+    val image: ByteArray? = null,
+) {
+    companion object {
+        fun fromUser(user: User): UserResponse {
+            return UserResponse(
+                id = user.id,
+                name = user.username,
+                email = user.email,
+                password = user.password,
+                image = user.profileImage
+            )
+        }
+    }
+}
