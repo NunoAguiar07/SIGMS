@@ -9,4 +9,5 @@ sealed class AuthError {
     data object InvalidCredentials : AuthError()
     data object TokenCreationFailed : AuthError()
     data object TokenValidationFailed : AuthError()
+    data object InvalidRole : AuthError()
 }

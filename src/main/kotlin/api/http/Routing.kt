@@ -9,10 +9,12 @@ import io.ktor.server.routing.*
 import isel.leic.group25.api.exceptions.respondEither
 import isel.leic.group25.api.exceptions.toProblem
 import isel.leic.group25.api.jwt.getUserIdFromPrincipal
+import isel.leic.group25.api.jwt.getUserRoleFromPrincipal
 import isel.leic.group25.api.model.*
+import isel.leic.group25.services.ClassService
 import isel.leic.group25.services.UserService
 
-fun Application.configureRouting(userService: UserService) {
+fun Application.configureRouting(userService: UserService, classService: ClassService) {
     routing {
         route("/api"){
             get("/") {
@@ -30,7 +32,8 @@ fun Application.configureRouting(userService: UserService) {
                     val result = userService.register(
                         email = credentials.email,
                         username = credentials.username,
-                        password = credentials.password
+                        password = credentials.password,
+                        role = credentials.role
                     )
                     call.respondEither(
                         either = result,
@@ -106,6 +109,25 @@ fun Application.configureRouting(userService: UserService) {
                         )
                     }
 
+                }
+                route("/schedule"){
+                    get("/") {
+                        val userId = call.getUserIdFromPrincipal() ?: return@get call.respond(HttpStatusCode.Unauthorized)
+                        val role = call.getUserRoleFromPrincipal() ?: return@get call.respond(HttpStatusCode.Unauthorized)
+                        val result = classService.getScheduleByUserId(userId, role)
+                        call.respondEither(
+                            either = result,
+                            transformError = { error -> error.toProblem() },
+                            transformSuccess = { classes ->
+                                val schedule = classes.map { classEntity ->
+                                    classEntity.toClassResponse()
+                                }
+                                ScheduleResponse(
+                                    classes = schedule
+                                )
+                            }
+                        )
+                    }
                 }
             }
         }
