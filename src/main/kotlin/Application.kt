@@ -10,7 +10,9 @@ import io.ktor.server.auth.jwt.*
 import io.ktor.server.response.*
 import isel.leic.group25.api.http.configureRouting
 import isel.leic.group25.api.jwt.JwtConfig
+import isel.leic.group25.db.repositories.timetables.ClassRepository
 import isel.leic.group25.db.repositories.users.UserRepository
+import isel.leic.group25.services.ClassService
 import isel.leic.group25.services.UserService
 import org.ktorm.database.Database
 
@@ -30,6 +32,8 @@ fun Application.module() {
 
     val jwtConfig = JwtConfig(secret, issuer, audience, myRealm)
     val userRepository = UserRepository(db)
+    val classRepository = ClassRepository(db)
+    val classService = ClassService(classRepository, db)
     val userService = UserService(userRepository, db, jwtConfig)
 
     install(Authentication) {
@@ -50,5 +54,5 @@ fun Application.module() {
             }
         }
     }
-    configureRouting(userService)
+    configureRouting(userService, classService)
 }

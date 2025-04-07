@@ -5,6 +5,7 @@ import io.ktor.server.application.*
 import io.ktor.server.response.*
 import isel.leic.group25.api.model.ProblemDetail
 import isel.leic.group25.services.errors.AuthError
+import isel.leic.group25.services.errors.ClassError
 import isel.leic.group25.utils.Either
 import java.net.URI
 
@@ -116,5 +117,17 @@ fun AuthError.toProblem(): Problem {
         AuthError.TokenCreationFailed -> Problem.InvalidToken
         AuthError.TokenValidationFailed -> Problem.ExpiredToken
         AuthError.UserChangesFailed -> Problem.UserChangesFailed
+        AuthError.InvalidRole -> Problem.InvalidCredentials
+    }
+}
+
+fun ClassError.toProblem(): Problem {
+    return when (this) {
+        ClassError.ClassNotFound -> Problem.UserNotFound
+        ClassError.InvalidRole -> Problem.InvalidCredentials
+        ClassError.ClassAlreadyExists -> Problem.UserAlreadyExists
+        ClassError.ClassChangesFailed -> Problem.UserChangesFailed
+        ClassError.InvalidClassData -> Problem.InsecurePassword
+        ClassError.MissingClassData -> Problem.MissingCredentials
     }
 }

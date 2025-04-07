@@ -28,7 +28,8 @@ Content-Type: application/json
 
 ###
 GET http://localhost:8080/api/profile/
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwODAvIiwiYXVkIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwLyIsInVzZXJJZCI6MSwicm9sZSI6bnVsbCwiaWF0IjoxNzQ0MDM0NzAyLCJleHAiOjE3NDQwMzgzMDJ9.XZuh1E9K4IRyRFlmXnz0WGzqfKjuos-tO1dt5vPqFac
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwODAvIiwiYXVkIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwLyIsInVzZXJJZCI6MSwicm9sZSI6bnVsbCwiaWF0IjoxNzQ0MDU0MDQzLCJleHAiOjE3NDQwNTc2NDN9.k7KDJo-dhKZM-s7zSWRnbX_OdiKVaA09wo9On1b6sbw
+
 
 ###
 PUT http://localhost:8080/api/profile/
@@ -50,7 +51,13 @@ Content-Type: application/json
     "newPassword": "Antonio_567"
 }
 
+###
+GET http://localhost:8080/api/schedule/
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwODAvIiwiYXVkIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwLyIsInVzZXJJZCI6MSwicm9sZSI6bnVsbCwiaWF0IjoxNzQ0MDU0MDQzLCJleHAiOjE3NDQwNTc2NDN9.k7KDJo-dhKZM-s7zSWRnbX_OdiKVaA09wo9On1b6sbw
+Content-Type: application/json
 
+{
 
+}
 
 

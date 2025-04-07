@@ -6,6 +6,8 @@ import isel.leic.group25.db.entities.timetables.Class
 import isel.leic.group25.db.entities.timetables.Subject
 import isel.leic.group25.db.entities.types.ClassType
 import isel.leic.group25.db.tables.Tables.Companion.classes
+import isel.leic.group25.db.tables.Tables.Companion.studentsClasses
+import isel.leic.group25.db.tables.Tables.Companion.teachersClasses
 import kotlinx.datetime.Instant
 import org.ktorm.dsl.eq
 import org.ktorm.entity.*
@@ -23,7 +25,6 @@ class ClassRepository(private val database: Database): ClassRepositoryInterface 
     override fun findClassesByType(type: ClassType): List<Class> {
         return database.classes.toList().filter { it.type == type }
     }
-
 
     override fun findClassesInTimeRange(start: Instant, end: Instant): List<Class> {
         return database.classes.toList().filter {
@@ -69,5 +70,15 @@ class ClassRepository(private val database: Database): ClassRepositoryInterface 
 
     override fun deleteClass(id: Int): Boolean {
         return database.classes.removeIf {  it.id eq id } > 0
+    }
+
+    override fun findClassesByStudentId(userId: Int): List<Class> {
+        return database.studentsClasses.filter { it.userId eq userId }
+            .map { it.schoolClass }
+    }
+
+    override fun findClassesByTeacherId(userId: Int): List<Class> {
+        return database.teachersClasses.filter { it.userId eq userId }
+            .map { it.schoolClass }
     }
 }

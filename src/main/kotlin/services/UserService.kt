@@ -21,7 +21,7 @@ class UserService(private val repository: UserRepository,
                   private val database: Database,
                   private val jwtConfig: JwtConfig) {
 
-    fun register(email: String, username: String, password: String): TokenResult {
+    fun register(email: String, username: String, password: String, role:String): TokenResult {
         if(email.isBlank() || username.isBlank() || password.isBlank()) {
             return failure(AuthError.MissingCredentials)
         }
@@ -38,7 +38,12 @@ class UserService(private val repository: UserRepository,
                 this.password = User.hashPassword(password)
                 this.profileImage = ByteArray(0)
             }
-            repository.create(newUser, Role.STUDENT)
+            when(role) {
+                "teacher" -> repository.create(newUser, Role.TEACHER)
+                "student" -> repository.create(newUser, Role.STUDENT)
+                "technician" -> repository.create(newUser, Role.TECHNICAL_SERVICE)
+                else -> return@useTransaction failure(AuthError.InvalidRole)
+            }
             val token = jwtConfig.generateToken(newUser.id)
             return@useTransaction success(token)
         }
