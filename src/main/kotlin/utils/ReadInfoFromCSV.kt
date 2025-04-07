@@ -1,5 +1,7 @@
 package isel.leic.group25.utils
 
+import org.apache.poi.ss.usermodel.CellType
+import org.apache.poi.ss.usermodel.DateUtil
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import java.io.File
 import java.io.FileInputStream
@@ -40,14 +42,28 @@ fun readExcelFile(filePath: String) {
     val fis = FileInputStream(filePath)
     val workbook = XSSFWorkbook(fis)
     val sheet = workbook.getSheetAt(0)
+    val dateFormat = java.text.SimpleDateFormat("HH:mm")
 
     for (row in sheet) {
         for (cell in row) {
+            val cellValue = when (cell.cellType) {
+                CellType.NUMERIC -> {
+                    if (DateUtil.isCellDateFormatted(cell)) {
+                        // Format time values properly
+                        dateFormat.format(cell.dateCellValue)
+                    } else {
+                        cell.numericCellValue.toString()
+                    }
+                }
+                CellType.STRING -> cell.stringCellValue
+                CellType.BLANK -> ""
+                else -> cell.toString()
+            }
 
-            if (cell.toString() == ""){
-                println("Empty cell")
+            if (cellValue.isEmpty()) {
+                print("Empty cell\t")
             } else {
-                println(cell.toString() + "\t")
+                print("$cellValue\t")
             }
         }
         println()
