@@ -10,7 +10,7 @@ POST http://localhost:8080/api/auth/register
 Content-Type: application/json
 
 {
-  "email": "antonio567@gmail.com",
+  "email": "antonio234@gmail.com",
   "username": "Antonio_123",
   "password": "Antonio_123"
 }
@@ -23,13 +23,32 @@ Content-Type: application/json
 
 {
   "email": "antonio567@gmail.com",
-  "password": "Antonio_123"
+  "password": "Antonio_567"
 }
 
 ###
 GET http://localhost:8080/api/profile/
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwODAvIiwiYXVkIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwLyIsInVzZXJJZCI6MSwicm9sZSI6bnVsbCwiaWF0IjoxNzQzOTU2MzM2LCJleHAiOjE3NDM5NTk5MzZ9._7aw3u0vgyDwykYXDEGYb0oTPBRiF_dlz9QhHbNVLmk
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwODAvIiwiYXVkIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwLyIsInVzZXJJZCI6MSwicm9sZSI6bnVsbCwiaWF0IjoxNzQ0MDM0NzAyLCJleHAiOjE3NDQwMzgzMDJ9.XZuh1E9K4IRyRFlmXnz0WGzqfKjuos-tO1dt5vPqFac
 
+###
+PUT http://localhost:8080/api/profile/
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwODAvIiwiYXVkIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwLyIsInVzZXJJZCI6MSwicm9sZSI6bnVsbCwiaWF0IjoxNzQ0MDM0NzAyLCJleHAiOjE3NDQwMzgzMDJ9.XZuh1E9K4IRyRFlmXnz0WGzqfKjuos-tO1dt5vPqFac
+Content-Type: application/json
+
+{
+    "username": "Antonio_123",
+    "image": []
+}
+
+###
+POST http://localhost:8080/api/profile/password
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwODAvIiwiYXVkIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwLyIsInVzZXJJZCI6MSwicm9sZSI6bnVsbCwiaWF0IjoxNzQ0MDM0NzAyLCJleHAiOjE3NDQwMzgzMDJ9.XZuh1E9K4IRyRFlmXnz0WGzqfKjuos-tO1dt5vPqFac
+Content-Type: application/json
+
+{
+    "oldPassword": "Antonio_123",
+    "newPassword": "Antonio_567"
+}
 
 
 

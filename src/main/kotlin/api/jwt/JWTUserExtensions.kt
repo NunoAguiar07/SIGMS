@@ -4,7 +4,7 @@ import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*
 
-    fun ApplicationCall.getUserIdFromPrincipal(): Int? {
+fun ApplicationCall.getUserIdFromPrincipal(): Int? {
     return principal<JWTPrincipal>()?.payload?.getClaim("userId")?.asInt()
 
 }

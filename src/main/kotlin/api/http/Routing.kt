@@ -88,8 +88,24 @@ fun Application.configureRouting(userService: UserService) {
                                 UserResponse.fromUser(user)
                             }
                         )
-
                     }
+                    post("/password") {
+                        val userId = call.getUserIdFromPrincipal() ?: return@post call.respond(HttpStatusCode.Unauthorized)
+                        val passwordRequest = call.receive<ChangePasswordRequest>()
+                        val result = userService.changePassword(
+                            userId = userId,
+                            oldPassword = passwordRequest.oldPassword,
+                            newPassword = passwordRequest.newPassword
+                        )
+                        call.respondEither(
+                            either = result,
+                            transformError = { error -> error.toProblem() },
+                            transformSuccess = { user ->
+                                UserResponse.fromUser(user)
+                            }
+                        )
+                    }
+
                 }
             }
         }
