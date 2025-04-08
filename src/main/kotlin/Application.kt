@@ -10,6 +10,7 @@ import io.ktor.server.auth.jwt.*
 import io.ktor.server.response.*
 import isel.leic.group25.api.http.configureRouting
 import isel.leic.group25.api.jwt.JwtConfig
+import isel.leic.group25.db.repositories.ktorm.KTransaction
 import isel.leic.group25.db.repositories.timetables.ClassRepository
 import isel.leic.group25.db.repositories.users.UserRepository
 import isel.leic.group25.services.ClassService
@@ -25,16 +26,17 @@ fun Application.module() {
         json()
     }
     val db = Database.connect(url = "jdbc:postgresql://db:5432/sigms", user = "user", password = "password123", driver = "org.postgresql.Driver")
-    val secret = environment.config.property("ktor.security.jwt.secret").getString()
-    val issuer = environment.config.property("ktor.security.jwt.issuer").getString()
-    val audience = environment.config.property("ktor.security.jwt.audience").getString()
-    val myRealm = environment.config.property("ktor.security.jwt.realm").getString()
+    val secret = environment.config.property("jwt.secret").getString()
+    val issuer = environment.config.property("jwt.issuer").getString()
+    val audience = environment.config.property("jwt.audience").getString()
+    val myRealm = environment.config.property("jwt.realm").getString()
 
     val jwtConfig = JwtConfig(secret, issuer, audience, myRealm)
+    val kTransaction = KTransaction(db)
     val userRepository = UserRepository(db)
     val classRepository = ClassRepository(db)
-    val classService = ClassService(classRepository, db)
-    val userService = UserService(userRepository, db, jwtConfig)
+    val classService = ClassService(classRepository, kTransaction)
+    val userService = UserService(userRepository, kTransaction, jwtConfig)
 
     install(Authentication) {
         jwt("auth-jwt") {

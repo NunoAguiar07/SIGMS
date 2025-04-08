@@ -9,7 +9,7 @@ import isel.leic.group25.db.tables.Tables.Companion.classes
 import isel.leic.group25.db.tables.Tables.Companion.studentsClasses
 import isel.leic.group25.db.tables.Tables.Companion.teachersClasses
 import kotlinx.datetime.Instant
-import org.ktorm.dsl.eq
+import org.ktorm.dsl.*
 import org.ktorm.entity.*
 
 
@@ -19,28 +19,28 @@ class ClassRepository(private val database: Database): ClassRepositoryInterface 
     }
 
     override fun findClassesBySubject(subject: Subject): List<Class> {
-        return database.classes.toList().filter { it.subject == subject }
+        return database.classes.filter { it.subject eq subject.id }.toList()
     }
 
     override fun findClassesByType(type: ClassType): List<Class> {
-        return database.classes.toList().filter { it.type == type }
+        return database.classes.filter { it.type eq type }.toList()
     }
 
     override fun findClassesInTimeRange(start: Instant, end: Instant): List<Class> {
-        return database.classes.toList().filter {
-            (it.startTime >= start && it.startTime < end) ||
-                    (it.endTime > start && it.endTime <= end) ||
-                    (it.startTime <= start && it.endTime >= end)
-        }
+        return database.classes.filter {
+            (it.startTime greaterEq start) and (it.startTime less end) or
+                    (it.endTime greater start) and (it.endTime lessEq  end) or
+                    (it.startTime lessEq start) and (it.endTime greaterEq end)
+        }.toList()
     }
 
     override fun findClassesOverlappingWith(classToCheck: Class): List<Class> {
-        return database.classes.toList().filter {
-            it.id != classToCheck.id &&
-                    ((it.startTime >= classToCheck.startTime && it.startTime < classToCheck.endTime) ||
-                            (it.endTime > classToCheck.startTime && it.endTime <= classToCheck.endTime) ||
-                            (it.startTime <= classToCheck.startTime && it.endTime >= classToCheck.endTime))
-        }
+        return database.classes.filter {
+            (it.id notEq classToCheck.id) and (
+                    (it.startTime greaterEq classToCheck.startTime) and (it.startTime less classToCheck.endTime) or
+                            (it.endTime greater  classToCheck.startTime) and (it.endTime lessEq classToCheck.endTime) or
+                            (it.startTime lessEq classToCheck.startTime) and (it.endTime greaterEq classToCheck.endTime))
+        }.toList()
     }
 
     override fun addClass(newClass: Class): Boolean {
@@ -53,23 +53,16 @@ class ClassRepository(private val database: Database): ClassRepositoryInterface 
     }
 
     override fun updateClass(updatedClass: Class): Boolean {
-        val index = database.classes.toList().indexOfFirst { it.id == updatedClass.id }
-        return if (index >= 0) {
-           database.classes.filter { it.id eq updatedClass.id }
-                .forEach {
-                    it.subject = updatedClass.subject
-                    it.type = updatedClass.type
-                    it.startTime = updatedClass.startTime
-                    it.endTime = updatedClass.endTime
-                }
-            true
-        } else {
-            false
-        }
+        return updatedClass.flushChanges() > 0
+
     }
 
-    override fun deleteClass(id: Int): Boolean {
+    override fun deleteClassById(id: Int): Boolean {
         return database.classes.removeIf {  it.id eq id } > 0
+    }
+
+    override fun deleteClass(toBeDeletedClass: Class): Boolean {
+        return toBeDeletedClass.delete() > 0
     }
 
     override fun findClassesByStudentId(userId: Int): List<Class> {

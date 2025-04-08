@@ -3,22 +3,19 @@ package isel.leic.group25.services
 import isel.leic.group25.api.jwt.JwtConfig
 import isel.leic.group25.db.entities.types.Role
 import isel.leic.group25.db.entities.users.User
+import isel.leic.group25.db.repositories.interfaces.TransactionInterface
 import isel.leic.group25.db.repositories.users.UserRepository
-import isel.leic.group25.db.tables.Tables.Companion.users
 import isel.leic.group25.services.errors.AuthError
 import isel.leic.group25.utils.Either
 import isel.leic.group25.utils.failure
 import isel.leic.group25.utils.success
-import org.ktorm.database.Database
-import org.ktorm.dsl.eq
-import org.ktorm.entity.any
 
 typealias UserResult = Either<AuthError, User>
 
 typealias TokenResult = Either<AuthError, String>
 
 class UserService(private val repository: UserRepository,
-                  private val database: Database,
+                  private val transactionInterface: TransactionInterface,
                   private val jwtConfig: JwtConfig) {
 
     fun register(email: String, username: String, password: String, role:String): TokenResult {
@@ -28,8 +25,8 @@ class UserService(private val repository: UserRepository,
         if(User.isNotSecurePassword(password)) {
             return failure(AuthError.InsecurePassword)
         }
-        return database.useTransaction {
-            if(database.users.any { it.email eq email }) {
+        return transactionInterface.useTransaction {
+            if(repository.findByEmail(email) != null) {
                 return@useTransaction failure(AuthError.UserAlreadyExists)
             }
             val newUser = User {
@@ -53,7 +50,7 @@ class UserService(private val repository: UserRepository,
         if(email.isBlank() || password.isBlank()) {
             return failure(AuthError.MissingCredentials)
         }
-        return database.useTransaction {
+        return transactionInterface.useTransaction {
             val user = repository.findByEmail(email)
                 ?: return@useTransaction failure(AuthError.UserNotFound)
             if(!User.verifyPassword(user.password, password)) {
@@ -65,7 +62,7 @@ class UserService(private val repository: UserRepository,
     }
 
     fun getUserById(id: Int): UserResult {
-        return database.useTransaction {
+        return transactionInterface.useTransaction {
             val user = repository.findById(id)
                 ?: return@useTransaction failure(AuthError.UserNotFound)
             return@useTransaction success(user)
@@ -73,7 +70,7 @@ class UserService(private val repository: UserRepository,
     }
 
     fun updateUser(id: Int, username: String?, image: ByteArray?): UserResult {
-        return database.useTransaction {
+        return transactionInterface.useTransaction {
             val user = repository.findById(id)
                 ?: return@useTransaction failure(AuthError.UserNotFound)
             if (username != null) {
@@ -97,7 +94,7 @@ class UserService(private val repository: UserRepository,
         if(User.isNotSecurePassword(newPassword)) {
             return failure(AuthError.InsecurePassword)
         }
-        return database.useTransaction {
+        return transactionInterface.useTransaction {
             val user = repository.findById(userId)
                 ?: return@useTransaction failure(AuthError.UserNotFound)
             if(!User.verifyPassword(user.password, oldPassword)) {

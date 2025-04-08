@@ -23,7 +23,9 @@ interface ClassRepositoryInterface {
 
     fun updateClass(updatedClass: Class): Boolean
 
-    fun deleteClass(id: Int): Boolean
+    fun deleteClassById(id: Int): Boolean
+
+    fun deleteClass(toBeDeletedClass: Class): Boolean
 
     fun findClassesByStudentId(userId: Int): List<Class>
 
