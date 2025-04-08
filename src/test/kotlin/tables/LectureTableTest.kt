@@ -9,13 +9,16 @@ import isel.leic.group25.db.tables.Tables.Companion.classes
 import isel.leic.group25.db.tables.Tables.Companion.lectures
 import isel.leic.group25.db.tables.Tables.Companion.rooms
 import isel.leic.group25.db.tables.Tables.Companion.subjects
+import isel.leic.group25.db.tables.timetables.Lectures
 import junit.framework.TestCase.assertEquals
 import kotlinx.datetime.Instant
 import org.h2.jdbcx.JdbcDataSource
 import org.h2.tools.RunScript
 import org.junit.jupiter.api.assertNull
 import org.ktorm.database.Database
+import org.ktorm.dsl.delete
 import org.ktorm.dsl.eq
+import org.ktorm.dsl.update
 import org.ktorm.entity.add
 import org.ktorm.entity.first
 import org.ktorm.entity.firstOrNull
@@ -113,8 +116,7 @@ class LectureTableTest {
             room = newRoom
             duration = newClass.duration
         }.also { database.lectures.add(it) }
-        val lecture = database.lectures.first { it.id eq newLecture.id }
-        assertEquals(newLecture.id, lecture.id)
+        val lecture = database.lectures.first { it.classId eq newLecture.schoolClass.id }
         assertEquals(newLecture.schoolClass.id, lecture.schoolClass.id)
         assertEquals(newLecture.room.id, lecture.room.id)
         assertEquals(newLecture.duration, lecture.duration)
@@ -142,19 +144,22 @@ class LectureTableTest {
             room = newRoom
             duration = newClass.duration
         }.also { database.lectures.add(it) }
-        val lecture = database.lectures.first { it.id eq newLecture.id }
-        assertEquals(newLecture.id, lecture.id)
+        val lecture = database.lectures.first { it.classId eq newLecture.schoolClass.id }
         assertEquals(newLecture.schoolClass.id, lecture.schoolClass.id)
         assertEquals(newLecture.room.id, lecture.room.id)
         assertEquals(newLecture.duration, lecture.duration)
         newLecture.duration = newClass.duration + Duration.parse("1h")
         newRoom.capacity = 20
         newClass.type = ClassType.THEORETICAL
-        newLecture.flushChanges()
+        database.update(Lectures) {
+            set(it.duration, newLecture.duration)
+            where {
+                it.classId eq newLecture.schoolClass.id
+            }
+        }
         newRoom.flushChanges()
         newClass.flushChanges()
-        val changedLecture = database.lectures.first { it.id eq newLecture.id }
-        assertEquals(newLecture.id, changedLecture.id)
+        val changedLecture = database.lectures.first { it.classId eq newLecture.schoolClass.id }
         assertEquals(newLecture.schoolClass.id, changedLecture.schoolClass.id)
         assertEquals(newLecture.schoolClass.type, changedLecture.schoolClass.type)
         assertEquals(ClassType.THEORETICAL, changedLecture.schoolClass.type)
@@ -187,7 +192,9 @@ class LectureTableTest {
             room = newRoom
             duration = newClass.duration
         }.also { database.lectures.add(it) }
-        newLecture.delete()
-        assertNull( database.lectures.firstOrNull { it.id eq newLecture.id } )
+        database.delete(Lectures) {
+            it.classId eq newLecture.schoolClass.id
+        }
+        assertNull( database.lectures.firstOrNull { it.classId eq newLecture.schoolClass.id } )
     }
 }

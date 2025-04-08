@@ -8,7 +8,6 @@ import org.ktorm.schema.varchar
 import kotlin.time.Duration
 
 object Lectures: Table<Lecture>("LECTURE") {
-    val id = int("id").primaryKey().bindTo { it.id }
     val classId = int("class_id").references(Classes){ it.schoolClass }
     val roomId = int("room_id").references(Rooms){ it.room }
     val duration = varchar("duration").transform({ Duration.parse(it)},{it.toIsoString()}).bindTo { it.duration }
