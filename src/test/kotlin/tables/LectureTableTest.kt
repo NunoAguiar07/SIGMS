@@ -60,6 +60,7 @@ class LectureTableTest {
             CREATE TABLE IF NOT EXISTS CLASS (
                 id SERIAL PRIMARY KEY,
                 subject_id INT NOT NULL REFERENCES SUBJECT(id) ON DELETE CASCADE,
+                class_name VARCHAR(255) NOT NULL,
                 class_type VARCHAR(20) CHECK (class_type IN ('theoretical', 'practical')),
                 start_time bigint NOT NULL,
                 end_time bigint NOT NULL,
@@ -102,6 +103,7 @@ class LectureTableTest {
         val currentTime = System.currentTimeMillis()
         val newClass = Class{
             subject = newSubject
+            name = "51D"
             type = ClassType.PRACTICAL
             startTime = Instant.fromEpochMilliseconds(currentTime)
             endTime = Instant.fromEpochMilliseconds(currentTime + 3600*1000)
@@ -130,6 +132,7 @@ class LectureTableTest {
         val currentTime = System.currentTimeMillis()
         val newClass = Class{
             subject = newSubject
+            name = "51D"
             type = ClassType.PRACTICAL
             startTime = Instant.fromEpochMilliseconds(currentTime)
             endTime = Instant.fromEpochMilliseconds(currentTime + 3600*1000)
@@ -178,6 +181,7 @@ class LectureTableTest {
         val currentTime = System.currentTimeMillis()
         val newClass = Class{
             subject = newSubject
+            name = "51D"
             type = ClassType.PRACTICAL
             startTime = Instant.fromEpochMilliseconds(currentTime)
             endTime = Instant.fromEpochMilliseconds(currentTime + 3600*1000)

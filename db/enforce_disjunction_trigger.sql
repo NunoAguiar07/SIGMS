@@ -7,7 +7,7 @@ BEGIN
         UNION ALL
         SELECT 1 FROM TECHNICAL_SERVICES WHERE user_id = NEW.user_id
         UNION ALL
-        SELECT 1 FROM ADMIN WHERE user_id = NEW.user_id
+        SELECT 1 FROM ADMINISTRATOR WHERE user_id = NEW.user_id
     ) THEN
         RAISE EXCEPTION 'User already belongs to another role.';
     END IF;
@@ -28,5 +28,5 @@ CREATE TRIGGER enforce_disjunction_technical_services
     FOR EACH ROW EXECUTE FUNCTION enforce_disjunction();
 
 CREATE TRIGGER enforce_disjunction_admin
-    BEFORE INSERT ON ADMIN
+    BEFORE INSERT ON ADMINISTRATOR
     FOR EACH ROW EXECUTE FUNCTION enforce_disjunction();

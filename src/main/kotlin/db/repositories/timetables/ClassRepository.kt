@@ -5,6 +5,8 @@ import org.ktorm.database.Database
 import isel.leic.group25.db.entities.timetables.Class
 import isel.leic.group25.db.entities.timetables.Subject
 import isel.leic.group25.db.entities.types.ClassType
+import isel.leic.group25.db.entities.users.Attend
+import isel.leic.group25.db.entities.users.User
 import isel.leic.group25.db.tables.Tables.Companion.classes
 import isel.leic.group25.db.tables.Tables.Companion.studentsClasses
 import isel.leic.group25.db.tables.Tables.Companion.teachersClasses
@@ -65,13 +67,23 @@ class ClassRepository(private val database: Database): ClassRepositoryInterface 
         return toBeDeletedClass.delete() > 0
     }
 
+    override fun addStudentToClass(user: User, schoolClass: Class): Boolean {
+        return database.studentsClasses.add(Attend {
+                this.user = user
+                this.schoolClass = schoolClass
+            }) > 0
+    }
+
+    override fun removeStudentFromClass(user: User, schoolClass: Class): Boolean {
+        return database.studentsClasses.removeIf { (it.studentId eq user.id) and (it.classId eq schoolClass.id) } > 0
+    }
+
     override fun findClassesByStudentId(userId: Int): List<Class> {
-        return database.studentsClasses.filter { it.userId eq userId }
+        return database.studentsClasses.filter { it.studentId eq userId }
             .map { it.schoolClass }
     }
 
     override fun findClassesByTeacherId(userId: Int): List<Class> {
-        return database.teachersClasses.filter { it.userId eq userId }
-            .map { it.schoolClass }
+        return database.teachersClasses.filter { it.teacherId eq userId }.map { it.schoolClass }
     }
 }

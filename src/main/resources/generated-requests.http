@@ -10,9 +10,10 @@ POST http://localhost:8080/api/auth/register
 Content-Type: application/json
 
 {
-  "email": "antonio234@gmail.com",
+  "email": "antonio224@gmail.com",
   "username": "Antonio_123",
-  "password": "Antonio_123"
+  "password": "Antonio_123",
+  "role": "student"
 }
 
 <> 2025-04-05T142635.201.json
@@ -22,28 +23,28 @@ POST http://localhost:8080/api/auth/login
 Content-Type: application/json
 
 {
-  "email": "antonio567@gmail.com",
+  "email": "antonio224@gmail.com",
   "password": "Antonio_567"
 }
 
 ###
 GET http://localhost:8080/api/profile/
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwODAvIiwiYXVkIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwLyIsInVzZXJJZCI6MSwicm9sZSI6bnVsbCwiaWF0IjoxNzQ0MDU0MDQzLCJleHAiOjE3NDQwNTc2NDN9.k7KDJo-dhKZM-s7zSWRnbX_OdiKVaA09wo9On1b6sbw
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwODAvIiwiYXVkIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwLyIsInVzZXJJZCI6MSwicm9sZSI6IlNUVURFTlQiLCJpYXQiOjE3NDQyOTAwODcsImV4cCI6MTc0NDI5MzY4N30.7iR59PDh9FhvWYcOx7KcfjxM7KgGFXiacmPSSBMsULk
 
 
 ###
 PUT http://localhost:8080/api/profile/
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwODAvIiwiYXVkIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwLyIsInVzZXJJZCI6MSwicm9sZSI6bnVsbCwiaWF0IjoxNzQ0MDM0NzAyLCJleHAiOjE3NDQwMzgzMDJ9.XZuh1E9K4IRyRFlmXnz0WGzqfKjuos-tO1dt5vPqFac
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwODAvIiwiYXVkIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwLyIsInVzZXJJZCI6MSwicm9sZSI6IlNUVURFTlQiLCJpYXQiOjE3NDQyOTAwODcsImV4cCI6MTc0NDI5MzY4N30.7iR59PDh9FhvWYcOx7KcfjxM7KgGFXiacmPSSBMsULk
 Content-Type: application/json
 
 {
-    "username": "Antonio_123",
+    "username": "Antonio_124",
     "image": []
 }
 
 ###
 POST http://localhost:8080/api/profile/password
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwODAvIiwiYXVkIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwLyIsInVzZXJJZCI6MSwicm9sZSI6bnVsbCwiaWF0IjoxNzQ0MDM0NzAyLCJleHAiOjE3NDQwMzgzMDJ9.XZuh1E9K4IRyRFlmXnz0WGzqfKjuos-tO1dt5vPqFac
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwODAvIiwiYXVkIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwLyIsInVzZXJJZCI6MSwicm9sZSI6IlNUVURFTlQiLCJpYXQiOjE3NDQyOTAwODcsImV4cCI6MTc0NDI5MzY4N30.7iR59PDh9FhvWYcOx7KcfjxM7KgGFXiacmPSSBMsULk
 Content-Type: application/json
 
 {
@@ -53,11 +54,8 @@ Content-Type: application/json
 
 ###
 GET http://localhost:8080/api/schedule/
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwODAvIiwiYXVkIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwLyIsInVzZXJJZCI6MSwicm9sZSI6bnVsbCwiaWF0IjoxNzQ0MDU0MDQzLCJleHAiOjE3NDQwNTc2NDN9.k7KDJo-dhKZM-s7zSWRnbX_OdiKVaA09wo9On1b6sbw
-Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwODAvIiwiYXVkIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwLyIsInVzZXJJZCI6MSwicm9sZSI6IlNUVURFTlQiLCJpYXQiOjE3NDQyOTA4NjEsImV4cCI6MTc0NDI5NDQ2MX0.bj6SA3N2LA5RiknAa0a2X4en6cJCLLediaB6mgaw5pw
 
-{
 
-}
 
 

@@ -9,10 +9,13 @@ import isel.leic.group25.services.errors.AuthError
 import isel.leic.group25.utils.Either
 import isel.leic.group25.utils.failure
 import isel.leic.group25.utils.success
+import java.util.*
 
 typealias UserResult = Either<AuthError, User>
 
 typealias TokenResult = Either<AuthError, String>
+
+typealias RoleResult = Either<AuthError, Role>
 
 class UserService(private val repository: UserRepository,
                   private val transactionInterface: TransactionInterface,
@@ -41,7 +44,7 @@ class UserService(private val repository: UserRepository,
                 "technician" -> repository.create(newUser, Role.TECHNICAL_SERVICE)
                 else -> return@useTransaction failure(AuthError.InvalidRole)
             }
-            val token = jwtConfig.generateToken(newUser.id)
+            val token = jwtConfig.generateToken(newUser.id, role.uppercase(Locale.getDefault()))
             return@useTransaction success(token)
         }
     }
@@ -56,7 +59,9 @@ class UserService(private val repository: UserRepository,
             if(!User.verifyPassword(user.password, password)) {
                 return@useTransaction failure(AuthError.InvalidCredentials)
             }
-            val token = jwtConfig.generateToken(user.id)
+            val role = repository.getRoleById(user.id)
+                ?: return@useTransaction failure(AuthError.UserNotFound)
+            val token = jwtConfig.generateToken(user.id, role.name)
             return@useTransaction success(token)
         }
     }
@@ -106,6 +111,14 @@ class UserService(private val repository: UserRepository,
                 return@useTransaction failure(AuthError.UserChangesFailed)
             }
             return@useTransaction success(user)
+        }
+    }
+
+    fun getRoleByUserId(userId: Int): RoleResult {
+        return transactionInterface.useTransaction {
+            val role = repository.getRoleById(userId)
+                ?: return@useTransaction failure(AuthError.UserNotFound)
+            return@useTransaction success(role)
         }
     }
 }

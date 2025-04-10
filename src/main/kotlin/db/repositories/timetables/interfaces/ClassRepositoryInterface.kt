@@ -4,6 +4,7 @@ import isel.leic.group25.db.entities.timetables.Subject
 import isel.leic.group25.db.entities.types.ClassType
 
 import isel.leic.group25.db.entities.timetables.Class
+import isel.leic.group25.db.entities.users.User
 import kotlinx.datetime.Instant
 
 // still need to remove some methods after some time
@@ -26,6 +27,10 @@ interface ClassRepositoryInterface {
     fun deleteClassById(id: Int): Boolean
 
     fun deleteClass(toBeDeletedClass: Class): Boolean
+
+    fun addStudentToClass(user: User, schoolClass: Class): Boolean
+
+    fun removeStudentFromClass(user: User, schoolClass: Class): Boolean
 
     fun findClassesByStudentId(userId: Int): List<Class>
 

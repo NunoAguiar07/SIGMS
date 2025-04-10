@@ -11,4 +11,6 @@ interface UserRepositoryInterface {
     fun create(newUser: User, role: Role): User
 
     fun update(user: User): Int
+
+    fun getRoleById(id: Int): Role?
 }

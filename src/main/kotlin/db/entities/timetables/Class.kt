@@ -10,6 +10,7 @@ import kotlin.time.Duration
 sealed interface Class: Entity<Class> {
     companion object: Entity.Factory<Class>()
     val id: Int
+    var name: String
     var subject: Subject
     var type: ClassType
     var startTime: Instant

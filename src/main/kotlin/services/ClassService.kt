@@ -13,20 +13,5 @@ typealias ClassResult = Either<ClassError, List<Class>>
 class ClassService(private val repository: ClassRepository,
                    private val transactionInterface: TransactionInterface,
 ) {
-    fun getScheduleByUserId(userId: Int, role: String): ClassResult {
-        return transactionInterface.useTransaction {
-            val classes = when (role) {
-                "STUDENT" -> {
-                    repository.findClassesByStudentId(userId)
-                }
-                "TEACHER" -> {
-                    repository.findClassesByTeacherId(userId)
-                }
-                else -> {
-                    return@useTransaction failure(ClassError.InvalidRole)
-                }
-            }
-            return@useTransaction success(classes)
-        }
-    }
+
 }

@@ -34,6 +34,7 @@ CREATE TABLE IF NOT EXISTS SUBJECT (
 
 CREATE TABLE IF NOT EXISTS CLASS (
     id SERIAL PRIMARY KEY,
+    class_name VARCHAR(255) NOT NULL,
     subject_id INT NOT NULL REFERENCES SUBJECT(id) ON DELETE CASCADE,
     class_type VARCHAR(20) CHECK (class_type IN ('theoretical', 'practical')),
     start_time bigint NOT NULL,

@@ -11,6 +11,7 @@ import isel.leic.group25.db.tables.Tables.Companion.users
 import org.ktorm.database.Database
 import org.ktorm.dsl.*
 import org.ktorm.entity.add
+import org.ktorm.entity.any
 import org.ktorm.entity.firstOrNull
 import org.ktorm.entity.update
 
@@ -44,5 +45,15 @@ class UserRepository(private val database: Database): UserRepositoryInterface {
 
     override fun update(user: User): Int {
         return database.users.update(user)
+    }
+
+    override fun getRoleById(id: Int): Role? {
+        return when {
+            database.admins.any { it.user eq id } -> Role.ADMIN
+            database.students.any { it.user eq id } -> Role.STUDENT
+            database.teachers.any { it.user eq id } -> Role.TEACHER
+            database.technicalServices.any { it.user eq id } -> Role.TECHNICAL_SERVICE
+            else -> null
+        }
     }
 }

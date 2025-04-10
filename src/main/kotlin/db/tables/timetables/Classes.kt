@@ -11,6 +11,7 @@ import org.ktorm.schema.varchar
 object Classes: Table<Class>("CLASS") {
     val id = int("id").primaryKey().bindTo { it.id }
     val subject = int("subject_id").references(Subjects){ it.subject }
+    val name = varchar("class_name").bindTo { it.name }
     val type = varchar("class_type").transform({ ClassType.valueOf(it.uppercase()) }, {it.name.lowercase()}).bindTo { it.type }
     val startTime = long("start_time").transform({ Instant.fromEpochMilliseconds(it)},{it.toEpochMilliseconds()}).bindTo { it.startTime }
     val endTime = long("end_time").transform({ Instant.fromEpochMilliseconds(it)},{it.toEpochMilliseconds()}).bindTo { it.endTime }

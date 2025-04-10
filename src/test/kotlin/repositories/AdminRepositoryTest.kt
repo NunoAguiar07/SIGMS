@@ -58,7 +58,7 @@ class AdminRepositoryTest {
                 primary key (user_id)
             );
             
-            CREATE TABLE IF NOT EXISTS ADMIN (
+            CREATE TABLE IF NOT EXISTS ADMINISTRATOR (
                 user_id INT UNIQUE NOT NULL REFERENCES USERS(id) ON DELETE CASCADE,
                 primary key (user_id)
             );

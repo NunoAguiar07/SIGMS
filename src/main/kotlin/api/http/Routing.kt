@@ -12,9 +12,11 @@ import isel.leic.group25.api.jwt.getUserIdFromPrincipal
 import isel.leic.group25.api.jwt.getUserRoleFromPrincipal
 import isel.leic.group25.api.model.*
 import isel.leic.group25.services.ClassService
+import isel.leic.group25.services.UserClassService
 import isel.leic.group25.services.UserService
+import isel.leic.group25.utils.Either
 
-fun Application.configureRouting(userService: UserService, classService: ClassService) {
+fun Application.configureRouting(userService: UserService, classService: ClassService, userClassService: UserClassService) {
     routing {
         route("/api"){
             get("/") {
@@ -113,18 +115,20 @@ fun Application.configureRouting(userService: UserService, classService: ClassSe
                 route("/schedule"){
                     get("/") {
                         val userId = call.getUserIdFromPrincipal() ?: return@get call.respond(HttpStatusCode.Unauthorized)
-                        val role = call.getUserRoleFromPrincipal() ?: return@get call.respond(HttpStatusCode.Unauthorized)
-                        val result = classService.getScheduleByUserId(userId, role)
+                        val userRole = userService.getRoleByUserId(userId)
                         call.respondEither(
-                            either = result,
+                            either = userRole,
                             transformError = { error -> error.toProblem() },
-                            transformSuccess = { classes ->
-                                val schedule = classes.map { classEntity ->
-                                    classEntity.toClassResponse()
+                            transformSuccess = { role ->
+                                when (val result = userClassService.getScheduleByUserId(userId, role.toString())) {
+                                    is Either.Right -> {
+                                        val schedule = result.value.map { classEntity ->
+                                            classEntity.toClassResponse()
+                                        }
+                                        ScheduleResponse(classes = schedule)
+                                    }
+                                    is Either.Left -> result // pass through the error from classService
                                 }
-                                ScheduleResponse(
-                                    classes = schedule
-                                )
                             }
                         )
                     }

@@ -7,7 +7,7 @@ BEGIN
         UNION ALL
         SELECT 1 FROM TECHNICAL_SERVICES WHERE user_id = NEW.id
         UNION ALL
-        SELECT 1 FROM ADMIN WHERE user_id = NEW.id
+        SELECT 1 FROM ADMINISTRATOR WHERE user_id = NEW.id
     ) THEN
         RAISE EXCEPTION 'User must belong to at least one role (STUDENT, TEACHER, TECHNICAL_SERVICES, or ADMIN).';
     END IF;
