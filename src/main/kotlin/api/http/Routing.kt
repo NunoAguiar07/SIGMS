@@ -166,31 +166,34 @@ fun Application.configureRouting(
                             successStatus = HttpStatusCode.Created
                         )
                     }
-                    get("/{id}") {
-                        val id = call.parameters["id"]
-                        val result = subjectService.getSubjectById(id)
-                        call.respondEither(
-                            either = result,
-                            transformError = { error -> error.toProblem() },
-                            transformSuccess = { subject ->
-                                SubjectResponse.fromSubject(subject)
-                            }
-                        )
+                    route("/{subjectId}"){
+                        get {
+                            val id = call.parameters["id"]
+                            val result = subjectService.getSubjectById(id)
+                            call.respondEither(
+                                either = result,
+                                transformError = { error -> error.toProblem() },
+                                transformSuccess = { subject ->
+                                    SubjectResponse.fromSubject(subject)
+                                }
+                            )
+                        }
+                        get ("/class") {
+                            val id = call.parameters["subjectId"]
+                            val result = classService.getAllClassesFromSubject(id)
+                            call.respondEither(
+                                either = result,
+                                transformError = { error -> error.toProblem() },
+                                transformSuccess = { classes ->
+                                    classes.map { schoolClass ->
+                                        ClassResponse.fromClass(schoolClass)
+                                    }
+                                }
+                            )
+                        }
                     }
                 }
                 route("/classes") {
-                    get {
-                        val result = classService.getAllClasses()
-                        call.respondEither(
-                            either = result,
-                            transformError = { error -> error.toProblem() },
-                            transformSuccess = { classes ->
-                                classes.map { schoolClass ->
-                                    ClassResponse.fromClass(schoolClass)
-                                }
-                            }
-                        )
-                    }
                     post {
                         val classRequest = call.receive<ClassRequest>()
                         val result = classService.createClass(

@@ -35,11 +35,7 @@ CREATE TABLE IF NOT EXISTS SUBJECT (
 CREATE TABLE IF NOT EXISTS CLASS (
     id SERIAL PRIMARY KEY,
     class_name VARCHAR(255) NOT NULL,
-    subject_id INT NOT NULL REFERENCES SUBJECT(id) ON DELETE CASCADE,
-    class_type VARCHAR(20) CHECK (class_type IN ('theoretical', 'practical')),
-    start_time bigint NOT NULL,
-    end_time bigint NOT NULL,
-    CHECK (end_time > start_time)
+    subject_id INT NOT NULL REFERENCES SUBJECT(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS TEACH (
@@ -75,7 +71,10 @@ CREATE TABLE IF NOT EXISTS OFFICE_ROOM (
 CREATE TABLE IF NOT EXISTS LECTURE (
     class_id INT NOT NULL REFERENCES CLASS(id) ON DELETE CASCADE,
     room_id INT NOT NULL REFERENCES ROOM(id) ON DELETE CASCADE,
-    duration VARCHAR(255) NOT NULL
+    class_type VARCHAR(20) CHECK (class_type IN ('theoretical', 'practical', 'theoretical_practical')),
+    start_time bigint NOT NULL,
+    end_time bigint NOT NULL,
+    CHECK (end_time > start_time)
 );
 
 CREATE TABLE IF NOT EXISTS ISSUE_REPORT (

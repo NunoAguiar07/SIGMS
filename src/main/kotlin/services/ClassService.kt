@@ -6,10 +6,8 @@ import isel.leic.group25.utils.Either
 import isel.leic.group25.utils.failure
 import isel.leic.group25.utils.success
 import isel.leic.group25.db.entities.timetables.Class
-import isel.leic.group25.db.entities.types.ClassType
 import isel.leic.group25.db.repositories.interfaces.TransactionInterface
 import isel.leic.group25.db.repositories.timetables.SubjectRepository
-import kotlinx.datetime.Instant
 
 typealias ClassListResult = Either<ClassError, List<Class>>
 
@@ -19,9 +17,14 @@ class ClassService(private val classRepository: ClassRepository,
                    private val subjectRepository: SubjectRepository,
                    private val transactionInterface: TransactionInterface,
 ) {
-    fun getAllClasses(): ClassListResult {
+    fun getAllClassesFromSubject(subjectId: String?): ClassListResult {
         return transactionInterface.useTransaction {
-            val classes = classRepository.findAllClasses()
+            if (subjectId == null || subjectId.toIntOrNull() == null) {
+                return@useTransaction failure(ClassError.InvalidSubjectId)
+            }
+            val subject = subjectRepository.findSubjectById(subjectId.toInt())
+                ?: return@useTransaction failure(ClassError.SubjectNotFound)
+            val classes = classRepository.findClassesBySubject(subject)
             if (classes.isEmpty()) {
                 return@useTransaction failure(ClassError.ClassNotFound)
             }
@@ -37,9 +40,6 @@ class ClassService(private val classRepository: ClassRepository,
             val newClass = Class {
                 this.name = name
                 this.subject = existingSubject
-                this.type = ClassType.valueOf(classType)
-                this.startTime = Instant.parse(startTime)
-                this.endTime = Instant.parse(endTime)
             }
             classRepository.addClass(newClass)
             return@useTransaction success(newClass)

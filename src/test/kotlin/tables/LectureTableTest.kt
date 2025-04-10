@@ -60,11 +60,7 @@ class LectureTableTest {
             CREATE TABLE IF NOT EXISTS CLASS (
                 id SERIAL PRIMARY KEY,
                 subject_id INT NOT NULL REFERENCES SUBJECT(id) ON DELETE CASCADE,
-                class_name VARCHAR(255) NOT NULL,
-                class_type VARCHAR(20) CHECK (class_type IN ('theoretical', 'practical')),
-                start_time bigint NOT NULL,
-                end_time bigint NOT NULL,
-                CHECK (end_time > start_time)
+                class_name VARCHAR(255) NOT NULL
             );
             
             CREATE TABLE IF NOT EXISTS ROOM (
@@ -89,7 +85,10 @@ class LectureTableTest {
                 id SERIAL PRIMARY KEY,
                 class_id INT NOT NULL REFERENCES CLASS(id) ON DELETE CASCADE,
                 room_id INT NOT NULL REFERENCES ROOM(id) ON DELETE CASCADE,
-                duration VARCHAR(255) NOT NULL
+                class_type VARCHAR(20) CHECK (class_type IN ('theoretical', 'practical', 'theoretical_practical' )),
+                start_time bigint NOT NULL,
+                end_time bigint NOT NULL,
+                CHECK (end_time > start_time)
             );
         """)
         )
@@ -100,23 +99,22 @@ class LectureTableTest {
         val newSubject = Subject{
             name = "PS"
         }.also { database.subjects.add(it) }
-        val currentTime = System.currentTimeMillis()
         val newClass = Class{
             subject = newSubject
             name = "51D"
-            type = ClassType.PRACTICAL
-            startTime = Instant.fromEpochMilliseconds(currentTime)
-            endTime = Instant.fromEpochMilliseconds(currentTime + 3600*1000)
         }.also { database.classes.add(it) }
         val newRoom = Room{
             capacity = 15
         }.also{
             database.rooms.add(it)
         }
+        val currentTime = System.currentTimeMillis()
         val newLecture = Lecture {
             schoolClass = newClass
             room = newRoom
-            duration = newClass.duration
+            type = ClassType.PRACTICAL
+            startTime = Instant.fromEpochMilliseconds(currentTime)
+            endTime = Instant.fromEpochMilliseconds(currentTime + 3600*1000)
         }.also { database.lectures.add(it) }
         val lecture = database.lectures.first { it.classId eq newLecture.schoolClass.id }
         assertEquals(newLecture.schoolClass.id, lecture.schoolClass.id)
@@ -133,9 +131,6 @@ class LectureTableTest {
         val newClass = Class{
             subject = newSubject
             name = "51D"
-            type = ClassType.PRACTICAL
-            startTime = Instant.fromEpochMilliseconds(currentTime)
-            endTime = Instant.fromEpochMilliseconds(currentTime + 3600*1000)
         }.also { database.classes.add(it) }
         val newRoom = Room{
             capacity = 15
@@ -145,17 +140,19 @@ class LectureTableTest {
         val newLecture = Lecture {
             schoolClass = newClass
             room = newRoom
-            duration = newClass.duration
+            type = ClassType.PRACTICAL
+            startTime = Instant.fromEpochMilliseconds(currentTime)
+            endTime = Instant.fromEpochMilliseconds(currentTime + 3600*1000)
         }.also { database.lectures.add(it) }
         val lecture = database.lectures.first { it.classId eq newLecture.schoolClass.id }
         assertEquals(newLecture.schoolClass.id, lecture.schoolClass.id)
         assertEquals(newLecture.room.id, lecture.room.id)
         assertEquals(newLecture.duration, lecture.duration)
-        newLecture.duration = newClass.duration + Duration.parse("1h")
+        newLecture.endTime += Duration.parse("1h")
         newRoom.capacity = 20
-        newClass.type = ClassType.THEORETICAL
+        newLecture.type = ClassType.THEORETICAL
         database.update(Lectures) {
-            set(it.duration, newLecture.duration)
+            set(it.endTime, newLecture.endTime)
             where {
                 it.classId eq newLecture.schoolClass.id
             }
@@ -164,8 +161,6 @@ class LectureTableTest {
         newClass.flushChanges()
         val changedLecture = database.lectures.first { it.classId eq newLecture.schoolClass.id }
         assertEquals(newLecture.schoolClass.id, changedLecture.schoolClass.id)
-        assertEquals(newLecture.schoolClass.type, changedLecture.schoolClass.type)
-        assertEquals(ClassType.THEORETICAL, changedLecture.schoolClass.type)
         assertEquals(newLecture.room.id, changedLecture.room.id)
         assertEquals(newLecture.room.capacity, changedLecture.room.capacity)
         assertEquals(20, changedLecture.room.capacity)
@@ -182,9 +177,6 @@ class LectureTableTest {
         val newClass = Class{
             subject = newSubject
             name = "51D"
-            type = ClassType.PRACTICAL
-            startTime = Instant.fromEpochMilliseconds(currentTime)
-            endTime = Instant.fromEpochMilliseconds(currentTime + 3600*1000)
         }.also { database.classes.add(it) }
         val newRoom = Room{
             capacity = 15
@@ -194,7 +186,9 @@ class LectureTableTest {
         val newLecture = Lecture {
             schoolClass = newClass
             room = newRoom
-            duration = newClass.duration
+            type = ClassType.PRACTICAL
+            startTime = Instant.fromEpochMilliseconds(currentTime)
+            endTime = Instant.fromEpochMilliseconds(currentTime + 3600*1000)
         }.also { database.lectures.add(it) }
         database.delete(Lectures) {
             it.classId eq newLecture.schoolClass.id

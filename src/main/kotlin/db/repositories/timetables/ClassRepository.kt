@@ -4,13 +4,11 @@ import isel.leic.group25.db.repositories.timetables.interfaces.ClassRepositoryIn
 import org.ktorm.database.Database
 import isel.leic.group25.db.entities.timetables.Class
 import isel.leic.group25.db.entities.timetables.Subject
-import isel.leic.group25.db.entities.types.ClassType
 import isel.leic.group25.db.entities.users.Attend
 import isel.leic.group25.db.entities.users.User
 import isel.leic.group25.db.tables.Tables.Companion.classes
 import isel.leic.group25.db.tables.Tables.Companion.studentsClasses
 import isel.leic.group25.db.tables.Tables.Companion.teachersClasses
-import kotlinx.datetime.Instant
 import org.ktorm.dsl.*
 import org.ktorm.entity.*
 
@@ -29,27 +27,6 @@ class ClassRepository(private val database: Database): ClassRepositoryInterface 
 
     override fun findClassesBySubject(subject: Subject): List<Class> {
         return database.classes.filter { it.subject eq subject.id }.toList()
-    }
-
-    override fun findClassesByType(type: ClassType): List<Class> {
-        return database.classes.filter { it.type eq type }.toList()
-    }
-
-    override fun findClassesInTimeRange(start: Instant, end: Instant): List<Class> {
-        return database.classes.filter {
-            (it.startTime greaterEq start) and (it.startTime less end) or
-                    (it.endTime greater start) and (it.endTime lessEq  end) or
-                    (it.startTime lessEq start) and (it.endTime greaterEq end)
-        }.toList()
-    }
-
-    override fun findClassesOverlappingWith(classToCheck: Class): List<Class> {
-        return database.classes.filter {
-            (it.id notEq classToCheck.id) and (
-                    (it.startTime greaterEq classToCheck.startTime) and (it.startTime less classToCheck.endTime) or
-                            (it.endTime greater  classToCheck.startTime) and (it.endTime lessEq classToCheck.endTime) or
-                            (it.startTime lessEq classToCheck.startTime) and (it.endTime greaterEq classToCheck.endTime))
-        }.toList()
     }
 
     override fun addClass(newClass: Class): Boolean {

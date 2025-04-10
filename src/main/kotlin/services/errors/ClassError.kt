@@ -8,4 +8,5 @@ sealed class ClassError {
     data object MissingClassData : ClassError()
     data object InvalidRole : ClassError()
     data object SubjectNotFound : ClassError()
+    data object InvalidSubjectId : ClassError()
 }

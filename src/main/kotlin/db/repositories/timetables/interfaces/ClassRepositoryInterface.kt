@@ -1,11 +1,8 @@
 package isel.leic.group25.db.repositories.timetables.interfaces
 
 import isel.leic.group25.db.entities.timetables.Subject
-import isel.leic.group25.db.entities.types.ClassType
-
 import isel.leic.group25.db.entities.timetables.Class
 import isel.leic.group25.db.entities.users.User
-import kotlinx.datetime.Instant
 
 // still need to remove some methods after some time
 interface ClassRepositoryInterface {
@@ -16,13 +13,6 @@ interface ClassRepositoryInterface {
     fun findClassByName(name: String): Class?
 
     fun findClassesBySubject(subject: Subject): List<Class>
-
-    fun findClassesByType(type: ClassType): List<Class>
-
-
-    fun findClassesInTimeRange(start: Instant, end: Instant): List<Class> // kotlin datetime, see if it is correct
-
-    fun findClassesOverlappingWith(classToCheck: Class): List<Class>
 
     fun addClass(newClass: Class): Boolean
 

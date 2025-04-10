@@ -25,61 +25,50 @@ class Problem private constructor(
         //Value representing the type of error that can happen in this case will be json problem as a content-type.
         private val MEDIA_TYPE = ContentType.parse("application/problem+json")
 
-        //Problem details
-        val UserAlreadyExists = Problem(
-            typeUri = URI("https://example.com/problems/user-already-exists"),
-            title = "User already exists",
-            status = HttpStatusCode.Conflict,
-            detail = "The user already exists in the system"
-        )
-        val InsecurePassword = Problem(
-            typeUri = URI("https://example.com/problems/insecure-password"),
-            title = "Insecure password",
-            status = HttpStatusCode.UnprocessableEntity,
-            detail = "The password provided is insecure"
-        )
-        val UserNotFound = Problem(
-            typeUri = URI("https://example.com/problems/user-not-found"),
-            title = "User not found",
-            status = HttpStatusCode.NotFound,
-            detail = "The user was not found in the system"
-        )
-        val InvalidCredentials = Problem(
-            typeUri = URI("https://example.com/problems/invalid-credentials"),
-            title = "Invalid credentials",
-            status = HttpStatusCode.Unauthorized,
-            detail = "The credentials provided are invalid"
-        )
-        val MissingCredentials = Problem(
-            typeUri = URI("https://example.com/problems/missing-credentials"),
-            title = "Missing credentials",
-            status = HttpStatusCode.BadRequest,
-            detail = "The credentials provided are missing"
-        )
-        val InvalidToken = Problem(
-            typeUri = URI("https://example.com/problems/invalid-token"),
-            title = "Invalid token",
-            status = HttpStatusCode.Unauthorized,
-            detail = "The token provided is invalid"
-        )
-        val ExpiredToken = Problem(
-            typeUri = URI("https://example.com/problems/expired-token"),
-            title = "Expired token",
-            status = HttpStatusCode.Unauthorized,
-            detail = "The token provided is expired"
-        )
-        val UserChangesFailed = Problem(
-            typeUri = URI("https://example.com/problems/user-changes-failed"),
-            title = "User changes failed",
-            status = HttpStatusCode.InternalServerError,
-            detail = "The user changes failed"
-        )
-        val FailedToAddToDatabase = Problem(
-            typeUri = URI("https://example.com/problems/subject-failed-to-add-to-database"),
-            title = "Failed to add to database",
-            status = HttpStatusCode.InternalServerError,
-            detail = "The resource failed to be added to the database"
-        )
+        fun conflict(title: String, detail: String? = null): Problem {
+            return Problem(
+                typeUri = URI("https://example.com/problems/conflict"),
+                title = title,
+                status = HttpStatusCode.Conflict,
+                detail = detail
+            )
+        }
+
+        fun notFound(title: String, detail: String? = null): Problem {
+            return Problem(
+                typeUri = URI("https://example.com/problems/not-found"),
+                title = title,
+                status = HttpStatusCode.NotFound,
+                detail = detail
+            )
+        }
+
+        fun badRequest(title: String, detail: String? = null): Problem {
+            return Problem(
+                typeUri = URI("https://example.com/problems/bad-request"),
+                title = title,
+                status = HttpStatusCode.BadRequest,
+                detail = detail
+            )
+        }
+
+        fun unauthorized(title: String, detail: String? = null): Problem {
+            return Problem(
+                typeUri = URI("https://example.com/problems/unauthorized"),
+                title = title,
+                status = HttpStatusCode.Unauthorized,
+                detail = detail
+            )
+        }
+
+        fun internalServerError(title: String, detail: String? = null): Problem {
+            return Problem(
+                typeUri = URI("https://example.com/problems/internal-server-error"),
+                title = title,
+                status = HttpStatusCode.InternalServerError,
+                detail = detail
+            )
+        }
     }
 
     suspend fun respond(call: ApplicationCall) {
@@ -110,39 +99,115 @@ suspend fun <L, R> ApplicationCall.respondEither(
 
 fun AuthError.toProblem(): Problem {
     return when (this) {
-        AuthError.UserAlreadyExists -> Problem.UserAlreadyExists
-        AuthError.InsecurePassword -> Problem.InsecurePassword
-        AuthError.MissingCredentials -> Problem.MissingCredentials
-        AuthError.UserNotFound -> Problem.UserNotFound
-        AuthError.InvalidCredentials -> Problem.InvalidCredentials
-        AuthError.TokenCreationFailed -> Problem.InvalidToken
-        AuthError.TokenValidationFailed -> Problem.ExpiredToken
-        AuthError.UserChangesFailed -> Problem.UserChangesFailed
-        AuthError.InvalidRole -> Problem.InvalidCredentials
+        AuthError.UserAlreadyExists -> Problem.conflict(
+            title = "User already exists",
+            detail = "The user with the given username or email already exists."
+        )
+        AuthError.InsecurePassword -> Problem.badRequest(
+            title = "Insecure password",
+            detail = "The provided password does not meet the security requirements."
+        )
+        AuthError.MissingCredentials -> Problem.badRequest(
+            title = "Missing credentials",
+            detail = "The request is missing required credentials."
+        )
+        AuthError.UserNotFound -> Problem.notFound(
+            title = "User not found",
+            detail = "The user with the given username or email was not found."
+        )
+        AuthError.InvalidCredentials -> Problem.unauthorized(
+            title = "Invalid credentials",
+            detail = "The provided credentials are invalid."
+        )
+        AuthError.TokenCreationFailed -> Problem.internalServerError(
+            title = "Token creation failed",
+            detail = "Failed to create a token for the user."
+        )
+        AuthError.TokenValidationFailed -> Problem.unauthorized(
+            title = "Token validation failed",
+            detail = "The provided token is invalid or expired."
+        )
+        AuthError.UserChangesFailed -> Problem.internalServerError(
+            title = "User changes failed",
+            detail = "Failed to update the user information."
+        )
+        AuthError.InvalidRole -> Problem.badRequest(
+            title = "Invalid role",
+            detail = "The provided role is invalid."
+        )
     }
 }
 
 fun ClassError.toProblem(): Problem {
     return when (this) {
-        ClassError.ClassNotFound -> Problem.UserNotFound
-        ClassError.InvalidRole -> Problem.InvalidCredentials
-        ClassError.ClassAlreadyExists -> Problem.UserAlreadyExists
-        ClassError.ClassChangesFailed -> Problem.UserChangesFailed
-        ClassError.InvalidClassData -> Problem.InsecurePassword
-        ClassError.MissingClassData -> Problem.MissingCredentials
-        ClassError.SubjectNotFound -> Problem.UserNotFound
+        ClassError.ClassNotFound -> Problem.notFound(
+            title = "Class not found",
+            detail = "The class with the given ID was not found."
+        )
+        ClassError.InvalidRole -> Problem.badRequest(
+            title = "Invalid role",
+            detail = "The provided role is invalid."
+        )
+        ClassError.ClassAlreadyExists -> Problem.conflict(
+            title = "Class already exists",
+            detail = "The class with the given name already exists."
+        )
+        ClassError.ClassChangesFailed -> Problem.internalServerError(
+            title = "Class changes failed",
+            detail = "Failed to update the class information."
+        )
+        ClassError.InvalidClassData -> Problem.badRequest(
+            title = "Invalid class data",
+            detail = "The provided class data is invalid."
+        )
+        ClassError.MissingClassData -> Problem.badRequest(
+            title = "Missing class data",
+            detail = "The request is missing required class data."
+        )
+        ClassError.SubjectNotFound -> Problem.notFound(
+            title = "Subject not found",
+            detail = "The subject with the given ID was not found."
+        )
+        ClassError.InvalidSubjectId -> Problem.badRequest(
+            title = "Invalid subject ID",
+            detail = "The provided subject ID is invalid."
+        )
     }
 }
 
 fun SubjectError.toProblem(): Problem {
     return when (this) {
-        SubjectError.SubjectNotFound -> Problem.UserNotFound
-        SubjectError.InvalidRole -> Problem.InvalidCredentials
-        SubjectError.SubjectAlreadyExists -> Problem.UserAlreadyExists
-        SubjectError.SubjectChangesFailed -> Problem.UserChangesFailed
-        SubjectError.InvalidSubjectData -> Problem.InsecurePassword
-        SubjectError.MissingSubjectData -> Problem.MissingCredentials
-        SubjectError.FailedToAddToDatabase -> Problem.FailedToAddToDatabase
-        SubjectError.InvalidSubjectId -> Problem.InvalidCredentials
+        SubjectError.SubjectNotFound -> Problem.notFound(
+            title = "Subject not found",
+            detail = "The subject with the given ID was not found."
+        )
+        SubjectError.InvalidRole -> Problem.badRequest(
+            title = "Invalid role",
+            detail = "The provided role is invalid."
+        )
+        SubjectError.SubjectAlreadyExists -> Problem.conflict(
+            title = "Subject already exists",
+            detail = "The subject with the given name already exists."
+        )
+        SubjectError.SubjectChangesFailed -> Problem.internalServerError(
+            title = "Subject changes failed",
+            detail = "Failed to update the subject information."
+        )
+        SubjectError.InvalidSubjectData -> Problem.badRequest(
+            title = "Invalid subject data",
+            detail = "The provided subject data is invalid."
+        )
+        SubjectError.MissingSubjectData -> Problem.badRequest(
+            title = "Missing subject data",
+            detail = "The request is missing required subject data."
+        )
+        SubjectError.FailedToAddToDatabase -> Problem.internalServerError(
+            title = "Failed to add subject to database",
+            detail = "Failed to add the subject to the database."
+        )
+        SubjectError.InvalidSubjectId -> Problem.badRequest(
+            title = "Invalid subject ID",
+            detail = "The provided subject ID is invalid."
+        )
     }
 }
