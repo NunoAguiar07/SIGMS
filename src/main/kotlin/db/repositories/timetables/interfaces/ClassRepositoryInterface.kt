@@ -9,7 +9,11 @@ import kotlinx.datetime.Instant
 
 // still need to remove some methods after some time
 interface ClassRepositoryInterface {
+    fun findAllClasses(): List<Class>
+
     fun findClassById(id: Int): Class?
+
+    fun findClassByName(name: String): Class?
 
     fun findClassesBySubject(subject: Subject): List<Class>
 

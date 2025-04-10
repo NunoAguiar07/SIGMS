@@ -1,5 +1,7 @@
 package isel.leic.group25.api.http
 
+import api.model.request.*
+import api.model.response.*
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
@@ -9,17 +11,23 @@ import io.ktor.server.routing.*
 import isel.leic.group25.api.exceptions.respondEither
 import isel.leic.group25.api.exceptions.toProblem
 import isel.leic.group25.api.jwt.getUserIdFromPrincipal
-import isel.leic.group25.api.jwt.getUserRoleFromPrincipal
-import isel.leic.group25.api.model.*
+import isel.leic.group25.api.model.response.*
+import isel.leic.group25.api.model.request.*
 import isel.leic.group25.services.ClassService
+import isel.leic.group25.services.SubjectService
 import isel.leic.group25.services.UserClassService
 import isel.leic.group25.services.UserService
 import isel.leic.group25.utils.Either
 
-fun Application.configureRouting(userService: UserService, classService: ClassService, userClassService: UserClassService) {
+fun Application.configureRouting(
+    userService: UserService,
+    classService: ClassService,
+    userClassService: UserClassService,
+    subjectService: SubjectService
+) {
     routing {
         route("/api"){
-            get("/") {
+            get {
                 call.respond(
                     WelcomePageResponse(
                         title = "Welcome to SIGMS",
@@ -67,7 +75,7 @@ fun Application.configureRouting(userService: UserService, classService: ClassSe
             }
             authenticate("auth-jwt") {
                 route("/profile"){
-                    get("/") {
+                    get {
                         val userId = call.getUserIdFromPrincipal() ?: return@get call.respond(HttpStatusCode.Unauthorized)
                         val result = userService.getUserById(userId)
                         call.respondEither(
@@ -78,7 +86,7 @@ fun Application.configureRouting(userService: UserService, classService: ClassSe
                             }
                         )
                     }
-                    put("/") {
+                    put {
                         val userId = call.getUserIdFromPrincipal() ?: return@put call.respond(HttpStatusCode.Unauthorized)
                         val updateRequest = call.receive<UserUpdateRequest>()
                         val result = userService.updateUser(
@@ -113,7 +121,7 @@ fun Application.configureRouting(userService: UserService, classService: ClassSe
 
                 }
                 route("/schedule"){
-                    get("/") {
+                    get {
                         val userId = call.getUserIdFromPrincipal() ?: return@get call.respond(HttpStatusCode.Unauthorized)
                         val userRole = userService.getRoleByUserId(userId)
                         call.respondEither(
@@ -123,13 +131,82 @@ fun Application.configureRouting(userService: UserService, classService: ClassSe
                                 when (val result = userClassService.getScheduleByUserId(userId, role.toString())) {
                                     is Either.Right -> {
                                         val schedule = result.value.map { classEntity ->
-                                            classEntity.toClassResponse()
+                                            ClassResponse.fromClass(classEntity)
                                         }
                                         ScheduleResponse(classes = schedule)
                                     }
-                                    is Either.Left -> result // pass through the error from classService
+                                    is Either.Left -> result
                                 }
                             }
+                        )
+                    }
+                }
+                route("/subject") {
+                    get {
+                        val result = subjectService.getAllSubjects()
+                        call.respondEither(
+                            either = result,
+                            transformError = { error -> error.toProblem() },
+                            transformSuccess = { subjects ->
+                                subjects.map { SubjectResponse.fromSubject(it) }
+                            }
+                        )
+                    }
+                    post {
+                        val subjectRequest = call.receive<SubjectRequest>()
+                        val result = subjectService.createSubject(
+                            name = subjectRequest.name
+                        )
+                        call.respondEither(
+                            either = result,
+                            transformError = { error -> error.toProblem() },
+                            transformSuccess = { subject ->
+                                SubjectResponse.fromSubject(subject)
+                            },
+                            successStatus = HttpStatusCode.Created
+                        )
+                    }
+                    get("/{id}") {
+                        val id = call.parameters["id"]
+                        val result = subjectService.getSubjectById(id)
+                        call.respondEither(
+                            either = result,
+                            transformError = { error -> error.toProblem() },
+                            transformSuccess = { subject ->
+                                SubjectResponse.fromSubject(subject)
+                            }
+                        )
+                    }
+                }
+                route("/classes") {
+                    get {
+                        val result = classService.getAllClasses()
+                        call.respondEither(
+                            either = result,
+                            transformError = { error -> error.toProblem() },
+                            transformSuccess = { classes ->
+                                classes.map { schoolClass ->
+                                    ClassResponse.fromClass(schoolClass)
+                                }
+                            }
+                        )
+                    }
+                    post {
+                        val classRequest = call.receive<ClassRequest>()
+                        val result = classService.createClass(
+                            name = classRequest.name,
+                            subjectId = classRequest.subjectId,
+                            classType = classRequest.classType,
+                            startTime = classRequest.startTime,
+                            endTime = classRequest.endTime
+                        )
+                        call.respondEither(
+                            either = result,
+                            transformError = { error -> error.toProblem() },
+                            transformSuccess = { schoolClasses ->
+                                ClassResponse.fromClass(schoolClasses)
+                            },
+                            successStatus = HttpStatusCode.Created
                         )
                     }
                 }

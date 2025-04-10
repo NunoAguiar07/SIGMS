@@ -6,6 +6,7 @@ import io.ktor.server.response.*
 import isel.leic.group25.api.model.ProblemDetail
 import isel.leic.group25.services.errors.AuthError
 import isel.leic.group25.services.errors.ClassError
+import isel.leic.group25.services.errors.SubjectError
 import isel.leic.group25.utils.Either
 import java.net.URI
 
@@ -36,12 +37,6 @@ class Problem private constructor(
             title = "Insecure password",
             status = HttpStatusCode.UnprocessableEntity,
             detail = "The password provided is insecure"
-        )
-        val UserOrPasswordAreInvalid = Problem(
-            typeUri = URI("https://example.com/problems/user-or-password-are-invalid"),
-            title = "User or password are invalid",
-            status = HttpStatusCode.Unauthorized,
-            detail = "The user or password provided are invalid"
         )
         val UserNotFound = Problem(
             typeUri = URI("https://example.com/problems/user-not-found"),
@@ -78,6 +73,12 @@ class Problem private constructor(
             title = "User changes failed",
             status = HttpStatusCode.InternalServerError,
             detail = "The user changes failed"
+        )
+        val FailedToAddToDatabase = Problem(
+            typeUri = URI("https://example.com/problems/subject-failed-to-add-to-database"),
+            title = "Failed to add to database",
+            status = HttpStatusCode.InternalServerError,
+            detail = "The resource failed to be added to the database"
         )
     }
 
@@ -129,5 +130,19 @@ fun ClassError.toProblem(): Problem {
         ClassError.ClassChangesFailed -> Problem.UserChangesFailed
         ClassError.InvalidClassData -> Problem.InsecurePassword
         ClassError.MissingClassData -> Problem.MissingCredentials
+        ClassError.SubjectNotFound -> Problem.UserNotFound
+    }
+}
+
+fun SubjectError.toProblem(): Problem {
+    return when (this) {
+        SubjectError.SubjectNotFound -> Problem.UserNotFound
+        SubjectError.InvalidRole -> Problem.InvalidCredentials
+        SubjectError.SubjectAlreadyExists -> Problem.UserAlreadyExists
+        SubjectError.SubjectChangesFailed -> Problem.UserChangesFailed
+        SubjectError.InvalidSubjectData -> Problem.InsecurePassword
+        SubjectError.MissingSubjectData -> Problem.MissingCredentials
+        SubjectError.FailedToAddToDatabase -> Problem.FailedToAddToDatabase
+        SubjectError.InvalidSubjectId -> Problem.InvalidCredentials
     }
 }

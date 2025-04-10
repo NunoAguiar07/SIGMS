@@ -16,8 +16,15 @@ import org.ktorm.entity.*
 
 
 class ClassRepository(private val database: Database): ClassRepositoryInterface {
+    override fun findAllClasses(): List<Class> {
+        return database.classes.toList()
+    }
     override fun findClassById(id: Int): Class? {
         return database.classes.firstOrNull { it.id eq id }
+    }
+
+    override fun findClassByName(name: String): Class? {
+        return database.classes.firstOrNull { it.name eq name }
     }
 
     override fun findClassesBySubject(subject: Subject): List<Class> {

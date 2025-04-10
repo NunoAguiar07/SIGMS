@@ -1,4 +1,4 @@
-package isel.leic.group25.api.model
+package api.model.request
 
 import kotlinx.serialization.Serializable
 

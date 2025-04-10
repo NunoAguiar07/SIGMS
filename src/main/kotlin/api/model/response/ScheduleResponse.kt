@@ -1,5 +1,6 @@
-package isel.leic.group25.api.model
+package api.model.response
 
+import isel.leic.group25.api.model.response.ClassResponse
 import kotlinx.serialization.Serializable
 
 @Serializable

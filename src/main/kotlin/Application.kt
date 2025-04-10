@@ -12,8 +12,10 @@ import isel.leic.group25.api.http.configureRouting
 import isel.leic.group25.api.jwt.JwtConfig
 import isel.leic.group25.db.repositories.ktorm.KTransaction
 import isel.leic.group25.db.repositories.timetables.ClassRepository
+import isel.leic.group25.db.repositories.timetables.SubjectRepository
 import isel.leic.group25.db.repositories.users.UserRepository
 import isel.leic.group25.services.ClassService
+import isel.leic.group25.services.SubjectService
 import isel.leic.group25.services.UserClassService
 import isel.leic.group25.services.UserService
 import org.ktorm.database.Database
@@ -36,8 +38,10 @@ fun Application.module() {
     val kTransaction = KTransaction(db)
     val userRepository = UserRepository(db)
     val classRepository = ClassRepository(db)
-    val classService = ClassService(classRepository, kTransaction)
+    val subjectRepository = SubjectRepository(db)
+    val classService = ClassService(classRepository, subjectRepository, kTransaction)
     val userService = UserService(userRepository, kTransaction, jwtConfig)
+    val subjectService = SubjectService(subjectRepository, kTransaction)
     val userClassService = UserClassService(userRepository, classRepository, kTransaction)
 
     install(Authentication) {
@@ -58,5 +62,5 @@ fun Application.module() {
             }
         }
     }
-    configureRouting(userService, classService, userClassService)
+    configureRouting(userService, classService, userClassService, subjectService)
 }

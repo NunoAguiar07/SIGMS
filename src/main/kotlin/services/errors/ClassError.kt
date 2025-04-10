@@ -7,4 +7,5 @@ sealed class ClassError {
     data object ClassChangesFailed : ClassError()
     data object MissingClassData : ClassError()
     data object InvalidRole : ClassError()
+    data object SubjectNotFound : ClassError()
 }
