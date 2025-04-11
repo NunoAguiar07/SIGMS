@@ -16,10 +16,8 @@ data class ClassInfo(
     val endTime: String
 )
 
-
-
-fun main() {
-    val file = FileInputStream("C:\\\\Users\\\\User\\\\IdeaProjects\\\\FinalProject\\\\src\\\\main\\\\resources\\\\HorarioTeste.xlsx")
+fun parseScheduleFromExcel(filePath: String): List<ClassInfo> {
+    val file = FileInputStream(filePath)
     val workbook = XSSFWorkbook(file)
     val sheet = workbook.getSheetAt(0)
 
@@ -39,7 +37,6 @@ fun main() {
         val timeCell = sheet.getRow(row)?.getCell(0)
         if (timeCell != null) {
             if (DateUtil.isCellDateFormatted(timeCell)) {
-
                 timeSlots[row] = dateFormat.format(timeCell.dateCellValue)
             } else {
                 timeSlots[row] = timeCell.toString().trim()
@@ -61,7 +58,6 @@ fun main() {
         val regex = Regex("""([^\s\[\(\]]+)|(\[[^\]]+\])|(\([^\)]+\))|(\(\[[^\]]+\]\))""")
         val tokens = regex.findAll(rawText).map { it.value.trim() }.toList()
 
-
         if (tokens.isEmpty()) continue
 
         val name = tokens[0].trim()
@@ -76,7 +72,7 @@ fun main() {
                 token.startsWith("[") && token.endsWith("]") -> {
                     val content = token.removeSurrounding("[", "]")
                     when {
-                        content.contains("@") || content.contains(".") || content.contains("Aud") || content.contains("LS") -> {
+                         content.contains(".")  -> {
                             rooms = content.split(";").map { it.trim() }
                         }
                         content.matches(Regex(".*\\d.*")) -> {
@@ -116,6 +112,17 @@ fun main() {
             )
         )
     }
+
+    file.close()
+    workbook.close()
+
+    return classes
+}
+
+
+
+fun main() {
+        val classes = parseScheduleFromExcel("C:\\Users\\User\\IdeaProjects\\FinalProject\\src\\main\\resources\\HorarioTeste.xlsx")
     classes.forEach {
         println(" ${it.day}: ${it.name}")
         println("  From ${it.startTime} to ${it.endTime}")
