@@ -11,13 +11,11 @@ import io.ktor.server.response.*
 import isel.leic.group25.api.http.configureRouting
 import isel.leic.group25.api.jwt.JwtConfig
 import isel.leic.group25.db.repositories.ktorm.KTransaction
+import isel.leic.group25.db.repositories.rooms.RoomRepository
 import isel.leic.group25.db.repositories.timetables.ClassRepository
 import isel.leic.group25.db.repositories.timetables.SubjectRepository
 import isel.leic.group25.db.repositories.users.UserRepository
-import isel.leic.group25.services.ClassService
-import isel.leic.group25.services.SubjectService
-import isel.leic.group25.services.UserClassService
-import isel.leic.group25.services.UserService
+import isel.leic.group25.services.*
 import org.ktorm.database.Database
 
 fun main(args: Array<String>) {
@@ -39,10 +37,12 @@ fun Application.module() {
     val userRepository = UserRepository(db)
     val classRepository = ClassRepository(db)
     val subjectRepository = SubjectRepository(db)
+    val roomRepository = RoomRepository(db)
     val classService = ClassService(classRepository, subjectRepository, kTransaction)
     val userService = UserService(userRepository, kTransaction, jwtConfig)
     val subjectService = SubjectService(subjectRepository, kTransaction)
     val userClassService = UserClassService(userRepository, classRepository, kTransaction)
+    val roomService = RoomService(roomRepository, kTransaction)
 
     install(Authentication) {
         jwt("auth-jwt") {
@@ -62,5 +62,5 @@ fun Application.module() {
             }
         }
     }
-    configureRouting(userService, classService, userClassService, subjectService)
+    configureRouting(userService, classService, userClassService, subjectService, roomService)
 }

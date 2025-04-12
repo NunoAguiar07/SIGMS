@@ -46,6 +46,7 @@ class RoomTableTest {
         RunScript.execute(connection, StringReader("""
             CREATE TABLE IF NOT EXISTS ROOM (
                 id SERIAL PRIMARY KEY,
+                room_name VARCHAR(255) NOT NULL,
                 capacity INT NOT NULL,
                 CHECK(capacity > 0)
             );
@@ -68,6 +69,7 @@ class RoomTableTest {
     @Test
     fun `Should create a new room`(){
         val newRoom = Room{
+            name = "G.2.02"
             capacity = 30
         }
         database.rooms.add(newRoom)
@@ -79,6 +81,7 @@ class RoomTableTest {
     @Test
     fun `Should update a room`(){
         val newRoom = Room{
+            name = "G.2.02"
             capacity = 30
         }
         database.rooms.add(newRoom)
@@ -92,6 +95,7 @@ class RoomTableTest {
     @Test
     fun `Should delete a room`(){
         val newRoom = Room{
+            name = "G.2.02"
             capacity = 30
         }
         database.rooms.add(newRoom)
@@ -106,6 +110,7 @@ class RoomTableTest {
     @Test
     fun `Should not allow a room with less than 1 capacity`(){
         val newRoom = Room{
+            name = "G.2.02"
             capacity = -1
         }
         assertThrows<Exception> { database.rooms.add(newRoom) }
@@ -118,6 +123,7 @@ class RoomTableTest {
     @Test
     fun `Should create a new study room`(){
         val newRoom = Room{
+            name = "G.2.02"
             capacity = 30
         }
         val newStudyRoom = StudyRoom{
@@ -133,6 +139,7 @@ class RoomTableTest {
     @Test
     fun `Should create a new classroom`(){
         val newRoom = Room{
+            name = "G.2.02"
             capacity = 30
         }
         val newClassroom = Classroom{
@@ -148,6 +155,7 @@ class RoomTableTest {
     @Test
     fun `Should create a new office room`(){
         val newRoom = Room{
+            name = "G.2.02"
             capacity = 30
         }
         val newOfficeRoom = OfficeRoom{

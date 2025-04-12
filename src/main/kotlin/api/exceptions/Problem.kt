@@ -6,6 +6,7 @@ import io.ktor.server.response.*
 import isel.leic.group25.api.model.ProblemDetail
 import isel.leic.group25.services.errors.AuthError
 import isel.leic.group25.services.errors.ClassError
+import isel.leic.group25.services.errors.RoomError
 import isel.leic.group25.services.errors.SubjectError
 import isel.leic.group25.utils.Either
 import java.net.URI
@@ -208,6 +209,31 @@ fun SubjectError.toProblem(): Problem {
         SubjectError.InvalidSubjectId -> Problem.badRequest(
             title = "Invalid subject ID",
             detail = "The provided subject ID is invalid."
+        )
+    }
+}
+
+fun RoomError.toProblem(): Problem {
+    return when (this) {
+        RoomError.RoomNotFound -> Problem.notFound(
+            title = "Room not found",
+            detail = "The room with the given ID was not found."
+        )
+        RoomError.RoomAlreadyExists -> Problem.conflict(
+            title = "Room already exists",
+            detail = "The room with the given name already exists."
+        )
+        RoomError.InvalidRoomData -> Problem.badRequest(
+            title = "Invalid room data",
+            detail = "The provided room data is invalid."
+        )
+        RoomError.InvalidRoomId -> Problem.badRequest(
+            title = "Invalid room ID",
+            detail = "The provided room ID is invalid."
+        )
+        RoomError.InvalidRoomCapacity -> Problem.badRequest(
+            title = "Invalid room capacity",
+            detail = "The provided room capacity is invalid."
         )
     }
 }

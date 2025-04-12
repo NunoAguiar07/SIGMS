@@ -9,4 +9,5 @@ sealed class SubjectError {
     data object SubjectChangesFailed : SubjectError()
     data object MissingSubjectData : SubjectError()
     data object InvalidRole : SubjectError()
+
 }

@@ -43,6 +43,7 @@ class IssueTableTest {
         RunScript.execute(connection, StringReader("""
             CREATE TABLE IF NOT EXISTS ROOM (
                 id SERIAL PRIMARY KEY,
+                room_name VARCHAR(255) NOT NULL,
                 capacity INT NOT NULL,
                 CHECK(capacity > 0)
             );
@@ -59,6 +60,7 @@ class IssueTableTest {
     @Test
     fun `Should create a new issue`(){
         val newRoom = Room {
+            name = "G.0.02"
             capacity = 15
         }.also{ database.rooms.add(it) }
         val newIssue = IssueReport {
@@ -81,6 +83,7 @@ class IssueTableTest {
     @Test
     fun `Should update an issue`(){
         val newRoom = Room {
+            name = "G.0.02"
             capacity = 15
         }.also{ database.rooms.add(it) }
         val newIssue = IssueReport {
@@ -109,6 +112,7 @@ class IssueTableTest {
     @Test
     fun `Should delete an issue`(){
         val newRoom = Room {
+            name = "G.0.02"
             capacity = 15
         }.also{ database.rooms.add(it) }
         val newIssue = IssueReport {

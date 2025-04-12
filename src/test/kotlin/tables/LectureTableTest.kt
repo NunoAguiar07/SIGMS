@@ -65,6 +65,7 @@ class LectureTableTest {
             
             CREATE TABLE IF NOT EXISTS ROOM (
                 id SERIAL PRIMARY KEY,
+                room_name VARCHAR(255) NOT NULL,
                 capacity INT NOT NULL,
                 CHECK(capacity > 0)
             );
@@ -104,6 +105,7 @@ class LectureTableTest {
             name = "51D"
         }.also { database.classes.add(it) }
         val newRoom = Room{
+            name = "G.2.02"
             capacity = 15
         }.also{
             database.rooms.add(it)
@@ -133,6 +135,7 @@ class LectureTableTest {
             name = "51D"
         }.also { database.classes.add(it) }
         val newRoom = Room{
+            name = "G.2.02"
             capacity = 15
         }.also{
             database.rooms.add(it)
@@ -179,6 +182,7 @@ class LectureTableTest {
             name = "51D"
         }.also { database.classes.add(it) }
         val newRoom = Room{
+            name = "G.2.02"
             capacity = 15
         }.also{
             database.rooms.add(it)

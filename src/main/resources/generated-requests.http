@@ -32,7 +32,8 @@ Content-Type: application/json
 }
 
 ###
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwODAvIiwiYXVkIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwLyIsInVzZXJJZCI6Miwicm9sZSI6IlNUVURFTlQiLCJpYXQiOjE3NDQzMDI3ODksImV4cCI6MTc0NDMwNjM4OX0.-ET2YrWYb5R5xhWZBz8hauJ67BYqzIZucbOGYmS0Rxk
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwODAvIiwiYXVkIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwLyIsInVzZXJJZCI6MSwicm9sZSI6IlNUVURFTlQiLCJpYXQiOjE3NDQ0NTgxNTEsImV4cCI6MTc0NDQ2MTc1MX0.iVs__RJ4dwIP88URwmbAYGNlbrYd17sfniY_XCCMt34
+
 
 ###
 GET {{baseUrl}}/profile
@@ -60,11 +61,11 @@ Content-Type: application/json
 }
 
 ###
-GET {{baseUrl}}/subject
+GET {{baseUrl}}/subjects
 Authorization: Bearer {{token}}
 
 ###
-POST {{baseUrl}}/subject
+POST {{baseUrl}}/subjects
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
@@ -73,12 +74,41 @@ Content-Type: application/json
 }
 
 ###
-GET {{baseUrl}}/subject/1
+GET {{baseUrl}}/subjects/1
 Authorization: Bearer {{token}}
 
 ###
-GET {{baseUrl}}/schedule
+GET {{baseUrl}}/subjects/1/classes
 Authorization: Bearer {{token}}
+
+###
+POST {{baseUrl}}/subjects/1/classes
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "LEIC51D"
+}
+
+###
+GET {{baseUrl}}/rooms
+Authorization: Bearer {{token}}
+
+###
+GET {{baseUrl}}/rooms/1
+Authorization: Bearer {{token}}
+
+###
+POST {{baseUrl}}/rooms
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "G.2.02",
+  "capacity": 30,
+  "type": "class"
+}
+
 
 
 

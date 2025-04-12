@@ -7,5 +7,6 @@ import org.ktorm.entity.Entity
 sealed interface Room: Entity<Room> {
     companion object: Entity.Factory<Room>()
     val id : Int
+    var name : String
     var capacity : Int
 }

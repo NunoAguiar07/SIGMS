@@ -13,17 +13,14 @@ import isel.leic.group25.api.exceptions.toProblem
 import isel.leic.group25.api.jwt.getUserIdFromPrincipal
 import isel.leic.group25.api.model.response.*
 import isel.leic.group25.api.model.request.*
-import isel.leic.group25.services.ClassService
-import isel.leic.group25.services.SubjectService
-import isel.leic.group25.services.UserClassService
-import isel.leic.group25.services.UserService
-import isel.leic.group25.utils.Either
+import isel.leic.group25.services.*
 
 fun Application.configureRouting(
     userService: UserService,
     classService: ClassService,
     userClassService: UserClassService,
-    subjectService: SubjectService
+    subjectService: SubjectService,
+    roomService: RoomService
 ) {
     routing {
         route("/api"){
@@ -120,28 +117,7 @@ fun Application.configureRouting(
                     }
 
                 }
-                route("/schedule"){
-                    get {
-                        val userId = call.getUserIdFromPrincipal() ?: return@get call.respond(HttpStatusCode.Unauthorized)
-                        val userRole = userService.getRoleByUserId(userId)
-                        call.respondEither(
-                            either = userRole,
-                            transformError = { error -> error.toProblem() },
-                            transformSuccess = { role ->
-                                when (val result = userClassService.getScheduleByUserId(userId, role.toString())) {
-                                    is Either.Right -> {
-                                        val schedule = result.value.map { classEntity ->
-                                            ClassResponse.fromClass(classEntity)
-                                        }
-                                        ScheduleResponse(classes = schedule)
-                                    }
-                                    is Either.Left -> result
-                                }
-                            }
-                        )
-                    }
-                }
-                route("/subject") {
+                route("/subjects") {
                     get {
                         val result = subjectService.getAllSubjects()
                         call.respondEither(
@@ -178,36 +154,62 @@ fun Application.configureRouting(
                                 }
                             )
                         }
-                        get ("/class") {
-                            val id = call.parameters["subjectId"]
-                            val result = classService.getAllClassesFromSubject(id)
-                            call.respondEither(
-                                either = result,
-                                transformError = { error -> error.toProblem() },
-                                transformSuccess = { classes ->
-                                    classes.map { schoolClass ->
-                                        ClassResponse.fromClass(schoolClass)
+                        route("/classes") {
+                            get {
+                                val id = call.parameters["subjectId"]
+                                val result = classService.getAllClassesFromSubject(id)
+                                call.respondEither(
+                                    either = result,
+                                    transformError = { error -> error.toProblem() },
+                                    transformSuccess = { classes ->
+                                        classes.map { schoolClass ->
+                                            ClassResponse.fromClass(schoolClass)
+                                        }
                                     }
-                                }
-                            )
+                                )
+                            }
+                            post {
+                                val id = call.parameters["subjectId"]
+                                val classRequest = call.receive<ClassRequest>()
+                                val result = classService.createClass(
+                                    name = classRequest.name,
+                                    subjectId = id
+                                )
+                                call.respondEither(
+                                    either = result,
+                                    transformError = { error -> error.toProblem() },
+                                    transformSuccess = { schoolClass ->
+                                        ClassResponse.fromClass(schoolClass)
+                                    },
+                                    successStatus = HttpStatusCode.Created
+                                )
+                            }
                         }
                     }
                 }
-                route("/classes") {
+                route("/rooms"){
+                    get {
+                        val result = roomService.getAllRooms()
+                        call.respondEither(
+                            either = result,
+                            transformError = { error -> error.toProblem() },
+                            transformSuccess = { rooms ->
+                                rooms.map { RoomResponse.from(it) }
+                            }
+                        )
+                    }
                     post {
-                        val classRequest = call.receive<ClassRequest>()
-                        val result = classService.createClass(
-                            name = classRequest.name,
-                            subjectId = classRequest.subjectId,
-                            classType = classRequest.classType,
-                            startTime = classRequest.startTime,
-                            endTime = classRequest.endTime
+                        val roomRequest = call.receive<RoomRequest>()
+                        val result = roomService.createRoom(
+                            name = roomRequest.name,
+                            capacity = roomRequest.capacity,
+                            type = roomRequest.type
                         )
                         call.respondEither(
                             either = result,
                             transformError = { error -> error.toProblem() },
-                            transformSuccess = { schoolClasses ->
-                                ClassResponse.fromClass(schoolClasses)
+                            transformSuccess = { room ->
+                                RoomResponse.from(room)
                             },
                             successStatus = HttpStatusCode.Created
                         )

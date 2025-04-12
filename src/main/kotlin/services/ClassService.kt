@@ -25,17 +25,20 @@ class ClassService(private val classRepository: ClassRepository,
             val subject = subjectRepository.findSubjectById(subjectId.toInt())
                 ?: return@useTransaction failure(ClassError.SubjectNotFound)
             val classes = classRepository.findClassesBySubject(subject)
-            if (classes.isEmpty()) {
-                return@useTransaction failure(ClassError.ClassNotFound)
-            }
             return@useTransaction success(classes)
         }
     }
 
-    fun createClass(name: String, subjectId: Int, classType: String, startTime: String, endTime: String): ClassResult {
+    fun createClass(name: String, subjectId: String?): ClassResult {
         return transactionInterface.useTransaction {
+            if (name.isBlank()) {
+                return@useTransaction failure(ClassError.InvalidClassData)
+            }
+            if (subjectId == null || subjectId.toIntOrNull() == null) {
+                return@useTransaction failure(ClassError.InvalidSubjectId)
+            }
             classRepository.findClassByName(name) ?: return@useTransaction failure(ClassError.ClassAlreadyExists)
-            val existingSubject = subjectRepository.findSubjectById(subjectId)
+            val existingSubject = subjectRepository.findSubjectById(subjectId.toInt())
                 ?: return@useTransaction failure(ClassError.SubjectNotFound)
             val newClass = Class {
                 this.name = name
