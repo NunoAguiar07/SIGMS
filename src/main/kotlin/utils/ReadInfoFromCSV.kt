@@ -51,17 +51,14 @@ fun parseScheduleFromExcel(filePath: String): List<ClassInfo> {
         val startRow = mergedRegion.firstRow
         val endRow = mergedRegion.lastRow
         val col = mergedRegion.firstColumn
-
         val cell = sheet.getRow(startRow).getCell(col)
         val rawText = cell?.toString()?.trim() ?: continue
-
         val regex = Regex("""([^\s\[\(\]]+)|(\[[^\]]+\])|(\([^\)]+\))|(\(\[[^\]]+\]\))""")
         val tokens = regex.findAll(rawText).map { it.value.trim() }.toList()
 
         if (tokens.isEmpty()) continue
 
         val name = tokens[0].trim()
-
         var groups = emptyList<String>()
         var teachers = emptyList<String>()
         var rooms = emptyList<String>()

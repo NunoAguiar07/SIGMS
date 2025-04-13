@@ -10,6 +10,7 @@ import org.ktorm.schema.long
 import org.ktorm.schema.varchar
 
 object Lectures: Table<Lecture>("LECTURE") {
+    val id = int("id").primaryKey().bindTo { it.id }
     val classId = int("class_id").references(Classes){ it.schoolClass }
     val roomId = int("room_id").references(Rooms){ it.room }
     val type = varchar("class_type").transform({ ClassType.valueOf(it.uppercase()) }, {it.name.lowercase()}).bindTo { it.type }
