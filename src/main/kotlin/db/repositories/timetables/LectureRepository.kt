@@ -20,10 +20,6 @@ class LectureRepository(private val database: Database) : LectureRepositoryInter
         return database.lectures.toList()
     }
 
-    override fun getLectureById(id: Int): Lecture? {
-        return database.lectures.firstOrNull { it.id eq id }
-    }
-
 
     override fun createLecture(
         schoolClass: Class,
@@ -40,7 +36,8 @@ class LectureRepository(private val database: Database) : LectureRepositoryInter
             this.endTime = endTime
         }
         database.lectures.add(newLecture)
-        return getLectureById(newLecture.id)
+        return getLecturesByRoom(room.id)
+            .firstOrNull { it.startTime == startTime && it.endTime == endTime && it.room.id == room.id && it.schoolClass.id == schoolClass.id }
     }
 
     override fun getLecturesByRoom(roomId: Int): List<Lecture> {

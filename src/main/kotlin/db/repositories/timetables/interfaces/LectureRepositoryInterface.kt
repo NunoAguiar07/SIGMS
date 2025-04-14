@@ -10,7 +10,6 @@ import kotlinx.datetime.Instant
 
 interface LectureRepositoryInterface {
     fun getAllLectures(): List<Lecture>
-    fun getLectureById(id: Int): Lecture?
 
     fun createLecture(
         schoolClass: Class,
