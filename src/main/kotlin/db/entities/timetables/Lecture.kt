@@ -2,6 +2,7 @@ package isel.leic.group25.db.entities.timetables
 
 import isel.leic.group25.db.entities.rooms.Room
 import isel.leic.group25.db.entities.types.ClassType
+import isel.leic.group25.db.entities.types.WeekDay
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 import org.ktorm.entity.Entity
@@ -13,6 +14,7 @@ sealed interface Lecture: Entity<Lecture> {
     var schoolClass: Class
     var room: Room
     var type: ClassType
+    var weekDay: WeekDay
     var startTime: Instant
     var endTime: Instant
     val duration: Duration

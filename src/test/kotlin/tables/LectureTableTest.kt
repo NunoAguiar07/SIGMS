@@ -5,6 +5,7 @@ import isel.leic.group25.db.entities.timetables.Class
 import isel.leic.group25.db.entities.timetables.Lecture
 import isel.leic.group25.db.entities.timetables.Subject
 import isel.leic.group25.db.entities.types.ClassType
+import isel.leic.group25.db.entities.types.WeekDay
 import isel.leic.group25.db.tables.Tables.Companion.classes
 import isel.leic.group25.db.tables.Tables.Companion.lectures
 import isel.leic.group25.db.tables.Tables.Companion.rooms
@@ -87,6 +88,7 @@ class LectureTableTest {
                 class_id INT NOT NULL REFERENCES CLASS(id) ON DELETE CASCADE,
                 room_id INT NOT NULL REFERENCES ROOM(id) ON DELETE CASCADE,
                 class_type VARCHAR(20) CHECK (class_type IN ('theoretical', 'practical', 'theoretical_practical' )),
+                week_day int CHECK(week_day > 0 and week_day < 8),
                 start_time bigint NOT NULL,
                 end_time bigint NOT NULL,
                 CHECK (end_time > start_time)
@@ -115,6 +117,7 @@ class LectureTableTest {
             schoolClass = newClass
             room = newRoom
             type = ClassType.PRACTICAL
+            weekDay = WeekDay.MONDAY
             startTime = Instant.fromEpochMilliseconds(currentTime)
             endTime = Instant.fromEpochMilliseconds(currentTime + 3600*1000)
         }.also { database.lectures.add(it) }
@@ -122,6 +125,7 @@ class LectureTableTest {
         assertEquals(newLecture.schoolClass.id, lecture.schoolClass.id)
         assertEquals(newLecture.room.id, lecture.room.id)
         assertEquals(newLecture.duration, lecture.duration)
+        assertEquals(newLecture.weekDay, lecture.weekDay)
     }
 
     @Test
