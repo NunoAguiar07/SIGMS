@@ -9,6 +9,7 @@ import isel.leic.group25.db.repositories.interfaces.TransactionInterface
 import isel.leic.group25.db.repositories.timetables.LectureRepository
 import isel.leic.group25.services.errors.LectureError
 import isel.leic.group25.utils.Either
+import isel.leic.group25.utils.Failure
 import isel.leic.group25.utils.failure
 import isel.leic.group25.utils.success
 import kotlinx.datetime.Instant
@@ -21,7 +22,9 @@ typealias LectureResult = Either<LectureError, Lecture>
 
 
 class LectureService(private val lectureRepository: LectureRepository,
-                     private val transactionInterface: TransactionInterface,) {
+                     private val transactionInterface: TransactionInterface,
+                     private val classService:ClassService,
+                     private val roomService: RoomService) {
 
     fun getAllLectures(): LectureListResult {
         return transactionInterface.useTransaction {
@@ -41,7 +44,14 @@ class LectureService(private val lectureRepository: LectureRepository,
         if (startTime >= endTime) {
             return failure(LectureError.InvalidLectureDate)
         }
+
         return transactionInterface.useTransaction {
+            if (classService.getClassById(schoolClass.id.toString()) is Failure){
+                return@useTransaction failure(LectureError.InvalidLectureClass)
+            }
+            if(roomService.getRoomById(room.id.toString()) is Failure) {
+                return@useTransaction failure(LectureError.InvalidLectureRoom)
+            }
             if(
                 lectureRepository.getAllLectures().any { it.startTime == startTime && it.endTime == endTime && it.room.id == room.id && it.schoolClass.id == schoolClass.id && it.type == type && it.weekDay == weekDay }
             ) {

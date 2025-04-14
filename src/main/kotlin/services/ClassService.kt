@@ -29,6 +29,17 @@ class ClassService(private val classRepository: ClassRepository,
         }
     }
 
+    fun getClassById(id: String?): ClassResult {
+        return transactionInterface.useTransaction {
+            if (id == null || id.toIntOrNull() == null) {
+                return@useTransaction failure(ClassError.InvalidClassData)
+            }
+            val schoolClass = classRepository.findClassById(id.toInt())
+                ?: return@useTransaction failure(ClassError.ClassNotFound)
+            return@useTransaction success(schoolClass)
+        }
+    }
+
     fun createClass(name: String, subjectId: String?): ClassResult {
         return transactionInterface.useTransaction {
             if (name.isBlank()) {
