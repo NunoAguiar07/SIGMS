@@ -3,15 +3,13 @@ package isel.leic.group25.db.repositories.timetables
 import isel.leic.group25.db.entities.rooms.Room
 import isel.leic.group25.db.entities.timetables.Class
 import isel.leic.group25.db.entities.timetables.Lecture
-import isel.leic.group25.db.entities.timetables.Subject
 import isel.leic.group25.db.entities.types.ClassType
 import isel.leic.group25.db.repositories.timetables.interfaces.LectureRepositoryInterface
 import isel.leic.group25.db.tables.Tables.Companion.lectures
-import kotlinx.datetime.Instant
 import org.ktorm.database.Database
 import org.ktorm.dsl.eq
 import org.ktorm.entity.*
-import kotlin.time.ExperimentalTime
+import kotlin.time.Duration
 
 
 class LectureRepository(private val database: Database) : LectureRepositoryInterface {
@@ -25,8 +23,8 @@ class LectureRepository(private val database: Database) : LectureRepositoryInter
         schoolClass: Class,
         room: Room,
         type: ClassType,
-        startTime: Instant,
-        endTime: Instant
+        startTime: Duration,
+        endTime: Duration
     ): Lecture? {
         val newLecture = Lecture {
             this.schoolClass = schoolClass

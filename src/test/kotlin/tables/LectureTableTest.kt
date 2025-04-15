@@ -11,8 +11,8 @@ import isel.leic.group25.db.tables.Tables.Companion.lectures
 import isel.leic.group25.db.tables.Tables.Companion.rooms
 import isel.leic.group25.db.tables.Tables.Companion.subjects
 import isel.leic.group25.db.tables.timetables.Lectures
+import isel.leic.group25.utils.toHoursAndMinutes
 import junit.framework.TestCase.assertEquals
-import kotlinx.datetime.Instant
 import org.h2.jdbcx.JdbcDataSource
 import org.h2.tools.RunScript
 import org.junit.jupiter.api.assertNull
@@ -29,6 +29,7 @@ import javax.sql.DataSource
 import kotlin.test.AfterTest
 import kotlin.test.Test
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.minutes
 
 class LectureTableTest {
     private val connection: Connection
@@ -89,8 +90,8 @@ class LectureTableTest {
                 room_id INT NOT NULL REFERENCES ROOM(id) ON DELETE CASCADE,
                 class_type VARCHAR(20) CHECK (class_type IN ('theoretical', 'practical', 'theoretical_practical' )),
                 week_day int CHECK(week_day > 0 and week_day < 8),
-                start_time bigint NOT NULL,
-                end_time bigint NOT NULL,
+                start_time int NOT NULL,
+                end_time int NOT NULL,
                 CHECK (end_time > start_time)
             );
         """)
@@ -112,20 +113,21 @@ class LectureTableTest {
         }.also{
             database.rooms.add(it)
         }
-        val currentTime = System.currentTimeMillis()
         val newLecture = Lecture {
             schoolClass = newClass
             room = newRoom
             type = ClassType.PRACTICAL
             weekDay = WeekDay.MONDAY
-            startTime = Instant.fromEpochMilliseconds(currentTime)
-            endTime = Instant.fromEpochMilliseconds(currentTime + 3600*1000)
+            startTime = Duration.parse("11h30m")
+            endTime = Duration.parse("11h30m") + 90.minutes
         }.also { database.lectures.add(it) }
         val lecture = database.lectures.first { it.classId eq newLecture.schoolClass.id }
         assertEquals(newLecture.schoolClass.id, lecture.schoolClass.id)
         assertEquals(newLecture.room.id, lecture.room.id)
         assertEquals(newLecture.duration, lecture.duration)
         assertEquals(newLecture.weekDay, lecture.weekDay)
+        assertEquals(newLecture.startTime.toHoursAndMinutes(), "11:30")
+        assertEquals(newLecture.endTime.toHoursAndMinutes(), "13:00")
     }
 
     @Test
@@ -133,7 +135,6 @@ class LectureTableTest {
         val newSubject = Subject{
             name = "PS"
         }.also { database.subjects.add(it) }
-        val currentTime = System.currentTimeMillis()
         val newClass = Class{
             subject = newSubject
             name = "51D"
@@ -148,8 +149,8 @@ class LectureTableTest {
             schoolClass = newClass
             room = newRoom
             type = ClassType.PRACTICAL
-            startTime = Instant.fromEpochMilliseconds(currentTime)
-            endTime = Instant.fromEpochMilliseconds(currentTime + 3600*1000)
+            startTime = Duration.parse("11h30m")
+            endTime = Duration.parse("11h30m") + 90.minutes
         }.also { database.lectures.add(it) }
         val lecture = database.lectures.first { it.classId eq newLecture.schoolClass.id }
         assertEquals(newLecture.schoolClass.id, lecture.schoolClass.id)
@@ -172,7 +173,7 @@ class LectureTableTest {
         assertEquals(newLecture.room.capacity, changedLecture.room.capacity)
         assertEquals(20, changedLecture.room.capacity)
         assertEquals(newLecture.duration, changedLecture.duration)
-        assertEquals(Duration.parse("2h"), changedLecture.duration)
+        assertEquals(Duration.parse("2h 30m"), changedLecture.duration)
     }
 
     @Test
@@ -180,7 +181,6 @@ class LectureTableTest {
         val newSubject = Subject{
             name = "PS"
         }.also { database.subjects.add(it) }
-        val currentTime = System.currentTimeMillis()
         val newClass = Class{
             subject = newSubject
             name = "51D"
@@ -195,8 +195,8 @@ class LectureTableTest {
             schoolClass = newClass
             room = newRoom
             type = ClassType.PRACTICAL
-            startTime = Instant.fromEpochMilliseconds(currentTime)
-            endTime = Instant.fromEpochMilliseconds(currentTime + 3600*1000)
+            startTime = Duration.parse("11h30m")
+            endTime = Duration.parse("11h30m") + 90.minutes
         }.also { database.lectures.add(it) }
         database.delete(Lectures) {
             it.classId eq newLecture.schoolClass.id

@@ -4,8 +4,7 @@ import isel.leic.group25.db.entities.rooms.Room
 import isel.leic.group25.db.entities.timetables.Class
 import isel.leic.group25.db.entities.timetables.Lecture
 import isel.leic.group25.db.entities.types.ClassType
-import kotlinx.datetime.Instant
-
+import kotlin.time.Duration
 
 
 interface LectureRepositoryInterface {
@@ -15,8 +14,8 @@ interface LectureRepositoryInterface {
         schoolClass: Class,
         room: Room,
         type: ClassType,
-        startTime: Instant,
-        endTime: Instant
+        startTime: Duration,
+        endTime: Duration
     ): Lecture?
     fun getLecturesByRoom(roomId: Int): List<Lecture>
     fun getLecturesBySubject(subjectId: Int): List<Lecture>
