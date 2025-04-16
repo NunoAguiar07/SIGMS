@@ -4,10 +4,8 @@ import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.response.*
 import isel.leic.group25.api.model.ProblemDetail
-import isel.leic.group25.services.errors.AuthError
-import isel.leic.group25.services.errors.ClassError
-import isel.leic.group25.services.errors.RoomError
-import isel.leic.group25.services.errors.SubjectError
+import isel.leic.group25.db.entities.issues.IssueReport
+import isel.leic.group25.services.errors.*
 import isel.leic.group25.utils.Either
 import java.net.URI
 
@@ -237,3 +235,90 @@ fun RoomError.toProblem(): Problem {
         )
     }
 }
+
+fun LectureError.toProblem(): Problem {
+    return when (this) {
+        LectureError.LectureAlreadyExists -> Problem.conflict(
+            title = "Lecture already exists",
+            detail = "The lecture with the given ID already exists."
+        )
+        LectureError.LectureChangesFailed -> Problem.internalServerError(
+            title = "Lecture changes failed",
+            detail = "Failed to update the lecture information."
+        )
+        LectureError.InvalidLectureId -> Problem.badRequest(
+            title = "Invalid lecture ID",
+            detail = "The provided lecture ID is invalid."
+        )
+        LectureError.InvalidLectureName -> Problem.badRequest(
+            title = "Invalid lecture name",
+            detail = "The provided lecture name is invalid."
+        )
+        LectureError.InvalidLectureClass -> Problem.badRequest(
+            title = "Invalid lecture class",
+            detail = "The provided lecture class is invalid."
+        )
+        LectureError.InvalidLectureSubject -> Problem.badRequest(
+            title = "Invalid lecture subject",
+            detail = "The provided lecture subject is invalid."
+        )
+        LectureError.InvalidLectureRoom -> Problem.badRequest(
+            title = "Invalid lecture room",
+            detail = "The provided lecture room is invalid."
+        )
+        LectureError.InvalidLectureTime -> Problem.badRequest(
+            title = "Invalid lecture time",
+            detail = "The provided lecture time is invalid."
+        )
+        LectureError.InvalidLectureDuration -> Problem.badRequest(
+            title = "Invalid lecture duration",
+            detail = "The provided lecture duration is invalid."
+        )
+        LectureError.InvalidLectureCapacity -> Problem.badRequest(
+            title = "Invalid lecture capacity",
+            detail = "The provided lecture capacity is invalid."
+        )
+        LectureError.InvalidLectureDate -> Problem.badRequest(
+            title = "Invalid lecture date",
+            detail = "The provided lecture date is invalid."
+        )
+        LectureError.LectureNotFound -> Problem.notFound(
+            title = "Lecture not found",
+            detail = "The lecture with the given ID was not found."
+        )
+    }
+}
+fun IssueReportError.toProblem(): Problem {
+    return when (this) {
+        IssueReportError.IssueReportNotFound -> Problem.notFound(
+            title = "Issue report not found",
+            detail = "The issue report with the given ID was not found."
+        )
+        IssueReportError.FailedToAddToDatabase -> Problem.internalServerError(
+            title = "Failed to add issue report",
+            detail = "An error occurred while adding the issue report to the database."
+        )
+        IssueReportError.FailedToDeleteFromDatabase -> Problem.internalServerError(
+            title = "Failed to delete issue report",
+            detail = "An error occurred while deleting the issue report from the database."
+        )
+        IssueReportError.FailedToUpdateInDatabase -> Problem.internalServerError(
+            title = "Failed to update issue report",
+            detail = "An error occurred while updating the issue report in the database."
+        )
+        IssueReportError.InvalidIssueReportId -> Problem.badRequest(
+            title = "Invalid issue report ID",
+            detail = "The provided issue report ID is invalid."
+        )
+        IssueReportError.InvalidRoomId -> Problem.badRequest(
+            title = "Invalid room ID",
+            detail = "The provided room ID is invalid."
+        )
+        IssueReportError.InvalidDescription -> Problem.badRequest(
+            title = "Invalid description",
+            detail = "The provided description is invalid or empty."
+        )
+    }
+}
+
+

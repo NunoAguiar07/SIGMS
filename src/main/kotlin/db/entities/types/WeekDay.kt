@@ -1,5 +1,9 @@
 package isel.leic.group25.db.entities.types
 
+import kotlinx.serialization.Serializable
+
+
+@Serializable
 enum class WeekDay(val value: Int) {
     MONDAY(1),
     TUESDAY(2),

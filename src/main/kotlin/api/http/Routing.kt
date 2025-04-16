@@ -20,7 +20,9 @@ fun Application.configureRouting(
     classService: ClassService,
     userClassService: UserClassService,
     subjectService: SubjectService,
-    roomService: RoomService
+    roomService: RoomService,
+    lectureService: LectureService,
+    issuesReportService: IssuesReportService
 ) {
     routing {
         route("/api"){
@@ -210,6 +212,64 @@ fun Application.configureRouting(
                             transformError = { error -> error.toProblem() },
                             transformSuccess = { room ->
                                 RoomResponse.from(room)
+                            },
+                            successStatus = HttpStatusCode.Created
+                        )
+                    }
+                }
+                route("/lectures"){ //
+                    get {
+                        val result = lectureService.getAllLectures()
+                        call.respondEither(
+                            either = result,
+                            transformError = { error -> error.toProblem() },
+                            transformSuccess = { lectures ->
+                                lectures.map { LectureResponse.from(it) }
+                            }
+                        )
+                    }
+                    post {
+                        val lectureRequest = call.receive<LectureRequest>()
+                        val result = lectureService.createLecture(
+                            schoolClassId = lectureRequest.schoolClassId,
+                            roomId = lectureRequest.roomId,
+                            weekDay = lectureRequest.weekDay,
+                            type = lectureRequest.type,
+                            startTime = lectureRequest.startTime,
+                            endTime = lectureRequest.endTime
+                        )
+                        call.respondEither(
+                            either = result,
+                            transformError = { error -> error.toProblem() },
+                            transformSuccess = { lecture ->
+                                LectureResponse.from(lecture)
+                            },
+                            successStatus = HttpStatusCode.Created
+                        )
+                    }
+                }
+                route("/issues") {
+                    get {
+                        val result = issuesReportService.getAllIssueReports()
+                        call.respondEither(
+                            either = result,
+                            transformError = { error -> error.toProblem() },
+                            transformSuccess = { issues ->
+                                issues.map { IssueReportResponse.from(it) }
+                            }
+                        )
+                    }
+                    post {
+                        val issueRequest = call.receive<IssueReportRequest>()
+                        val result = issuesReportService.createIssueReport(
+                            roomId = issueRequest.roomId,
+                            description = issueRequest.description
+                        )
+                        call.respondEither(
+                            either = result,
+                            transformError = { error -> error.toProblem() },
+                            transformSuccess = { issue ->
+                                IssueReportResponse.from(issue)
                             },
                             successStatus = HttpStatusCode.Created
                         )

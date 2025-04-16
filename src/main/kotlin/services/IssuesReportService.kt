@@ -4,6 +4,7 @@ import isel.leic.group25.db.entities.issues.IssueReport
 import isel.leic.group25.db.entities.rooms.Room
 import isel.leic.group25.db.repositories.interfaces.TransactionInterface
 import isel.leic.group25.db.repositories.issues.interfaces.IssueReportRepositoryInterface
+import isel.leic.group25.db.repositories.rooms.interfaces.RoomRepositoryInterface
 import isel.leic.group25.services.errors.IssueReportError
 import isel.leic.group25.utils.Either
 import isel.leic.group25.utils.failure
@@ -17,7 +18,8 @@ typealias IssueReportUpdateResult = Either<IssueReportError, IssueReport>
 typealias IssueReportDeletionResult = Either<IssueReportError, Boolean>
 
 class IssuesReportService(private val issueReportRepository: IssueReportRepositoryInterface,
-                          private val transactionInterface: TransactionInterface
+                          private val transactionInterface: TransactionInterface,
+                          private val roomRepository: RoomRepositoryInterface
 ) {
     fun getAllIssueReports(): IssueReportListResult {
        return transactionInterface.useTransaction {
@@ -37,14 +39,16 @@ class IssuesReportService(private val issueReportRepository: IssueReportReposito
         }
     }
 
-    fun createIssueReport(room: Room, description: String):IssueReportResult {
+    fun createIssueReport(roomId: Int, description: String):IssueReportResult {
         if (description.isBlank()) {
             return failure(IssueReportError.InvalidDescription)
         }
-        if (room.id <= 0) {
+        if (roomId <= 0) {
             return failure(IssueReportError.InvalidRoomId)
         }
        return transactionInterface.useTransaction {
+           val room = roomRepository.getRoomById(roomId)
+               ?: return@useTransaction failure(IssueReportError.InvalidRoomId)
             val newIssue = issueReportRepository.createIssueReport(room, description)
                 ?: return@useTransaction failure(IssueReportError.FailedToAddToDatabase)
            return@useTransaction success(newIssue)

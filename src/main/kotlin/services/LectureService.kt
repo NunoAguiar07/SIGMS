@@ -1,18 +1,18 @@
 package isel.leic.group25.services
 
-import isel.leic.group25.db.entities.rooms.Room
 import isel.leic.group25.db.entities.timetables.Class
 import isel.leic.group25.db.entities.timetables.Lecture
 import isel.leic.group25.db.entities.types.ClassType
 import isel.leic.group25.db.entities.types.WeekDay
 import isel.leic.group25.db.repositories.interfaces.TransactionInterface
+import isel.leic.group25.db.repositories.rooms.RoomRepository
+import isel.leic.group25.db.repositories.timetables.ClassRepository
 import isel.leic.group25.db.repositories.timetables.LectureRepository
 import isel.leic.group25.services.errors.LectureError
-import isel.leic.group25.utils.Either
-import isel.leic.group25.utils.Failure
-import isel.leic.group25.utils.failure
-import isel.leic.group25.utils.success
+import isel.leic.group25.utils.*
 import kotlinx.datetime.Instant
+import kotlin.time.Duration
+
 
 typealias LectureListResult = Either<LectureError, List<Lecture>>
 
@@ -23,8 +23,8 @@ typealias LectureResult = Either<LectureError, Lecture>
 
 class LectureService(private val lectureRepository: LectureRepository,
                      private val transactionInterface: TransactionInterface,
-                     private val classService:ClassService,
-                     private val roomService: RoomService) {
+                     private val classRepository: ClassRepository,
+                     private val roomRepository: RoomRepository) {
 
     fun getAllLectures(): LectureListResult {
         return transactionInterface.useTransaction {
@@ -34,32 +34,31 @@ class LectureService(private val lectureRepository: LectureRepository,
     }
 
     fun createLecture(
-        schoolClass: Class,
-        room: Room,
+        schoolClassId: Int,
+        roomId: Int,
         weekDay: WeekDay,
         type: ClassType,
-        startTime: Instant,
-        endTime: Instant
+        startTime: String,
+        endTime: String
     ): LectureResult {
-        if (startTime >= endTime) {
+        val parsedStartTime = startTime.hoursAndMinutesToDuration()
+        val parsedEndTime = endTime.hoursAndMinutesToDuration()
+        if (parsedStartTime >= parsedEndTime) {
             return failure(LectureError.InvalidLectureDate)
         }
 
         return transactionInterface.useTransaction {
-            if (classService.getClassById(schoolClass.id.toString()) is Failure){
-                return@useTransaction failure(LectureError.InvalidLectureClass)
-            }
-            if(roomService.getRoomById(room.id.toString()) is Failure) {
-                return@useTransaction failure(LectureError.InvalidLectureRoom)
-            }
             if(
-                lectureRepository.getAllLectures().any { it.startTime == startTime && it.endTime == endTime && it.room.id == room.id && it.schoolClass.id == schoolClass.id && it.type == type && it.weekDay == weekDay }
+                lectureRepository.getAllLectures().any { it.startTime == parsedStartTime && it.endTime == parsedEndTime && it.room.id == roomId && it.schoolClass.id == schoolClassId && it.type == type && it.weekDay == weekDay }
             ) {
                 return@useTransaction failure(LectureError.LectureAlreadyExists)
             }
-           val newLecture = lectureRepository.createLecture(schoolClass, room, weekDay, type, startTime, endTime)
+            val room = roomRepository.getRoomById(roomId) ?: return@useTransaction failure(LectureError.InvalidLectureRoom)
+            val schoolClass = classRepository.findClassById(schoolClassId) ?: return@useTransaction failure(LectureError.InvalidLectureClass)
+           val newLecture = lectureRepository.createLecture(schoolClass, room,type , weekDay, parsedStartTime, parsedEndTime)
                ?: return@useTransaction failure(LectureError.LectureNotFound)
             return@useTransaction success(newLecture)
+
         }
     }
 

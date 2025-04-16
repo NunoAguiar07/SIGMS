@@ -4,6 +4,7 @@ import isel.leic.group25.db.entities.rooms.Room
 import isel.leic.group25.db.entities.timetables.Class
 import isel.leic.group25.db.entities.timetables.Lecture
 import isel.leic.group25.db.entities.types.ClassType
+import isel.leic.group25.db.entities.types.WeekDay
 import isel.leic.group25.db.repositories.timetables.interfaces.LectureRepositoryInterface
 import isel.leic.group25.db.tables.Tables.Companion.lectures
 import org.ktorm.database.Database
@@ -23,6 +24,7 @@ class LectureRepository(private val database: Database) : LectureRepositoryInter
         schoolClass: Class,
         room: Room,
         type: ClassType,
+        weekDay: WeekDay,
         startTime: Duration,
         endTime: Duration
     ): Lecture? {
@@ -30,6 +32,7 @@ class LectureRepository(private val database: Database) : LectureRepositoryInter
             this.schoolClass = schoolClass
             this.room = room
             this.type = type
+            this.weekDay = weekDay
             this.startTime = startTime
             this.endTime = endTime
         }

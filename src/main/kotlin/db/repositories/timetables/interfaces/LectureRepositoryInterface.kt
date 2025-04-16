@@ -4,6 +4,7 @@ import isel.leic.group25.db.entities.rooms.Room
 import isel.leic.group25.db.entities.timetables.Class
 import isel.leic.group25.db.entities.timetables.Lecture
 import isel.leic.group25.db.entities.types.ClassType
+import isel.leic.group25.db.entities.types.WeekDay
 import kotlin.time.Duration
 
 
@@ -14,6 +15,7 @@ interface LectureRepositoryInterface {
         schoolClass: Class,
         room: Room,
         type: ClassType,
+        weekDay: WeekDay,
         startTime: Duration,
         endTime: Duration
     ): Lecture?
