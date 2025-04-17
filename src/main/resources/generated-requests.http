@@ -32,7 +32,7 @@ Content-Type: application/json
 }
 
 ###
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwODAvIiwiYXVkIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwLyIsInVzZXJJZCI6MSwicm9sZSI6IlNUVURFTlQiLCJpYXQiOjE3NDQ0NTgxNTEsImV4cCI6MTc0NDQ2MTc1MX0.iVs__RJ4dwIP88URwmbAYGNlbrYd17sfniY_XCCMt34
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwODAvIiwiYXVkIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwLyIsInVzZXJJZCI6MSwicm9sZSI6IlNUVURFTlQiLCJpYXQiOjE3NDQ4OTIxODUsImV4cCI6MTc0NDg5NTc4NX0.QRG7tQIIZzNGoKsa7MPGhgl2YrVpx1s4SRF2kQVbIFI
 
 
 ###
@@ -91,6 +91,10 @@ Content-Type: application/json
 }
 
 ###
+GET {{baseUrl}}/subjects/1/classes/1/lectures
+Authorization: Bearer {{token}}
+
+###
 GET {{baseUrl}}/rooms
 Authorization: Bearer {{token}}
 
@@ -109,6 +113,26 @@ Content-Type: application/json
   "type": "class"
 }
 
+###
+GET {{baseUrl}}/rooms/1/lectures
+Authorization: Bearer {{token}}
 
+###
+GET {{baseUrl}}/lectures
+Authorization: Bearer {{token}}
+
+###
+POST {{baseUrl}}/lectures
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "schoolClassId": 1,
+  "roomId": 1,
+  "startTime": "18:30",
+  "endTime": "19:00",
+  "type": "THEORETICAL",
+  "weekDay": "MONDAY"
+}
 
 

@@ -3,9 +3,9 @@ package isel.leic.group25.api.model.response
 import isel.leic.group25.db.entities.timetables.Lecture
 import isel.leic.group25.db.entities.types.ClassType
 import isel.leic.group25.db.entities.types.WeekDay
+import kotlinx.serialization.Serializable
 
-
-
+@Serializable
 data class LectureResponse(
     val schoolClass: Int,
     val room: Int,

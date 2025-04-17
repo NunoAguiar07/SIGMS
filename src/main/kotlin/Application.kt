@@ -68,5 +68,5 @@ fun Application.module() {
             }
         }
     }
-    configureRouting(userService, classService, userClassService, subjectService, roomService, lectureService, issueReportService )
+    configureRouting(userService, classService, userClassService, subjectService, roomService, lectureService, issueReportService)
 }

@@ -20,6 +20,6 @@ interface LectureRepositoryInterface {
         endTime: Duration
     ): Lecture?
     fun getLecturesByRoom(roomId: Int): List<Lecture>
-    fun getLecturesBySubject(subjectId: Int): List<Lecture>
+    fun getLecturesByClass(classId: Int): List<Lecture>
     fun getLecturesByType(type: ClassType): List<Lecture>
 }

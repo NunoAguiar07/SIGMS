@@ -4,6 +4,5 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class ClassRequest(
-    val name: String,
-    val subjectId: Int
+    val name: String
 )

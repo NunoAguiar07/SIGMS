@@ -1,7 +1,6 @@
 package isel.leic.group25.services
 
 import isel.leic.group25.db.entities.issues.IssueReport
-import isel.leic.group25.db.entities.rooms.Room
 import isel.leic.group25.db.repositories.interfaces.TransactionInterface
 import isel.leic.group25.db.repositories.issues.interfaces.IssueReportRepositoryInterface
 import isel.leic.group25.db.repositories.rooms.interfaces.RoomRepositoryInterface
@@ -28,12 +27,15 @@ class IssuesReportService(private val issueReportRepository: IssueReportReposito
         }
     }
 
-    fun getIssueReportById(id: Int): IssueReportResult {
-        if (id <= 0) {
+    fun getIssueReportById(id: String?): IssueReportResult {
+        if (id == null || id.toIntOrNull() == null) {
+            return failure(IssueReportError.InvalidIssueReportId)
+        }
+        if (id.toInt() <= 0) {
             return failure(IssueReportError.InvalidIssueReportId)
         }
         return transactionInterface.useTransaction {
-           val issue = issueReportRepository.getIssueReportById(id)
+           val issue = issueReportRepository.getIssueReportById(id.toInt())
                ?: return@useTransaction failure(IssueReportError.InvalidIssueReportId)
             return@useTransaction success(issue)
         }

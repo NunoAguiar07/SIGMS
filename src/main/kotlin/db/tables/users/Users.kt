@@ -6,7 +6,7 @@ import org.ktorm.schema.int
 import org.ktorm.schema.varchar
 import java.util.*
 
-object Users: Table<User>("USERS") {
+object Users: Table<User>("users") {
     val id = int("id").primaryKey().bindTo { it.id }
     val email = varchar("email").bindTo { it.email }
     val username = varchar("username").bindTo { it.username }

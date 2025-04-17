@@ -6,7 +6,7 @@ import org.ktorm.schema.Table
 import org.ktorm.schema.int
 
 
-object Teaches : Table<Teach>("TEACH") {
+object Teaches : Table<Teach>("teach") {
     val teacherId = int("teacher_id").primaryKey().references(Users) { it.user }
     val classId = int("class_id").primaryKey().references(Classes) { it.schoolClass }
 }

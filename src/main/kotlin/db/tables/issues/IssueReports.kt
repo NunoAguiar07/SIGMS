@@ -6,7 +6,7 @@ import org.ktorm.schema.Table
 import org.ktorm.schema.int
 import org.ktorm.schema.text
 
-object IssueReports: Table<IssueReport>("ISSUE_REPORT") {
+object IssueReports: Table<IssueReport>("issue_report") {
     val id = int("id").primaryKey().bindTo { it.id }
     val room = int("room_id").references(Rooms){ it.room }
     val description = text("description").bindTo { it.description }

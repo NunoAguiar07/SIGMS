@@ -45,8 +45,8 @@ class LectureRepository(private val database: Database) : LectureRepositoryInter
         return database.lectures.filter { it.roomId eq roomId }.map { it }
     }
 
-    override fun getLecturesBySubject(subjectId: Int): List<Lecture> {
-        return database.lectures.filter { it.classId eq subjectId }.map { it }
+    override fun getLecturesByClass(classId: Int): List<Lecture> {
+        return database.lectures.filter { it.classId eq classId }.map { it }
     }
 
     override fun getLecturesByType(type: ClassType): List<Lecture> {

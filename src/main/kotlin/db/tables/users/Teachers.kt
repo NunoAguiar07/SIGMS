@@ -5,6 +5,6 @@ import isel.leic.group25.db.entities.users.Teacher
 import org.ktorm.schema.Table
 import org.ktorm.schema.int
 
-object Teachers : Table<Teacher>("TEACHER") {
+object Teachers : Table<Teacher>("teacher") {
     val user = int("user_id").primaryKey().references(Users) { it.user }
 }

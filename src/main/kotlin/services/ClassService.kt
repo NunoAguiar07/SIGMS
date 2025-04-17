@@ -48,7 +48,9 @@ class ClassService(private val classRepository: ClassRepository,
             if (subjectId == null || subjectId.toIntOrNull() == null) {
                 return@useTransaction failure(ClassError.InvalidSubjectId)
             }
-            classRepository.findClassByName(name) ?: return@useTransaction failure(ClassError.ClassAlreadyExists)
+            if(classRepository.findClassByName(name) != null) {
+                return@useTransaction failure(ClassError.ClassAlreadyExists)
+            }
             val existingSubject = subjectRepository.findSubjectById(subjectId.toInt())
                 ?: return@useTransaction failure(ClassError.SubjectNotFound)
             val newClass = Class {
