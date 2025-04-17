@@ -4,7 +4,6 @@ import io.ktor.http.*
 import io.ktor.server.request.*
 import io.ktor.server.routing.*
 import isel.leic.group25.api.exceptions.respondEither
-import isel.leic.group25.api.exceptions.toProblem
 import isel.leic.group25.api.model.request.LectureRequest
 import isel.leic.group25.api.model.response.LectureResponse
 import isel.leic.group25.services.LectureService

@@ -41,15 +41,18 @@ class IssuesReportService(private val issueReportRepository: IssueReportReposito
         }
     }
 
-    fun createIssueReport(roomId: Int, description: String):IssueReportResult {
+    fun createIssueReport(roomId: String?, description: String):IssueReportResult {
+        if (roomId == null || roomId.toIntOrNull() == null) {
+            return failure(IssueReportError.InvalidRoomId)
+        }
         if (description.isBlank()) {
             return failure(IssueReportError.InvalidDescription)
         }
-        if (roomId <= 0) {
+        if (roomId.toInt() <= 0) {
             return failure(IssueReportError.InvalidRoomId)
         }
        return transactionInterface.useTransaction {
-           val room = roomRepository.getRoomById(roomId)
+           val room = roomRepository.getRoomById(roomId.toInt())
                ?: return@useTransaction failure(IssueReportError.InvalidRoomId)
             val newIssue = issueReportRepository.createIssueReport(room, description)
                 ?: return@useTransaction failure(IssueReportError.FailedToAddToDatabase)
@@ -80,7 +83,7 @@ class IssuesReportService(private val issueReportRepository: IssueReportReposito
             return failure(IssueReportError.InvalidIssueReportId)
         }
        return transactionInterface.useTransaction {
-            val issueReport = issueReportRepository.getIssueReportById(id)
+            issueReportRepository.getIssueReportById(id)
                 ?: return@useTransaction failure(IssueReportError.InvalidIssueReportId)
             val room = issueReportRepository.getIssueReportById(roomId)
                 ?: return@useTransaction failure(IssueReportError.InvalidRoomId)

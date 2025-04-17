@@ -118,6 +118,23 @@ GET {{baseUrl}}/rooms/1/lectures
 Authorization: Bearer {{token}}
 
 ###
+GET {{baseUrl}}/rooms/1/issues
+Authorization: Bearer {{token}}
+
+###
+POST {{baseUrl}}/rooms/1/issues
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "description": "The projector is not working"
+}
+
+###
+GET {{baseUrl}}/rooms/1/issues/1
+Authorization: Bearer {{token}}
+
+###
 GET {{baseUrl}}/lectures
 Authorization: Bearer {{token}}
 
@@ -134,5 +151,7 @@ Content-Type: application/json
   "type": "THEORETICAL",
   "weekDay": "MONDAY"
 }
+
+
 
 

@@ -8,7 +8,6 @@ import io.ktor.http.*
 import io.ktor.server.request.*
 import io.ktor.server.routing.*
 import isel.leic.group25.api.exceptions.respondEither
-import isel.leic.group25.api.exceptions.toProblem
 import isel.leic.group25.services.UserService
 
 fun Route.authRoutes(userService: UserService) {

@@ -28,7 +28,7 @@ fun Application.module() {
     install(ContentNegotiation) {
         json()
     }
-    val db = Database.connect(url = "jdbc:postgresql://db:5432/sigms", user = "user", password = "password123", driver = "org.postgresql.Driver")
+    val db = Database.connect(url = "jdbc:postgresql://localhost:5432/sigms", user = "user", password = "password123", driver = "org.postgresql.Driver")
     val secret = environment.config.property("jwt.secret").getString()
     val issuer = environment.config.property("jwt.issuer").getString()
     val audience = environment.config.property("jwt.audience").getString()

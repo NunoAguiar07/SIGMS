@@ -15,8 +15,7 @@ fun Route.authenticatedRoutes(
     authenticate("auth-jwt") {
         profileRoutes(userService)
         subjectRoutes(subjectService, classService, lectureService)
-        roomRoutes(roomService, lectureService)
+        roomRoutes(roomService, lectureService, issuesReportService)
         lectureRoutes(lectureService)
-        issueRoutes(issuesReportService)
     }
 }
