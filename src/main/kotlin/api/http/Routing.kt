@@ -6,6 +6,7 @@ import isel.leic.group25.api.http.routes.athenticatedRoutes.authenticatedRoutes
 import isel.leic.group25.api.http.routes.authRoutes
 import isel.leic.group25.api.http.routes.welcomeRoutes
 import isel.leic.group25.services.*
+import isel.leic.group25.websockets.hardware.route.DeviceRoute
 
 fun Application.configureRouting(
     userService: UserService,
@@ -28,6 +29,9 @@ fun Application.configureRouting(
                 lectureService,
                 issuesReportService
             )
+        }
+        with(DeviceRoute){
+            install()
         }
     }
 

@@ -8,6 +8,7 @@ import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*
 import io.ktor.server.response.*
+import io.ktor.server.websocket.*
 import isel.leic.group25.api.http.configureRouting
 import isel.leic.group25.api.jwt.JwtConfig
 import isel.leic.group25.db.repositories.issues.IssueReportRepository
@@ -19,6 +20,8 @@ import isel.leic.group25.db.repositories.timetables.SubjectRepository
 import isel.leic.group25.db.repositories.users.UserRepository
 import isel.leic.group25.services.*
 import org.ktorm.database.Database
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 fun main(args: Array<String>) {
     EngineMain.main(args)
@@ -67,6 +70,12 @@ fun Application.module() {
                 call.respond(HttpStatusCode.Unauthorized, "Token expired or invalid")
             }
         }
+    }
+    install(WebSockets) {
+        pingPeriod = 15.seconds
+        timeout = 30.seconds
+        maxFrameSize = Long.MAX_VALUE
+        masking = false
     }
     configureRouting(userService, classService, userClassService, subjectService, roomService, lectureService, issueReportService)
 }
