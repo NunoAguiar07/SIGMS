@@ -16,9 +16,17 @@ class RoomService (
     private val roomRepository: RoomRepository,
     private val transactionInterface: TransactionInterface,
 ) {
-    fun getAllRooms(): RoomListResult {
+    fun getAllRooms(limit: String?, offset: String?): RoomListResult {
+        val newLimit = limit?.toInt() ?: 20
+        if (newLimit <= 0 || newLimit > 100) {
+            return failure(RoomError.InvalidRoomLimit)
+        }
+        val newOffset = offset?.toInt() ?: 0
+        if (newOffset < 0) {
+            return failure(RoomError.InvalidRoomOffSet)
+        }
         return transactionInterface.useTransaction {
-            val rooms = roomRepository.getAllRooms()
+            val rooms = roomRepository.getAllRooms(newLimit, newOffset)
             return@useTransaction success(rooms)
         }
     }

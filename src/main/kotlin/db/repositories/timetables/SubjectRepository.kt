@@ -5,13 +5,11 @@ import isel.leic.group25.db.repositories.timetables.interfaces.SubjectRepository
 import isel.leic.group25.db.tables.Tables.Companion.subjects
 import org.ktorm.database.Database
 import org.ktorm.dsl.eq
-import org.ktorm.entity.add
-import org.ktorm.entity.firstOrNull
-import org.ktorm.entity.toList
+import org.ktorm.entity.*
 
 class SubjectRepository(private val database: Database): SubjectRepositoryInterface {
-    override fun getAllSubjects(): List<Subject> {
-        return database.subjects.toList()
+    override fun getAllSubjects(limit:Int, offset:Int): List<Subject> {
+        return database.subjects.drop(offset).take(limit).toList()
     }
 
     override fun findSubjectById(id: Int): Subject? {

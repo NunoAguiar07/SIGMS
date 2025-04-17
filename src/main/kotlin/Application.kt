@@ -20,7 +20,7 @@ import isel.leic.group25.db.repositories.timetables.SubjectRepository
 import isel.leic.group25.db.repositories.users.UserRepository
 import isel.leic.group25.services.*
 import org.ktorm.database.Database
-import kotlin.time.Duration
+import org.ktorm.support.postgresql.PostgreSqlDialect
 import kotlin.time.Duration.Companion.seconds
 
 fun main(args: Array<String>) {
@@ -31,7 +31,7 @@ fun Application.module() {
     install(ContentNegotiation) {
         json()
     }
-    val db = Database.connect(url = "jdbc:postgresql://localhost:5432/sigms", user = "user", password = "password123", driver = "org.postgresql.Driver")
+    val db = Database.connect(url = "jdbc:postgresql://localhost:5432/sigms", user = "user", password = "password123", driver = "org.postgresql.Driver", dialect = PostgreSqlDialect())
     val secret = environment.config.property("jwt.secret").getString()
     val issuer = environment.config.property("jwt.issuer").getString()
     val audience = environment.config.property("jwt.audience").getString()

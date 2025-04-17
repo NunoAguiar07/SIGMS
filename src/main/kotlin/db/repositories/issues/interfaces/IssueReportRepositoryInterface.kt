@@ -5,7 +5,7 @@ import isel.leic.group25.db.entities.rooms.Room
 
 
 interface IssueReportRepositoryInterface {
-    fun getAllIssueReports(): List<IssueReport>
+    fun getAllIssueReports(limit:Int, offset:Int): List<IssueReport>
     fun getIssueReportById(id: Int): IssueReport?
     fun createIssueReport(room: Room, description: String): IssueReport?
     fun deleteIssueReport(id: Int): Boolean

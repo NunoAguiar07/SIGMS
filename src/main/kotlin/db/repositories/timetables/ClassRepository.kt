@@ -25,8 +25,8 @@ class ClassRepository(private val database: Database): ClassRepositoryInterface 
         return database.classes.firstOrNull { it.name eq name }
     }
 
-    override fun findClassesBySubject(subject: Subject): List<Class> {
-        return database.classes.filter { it.subject eq subject.id }.toList()
+    override fun findClassesBySubject(subject: Subject, limit:Int, offset:Int): List<Class> {
+        return database.classes.filter { it.subject eq subject.id }.drop(offset).take(limit).toList()
     }
 
     override fun addClass(newClass: Class): Boolean {

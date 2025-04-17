@@ -23,9 +23,17 @@ class LectureService(private val lectureRepository: LectureRepository,
                      private val classRepository: ClassRepository,
                      private val roomRepository: RoomRepository) {
 
-    fun getAllLectures(): LectureListResult {
+    fun getAllLectures(limit: String?, offSet: String?): LectureListResult {
+        val newLimit = limit?.toInt() ?: 20
+        if (newLimit <= 0 || newLimit > 100) {
+            return failure(LectureError.InvalidLectureLimit)
+        }
+        val newOffSet = offSet?.toInt() ?: 0
+        if (newOffSet < 0) {
+            return failure(LectureError.InvalidLectureOffset)
+        }
         return transactionInterface.useTransaction {
-            val lectures = lectureRepository.getAllLectures()
+            val lectures = lectureRepository.getAllLectures(newLimit, newOffSet)
             return@useTransaction success(lectures)
         }
     }
@@ -65,20 +73,36 @@ class LectureService(private val lectureRepository: LectureRepository,
         }
     }
 
-    fun getLecturesByRoom(roomId: String?): LectureListResult {
+    fun getLecturesByRoom(roomId: String?, limit: String?, offSet: String?): LectureListResult {
         if (roomId == null || roomId.toIntOrNull() == null) {
             return failure(LectureError.InvalidLectureRoom)
         }
         if (roomId.toInt() <= 0) {
             return failure(LectureError.InvalidLectureRoom)
         }
+        val newLimit = limit?.toInt() ?: 20
+        if (newLimit <= 0 || newLimit > 100) {
+            return failure(LectureError.InvalidLectureLimit)
+        }
+        val newOffSet = offSet?.toInt() ?: 0
+        if (newOffSet < 0) {
+            return failure(LectureError.InvalidLectureOffset)
+        }
         return transactionInterface.useTransaction {
-            val lectures = lectureRepository.getLecturesByRoom(roomId.toInt())
+            val lectures = lectureRepository.getLecturesByRoom(roomId.toInt(), newLimit, newOffSet)
             return@useTransaction success(lectures)
         }
     }
 
-    fun getLecturesByClass(classId: String?): LectureListResult {
+    fun getLecturesByClass(classId: String?, limit: String?, offset:String?): LectureListResult {
+        val newLimit = limit?.toInt() ?: 20
+        if (newLimit <= 0 || newLimit > 100) {
+            return failure(LectureError.InvalidLectureLimit)
+        }
+        val newOffset = offset?.toInt() ?: 0
+        if (newOffset < 0) {
+            return failure(LectureError.InvalidLectureOffset)
+        }
         if (classId == null || classId.toIntOrNull() == null) {
             return failure(LectureError.InvalidLectureSubject)
         }
@@ -86,7 +110,7 @@ class LectureService(private val lectureRepository: LectureRepository,
             return failure(LectureError.InvalidLectureSubject)
         }
         return transactionInterface.useTransaction {
-            val lectures = lectureRepository.getLecturesByClass(classId.toInt())
+            val lectures = lectureRepository.getLecturesByClass(classId.toInt(), newLimit, newOffset)
             return@useTransaction success(lectures)
         }
     }

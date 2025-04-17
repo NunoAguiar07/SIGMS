@@ -11,13 +11,15 @@ import isel.leic.group25.db.tables.Tables.Companion.rooms
 import isel.leic.group25.db.tables.Tables.Companion.studyRooms
 import org.ktorm.database.Database
 import org.ktorm.dsl.eq
-import org.ktorm.entity.add
-import org.ktorm.entity.firstOrNull
-import org.ktorm.entity.toList
+import org.ktorm.entity.*
 
 class RoomRepository (private val database: Database) : RoomRepositoryInterface {
     override fun getAllRooms(): List<Room> {
         return database.rooms.toList()
+    }
+
+    override fun getAllRooms(limit:Int, offset:Int): List<Room> {
+        return database.rooms.drop(offset).take(limit).toList()
     }
 
     override fun getRoomById(id: Int): Room? {

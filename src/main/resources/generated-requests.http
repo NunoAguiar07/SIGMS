@@ -32,7 +32,7 @@ Content-Type: application/json
 }
 
 ###
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwODAvIiwiYXVkIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwLyIsInVzZXJJZCI6MSwicm9sZSI6IlNUVURFTlQiLCJpYXQiOjE3NDQ4OTIxODUsImV4cCI6MTc0NDg5NTc4NX0.QRG7tQIIZzNGoKsa7MPGhgl2YrVpx1s4SRF2kQVbIFI
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwODAvIiwiYXVkIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwLyIsInVzZXJJZCI6MSwicm9sZSI6IlNUVURFTlQiLCJpYXQiOjE3NDQ5MDA0MzUsImV4cCI6MTc0NDkwNDAzNX0.aw1JUMfzVFJs6Sx-7ixRGe427ERJF0GgsaiDKemCwnk
 
 
 ###
@@ -127,7 +127,7 @@ Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "description": "The projector is not working"
+  "description": "The projector is not working again"
 }
 
 ###

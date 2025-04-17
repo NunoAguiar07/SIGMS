@@ -12,7 +12,7 @@ interface ClassRepositoryInterface {
 
     fun findClassByName(name: String): Class?
 
-    fun findClassesBySubject(subject: Subject): List<Class>
+    fun findClassesBySubject(subject: Subject, limit:Int, offset:Int): List<Class>
 
     fun addClass(newClass: Class): Boolean
 

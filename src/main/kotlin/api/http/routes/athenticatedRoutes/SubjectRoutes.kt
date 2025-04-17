@@ -21,7 +21,9 @@ fun Route.subjectRoutes(
 ) {
     route("/subjects") {
         get {
-            val result = subjectService.getAllSubjects()
+            val limit = call.parameters["limit"]
+            val offset = call.parameters["offset"]
+            val result = subjectService.getAllSubjects(limit, offset)
             call.respondEither(
                 either = result,
                 transformError = { error -> error.toProblem() },
@@ -58,8 +60,10 @@ fun Route.subjectRoutes(
             }
             route("/classes") {
                 get {
+                    val limit = call.parameters["limit"]
+                    val offset = call.parameters["offset"]
                     val id = call.parameters["subjectId"] ?: return@get call.respond(HttpStatusCode.BadRequest)
-                    val result = classService.getAllClassesFromSubject(id)
+                    val result = classService.getAllClassesFromSubject(id, limit, offset)
                     call.respondEither(
                         either = result,
                         transformError = { error -> error.toProblem() },
@@ -98,8 +102,10 @@ fun Route.subjectRoutes(
                     }
                     route("/lectures") {
                         get {
+                            val limit = call.parameters["limit"]
+                            val offset = call.parameters["offset"]
                             val id = call.parameters["classId"] ?: return@get call.respond(HttpStatusCode.BadRequest)
-                            val result = lectureService.getLecturesByClass(id)
+                            val result = lectureService.getLecturesByClass(id, limit, offset)
                             call.respondEither(
                                 either = result,
                                 transformError = { error -> error.toProblem() },

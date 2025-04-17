@@ -19,6 +19,9 @@ class LectureRepository(private val database: Database) : LectureRepositoryInter
         return database.lectures.toList()
     }
 
+    override fun getAllLectures(limit:Int, offSet: Int): List<Lecture> {
+        return database.lectures.drop(offSet).take(limit).toList()
+    }
 
     override fun createLecture(
         schoolClass: Class,
@@ -37,16 +40,16 @@ class LectureRepository(private val database: Database) : LectureRepositoryInter
             this.endTime = endTime
         }
         database.lectures.add(newLecture)
-        return getLecturesByRoom(room.id)
+        return getLecturesByRoom(room.id, 1, 0)
             .firstOrNull { it.startTime == startTime && it.endTime == endTime && it.room.id == room.id && it.schoolClass.id == schoolClass.id }
     }
 
-    override fun getLecturesByRoom(roomId: Int): List<Lecture> {
-        return database.lectures.filter { it.roomId eq roomId }.map { it }
+    override fun getLecturesByRoom(roomId: Int, limit:Int, offSet:Int): List<Lecture> {
+        return database.lectures.filter { it.roomId eq roomId }.drop(offSet).take(limit).toList()
     }
 
-    override fun getLecturesByClass(classId: Int): List<Lecture> {
-        return database.lectures.filter { it.classId eq classId }.map { it }
+    override fun getLecturesByClass(classId: Int, limit:Int, offSet:Int): List<Lecture> {
+        return database.lectures.filter { it.classId eq classId }.drop(offSet).take(limit).toList()
     }
 
     override fun getLecturesByType(type: ClassType): List<Lecture> {

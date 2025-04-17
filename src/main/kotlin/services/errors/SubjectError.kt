@@ -11,6 +11,8 @@ sealed class SubjectError {
     data object SubjectChangesFailed : SubjectError()
     data object MissingSubjectData : SubjectError()
     data object InvalidRole : SubjectError()
+    data object InvalidSubjectLimit : SubjectError()
+    data object InvalidSubjectOffset : SubjectError()
 
     fun toProblem(): Problem {
         return when (this) {
@@ -45,6 +47,14 @@ sealed class SubjectError {
             InvalidSubjectId -> Problem.badRequest(
                 title = "Invalid subject ID",
                 detail = "The provided subject ID is invalid."
+            )
+            InvalidSubjectLimit -> Problem.badRequest(
+                title = "Invalid subject limit",
+                detail = "The provided subject limit is invalid. It should be between 1 and 100."
+            )
+            InvalidSubjectOffset -> Problem.badRequest(
+                title = "Invalid subject offset",
+                detail = "The provided subject offset is invalid. It should be a non-negative integer."
             )
         }
     }

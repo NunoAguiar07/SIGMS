@@ -14,6 +14,8 @@ sealed class LectureError {
     data object InvalidLectureDuration : LectureError()
     data object InvalidLectureCapacity : LectureError()
     data object InvalidLectureDate : LectureError()
+    data object InvalidLectureLimit : LectureError()
+    data object InvalidLectureOffset : LectureError()
     data object LectureNotFound : LectureError()
 
     fun toProblem(): Problem {
@@ -65,6 +67,14 @@ sealed class LectureError {
             LectureNotFound -> Problem.notFound(
                 title = "Lecture not found",
                 detail = "The lecture with the given ID was not found."
+            )
+            InvalidLectureLimit -> Problem.badRequest(
+                title = "Invalid lecture limit",
+                detail = "The limit parameter must be a positive integer lesser than 100."
+            )
+            InvalidLectureOffset -> Problem.badRequest(
+                title = "Invalid lecture offset",
+                detail = "The offset parameter must be a positive integer."
             )
         }
     }

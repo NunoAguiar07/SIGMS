@@ -20,9 +20,17 @@ class IssuesReportService(private val issueReportRepository: IssueReportReposito
                           private val transactionInterface: TransactionInterface,
                           private val roomRepository: RoomRepositoryInterface
 ) {
-    fun getAllIssueReports(): IssueReportListResult {
-       return transactionInterface.useTransaction {
-            val issues = issueReportRepository.getAllIssueReports()
+    fun getAllIssueReports(limit:String?, offset:String?): IssueReportListResult {
+        val newLimit = limit?.toInt() ?: 20
+        if (newLimit <= 0 || newLimit > 100) {
+            return failure(IssueReportError.InvalidIssueReportLimit)
+        }
+        val newOffset = offset?.toInt() ?: 0
+        if (newOffset < 0) {
+            return failure(IssueReportError.InvalidIssueReportOffSet)
+        }
+        return transactionInterface.useTransaction {
+            val issues = issueReportRepository.getAllIssueReports(newLimit, newOffset)
            return@useTransaction success(issues)
         }
     }
