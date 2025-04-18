@@ -68,34 +68,37 @@ class IssuesReportService(private val issueReportRepository: IssueReportReposito
        }
     }
 
-    fun deleteIssueReport(id: Int): IssueReportDeletionResult {
-        if (id <= 0) {
+    fun deleteIssueReport(id: String): IssueReportDeletionResult {
+        val parsedId = id.toInt()
+        if (parsedId <= 0) {
             return failure(IssueReportError.InvalidIssueReportId)
         }
         return transactionInterface.useTransaction {
-            issueReportRepository.getIssueReportById(id)
+            issueReportRepository.getIssueReportById(parsedId)
                 ?: return@useTransaction failure(IssueReportError.InvalidIssueReportId)
-            val deletedIssue = issueReportRepository.deleteIssueReport(id)
+            val deletedIssue = issueReportRepository.deleteIssueReport(parsedId)
             return@useTransaction success(deletedIssue)
         }
     }
 
-    fun updateIssueReport(id: Int, roomId: Int, description: String): IssueReportUpdateResult {
+    fun updateIssueReport(id: String, roomId: String, description: String): IssueReportUpdateResult {
+        val parsedId = id.toInt()
+        val parsedRoomId = roomId.toInt()
         if (description.isBlank()) {
             return failure(IssueReportError.InvalidDescription)
         }
-        if (roomId <= 0) {
+        if (parsedRoomId <= 0) {
             return failure(IssueReportError.InvalidRoomId)
         }
-        if (id <= 0) {
+        if (parsedId <= 0) {
             return failure(IssueReportError.InvalidIssueReportId)
         }
        return transactionInterface.useTransaction {
-            issueReportRepository.getIssueReportById(id)
+            issueReportRepository.getIssueReportById(parsedId)
                 ?: return@useTransaction failure(IssueReportError.InvalidIssueReportId)
-            val room = issueReportRepository.getIssueReportById(roomId)
+            val room = issueReportRepository.getIssueReportById(parsedRoomId)
                 ?: return@useTransaction failure(IssueReportError.InvalidRoomId)
-            val updatedIssue = issueReportRepository.updateIssueReport(id, room.id, description)
+            val updatedIssue = issueReportRepository.updateIssueReport(parsedId, room.id, description)
                 ?: return@useTransaction failure(IssueReportError.FailedToUpdateInDatabase)
             return@useTransaction success(updatedIssue)
         }

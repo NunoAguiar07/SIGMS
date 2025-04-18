@@ -117,6 +117,36 @@ fun Route.roomRoutes(
                         )
                     }
                 }
+                delete("{issueId}") {
+                    val id = call.parameters["issueId"] ?: return@delete call.respond(HttpStatusCode.BadRequest)
+                    val result = issuesReportService.deleteIssueReport(id)
+                    call.respondEither(
+                        either = result,
+                        transformError = { error -> error.toProblem() },
+                        transformSuccess = {
+                            HttpStatusCode.NoContent
+                        }
+                    )
+                }
+                route("/{issueId}") {
+                    put {
+                        val id = call.parameters["issueId"] ?: return@put call.respond(HttpStatusCode.BadRequest)
+                        val roomId = call.parameters["roomId"] ?: return@put call.respond(HttpStatusCode.BadRequest)
+                        val issueRequest = call.receive<IssueReportRequest>()
+                        val result = issuesReportService.updateIssueReport(
+                            id = id,
+                            roomId = roomId,
+                            description = issueRequest.description
+                        )
+                        call.respondEither(
+                            either = result,
+                            transformError = { error -> error.toProblem() },
+                            transformSuccess = { issue ->
+                                IssueReportResponse.from(issue)
+                            }
+                        )
+                    }
+                }
             }
         }
     }
