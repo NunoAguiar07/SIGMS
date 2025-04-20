@@ -28,13 +28,13 @@ class IssueReportRepository(private val database: Database) : IssueReportReposit
         return database.issueReports.firstOrNull { it.id eq id }
     }
 
-    override fun createIssueReport(room: Room, description: String): IssueReport? {
+    override fun createIssueReport(room: Room, description: String): IssueReport {
         val newIssueReport = IssueReport {
             this.room = room
             this.description = description
         }
         database.issueReports.add(newIssueReport)
-        return getIssueReportById(newIssueReport.id)
+        return newIssueReport
     }
 
     override fun updateIssueReport(id: Int, roomId: Int, description: String): IssueReport? {

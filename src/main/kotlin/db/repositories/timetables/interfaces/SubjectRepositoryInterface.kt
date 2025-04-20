@@ -6,5 +6,5 @@ interface SubjectRepositoryInterface {
     fun getAllSubjects(limit:Int, offset:Int): List<Subject>
     fun findSubjectById(id: Int): Subject?
     fun findSubjectByName(name: String): Subject?
-    fun createSubject(name: String): Subject?
+    fun createSubject(name: String): Subject
 }

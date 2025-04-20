@@ -20,11 +20,11 @@ class SubjectRepository(private val database: Database): SubjectRepositoryInterf
         return database.subjects.firstOrNull { it.name eq name }
     }
 
-    override fun createSubject(name: String): Subject? {
+    override fun createSubject(name: String): Subject {
         val newSubject = Subject {
             this.name = name
         }
         database.subjects.add(newSubject)
-        return findSubjectByName(name)
+        return newSubject
     }
 }

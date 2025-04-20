@@ -26,13 +26,13 @@ class RoomRepository (private val database: Database) : RoomRepositoryInterface 
         return database.rooms.firstOrNull { it.id eq id }
     }
 
-    override fun createRoom(capacity: Int, name: String): Room? {
+    override fun createRoom(capacity: Int, name: String): Room {
         val newRoom = Room {
             this.name = name
             this.capacity = capacity
         }
         database.rooms.add(newRoom)
-        return getRoomById(newRoom.id)
+        return newRoom
     }
 
     override fun createClassRoom(room: Room): Int {
