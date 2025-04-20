@@ -32,7 +32,7 @@ Content-Type: application/json
 }
 
 ###
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwODAvIiwiYXVkIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwLyIsInVzZXJJZCI6MSwicm9sZSI6IlNUVURFTlQiLCJpYXQiOjE3NDQ5MDA0MzUsImV4cCI6MTc0NDkwNDAzNX0.aw1JUMfzVFJs6Sx-7ixRGe427ERJF0GgsaiDKemCwnk
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwODAvIiwiYXVkIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwLyIsInVzZXJJZCI6MSwicm9sZSI6IlNUVURFTlQiLCJpYXQiOjE3NDUxNTcxNzcsImV4cCI6MTc0NTE2MDc3N30.-igDRRF0CcpTg_DasfEWZzme60pAekqgK2CZsZ49gvo
 
 
 ###
@@ -70,7 +70,7 @@ Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "name": "Mathematics"
+  "name": "CDI"
 }
 
 ###
@@ -82,13 +82,23 @@ GET {{baseUrl}}/subjects/1/classes
 Authorization: Bearer {{token}}
 
 ###
-POST {{baseUrl}}/subjects/1/classes
+POST {{baseUrl}}/subjects/2/classes
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
   "name": "LEIC51D"
 }
+
+###
+POST {{baseUrl}}/subjects/1/classes/1/users
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+###
+DELETE {{baseUrl}}/subjects/1/classes/1/users
+Authorization: Bearer {{token}}
+Content-Type: application/json
 
 ###
 GET {{baseUrl}}/subjects/1/classes/1/lectures
@@ -108,7 +118,7 @@ Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "name": "G.2.02",
+  "name": "G.2.03",
   "capacity": 30,
   "type": "class"
 }
@@ -127,7 +137,7 @@ Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "description": "The projector is not working again"
+  "description": "The projector is not working"
 }
 
 ###
@@ -144,14 +154,17 @@ Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "schoolClassId": 1,
-  "roomId": 1,
-  "startTime": "18:30",
-  "endTime": "19:00",
+  "schoolClassId": 3,
+  "roomId": 2,
+  "startTime": "17:30",
+  "endTime": "18:00",
   "type": "THEORETICAL",
-  "weekDay": "MONDAY"
+  "weekDay": "TUESDAY"
 }
 
-
+###
+GET {{baseUrl}}/schedule
+Authorization: Bearer {{token}}
+Content-Type: application/json
 
 

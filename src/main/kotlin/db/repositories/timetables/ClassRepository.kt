@@ -6,6 +6,7 @@ import isel.leic.group25.db.entities.timetables.Class
 import isel.leic.group25.db.entities.timetables.Subject
 import isel.leic.group25.db.entities.users.Attend
 import isel.leic.group25.db.entities.users.User
+import isel.leic.group25.db.entities.users.Teach
 import isel.leic.group25.db.tables.Tables.Companion.classes
 import isel.leic.group25.db.tables.Tables.Companion.studentsClasses
 import isel.leic.group25.db.tables.Tables.Companion.teachersClasses
@@ -59,6 +60,25 @@ class ClassRepository(private val database: Database): ClassRepositoryInterface 
 
     override fun removeStudentFromClass(user: User, schoolClass: Class): Boolean {
         return database.studentsClasses.removeIf { (it.studentId eq user.id) and (it.classId eq schoolClass.id) } > 0
+    }
+
+    override fun addTeacherToClass(user: User, schoolClass: Class): Boolean {
+        return database.teachersClasses.add(Teach{
+                this.user = user
+                this.schoolClass = schoolClass
+        }) > 0
+    }
+
+    override fun removeTeacherFromClass(user: User, schoolClass: Class): Boolean {
+        return database.teachersClasses.removeIf { (it.teacherId eq user.id) and (it.classId eq schoolClass.id) } > 0
+    }
+
+    override fun checkStudentInClass(userId: Int, classId: Int): Boolean {
+        return database.studentsClasses.any { (it.studentId eq userId) and (it.classId eq classId) }
+    }
+
+    override fun checkTeacherInClass(userId: Int, classId: Int): Boolean {
+        return database.teachersClasses.any { (it.teacherId eq userId) and (it.classId eq classId) }
     }
 
     override fun findClassesByStudentId(userId: Int): List<Class> {
