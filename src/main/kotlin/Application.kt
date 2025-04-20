@@ -47,8 +47,9 @@ fun Application.module() {
     val issueReportRepository = IssueReportRepository(db)
     val classService = ClassService(classRepository, subjectRepository, kTransaction)
     val userService = UserService(userRepository, kTransaction, jwtConfig)
+    val authService = AuthService(userRepository, kTransaction, jwtConfig)
     val subjectService = SubjectService(subjectRepository, kTransaction)
-    val userClassService = UserClassService(userRepository, classRepository, kTransaction)
+    val userClassService = UserClassService(userRepository, classRepository, lectureRepository, kTransaction)
     val roomService = RoomService(roomRepository, kTransaction)
     val lectureService = LectureService(lectureRepository, kTransaction, classRepository, roomRepository)
     val issueReportService = IssuesReportService(issueReportRepository, kTransaction, roomRepository)
@@ -77,5 +78,5 @@ fun Application.module() {
         maxFrameSize = Long.MAX_VALUE
         masking = false
     }
-    configureRouting(userService, classService, userClassService, subjectService, roomService, lectureService, issueReportService)
+    configureRouting(userService, authService, classService, userClassService, subjectService, roomService, lectureService, issueReportService)
 }

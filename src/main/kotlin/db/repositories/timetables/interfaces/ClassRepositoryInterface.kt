@@ -26,6 +26,14 @@ interface ClassRepositoryInterface {
 
     fun removeStudentFromClass(user: User, schoolClass: Class): Boolean
 
+    fun addTeacherToClass(user: User, schoolClass: Class): Boolean
+
+    fun removeTeacherFromClass(user: User, schoolClass: Class): Boolean
+
+    fun checkStudentInClass(userId: Int, classId:Int): Boolean
+
+    fun checkTeacherInClass(userId: Int, classId: Int): Boolean
+
     fun findClassesByStudentId(userId: Int): List<Class>
 
     fun findClassesByTeacherId(userId: Int): List<Class>

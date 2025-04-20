@@ -7,6 +7,7 @@ import isel.leic.group25.services.*
 fun Route.authenticatedRoutes(
     userService: UserService,
     classService: ClassService,
+    userClassService: UserClassService,
     subjectService: SubjectService,
     roomService: RoomService,
     lectureService: LectureService,
@@ -14,8 +15,9 @@ fun Route.authenticatedRoutes(
 ) {
     authenticate("auth-jwt") {
         profileRoutes(userService)
-        subjectRoutes(subjectService, classService, lectureService)
+        subjectRoutes(subjectService, classService, userClassService, lectureService)
         roomRoutes(roomService, lectureService, issuesReportService)
         lectureRoutes(lectureService)
+        scheduleRoutes(userClassService)
     }
 }

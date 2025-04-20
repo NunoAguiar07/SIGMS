@@ -2,9 +2,10 @@ package isel.leic.group25.api.http.routes.athenticatedRoutes
 
 import io.ktor.http.*
 import io.ktor.server.request.*
-import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import isel.leic.group25.api.exceptions.respondEither
+import isel.leic.group25.api.jwt.getUserIdFromPrincipal
+import isel.leic.group25.api.jwt.getUserRoleFromPrincipal
 import isel.leic.group25.api.model.request.ClassRequest
 import isel.leic.group25.api.model.request.SubjectRequest
 import isel.leic.group25.api.model.response.ClassResponse
@@ -13,10 +14,12 @@ import isel.leic.group25.api.model.response.SubjectResponse
 import isel.leic.group25.services.ClassService
 import isel.leic.group25.services.LectureService
 import isel.leic.group25.services.SubjectService
+import isel.leic.group25.services.UserClassService
 
 fun Route.subjectRoutes(
     subjectService: SubjectService,
     classService: ClassService,
+    usersClassService: UserClassService,
     lectureService: LectureService
 ) {
     route("/subjects") {
@@ -48,7 +51,7 @@ fun Route.subjectRoutes(
         }
         route("/{subjectId}") {
             get {
-                val id = call.parameters["subjectId"] ?: return@get call.respond(HttpStatusCode.BadRequest)
+                val id = call.parameters["subjectId"]
                 val result = subjectService.getSubjectById(id)
                 call.respondEither(
                     either = result,
@@ -62,7 +65,7 @@ fun Route.subjectRoutes(
                 get {
                     val limit = call.parameters["limit"]
                     val offset = call.parameters["offset"]
-                    val id = call.parameters["subjectId"] ?: return@get call.respond(HttpStatusCode.BadRequest)
+                    val id = call.parameters["subjectId"]
                     val result = classService.getAllClassesFromSubject(id, limit, offset)
                     call.respondEither(
                         either = result,
@@ -73,7 +76,7 @@ fun Route.subjectRoutes(
                     )
                 }
                 post {
-                    val id = call.parameters["subjectId"] ?: return@post call.respond(HttpStatusCode.BadRequest)
+                    val id = call.parameters["subjectId"]
                     val classRequest = call.receive<ClassRequest>()
                     val result = classService.createClass(
                         name = classRequest.name,
@@ -90,7 +93,7 @@ fun Route.subjectRoutes(
                 }
                 route("/{classId}") {
                     get {
-                        val id = call.parameters["classId"] ?: return@get call.respond(HttpStatusCode.BadRequest)
+                        val id = call.parameters["classId"]
                         val result = classService.getClassById(id)
                         call.respondEither(
                             either = result,
@@ -100,11 +103,52 @@ fun Route.subjectRoutes(
                             }
                         )
                     }
+                    route("/users") {
+//                        get {
+//                            val limit = call.parameters["limit"]
+//                            val offset = call.parameters["offset"]
+//                            val id = call.parameters["classId"]
+//                            val result = classService.getUsersByClass(id, limit, offset)
+//                            call.respondEither(
+//                                either = result,
+//                                transformError = { error -> error.toProblem() },
+//                                transformSuccess = { users ->
+//                                    users.map { UserResponse.fromUser(it) }
+//                                }
+//                            )
+//                        }
+                        post {
+                            val role = call.getUserRoleFromPrincipal()
+                            val userId = call.getUserIdFromPrincipal()
+                            val id = call.parameters["classId"]
+                            val result = usersClassService.addUserToClass(userId, id, role)
+                            call.respondEither(
+                                either = result,
+                                transformError = { error -> error.toProblem() },
+                                transformSuccess = {
+                                    HttpStatusCode.NoContent
+                                }
+                            )
+                        }
+                        delete {
+                            val role = call.getUserRoleFromPrincipal()
+                            val userId = call.getUserIdFromPrincipal()
+                            val classId = call.parameters["classId"]
+                            val result = usersClassService.removeUserFromClass(userId, classId, role)
+                            call.respondEither(
+                                either = result,
+                                transformError = { error -> error.toProblem() },
+                                transformSuccess = {
+                                    HttpStatusCode.NoContent
+                                }
+                            )
+                        }
+                    }
                     route("/lectures") {
                         get {
                             val limit = call.parameters["limit"]
                             val offset = call.parameters["offset"]
-                            val id = call.parameters["classId"] ?: return@get call.respond(HttpStatusCode.BadRequest)
+                            val id = call.parameters["classId"]
                             val result = lectureService.getLecturesByClass(id, limit, offset)
                             call.respondEither(
                                 either = result,
