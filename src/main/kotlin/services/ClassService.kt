@@ -65,7 +65,7 @@ class ClassService(private val classRepository: ClassRepository,
                 this.name = name
                 this.subject = existingSubject
             }
-            classRepository.addClass(newClass)
+            classRepository.addClass(newClass.name, newClass.subject)
             return@useTransaction success(newClass)
         }
     }

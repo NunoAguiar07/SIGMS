@@ -29,18 +29,17 @@ class ClassRepository(private val database: Database): ClassRepositoryInterface 
         return database.classes.filter { it.subject eq subject.id }.drop(offset).take(limit).toList()
     }
 
-    override fun addClass(newClass: Class): Boolean {
-        return if (database.classes.none { it.id eq newClass.id }) {
-            database.classes.add(newClass)
-            true
-        } else {
-            false
+    override fun addClass(name: String, subject: Subject): Class {
+        val newClass = Class {
+            this.name = name
+            this.subject = subject
         }
+        database.classes.add(newClass)
+        return newClass
     }
 
     override fun updateClass(updatedClass: Class): Boolean {
         return updatedClass.flushChanges() > 0
-
     }
 
     override fun deleteClassById(id: Int): Boolean {
@@ -70,4 +69,5 @@ class ClassRepository(private val database: Database): ClassRepositoryInterface 
     override fun findClassesByTeacherId(userId: Int): List<Class> {
         return database.teachersClasses.filter { it.teacherId eq userId }.map { it.schoolClass }
     }
+
 }

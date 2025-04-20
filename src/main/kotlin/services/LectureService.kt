@@ -67,7 +67,6 @@ class LectureService(private val lectureRepository: LectureRepository,
             val room = roomRepository.getRoomById(roomId) ?: return@useTransaction failure(LectureError.InvalidLectureRoom)
             val schoolClass = classRepository.findClassById(schoolClassId) ?: return@useTransaction failure(LectureError.InvalidLectureClass)
             val newLecture = lectureRepository.createLecture(schoolClass, room,type , weekDay, parsedStartTime, parsedEndTime)
-               ?: return@useTransaction failure(LectureError.LectureNotFound)
             return@useTransaction success(newLecture)
 
         }

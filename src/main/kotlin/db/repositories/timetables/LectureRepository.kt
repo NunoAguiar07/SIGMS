@@ -30,7 +30,7 @@ class LectureRepository(private val database: Database) : LectureRepositoryInter
         weekDay: WeekDay,
         startTime: Duration,
         endTime: Duration
-    ): Lecture? {
+    ): Lecture {
         val newLecture = Lecture {
             this.schoolClass = schoolClass
             this.room = room
@@ -40,8 +40,7 @@ class LectureRepository(private val database: Database) : LectureRepositoryInter
             this.endTime = endTime
         }
         database.lectures.add(newLecture)
-        return getLecturesByRoom(room.id, 1, 0)
-            .firstOrNull { it.startTime == startTime && it.endTime == endTime && it.room.id == room.id && it.schoolClass.id == schoolClass.id }
+        return newLecture
     }
 
     override fun getLecturesByRoom(roomId: Int, limit:Int, offSet:Int): List<Lecture> {

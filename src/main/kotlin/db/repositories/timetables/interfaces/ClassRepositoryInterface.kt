@@ -14,7 +14,7 @@ interface ClassRepositoryInterface {
 
     fun findClassesBySubject(subject: Subject, limit:Int, offset:Int): List<Class>
 
-    fun addClass(newClass: Class): Boolean
+    fun addClass(name: String, subject: Subject): Class
 
     fun updateClass(updatedClass: Class): Boolean
 
