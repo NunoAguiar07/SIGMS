@@ -8,13 +8,13 @@ import io.ktor.http.*
 import io.ktor.server.request.*
 import io.ktor.server.routing.*
 import isel.leic.group25.api.exceptions.respondEither
-import isel.leic.group25.services.UserService
+import isel.leic.group25.services.AuthService
 
-fun Route.authRoutes(userService: UserService) {
+fun Route.authRoutes(authService: AuthService) {
     route("/auth") {
         post("/register") {
             val credentials = call.receive<UserCredentialsRequest>()
-            val result = userService.register(
+            val result = authService.register(
                 email = credentials.email,
                 username = credentials.username,
                 password = credentials.password,
@@ -33,7 +33,7 @@ fun Route.authRoutes(userService: UserService) {
         }
         post("/login") {
             val credentials = call.receive<LoginCredentialsRequest>()
-            val result = userService.login(
+            val result = authService.login(
                 email = credentials.email,
                 password = credentials.password
             )

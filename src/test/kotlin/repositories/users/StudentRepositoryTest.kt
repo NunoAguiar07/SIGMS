@@ -1,9 +1,9 @@
-package repositories
+package repositories.users
 
 import isel.leic.group25.db.entities.types.Role
 import isel.leic.group25.db.entities.users.User
 import isel.leic.group25.db.repositories.ktorm.KTransaction
-import isel.leic.group25.db.repositories.users.TeacherRepository
+import isel.leic.group25.db.repositories.users.StudentRepository
 import isel.leic.group25.db.repositories.users.UserRepository
 import org.h2.jdbcx.JdbcDataSource
 import org.h2.tools.RunScript
@@ -13,7 +13,7 @@ import java.sql.Connection
 import javax.sql.DataSource
 import kotlin.test.*
 
-class TeacherRepositoryTest {
+class StudentRepositoryTest {
     private val connection: Connection
     private val database: Database
 
@@ -66,55 +66,55 @@ class TeacherRepositoryTest {
         )
     }
 
-    private val teacherRepository = TeacherRepository(database)
+    private val studentRepository = StudentRepository(database)
     private val userRepository = UserRepository(database)
     private val kTransaction = KTransaction(database)
 
     @Test
-    fun `Should create a new teacher and find it by id`(){
+    fun `Should create a new student and find it by id`(){
         kTransaction.useTransaction {
             val newUser = User {
                 email = "testemail@test.com"
                 username = "tester"
                 password = User.hashPassword("test")
                 profileImage = byteArrayOf()
-            }.let { userRepository.create(it, Role.TEACHER) }
-            val teacher = teacherRepository.findTeacherById(newUser.id)
-            assertNotNull(teacher)
-            assertEquals(newUser.id, teacher.user.id)
+            }.let { userRepository.create(it, Role.STUDENT) }
+            val student = studentRepository.findStudentById(newUser.id)
+            assertNotNull(student)
+            assertEquals(newUser.id, student.user.id)
         }
     }
 
     @Test
-    fun `Should create a new teacher and find it by email`(){
+    fun `Should create a new student and find it by email`(){
         kTransaction.useTransaction {
             val newUser = User {
                 email = "testemail@test.com"
                 username = "tester"
                 password = User.hashPassword("test")
                 profileImage = byteArrayOf()
-            }.let { userRepository.create(it, Role.TEACHER) }
-            val teacher = teacherRepository.findTeacherByEmail(newUser.email)
-            assertNotNull(teacher)
-            assertEquals(newUser.id, teacher.user.id)
+            }.let { userRepository.create(it, Role.STUDENT) }
+            val student = studentRepository.findStudentByEmail(newUser.email)
+            assertNotNull(student)
+            assertEquals(newUser.id, student.user.id)
         }
     }
 
     @Test
-    fun `Should verify user is teacher`(){
+    fun `Should verify user is student`(){
         kTransaction.useTransaction {
             val newUser = User {
                 email = "testemail@test.com"
                 username = "tester"
                 password = User.hashPassword("test")
                 profileImage = byteArrayOf()
-            }.let { userRepository.create(it, Role.TEACHER) }
-            assertTrue(teacherRepository.isTeacher(newUser))
+            }.let { userRepository.create(it, Role.STUDENT) }
+            assertTrue(studentRepository.isStudent(newUser))
         }
     }
 
     @Test
-    fun `Should verify user is not teacher`(){
+    fun `Should verify user is not student`(){
         kTransaction.useTransaction {
             val newUser = User {
                 email = "testemail@test.com"
@@ -122,7 +122,7 @@ class TeacherRepositoryTest {
                 password = User.hashPassword("test")
                 profileImage = byteArrayOf()
             }.let { userRepository.create(it, Role.ADMIN) }
-            assertFalse(teacherRepository.isTeacher(newUser))
+            assertFalse(studentRepository.isStudent(newUser))
         }
     }
 }

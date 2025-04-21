@@ -11,6 +11,8 @@ sealed class IssueReportError {
     data object InvalidIssueReportId : IssueReportError()
     data object InvalidRoomId : IssueReportError()
     data object InvalidDescription : IssueReportError()
+    data object InvalidIssueReportLimit : IssueReportError()
+    data object InvalidIssueReportOffSet : IssueReportError()
 
     fun toProblem(): Problem {
         return when (this) {
@@ -41,6 +43,14 @@ sealed class IssueReportError {
             InvalidDescription -> Problem.badRequest(
                 title = "Invalid description",
                 detail = "The provided description is invalid or empty."
+            )
+            InvalidIssueReportLimit -> Problem.badRequest(
+                title = "Invalid issue report limit",
+                detail = "The provided issue report limit is invalid."
+            )
+            InvalidIssueReportOffSet -> Problem.badRequest(
+                title = "Invalid issue report offset",
+                detail = "The provided issue report offset is invalid."
             )
         }
     }

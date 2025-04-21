@@ -17,14 +17,22 @@ class ClassService(private val classRepository: ClassRepository,
                    private val subjectRepository: SubjectRepository,
                    private val transactionInterface: TransactionInterface,
 ) {
-    fun getAllClassesFromSubject(subjectId: String?): ClassListResult {
+    fun getAllClassesFromSubject(subjectId: String?, limit:String?, offset:String?): ClassListResult {
         return transactionInterface.useTransaction {
+            val newLimit = limit?.toInt() ?: 20
+            if (newLimit <= 0 || newLimit > 100) {
+                return@useTransaction failure(ClassError.InvalidClassLimit)
+            }
+            val newOffset = offset?.toInt() ?: 0
+            if (newOffset < 0) {
+                return@useTransaction failure(ClassError.InvalidClassOffset)
+            }
             if (subjectId == null || subjectId.toIntOrNull() == null) {
                 return@useTransaction failure(ClassError.InvalidSubjectId)
             }
             val subject = subjectRepository.findSubjectById(subjectId.toInt())
                 ?: return@useTransaction failure(ClassError.SubjectNotFound)
-            val classes = classRepository.findClassesBySubject(subject)
+            val classes = classRepository.findClassesBySubject(subject, newLimit, newOffset)
             return@useTransaction success(classes)
         }
     }
@@ -48,7 +56,8 @@ class ClassService(private val classRepository: ClassRepository,
             if (subjectId == null || subjectId.toIntOrNull() == null) {
                 return@useTransaction failure(ClassError.InvalidSubjectId)
             }
-            if(classRepository.findClassByName(name) != null) {
+            val existingClass = classRepository.findClassByName(name)
+            if(existingClass != null && existingClass.subject.id == subjectId.toInt()) {
                 return@useTransaction failure(ClassError.ClassAlreadyExists)
             }
             val existingSubject = subjectRepository.findSubjectById(subjectId.toInt())
@@ -57,7 +66,7 @@ class ClassService(private val classRepository: ClassRepository,
                 this.name = name
                 this.subject = existingSubject
             }
-            classRepository.addClass(newClass)
+            classRepository.addClass(newClass.name, newClass.subject)
             return@useTransaction success(newClass)
         }
     }

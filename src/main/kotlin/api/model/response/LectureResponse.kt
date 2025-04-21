@@ -7,8 +7,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class LectureResponse(
-    val schoolClass: Int,
-    val room: Int,
+    val schoolClass: ClassResponse,
+    val room: RoomResponse,
     val type: ClassType,
     val weekDay: WeekDay,
     val startTime: String,
@@ -17,8 +17,8 @@ data class LectureResponse(
     companion object {
         fun from(lecture: Lecture): LectureResponse {
             return LectureResponse(
-                schoolClass = lecture.schoolClass.id,
-                room = lecture.room.id,
+                schoolClass = ClassResponse.fromClass(lecture.schoolClass),
+                room = RoomResponse.from(lecture.room),
                 type = lecture.type,
                 weekDay = lecture.weekDay,
                 startTime = lecture.startTime.toString(),

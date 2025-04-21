@@ -11,6 +11,8 @@ sealed class ClassError {
     data object InvalidRole : ClassError()
     data object SubjectNotFound : ClassError()
     data object InvalidSubjectId : ClassError()
+    data object InvalidClassLimit : ClassError()
+    data object InvalidClassOffset : ClassError()
 
     fun toProblem(): Problem {
         return when (this) {
@@ -45,6 +47,14 @@ sealed class ClassError {
             InvalidSubjectId -> Problem.badRequest(
                 title = "Invalid subject ID",
                 detail = "The provided subject ID is invalid."
+            )
+            InvalidClassLimit -> Problem.badRequest(
+                title = "Invalid class limit",
+                detail = "The provided class limit is invalid. It should be between 1 and 100."
+            )
+            InvalidClassOffset -> Problem.badRequest(
+                title = "Invalid class offset",
+                detail = "The provided class offset is invalid. It should be a non-negative integer."
             )
         }
     }

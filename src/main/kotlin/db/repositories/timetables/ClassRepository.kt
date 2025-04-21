@@ -6,6 +6,7 @@ import isel.leic.group25.db.entities.timetables.Class
 import isel.leic.group25.db.entities.timetables.Subject
 import isel.leic.group25.db.entities.users.Attend
 import isel.leic.group25.db.entities.users.User
+import isel.leic.group25.db.entities.users.Teach
 import isel.leic.group25.db.tables.Tables.Companion.classes
 import isel.leic.group25.db.tables.Tables.Companion.studentsClasses
 import isel.leic.group25.db.tables.Tables.Companion.teachersClasses
@@ -25,22 +26,21 @@ class ClassRepository(private val database: Database): ClassRepositoryInterface 
         return database.classes.firstOrNull { it.name eq name }
     }
 
-    override fun findClassesBySubject(subject: Subject): List<Class> {
-        return database.classes.filter { it.subject eq subject.id }.toList()
+    override fun findClassesBySubject(subject: Subject, limit:Int, offset:Int): List<Class> {
+        return database.classes.filter { it.subject eq subject.id }.drop(offset).take(limit).toList()
     }
 
-    override fun addClass(newClass: Class): Boolean {
-        return if (database.classes.none { it.id eq newClass.id }) {
-            database.classes.add(newClass)
-            true
-        } else {
-            false
+    override fun addClass(name: String, subject: Subject): Class {
+        val newClass = Class {
+            this.name = name
+            this.subject = subject
         }
+        database.classes.add(newClass)
+        return newClass
     }
 
     override fun updateClass(updatedClass: Class): Boolean {
         return updatedClass.flushChanges() > 0
-
     }
 
     override fun deleteClassById(id: Int): Boolean {
@@ -62,6 +62,25 @@ class ClassRepository(private val database: Database): ClassRepositoryInterface 
         return database.studentsClasses.removeIf { (it.studentId eq user.id) and (it.classId eq schoolClass.id) } > 0
     }
 
+    override fun addTeacherToClass(user: User, schoolClass: Class): Boolean {
+        return database.teachersClasses.add(Teach{
+                this.user = user
+                this.schoolClass = schoolClass
+        }) > 0
+    }
+
+    override fun removeTeacherFromClass(user: User, schoolClass: Class): Boolean {
+        return database.teachersClasses.removeIf { (it.teacherId eq user.id) and (it.classId eq schoolClass.id) } > 0
+    }
+
+    override fun checkStudentInClass(userId: Int, classId: Int): Boolean {
+        return database.studentsClasses.any { (it.studentId eq userId) and (it.classId eq classId) }
+    }
+
+    override fun checkTeacherInClass(userId: Int, classId: Int): Boolean {
+        return database.teachersClasses.any { (it.teacherId eq userId) and (it.classId eq classId) }
+    }
+
     override fun findClassesByStudentId(userId: Int): List<Class> {
         return database.studentsClasses.filter { it.studentId eq userId }
             .map { it.schoolClass }
@@ -70,4 +89,5 @@ class ClassRepository(private val database: Database): ClassRepositoryInterface 
     override fun findClassesByTeacherId(userId: Int): List<Class> {
         return database.teachersClasses.filter { it.teacherId eq userId }.map { it.schoolClass }
     }
+
 }

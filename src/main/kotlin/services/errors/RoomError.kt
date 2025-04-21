@@ -8,6 +8,8 @@ sealed class RoomError {
     data object RoomNotFound : RoomError()
     data object InvalidRoomId : RoomError()
     data object InvalidRoomCapacity : RoomError()
+    data object InvalidRoomLimit : RoomError()
+    data object InvalidRoomOffSet : RoomError()
 
     fun toProblem(): Problem {
         return when (this) {
@@ -30,6 +32,14 @@ sealed class RoomError {
             InvalidRoomCapacity -> Problem.badRequest(
                 title = "Invalid room capacity",
                 detail = "The provided room capacity is invalid."
+            )
+            InvalidRoomLimit -> Problem.badRequest(
+                title = "Invalid room limit",
+                detail = "The provided room limit is invalid."
+            )
+            InvalidRoomOffSet -> Problem.badRequest(
+                title = "Invalid room offset",
+                detail = "The provided room offset is invalid."
             )
         }
     }

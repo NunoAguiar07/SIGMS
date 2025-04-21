@@ -7,14 +7,11 @@ import isel.leic.group25.db.tables.Tables.Companion.issueReports
 import isel.leic.group25.db.tables.Tables.Companion.rooms
 import org.ktorm.database.Database
 import org.ktorm.dsl.eq
-import org.ktorm.entity.add
-import org.ktorm.entity.firstOrNull
-import org.ktorm.entity.map
-import org.ktorm.entity.removeIf
+import org.ktorm.entity.*
 
 class IssueReportRepository(private val database: Database) : IssueReportRepositoryInterface{
-    override fun getAllIssueReports(): List<IssueReport> {
-        return database.issueReports.map { it }
+    override fun getAllIssueReports(limit:Int, offset:Int): List<IssueReport> {
+        return database.issueReports.drop(offset).take(limit).toList()
     }
 
     override fun deleteIssueReport(id: Int): Boolean {
@@ -31,13 +28,13 @@ class IssueReportRepository(private val database: Database) : IssueReportReposit
         return database.issueReports.firstOrNull { it.id eq id }
     }
 
-    override fun createIssueReport(room: Room, description: String): IssueReport? {
+    override fun createIssueReport(room: Room, description: String): IssueReport {
         val newIssueReport = IssueReport {
             this.room = room
             this.description = description
         }
         database.issueReports.add(newIssueReport)
-        return getIssueReportById(newIssueReport.id)
+        return newIssueReport
     }
 
     override fun updateIssueReport(id: Int, roomId: Int, description: String): IssueReport? {

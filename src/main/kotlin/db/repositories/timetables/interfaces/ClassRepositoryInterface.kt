@@ -12,9 +12,9 @@ interface ClassRepositoryInterface {
 
     fun findClassByName(name: String): Class?
 
-    fun findClassesBySubject(subject: Subject): List<Class>
+    fun findClassesBySubject(subject: Subject, limit:Int, offset:Int): List<Class>
 
-    fun addClass(newClass: Class): Boolean
+    fun addClass(name: String, subject: Subject): Class
 
     fun updateClass(updatedClass: Class): Boolean
 
@@ -25,6 +25,14 @@ interface ClassRepositoryInterface {
     fun addStudentToClass(user: User, schoolClass: Class): Boolean
 
     fun removeStudentFromClass(user: User, schoolClass: Class): Boolean
+
+    fun addTeacherToClass(user: User, schoolClass: Class): Boolean
+
+    fun removeTeacherFromClass(user: User, schoolClass: Class): Boolean
+
+    fun checkStudentInClass(userId: Int, classId:Int): Boolean
+
+    fun checkTeacherInClass(userId: Int, classId: Int): Boolean
 
     fun findClassesByStudentId(userId: Int): List<Class>
 

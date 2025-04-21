@@ -18,9 +18,17 @@ class SubjectService(
     private val subjectRepository: SubjectRepository,
     private val transactionInterface: TransactionInterface,
 ) {
-    fun getAllSubjects(): SubjectListResult {
+    fun getAllSubjects(limit:String?, offset:String?): SubjectListResult {
+        val newLimit = limit?.toInt() ?: 20
+        if (newLimit <= 0 || newLimit > 100) {
+            return failure(SubjectError.InvalidSubjectLimit)
+        }
+        val newOffset = offset?.toInt() ?: 0
+        if (newOffset < 0) {
+            return failure(SubjectError.InvalidSubjectOffset)
+        }
         return transactionInterface.useTransaction {
-            val subjects = subjectRepository.getAllSubjects()
+            val subjects = subjectRepository.getAllSubjects(newLimit, newOffset)
             return@useTransaction success(subjects)
         }
     }

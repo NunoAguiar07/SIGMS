@@ -9,7 +9,9 @@ import kotlin.time.Duration
 
 
 interface LectureRepositoryInterface {
+
     fun getAllLectures(): List<Lecture>
+    fun getAllLectures(limit: Int, offSet: Int): List<Lecture>
 
     fun createLecture(
         schoolClass: Class,
@@ -19,7 +21,7 @@ interface LectureRepositoryInterface {
         startTime: Duration,
         endTime: Duration
     ): Lecture?
-    fun getLecturesByRoom(roomId: Int): List<Lecture>
-    fun getLecturesByClass(classId: Int): List<Lecture>
+    fun getLecturesByRoom(roomId: Int, limit: Int, offSet: Int): List<Lecture>
+    fun getLecturesByClass(classId: Int, limit: Int, offSet: Int): List<Lecture>
     fun getLecturesByType(type: ClassType): List<Lecture>
 }

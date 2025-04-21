@@ -1,9 +1,9 @@
-package repositories
+package repositories.users
 
 import isel.leic.group25.db.entities.types.Role
 import isel.leic.group25.db.entities.users.User
 import isel.leic.group25.db.repositories.ktorm.KTransaction
-import isel.leic.group25.db.repositories.users.AdminRepository
+import isel.leic.group25.db.repositories.users.TechnicalServiceRepository
 import isel.leic.group25.db.repositories.users.UserRepository
 import org.h2.jdbcx.JdbcDataSource
 import org.h2.tools.RunScript
@@ -13,7 +13,7 @@ import java.sql.Connection
 import javax.sql.DataSource
 import kotlin.test.*
 
-class AdminRepositoryTest {
+class TechnicalServiceRepositoryTest {
     private val connection: Connection
     private val database: Database
 
@@ -66,12 +66,55 @@ class AdminRepositoryTest {
         )
     }
 
-    private val adminRepository = AdminRepository(database)
+    private val technicalServiceRepository = TechnicalServiceRepository(database)
     private val userRepository = UserRepository(database)
     private val kTransaction = KTransaction(database)
 
     @Test
-    fun `Should create a new admin and find it by id`(){
+    fun `Should create a new technical service and find it by id`(){
+        kTransaction.useTransaction {
+            val newUser = User {
+                email = "testemail@test.com"
+                username = "tester"
+                password = User.hashPassword("test")
+                profileImage = byteArrayOf()
+            }.let { userRepository.create(it, Role.TECHNICAL_SERVICE) }
+            val technicalService = technicalServiceRepository.findTechnicalServiceById(newUser.id)
+            assertNotNull(technicalService)
+            assertEquals(newUser.id, technicalService.user.id)
+        }
+    }
+
+    @Test
+    fun `Should create a new technical service and find it by email`(){
+        kTransaction.useTransaction {
+            val newUser = User {
+                email = "testemail@test.com"
+                username = "tester"
+                password = User.hashPassword("test")
+                profileImage = byteArrayOf()
+            }.let { userRepository.create(it, Role.TECHNICAL_SERVICE) }
+            val technicalService = technicalServiceRepository.findTechnicalServiceByEmail(newUser.email)
+            assertNotNull(technicalService)
+            assertEquals(newUser.id, technicalService.user.id)
+        }
+    }
+
+    @Test
+    fun `Should verify user is technical service`(){
+        kTransaction.useTransaction {
+            val newUser = User {
+                email = "testemail@test.com"
+                username = "tester"
+                password = User.hashPassword("test")
+                profileImage = byteArrayOf()
+            }.let { userRepository.create(it, Role.TECHNICAL_SERVICE) }
+            assertTrue(technicalServiceRepository.isTechnicalService(newUser))
+        }
+    }
+
+    @Test
+    fun `Should verify user is not technical service`(){
         kTransaction.useTransaction {
             val newUser = User {
                 email = "testemail@test.com"
@@ -79,50 +122,7 @@ class AdminRepositoryTest {
                 password = User.hashPassword("test")
                 profileImage = byteArrayOf()
             }.let { userRepository.create(it, Role.ADMIN) }
-            val admin = adminRepository.findAdminById(newUser.id)
-            assertNotNull(admin)
-            assertEquals(newUser.id, admin.user.id)
-        }
-    }
-
-    @Test
-    fun `Should create a new admin and find it by email`(){
-        kTransaction.useTransaction {
-            val newUser = User {
-                email = "testemail@test.com"
-                username = "tester"
-                password = User.hashPassword("test")
-                profileImage = byteArrayOf()
-            }.let { userRepository.create(it, Role.ADMIN) }
-            val admin = adminRepository.findAdminByEmail(newUser.email)
-            assertNotNull(admin)
-            assertEquals(newUser.id, admin.user.id)
-        }
-    }
-
-    @Test
-    fun `Should verify user is admin`(){
-        kTransaction.useTransaction {
-            val newUser = User {
-                email = "testemail@test.com"
-                username = "tester"
-                password = User.hashPassword("test")
-                profileImage = byteArrayOf()
-            }.let { userRepository.create(it, Role.ADMIN) }
-            assertTrue(adminRepository.isAdmin(newUser))
-        }
-    }
-
-    @Test
-    fun `Should verify user is not admin`(){
-        kTransaction.useTransaction {
-            val newUser = User {
-                email = "testemail@test.com"
-                username = "tester"
-                password = User.hashPassword("test")
-                profileImage = byteArrayOf()
-            }.let { userRepository.create(it, Role.STUDENT) }
-            assertFalse(adminRepository.isAdmin(newUser))
+            assertFalse(technicalServiceRepository.isTechnicalService(newUser))
         }
     }
 }

@@ -33,6 +33,7 @@ dependencies {
     implementation("org.apache.poi:poi-ooxml:5.2.3") // just for excel readability
     implementation("org.ktorm:ktorm-core:${ktorm_version}")
     implementation("org.postgresql:postgresql:42.7.3")
+    implementation("org.ktorm:ktorm-support-postgresql:${ktorm_version}")
     implementation("io.ktor:ktor-server-websockets")
     implementation("de.mkammerer:argon2-jvm:latest.release")
     implementation("io.ktor:ktor-serialization-gson:3.1.1")
