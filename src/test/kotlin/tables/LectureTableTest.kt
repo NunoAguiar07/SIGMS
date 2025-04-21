@@ -90,8 +90,8 @@ class LectureTableTest {
                 room_id INT NOT NULL REFERENCES ROOM(id) ON DELETE CASCADE,
                 class_type VARCHAR(20) CHECK (class_type IN ('theoretical', 'practical', 'theoretical_practical' )),
                 week_day int CHECK(week_day > 0 and week_day < 8),
-                start_time int NOT NULL,
-                end_time int NOT NULL,
+                start_time time NOT NULL,
+                end_time time NOT NULL,
                 CHECK (end_time > start_time)
             );
         """)

@@ -44,7 +44,7 @@ class ClassRepository(private val database: Database): ClassRepositoryInterface 
     }
 
     override fun deleteClassById(id: Int): Boolean {
-        return database.classes.removeIf {  it.id eq id } > 0
+        return database.classes.removeIf {  (it.id eq id) and (it.subject eq 0)} > 0
     }
 
     override fun deleteClass(toBeDeletedClass: Class): Boolean {

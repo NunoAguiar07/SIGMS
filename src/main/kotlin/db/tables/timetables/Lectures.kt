@@ -4,16 +4,27 @@ import isel.leic.group25.db.entities.timetables.Lecture
 import isel.leic.group25.db.entities.types.ClassType
 import isel.leic.group25.db.entities.types.WeekDay
 import isel.leic.group25.db.tables.rooms.Rooms
+import isel.leic.group25.utils.hoursAndMinutesToDuration
+import isel.leic.group25.utils.toHoursAndMinutes
 import org.ktorm.schema.Table
 import org.ktorm.schema.int
+import org.ktorm.schema.time
 import org.ktorm.schema.varchar
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
+import kotlin.time.toJavaDuration
 
 object Lectures: Table<Lecture>("lecture") {
     val classId = int("class_id").references(Classes){ it.schoolClass }
     val roomId = int("room_id").references(Rooms){ it.room }
     val type = varchar("class_type").transform({ ClassType.valueOf(it.uppercase()) }, {it.name.lowercase()}).bindTo { it.type }
     val weekDay = int("week_day").transform({ WeekDay.fromValue(it)},{it.value}).bindTo { it.weekDay }
-    val startTime = int("start_time").transform({ it.minutes },{ it.inWholeMinutes.toInt() }).bindTo { it.startTime }
-    val endTime = int("end_time").transform({ it.minutes },{ it.inWholeMinutes.toInt() }).bindTo { it.endTime }
+    val startTime = time("start_time").transform({ "${it.hour}:${it.minute}".hoursAndMinutesToDuration() },{
+        val formatter = DateTimeFormatter.ofPattern("HH:mm")
+        LocalTime.parse(it.toHoursAndMinutes(), formatter) }).bindTo { it.startTime }
+    val endTime = time("end_time").transform({ "${it.hour}:${it.minute}".hoursAndMinutesToDuration() },{
+        val formatter = DateTimeFormatter.ofPattern("HH:mm")
+        LocalTime.parse(it.toHoursAndMinutes(), formatter) }).bindTo { it.endTime }
 }
