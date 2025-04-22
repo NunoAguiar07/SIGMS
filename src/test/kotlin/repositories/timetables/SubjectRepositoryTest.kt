@@ -3,6 +3,7 @@ package repositories.timetables
 import isel.leic.group25.db.repositories.ktorm.KTransaction
 import isel.leic.group25.db.repositories.timetables.SubjectRepository
 import repositories.DatabaseTestSetup
+import kotlin.test.AfterTest
 import kotlin.test.Test
 
 // check comments before changing tests
@@ -11,6 +12,10 @@ class SubjectRepositoryTest {
     private val kTransaction = KTransaction(DatabaseTestSetup.database)
     private val subjectRepository = SubjectRepository(DatabaseTestSetup.database)
 
+    @AfterTest
+    fun clearDatabase() {
+        DatabaseTestSetup.clearDB()
+    }
 
     @Test
     fun `Should create a new subject and find it by id`() {
@@ -38,7 +43,7 @@ class SubjectRepositoryTest {
             val newSubject1 = subjectRepository.createSubject("testSubject1")
             val newSubject2 = subjectRepository.createSubject("testSubject2")
             val subjects = subjectRepository.getAllSubjects(10, 0)
-            assert(subjects.size == 4) // Assuming there are 4  objects in the database based on the tests above
+            assert(subjects.size == 2)
             assert(subjects.contains(newSubject1))
             assert(subjects.contains(newSubject2))
         }

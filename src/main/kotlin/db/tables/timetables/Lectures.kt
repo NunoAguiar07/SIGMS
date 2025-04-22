@@ -12,9 +12,6 @@ import org.ktorm.schema.time
 import org.ktorm.schema.varchar
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
-import kotlin.time.Duration
-import kotlin.time.Duration.Companion.minutes
-import kotlin.time.toJavaDuration
 
 object Lectures: Table<Lecture>("lecture") {
     val classId = int("class_id").references(Classes){ it.schoolClass }
@@ -22,9 +19,10 @@ object Lectures: Table<Lecture>("lecture") {
     val type = varchar("class_type").transform({ ClassType.valueOf(it.uppercase()) }, {it.name.lowercase()}).bindTo { it.type }
     val weekDay = int("week_day").transform({ WeekDay.fromValue(it)},{it.value}).bindTo { it.weekDay }
     val startTime = time("start_time").transform({ "${it.hour}:${it.minute}".hoursAndMinutesToDuration() },{
-        val formatter = DateTimeFormatter.ofPattern("HH:mm")
+        val formatter = DateTimeFormatter.ofPattern("H:mm")
         LocalTime.parse(it.toHoursAndMinutes(), formatter) }).bindTo { it.startTime }
     val endTime = time("end_time").transform({ "${it.hour}:${it.minute}".hoursAndMinutesToDuration() },{
-        val formatter = DateTimeFormatter.ofPattern("HH:mm")
+        val formatter = DateTimeFormatter.ofPattern("H:mm")
         LocalTime.parse(it.toHoursAndMinutes(), formatter) }).bindTo { it.endTime }
 }
+

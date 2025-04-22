@@ -9,4 +9,12 @@ jwt:
   issuer: "http://localhost:8080/"
   audience: "http://localhost:8080/"
   realm: "Access to 'isel.leic.group25'"
-
+frontend:
+  url: "http://localhost:8080/"
+email:
+  host: "smtp.yourdomain.com"
+  port: 587
+  username: "noreply@yourdomain.com"
+  password: "your-email-password"
+  from: "noreply@yourdomain.com"
+  useSsl: true

@@ -9,17 +9,20 @@ import org.ktorm.database.Database
 import org.ktorm.dsl.eq
 import org.ktorm.entity.any
 import org.ktorm.entity.firstOrNull
+import org.ktorm.entity.mapNotNull
 
 class AdminRepository(private val database: Database): AdminRepositoryInterface {
+    override fun getAllAdminEmails(): List<String> {
+        return database.admins.mapNotNull { it.user.email }
+    }
+
     override fun findAdminById(id: Int): Admin? {
        return database.admins.firstOrNull { it.user eq id }
     }
 
     override fun findAdminByEmail(email:String): Admin? {
-        database.useTransaction {
-            val user = database.users.firstOrNull { it.email eq email } ?: return null
-            return database.admins.firstOrNull { it.user eq user.id }
-        }
+        val user = database.users.firstOrNull { it.email eq email } ?: return null
+        return database.admins.firstOrNull { it.user eq user.id }
     }
 
     override fun isAdmin(user: User): Boolean {

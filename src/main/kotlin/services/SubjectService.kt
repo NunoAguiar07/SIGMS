@@ -12,8 +12,6 @@ typealias SubjectListResult = Either<SubjectError, List<Subject>>
 
 typealias SubjectResult = Either<SubjectError, Subject>
 
-typealias SubjectCreationResult = Either<SubjectError, Boolean>
-
 class SubjectService(
     private val subjectRepository: SubjectRepository,
     private val transactionInterface: TransactionInterface,
@@ -49,7 +47,10 @@ class SubjectService(
             if (existingSubject != null) {
                 return@useTransaction failure(SubjectError.SubjectAlreadyExists)
             }
-            val newSubject = subjectRepository.createSubject(name) ?: return@useTransaction failure(SubjectError.FailedToAddToDatabase)
+            if (name.isBlank() || name.length > 255) {
+                return@useTransaction failure(SubjectError.InvalidSubjectData)
+            }
+            val newSubject = subjectRepository.createSubject(name)
             return@useTransaction success(newSubject)
         }
     }

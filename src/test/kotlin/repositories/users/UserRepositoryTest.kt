@@ -4,69 +4,18 @@ import isel.leic.group25.db.entities.types.Role
 import isel.leic.group25.db.entities.users.User
 import isel.leic.group25.db.repositories.ktorm.KTransaction
 import isel.leic.group25.db.repositories.users.UserRepository
-import org.h2.jdbcx.JdbcDataSource
-import org.h2.tools.RunScript
-import org.ktorm.database.Database
-import java.io.StringReader
-import java.sql.Connection
-import javax.sql.DataSource
+import repositories.DatabaseTestSetup
 import kotlin.test.*
 
 class UserRepositoryTest {
-    private val connection: Connection
-    private val database: Database
 
     @AfterTest
-    fun clearDB(){
-        RunScript.execute(connection, StringReader("""
-            DELETE FROM USERS;
-            """)
-        )
+    fun clearDatabase() {
+        DatabaseTestSetup.clearDB()
     }
 
-    init {
-        val dataSource: DataSource = JdbcDataSource().apply {
-            setURL("jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1")
-            user = "sa"
-            password = ""
-        }
-        connection = dataSource.connection
-        database = Database.connect(dataSource)
-        RunScript.execute(connection, StringReader("""
-            CREATE TABLE IF NOT EXISTS USERS (
-                id SERIAL PRIMARY KEY,
-                email VARCHAR(255) UNIQUE NOT NULL,
-                username VARCHAR(255) NOT NULL,
-                password VARCHAR(255) NOT NULL,
-                profile_image VARCHAR(255)
-            );
-            
-            CREATE TABLE IF NOT EXISTS STUDENT (
-                user_id INT UNIQUE NOT NULL REFERENCES USERS(id) ON DELETE CASCADE,
-                primary key (user_id)
-            
-            );
-            
-            CREATE TABLE IF NOT EXISTS TEACHER (
-                 user_id INT UNIQUE NOT NULL REFERENCES USERS(id) ON DELETE CASCADE,
-                 primary key (user_id)
-            );
-            
-            CREATE TABLE IF NOT EXISTS TECHNICAL_SERVICES (
-                user_id INT UNIQUE NOT NULL REFERENCES USERS(id) ON DELETE CASCADE,
-                primary key (user_id)
-            );
-            
-            CREATE TABLE IF NOT EXISTS ADMIN (
-                user_id INT UNIQUE NOT NULL REFERENCES USERS(id) ON DELETE CASCADE,
-                primary key (user_id)
-            );
-        """)
-        )
-    }
-
-    private val userRepository = UserRepository(database)
-    private val kTransaction = KTransaction(database)
+    private val userRepository = UserRepository(DatabaseTestSetup.database)
+    private val kTransaction = KTransaction(DatabaseTestSetup.database)
 /*
     @Test
     fun `Should create a new user for every role`(){
@@ -113,7 +62,7 @@ class UserRepositoryTest {
                 username = "tester"
                 password = User.hashPassword("test")
                 profileImage = byteArrayOf()
-            }.let { userRepository.create(it, Role.STUDENT) }
+            }.let { userRepository.createWithRole(it, Role.STUDENT) }
             val user = userRepository.findById(newUser.id)
             assertNotNull(user)
             assertEquals(newUser.id, user.id)
@@ -131,7 +80,7 @@ class UserRepositoryTest {
                 username = "tester"
                 password = User.hashPassword("test")
                 profileImage = byteArrayOf()
-            }.let { userRepository.create(it, Role.STUDENT) }
+            }.let { userRepository.createWithRole(it, Role.STUDENT) }
             val user = userRepository.findByEmail(newUser.email)
             assertNotNull(user)
             assertEquals(newUser.id, user.id)
@@ -149,7 +98,7 @@ class UserRepositoryTest {
                 username = "tester"
                 password = User.hashPassword("test")
                 profileImage = byteArrayOf()
-            }.let { userRepository.create(it, Role.STUDENT) }
+            }.let { userRepository.createWithRole(it, Role.STUDENT) }
             val newUsername = "newTester"
             newUser.username = newUsername
             userRepository.update(newUser)

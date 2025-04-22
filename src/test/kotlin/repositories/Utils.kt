@@ -22,6 +22,7 @@ class DatabaseTestSetup {
                 DELETE FROM TEACHER;
                 DELETE FROM TECHNICAL_SERVICES;
                 DELETE FROM ADMINISTRATOR;
+                DELETE FROM ROLE_APPROVALS;
                 DELETE FROM SUBJECT;
                 DELETE FROM CLASS;
                 DELETE FROM TEACH;
@@ -75,6 +76,17 @@ CREATE TABLE IF NOT EXISTS ADMINISTRATOR (
     primary key (user_id)
 );
 
+CREATE TABLE IF NOT EXISTS ROLE_APPROVALS (
+    id SERIAL PRIMARY KEY,
+    user_id INT NOT NULL REFERENCES USERS(id) ON DELETE CASCADE,
+    requested_role VARCHAR(50) NOT NULL CHECK (requested_role IN ('TEACHER', 'TECHNICAL_SERVICE')),
+    verification_token VARCHAR(255) UNIQUE NOT NULL,
+    verified_by INT REFERENCES ADMINISTRATOR(user_id) ON DELETE SET NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    expires_at TIMESTAMP NOT NULL,
+    status VARCHAR(20) DEFAULT 'PENDING' NOT NULL CHECK (status IN ('PENDING', 'APPROVED', 'REJECTED'))
+);
+
 CREATE TABLE IF NOT EXISTS SUBJECT (
      id SERIAL PRIMARY KEY,
      subject_name VARCHAR(255) NOT NULL
@@ -122,8 +134,8 @@ CREATE TABLE IF NOT EXISTS LECTURE (
     room_id INT NOT NULL REFERENCES ROOM(id) ON DELETE CASCADE,
     class_type VARCHAR(20) CHECK (class_type IN ('theoretical', 'practical', 'theoretical_practical')),
     week_day int CHECK(week_day > 0 and week_day < 8),
-    start_time int NOT NULL,
-    end_time int NOT NULL,
+    start_time time NOT NULL,
+    end_time time NOT NULL,
     CHECK (end_time > start_time)
 );
 

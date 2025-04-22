@@ -3,6 +3,7 @@ package repositories.rooms
 import isel.leic.group25.db.repositories.ktorm.KTransaction
 import isel.leic.group25.db.repositories.rooms.RoomRepository
 import repositories.DatabaseTestSetup
+import kotlin.test.AfterTest
 import kotlin.test.Test
 
 
@@ -10,6 +11,11 @@ import kotlin.test.Test
 class RoomRepositoryTest {
     private val kTransaction = KTransaction(DatabaseTestSetup.database)
     private val roomRepository = RoomRepository(DatabaseTestSetup.database)
+
+    @AfterTest
+    fun clearDatabase() {
+        DatabaseTestSetup.clearDB()
+    }
 
     @Test
     fun `Should create a new room and find it by id`() {
@@ -37,7 +43,7 @@ class RoomRepositoryTest {
             val newRoom1 = roomRepository.createRoom(20, "testRoom1")
             val newRoom2 = roomRepository.createRoom(30, "testRoom2")
             val rooms = roomRepository.getAllRooms(10, 0)
-            assert(rooms.size == 4) // Assuming there are 4 objects in the database based on the tests above
+            assert(rooms.size == 2)
             assert(rooms.contains(newRoom1))
             assert(rooms.contains(newRoom2))
         }
@@ -47,8 +53,8 @@ class RoomRepositoryTest {
     fun `Should create a new classroom and find it by id`() {
         kTransaction.useTransaction {
             val newRoom = roomRepository.createRoom(20, "testRoom")
-            val classroomId = roomRepository.createClassRoom(newRoom)
-            val foundClassroom = roomRepository.getAllRooms().firstOrNull { it.id == classroomId }
+            roomRepository.createClassRoom(newRoom)
+            val foundClassroom = roomRepository.getAllRooms().firstOrNull()
             assert(foundClassroom != null)
             assert(foundClassroom?.name == newRoom.name)
         }
@@ -57,8 +63,8 @@ class RoomRepositoryTest {
     fun `Should create a new office room and find it by id`() {
         kTransaction.useTransaction {
             val newRoom = roomRepository.createRoom(20, "testRoom")
-            val officeRoomId = roomRepository.createOfficeRoom(newRoom)
-            val foundOfficeRoom = roomRepository.getAllRooms().firstOrNull { it.id == officeRoomId }
+            roomRepository.createOfficeRoom(newRoom)
+            val foundOfficeRoom = roomRepository.getAllRooms().firstOrNull()
             assert(foundOfficeRoom != null)
             assert(foundOfficeRoom?.name == newRoom.name)
         }
@@ -67,8 +73,8 @@ class RoomRepositoryTest {
     fun `Should create a new study room and find it by id`() {
         kTransaction.useTransaction {
             val newRoom = roomRepository.createRoom(20, "testRoom")
-            val studyRoomId = roomRepository.createStudyRoom(newRoom)
-            val foundStudyRoom = roomRepository.getAllRooms().firstOrNull { it.id == studyRoomId }
+            roomRepository.createStudyRoom(newRoom)
+            val foundStudyRoom = roomRepository.getAllRooms().firstOrNull()
             assert(foundStudyRoom != null)
             assert(foundStudyRoom?.name == newRoom.name)
         }

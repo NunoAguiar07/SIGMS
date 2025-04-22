@@ -11,8 +11,8 @@ import isel.leic.group25.services.LectureService
 fun Route.lectureRoutes(lectureService: LectureService) {
     route("/lectures") {
         get {
-            val limit = call.parameters["limit"]
-            val offset = call.parameters["offset"]
+            val limit = call.queryParameters["limit"]
+            val offset = call.queryParameters["offset"]
             val result = lectureService.getAllLectures(limit, offset)
             call.respondEither(
                 either = result,

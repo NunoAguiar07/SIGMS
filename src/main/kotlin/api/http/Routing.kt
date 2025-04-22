@@ -23,6 +23,7 @@ fun Application.configureRouting(
             welcomeRoutes()
             authRoutes(authService)
             authenticatedRoutes(
+                authService,
                 userService,
                 classService,
                 userClassService,

@@ -10,13 +10,7 @@ import isel.leic.group25.db.entities.types.WeekDay
 import isel.leic.group25.db.repositories.rooms.RoomRepository
 import isel.leic.group25.db.repositories.timetables.ClassRepository
 import isel.leic.group25.db.repositories.timetables.SubjectRepository
-import org.h2.jdbcx.JdbcDataSource
-import org.h2.tools.RunScript
-import org.ktorm.database.Database
 import repositories.DatabaseTestSetup
-import java.io.StringReader
-import java.sql.Connection
-import javax.sql.DataSource
 import kotlin.test.AfterTest
 import kotlin.test.Test
 import kotlin.time.Duration.Companion.minutes
@@ -27,6 +21,11 @@ class LectureRepositoryTest {
     private val classRepository = ClassRepository(DatabaseTestSetup.database)
     private val roomRepository = RoomRepository(DatabaseTestSetup.database)
     private val subjectRepository = SubjectRepository(DatabaseTestSetup.database)
+
+    @AfterTest
+    fun clearDatabase() {
+        DatabaseTestSetup.clearDB()
+    }
 
     @Test
     fun `Should create a new lecture and find it by id`() {

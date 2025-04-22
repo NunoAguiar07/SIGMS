@@ -8,7 +8,11 @@ interface UserRepositoryInterface {
 
     fun findByEmail(email: String): User?
 
-    fun create(newUser: User, role: Role): User
+    fun associateWithRole(newUser: User, role: Role): User
+
+    fun createWithRole(newUser: User, role: Role): User
+
+    fun createWithoutRole(newUser: User): User
 
     fun update(user: User): Int
 

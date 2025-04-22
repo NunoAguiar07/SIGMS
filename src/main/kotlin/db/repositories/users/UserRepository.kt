@@ -24,8 +24,7 @@ class UserRepository(private val database: Database): UserRepositoryInterface {
         return database.users.firstOrNull { it.email eq email }
     }
 
-    override fun create(newUser: User, role: Role): User {
-        database.users.add(newUser)
+    override fun associateWithRole(newUser: User, role: Role): User {
         when(role){
             Role.ADMIN -> {
                 database.admins.add(Admin{user=newUser})
@@ -40,6 +39,16 @@ class UserRepository(private val database: Database): UserRepositoryInterface {
                 database.technicalServices.add(TechnicalService{user=newUser})
             }
         }
+        return newUser
+    }
+
+    override fun createWithRole(newUser: User, role: Role): User {
+        database.users.add(newUser)
+        return associateWithRole(newUser, role)
+    }
+
+    override fun createWithoutRole(newUser: User): User {
+        database.users.add(newUser)
         return newUser
     }
 

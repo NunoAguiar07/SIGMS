@@ -5,6 +5,7 @@ import io.ktor.server.routing.*
 import isel.leic.group25.services.*
 
 fun Route.authenticatedRoutes(
+    authService: AuthService,
     userService: UserService,
     classService: ClassService,
     userClassService: UserClassService,
@@ -14,6 +15,7 @@ fun Route.authenticatedRoutes(
     issuesReportService: IssuesReportService
 ) {
     authenticate("auth-jwt") {
+        assesRoleRoutes(authService)
         profileRoutes(userService)
         subjectRoutes(subjectService, classService, userClassService, lectureService)
         roomRoutes(roomService, lectureService, issuesReportService)

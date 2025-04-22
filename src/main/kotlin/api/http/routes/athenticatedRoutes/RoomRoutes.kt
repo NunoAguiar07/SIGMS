@@ -21,8 +21,8 @@ fun Route.roomRoutes(
 ) {
     route("/rooms") {
         get {
-            val limit = call.parameters["limit"]
-            val offset = call.parameters["offset"]
+            val limit = call.queryParameters["limit"]
+            val offset = call.queryParameters["offset"]
             val result = roomService.getAllRooms(limit, offset)
             call.respondEither(
                 either = result,
@@ -62,8 +62,8 @@ fun Route.roomRoutes(
             }
             route("/lectures") {
                 get {
-                    val limit = call.parameters["limit"]
-                    val offset = call.parameters["offset"]
+                    val limit = call.queryParameters["limit"]
+                    val offset = call.queryParameters["offset"]
                     val id = call.parameters["roomId"] ?: return@get call.respond(HttpStatusCode.BadRequest)
                     val result = lectureService.getLecturesByRoom(id, limit, offset)
                     call.respondEither(
@@ -77,8 +77,8 @@ fun Route.roomRoutes(
             }
             route("/issues") {
                 get {
-                    val limit = call.parameters["limit"]
-                    val offset = call.parameters["offset"]
+                    val limit = call.queryParameters["limit"]
+                    val offset = call.queryParameters["offset"]
                     val result = issuesReportService.getAllIssueReports(limit, offset)
                     call.respondEither(
                         either = result,

@@ -16,6 +16,11 @@ class ClassRepositoryTest {
     private val classRepository = ClassRepository(DatabaseTestSetup.database)
     private val subjectRepository = SubjectRepository(DatabaseTestSetup.database)
 
+    @AfterTest
+    fun clearDatabase() {
+        DatabaseTestSetup.clearDB()
+    }
+
     @Test
     fun `Should create a new class and find it by id`() {
         kTransaction.useTransaction {
@@ -122,7 +127,7 @@ class ClassRepositoryTest {
             username = "tester"
             password = User.hashPassword("test")
             profileImage = byteArrayOf()
-        }.let { userRepository.create(it, Role.STUDENT) }
+        }.let { userRepository.createWithRole(it, Role.STUDENT) }
         val result = classRepository.addStudentToClass(newUser, clazz)
         assertTrue(result)
         val foundClasses = classRepository.findClassesByStudentId(newUser.id)
@@ -146,7 +151,7 @@ class ClassRepositoryTest {
             username = "tester123"
             password = User.hashPassword("test")
             profileImage = byteArrayOf()
-        }.let { userRepository.create(it, Role.STUDENT) }
+        }.let { userRepository.createWithRole(it, Role.STUDENT) }
         classRepository.addStudentToClass(newUser, clazz)
         val result = classRepository.removeStudentFromClass(newUser, clazz)
         assertTrue(result)
@@ -170,7 +175,7 @@ class ClassRepositoryTest {
             username = "tester1234"
             password = User.hashPassword("test")
             profileImage = byteArrayOf()
-        }.let { userRepository.create(it, Role.STUDENT) }
+        }.let { userRepository.createWithRole(it, Role.STUDENT) }
         classRepository.addStudentToClass(newUser, clazz)
         val foundClasses = classRepository.findClassesByStudentId(newUser.id)
         assertNotNull(foundClasses)

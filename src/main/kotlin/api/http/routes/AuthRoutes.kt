@@ -24,9 +24,11 @@ fun Route.authRoutes(authService: AuthService) {
                 either = result,
                 transformError = { error -> error.toProblem() },
                 transformSuccess = { token ->
-                    RegisterResponse(
-                        token = token,
-                    )
+                    if (token != null) {
+                        RegisterResponse(
+                            token = token,
+                        )
+                    }
                 },
                 successStatus = HttpStatusCode.Created
             )

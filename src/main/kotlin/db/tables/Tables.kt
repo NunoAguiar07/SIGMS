@@ -29,6 +29,7 @@ class Tables {
         val Database.teachers get() = this.sequenceOf(Teachers)
         val Database.technicalServices get() = this.sequenceOf(TechnicalServices)
         val Database.users get() = this.sequenceOf(Users)
+        val Database.pendingRoleApprovals get() = this.sequenceOf(RoleApprovals)
         val Database.teachersClasses get() = this.sequenceOf(Teaches)
         val Database.studentsClasses get() = this.sequenceOf(Attends)
     }

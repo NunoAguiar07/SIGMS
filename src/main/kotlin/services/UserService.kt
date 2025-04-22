@@ -1,6 +1,5 @@
 package isel.leic.group25.services
 
-import isel.leic.group25.api.jwt.JwtConfig
 import isel.leic.group25.db.entities.types.Role
 import isel.leic.group25.db.entities.users.User
 import isel.leic.group25.db.repositories.interfaces.TransactionInterface
@@ -12,13 +11,10 @@ import isel.leic.group25.utils.success
 
 typealias UserResult = Either<AuthError, User>
 
-typealias TokenResult = Either<AuthError, String>
-
-typealias RoleResult = Either<AuthError, Role>
+typealias RoleResult = Either<AuthError, Role?>
 
 class UserService(private val repository: UserRepository,
-                  private val transactionInterface: TransactionInterface,
-                  private val jwtConfig: JwtConfig) {
+                  private val transactionInterface: TransactionInterface) {
 
     fun getUserById(id: Int): UserResult {
         return transactionInterface.useTransaction {

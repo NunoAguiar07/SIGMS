@@ -4,6 +4,8 @@ import isel.leic.group25.db.entities.users.Admin
 import isel.leic.group25.db.entities.users.User
 
 interface AdminRepositoryInterface {
+     fun getAllAdminEmails(): List<String>
+
      fun findAdminById(id: Int): Admin?
 
      fun findAdminByEmail(email: String): Admin?
