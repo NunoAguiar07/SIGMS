@@ -10,10 +10,7 @@ import isel.leic.group25.db.tables.Tables.Companion.technicalServices
 import isel.leic.group25.db.tables.Tables.Companion.users
 import org.ktorm.database.Database
 import org.ktorm.dsl.*
-import org.ktorm.entity.add
-import org.ktorm.entity.any
-import org.ktorm.entity.firstOrNull
-import org.ktorm.entity.update
+import org.ktorm.entity.*
 
 class UserRepository(private val database: Database): UserRepositoryInterface {
     override fun findById(id: Int): User? {
@@ -64,5 +61,17 @@ class UserRepository(private val database: Database): UserRepositoryInterface {
             database.technicalServices.any { it.user eq id } -> Role.TECHNICAL_SERVICE
             else -> null
         }
+    }
+
+    override fun delete(id: Int): Boolean {
+        val user = database.users.firstOrNull { it.id eq id } ?: return false
+        database.useTransaction {
+            database.admins.removeIf { it.user eq id }
+            database.students.removeIf { it.user eq id }
+            database.teachers.removeIf { it.user eq id }
+            database.technicalServices.removeIf { it.user eq id }
+            database.users.removeIf { it.id eq id }
+        }
+        return true
     }
 }

@@ -7,4 +7,5 @@ interface SubjectRepositoryInterface {
     fun findSubjectById(id: Int): Subject?
     fun findSubjectByName(name: String): Subject?
     fun createSubject(name: String): Subject
+    fun deleteSubject(id: Int): Boolean
 }

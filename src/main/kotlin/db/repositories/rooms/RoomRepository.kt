@@ -56,4 +56,17 @@ class RoomRepository (private val database: Database) : RoomRepositoryInterface 
         return database.studyRooms.add(newRoom)
     }
 
+    override fun deleteRoom(id: Int): Boolean {
+        val condition = database.rooms.removeIf { it.id eq id }
+        return condition == 0
+    }
+
+    override fun updateRoom(id: Int, name: String, capacity: Int): Room? {
+        val room = database.rooms.firstOrNull { it.id eq id } ?: return null
+        room.name = name
+        room.capacity = capacity
+        database.rooms.update(room)
+        return room
+    }
+
 }

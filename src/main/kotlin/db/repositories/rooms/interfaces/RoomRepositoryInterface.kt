@@ -10,4 +10,7 @@ interface RoomRepositoryInterface {
     fun createClassRoom(room: Room): Int
     fun createOfficeRoom(room: Room): Int
     fun createStudyRoom(room: Room): Int
+    fun deleteRoom(id: Int): Boolean
+    fun updateRoom(id: Int, name: String, capacity: Int): Room?
+
 }

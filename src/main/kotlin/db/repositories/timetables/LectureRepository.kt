@@ -8,6 +8,7 @@ import isel.leic.group25.db.entities.types.WeekDay
 import isel.leic.group25.db.repositories.timetables.interfaces.LectureRepositoryInterface
 import isel.leic.group25.db.tables.Tables.Companion.lectures
 import org.ktorm.database.Database
+import org.ktorm.dsl.and
 import org.ktorm.dsl.eq
 import org.ktorm.entity.*
 import kotlin.time.Duration
@@ -54,5 +55,60 @@ class LectureRepository(private val database: Database) : LectureRepositoryInter
     override fun getLecturesByType(type: ClassType): List<Lecture> {
         return database.lectures.filter { it.type eq type }.map { it }
     }
+
+    override fun deleteLecture(schoolClass: Class,
+                               room: Room,
+                               type: ClassType,
+                               weekDay: WeekDay,
+                               startTime: Duration,
+                               endTime: Duration): Boolean {
+        val lecture = database.lectures.removeIf {
+            (it.classId eq schoolClass.id) and
+                    (it.roomId eq room.id) and
+                    (it.type eq type) and
+                    (it.weekDay eq weekDay) and
+                    (it.startTime eq startTime) and
+                    (it.endTime eq endTime)
+        }
+        return lecture == 0
+    }
+
+    override fun updateLecture(
+        schoolClass: Class,
+        room: Room,
+        type: ClassType,
+        weekDay: WeekDay,
+        startTime: Duration,
+        endTime: Duration,
+        newSchoolClass: Class,
+        newRoom: Room,
+        newType: ClassType,
+        newWeekDay: WeekDay,
+        newStartTime: Duration,
+        newEndTime: Duration
+    ): Boolean {
+        val lecture = database.lectures.firstOrNull {
+            (it.classId eq schoolClass.id) and
+                    (it.roomId eq room.id) and
+                    (it.type eq type) and
+                    (it.weekDay eq weekDay) and
+                    (it.startTime eq startTime) and
+                    (it.endTime eq endTime)
+        }
+
+        if (lecture == null) {
+            return false
+        }else{
+            lecture.schoolClass = newSchoolClass
+            lecture.room = newRoom
+            lecture.type = newType
+            lecture.weekDay = newWeekDay
+            lecture.startTime = newStartTime
+            lecture.endTime = newEndTime
+            database.lectures.update(lecture)
+            return true
+        }
+    }
+
 }
 

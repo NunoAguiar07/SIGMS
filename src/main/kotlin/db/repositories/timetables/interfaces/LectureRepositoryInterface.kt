@@ -20,8 +20,29 @@ interface LectureRepositoryInterface {
         weekDay: WeekDay,
         startTime: Duration,
         endTime: Duration
-    ): Lecture?
+    ): Lecture
     fun getLecturesByRoom(roomId: Int, limit: Int, offSet: Int): List<Lecture>
     fun getLecturesByClass(classId: Int, limit: Int, offSet: Int): List<Lecture>
     fun getLecturesByType(type: ClassType): List<Lecture>
+    fun deleteLecture(schoolClass: Class,
+                      room: Room,
+                      type: ClassType,
+                      weekDay: WeekDay,
+                      startTime: Duration,
+                      endTime: Duration): Boolean
+
+    fun updateLecture(
+        schoolClass: Class,
+        room: Room,
+        type: ClassType,
+        weekDay: WeekDay,
+        startTime: Duration,
+        endTime: Duration,
+        newSchoolClass: Class,
+        newRoom: Room,
+        newType: ClassType,
+        newWeekDay: WeekDay,
+        newStartTime: Duration,
+        newEndTime: Duration
+    ): Boolean
 }

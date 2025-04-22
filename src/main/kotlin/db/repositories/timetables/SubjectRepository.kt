@@ -27,4 +27,8 @@ class SubjectRepository(private val database: Database): SubjectRepositoryInterf
         database.subjects.add(newSubject)
         return newSubject
     }
+    override fun deleteSubject(id: Int): Boolean {
+        val condition = database.subjects.removeIf { it.id eq id }
+        return condition == 0
+    }
 }

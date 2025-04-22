@@ -17,4 +17,6 @@ interface UserRepositoryInterface {
     fun update(user: User): Int
 
     fun getRoleById(id: Int): Role?
+
+    fun delete(id: Int): Boolean
 }

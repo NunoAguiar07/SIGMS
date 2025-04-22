@@ -13,6 +13,7 @@ class IssueReportRepositoryTest {
     private val issueReportRepository = IssueReportRepository(database)
     private val roomRepository = RoomRepository(database)
 
+
     @AfterTest
     fun clearDatabase() {
         DatabaseTestSetup.clearDB()
@@ -48,7 +49,7 @@ class IssueReportRepositoryTest {
             val newIssueReport1 = issueReportRepository.createIssueReport(room1, "testDescription1")
             val newIssueReport2 = issueReportRepository.createIssueReport(room2, "testDescription2")
             val issueReports = issueReportRepository.getAllIssueReports(10, 0)
-            assert(issueReports.size == 2)
+            assert(issueReports.size == 2) // Assuming there are 6 objects in the database based on the tests
             assert(issueReports.contains(newIssueReport1))
             assert(issueReports.contains(newIssueReport2))
         }

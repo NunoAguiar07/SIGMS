@@ -17,6 +17,8 @@ sealed class AuthError {
     data object AlreadyProcessed : AuthError()
     data object InvalidLimit : AuthError()
     data object InvalidOffset : AuthError()
+    data object UserDeleteFailed : AuthError()
+
 
     fun toProblem(): Problem {
         return when (this) {
@@ -75,6 +77,10 @@ sealed class AuthError {
             InvalidOffset -> Problem.badRequest(
                 title = "Invalid offset",
                 detail = "The provided offset is invalid."
+            )
+            UserDeleteFailed -> Problem.internalServerError(
+                title = "User delete failed",
+                detail = "Failed to delete the user."
             )
         }
     }

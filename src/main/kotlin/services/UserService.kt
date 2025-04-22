@@ -71,4 +71,15 @@ class UserService(private val repository: UserRepository,
             return@useTransaction success(role)
         }
     }
+    fun deleteUser(id: Int): UserResult {
+        return transactionInterface.useTransaction {
+            val user = repository.findById(id)
+                ?: return@useTransaction failure(AuthError.UserNotFound)
+            val deleted = repository.delete(id)
+            if (!deleted) {
+                return@useTransaction failure(AuthError.UserDeleteFailed)
+            }
+            return@useTransaction success(user)
+        }
+    }
 }
