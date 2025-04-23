@@ -12,10 +12,10 @@ POST {{baseUrl}}/auth/register
 Content-Type: application/json
 
 {
-  "email": "antonio229@gmail.com",
+  "email": "antonio227@gmail.com",
   "username": "Antonio_123",
   "password": "Antonio_123",
-  "role": "student"
+  "role": "teacher"
 }
 
 
@@ -27,12 +27,12 @@ POST {{baseUrl}}/auth/login
 Content-Type: application/json
 
 {
-  "email": "antonio229@gmail.com",
+  "email": "admin1@example.com",
   "password": "Antonio_123"
 }
 
 ###
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwODAvIiwiYXVkIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwLyIsInVzZXJJZCI6MSwicm9sZSI6IlNUVURFTlQiLCJpYXQiOjE3NDUxNTcxNzcsImV4cCI6MTc0NTE2MDc3N30.-igDRRF0CcpTg_DasfEWZzme60pAekqgK2CZsZ49gvo
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwODAvIiwiYXVkIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwLyIsInVzZXJJZCI6MSwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzQ1NDI0MzQxLCJleHAiOjE3NDU0Mjc5NDF9.PZ9kIqqHMczyOf0zoEzGB38KdO_BJvCY9Nr0nTnexT0
 
 
 ###
@@ -167,4 +167,14 @@ GET {{baseUrl}}/schedule
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
+###
+GET {{baseUrl}}/assesRole
+Authorization: Bearer {{token}}
 
+###
+GET {{baseUrl}}/assesRole/20ef8acc-072e-421d-a039-a2a860b3d602
+Authorization: Bearer {{token}}
+
+###
+PUT {{baseUrl}}/assesRole?token=20ef8acc-072e-421d-a039-a2a860b3d602&status=approved
+Authorization: Bearer {{token}}

@@ -35,7 +35,7 @@ fun Application.module() {
     install(ContentNegotiation) {
         json()
     }
-    val db = Database.connect(url = "jdbc:postgresql://localhost:5432/sigms", user = "user", password = "password123", driver = "org.postgresql.Driver", dialect = PostgreSqlDialect())
+    val db = Database.connect(url = "jdbc:postgresql://db:5432/sigms", user = "user", password = "password123", driver = "org.postgresql.Driver", dialect = PostgreSqlDialect())
 
     val emailConfig = EmailConfig(
         host = environment.config.property("email.host").getString(),

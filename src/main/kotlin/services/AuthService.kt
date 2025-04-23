@@ -74,6 +74,7 @@ class AuthService(
                         this.requestedRole = Role.valueOf(role.uppercase(Locale.getDefault()))
                         this.verificationToken = verificationToken
                         this.verifiedBy = null
+                        this.createdAt = Clock.System.now()
                         this.expiresAt = expiresAt
                         this.status = Status.PENDING
                     }

@@ -12,9 +12,9 @@ jwt:
 frontend:
   url: "http://localhost:8080/"
 email:
-  host: "smtp.yourdomain.com"
-  port: 587
-  username: "noreply@yourdomain.com"
-  password: "your-email-password"
+  host: "localhost"
+  port: 1025
+  username: ""
+  password: ""
   from: "noreply@yourdomain.com"
-  useSsl: true
+  useSsl: false
