@@ -35,24 +35,23 @@ fun Application.module() {
     install(ContentNegotiation) {
         json()
     }
-    val db = Database.connect(url = "jdbc:postgresql://db:5432/sigms", user = "user", password = "password123", driver = "org.postgresql.Driver", dialect = PostgreSqlDialect())
+    val db = Database.connect(url = System.getenv("DB_URL"), user = System.getenv("DB_USER"), password = System.getenv("DB_PASSWORD"), driver = "org.postgresql.Driver", dialect = PostgreSqlDialect())
 
-    val emailConfig = EmailConfig(
-        host = environment.config.property("email.host").getString(),
-        port = environment.config.property("email.port").getString().toInt(),
-        username = environment.config.property("email.username").getString(),
-        password = environment.config.property("email.password").getString(),
-        from = environment.config.property("email.from").getString(),
-        useSsl = environment.config.property("email.useSsl").getString().toBoolean(),
-        baseUrl = environment.config.property("frontend.url").getString()
+    val emailConfig = EmailConfig(System.getenv("EMAIL_HOST"),
+        port = System.getenv("EMAIL_PORT").toInt(),
+        username = System.getenv("EMAIL_USERNAME"),
+        password = System.getenv("EMAIL_PASSWORD"),
+        from = System.getenv("EMAIL_FROM"),
+        useSsl = System.getenv("EMAIL_USE_SSL").toBoolean(),
+        baseUrl = System.getenv("FRONTEND_URL")
     )
 
-    val secret = environment.config.property("jwt.secret").getString()
-    val issuer = environment.config.property("jwt.issuer").getString()
-    val audience = environment.config.property("jwt.audience").getString()
-    val myRealm = environment.config.property("jwt.realm").getString()
+    val secret = System.getenv("JWT_SECRET")
+    val issuer = System.getenv("JWT_ISSUER")
+    val audience = System.getenv("JWT_AUDIENCE")
+    val myRealm = System.getenv("JWT_REALM")
 
-    val frontendUrl = environment.config.property("frontend.url").getString()
+    val frontendUrl = System.getenv("FRONTEND_URL")
 
     val jwtConfig = JwtConfig(secret, issuer, audience, myRealm)
     val kTransaction = KTransaction(db)

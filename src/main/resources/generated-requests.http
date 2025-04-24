@@ -12,10 +12,10 @@ POST {{baseUrl}}/auth/register
 Content-Type: application/json
 
 {
-  "email": "antonio227@gmail.com",
+  "email": "antonio2200@gmail.com",
   "username": "Antonio_123",
   "password": "Antonio_123",
-  "role": "teacher"
+  "role": "student"
 }
 
 
