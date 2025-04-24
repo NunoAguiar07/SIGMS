@@ -1,14 +1,15 @@
 package isel.leic.group25.api.model.response
 
-import api.model.response.UserResponse
 import isel.leic.group25.db.entities.types.Role
 import isel.leic.group25.db.entities.types.Status
+import isel.leic.group25.db.entities.users.Admin
 import isel.leic.group25.db.entities.users.RoleApproval
+import isel.leic.group25.db.entities.users.User
 import kotlinx.serialization.Serializable
 import kotlin.time.ExperimentalTime
 
 @Serializable
-data class AssesRoleResponse (
+data class AssessRoleResponse (
     val id : Int,
     var user: UserResponse,
     var requestedRole: Role,

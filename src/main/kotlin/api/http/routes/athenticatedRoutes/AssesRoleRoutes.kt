@@ -5,7 +5,7 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import isel.leic.group25.api.exceptions.respondEither
 import isel.leic.group25.api.jwt.getUserIdFromPrincipal
-import isel.leic.group25.api.model.response.AssesRoleResponse
+import isel.leic.group25.api.model.response.AssessRoleResponse
 import isel.leic.group25.services.AuthService
 
 fun Route.assesRoleRoutes(
@@ -21,7 +21,7 @@ fun Route.assesRoleRoutes(
                 transformError = { error -> error.toProblem() },
                 transformSuccess = { approvals ->
                     approvals.map { approval ->
-                        AssesRoleResponse.from(approval)
+                        AssessRoleResponse.from(approval)
                     }
                 }
             )
@@ -52,7 +52,7 @@ fun Route.assesRoleRoutes(
                     either = result,
                     transformError = { error -> error.toProblem() },
                     transformSuccess = { roleApproval ->
-                        AssesRoleResponse.from(roleApproval)
+                        AssessRoleResponse.from(roleApproval)
                     }
                 )
             }

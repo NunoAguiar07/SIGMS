@@ -1,0 +1,188 @@
+openapi: 3.1.0
+info:
+  title: SIGMS
+  description: The OpenAPI specification for the SIGMS
+  version: 1.0.0
+servers:
+  - url: 'https://localhost:8080'
+paths:
+
+components:
+  schemas:
+    ChangePassword:
+      type: object
+      required:
+        - oldPassword
+        - newPassword
+      properties:
+        oldPassword:
+          type: string
+          example: "thepasswordshouldcomehashed"
+        newPassword:
+          type: string
+          example: "thepasswordshouldcomehashed"
+    ClassRequest:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          example: "51D"
+    IssueReportRequest:
+      type: object
+      required:
+        - description
+      properties:
+        description:
+         type: string
+         example: "There is an issue with room X"
+    LectureRequest:
+      type: object
+      required:
+        - classId
+        - roomId
+        - type
+        - weekDay
+        - startTime
+        - endTime
+      properties:
+        classId:
+          type: integer
+          example: 1
+        roomId:
+          type: integer
+          example: 1
+        type:
+          $ref: "#/components/schemas/ClassType"
+        weekDay:
+          $ref: "#/components/schemas/WeekDay"
+        startTime:
+          type: string
+          example: "11:00"
+        endTime:
+          type: string
+          example: "13:00"
+    LoginCredentialsRequest:
+      type: object
+      required:
+        email:
+          type: string
+          example: "example@email.com"
+        password:
+          type: string
+          example: "thepasswordshouldcomehashed"
+    RoomRequest:
+      type: object
+      required:
+        - name
+        - capacity
+        - type
+      properties:
+        name:
+          type: string
+          example: "F.0.23"
+        capacity:
+          type: integer
+          example: 30
+        type:
+          type: string
+          example: "class"
+    SubjectRequest:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          example: "LS"
+    UserCredentialsRequest:
+      type: object
+      required:
+        - email
+        - username
+        - password
+        - role
+      properties:
+        email:
+          type: string
+          example: "example@email.com"
+        username:
+          type: string
+          example: "DefinitelyAUsername"
+        password:
+          type: string
+          example: "thepasswordshouldcomehashed"
+        role:
+          $ref: "#/components/schemas/Role"
+    UserUpdateRequest:
+        type: object
+        properties:
+          username:
+            type: string
+            example: "I'veChangeMyUsername"
+          image:
+            type: string
+            format: binary
+    AssessRole:
+      type: object
+      properties:
+        user:
+          $ref: "#/components/schemas/User"
+        requestedRole:
+          $ref: "#/components/schemas/Role"
+        verificationToken:
+          type: string
+          example: "UUIDToken"
+        createdAt:
+          type: string
+          format: time
+
+
+
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        email:
+          type: string
+          example: "example@email.com"
+        username:
+          type: string
+          example: "YouWereMerelyGivenAnUsernameIWasBornIntoIt"
+        password:
+          type: string
+          example: "ThisPasswordShouldNotBeHereButAtLeastIsHashed"
+        profileImage:
+          type: string
+          format: binary
+
+
+
+    Admin:
+
+    WeekDay:
+      type: string
+      enum:
+        - MONDAY
+        - TUESDAY
+        - WEDNESDAY
+        - THURSDAY
+        - FRIDAY
+        - SATURDAY
+        - SUNDAY
+    ClassType:
+      type: string
+      enum:
+        - THEORETICAL,
+        - PRACTICAL,
+        - THEORETICAL_PRACTICAL,
+    Role:
+      type: string
+      enum:
+        - STUDENT
+        - TEACHER
+        - ADMIN
+        - TECHNICIAN

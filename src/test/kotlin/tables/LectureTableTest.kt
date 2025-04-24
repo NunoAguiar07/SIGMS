@@ -99,7 +99,7 @@ class LectureTableTest {
     }
 
     @Test
-    fun `Should create a new lecture`(){
+    fun `Should create a new lecture`() {
         val newSubject = Subject{
             name = "PS"
         }.also { database.subjects.add(it) }
@@ -131,7 +131,7 @@ class LectureTableTest {
     }
 
     @Test
-    fun `Should update a lecture`(){
+    fun `Should update a lecture`() {
         val newSubject = Subject{
             name = "PS"
         }.also { database.subjects.add(it) }
@@ -177,7 +177,7 @@ class LectureTableTest {
     }
 
     @Test
-    fun `Should delete a lecture`(){
+    fun `Should delete a lecture`() {
         val newSubject = Subject{
             name = "PS"
         }.also { database.subjects.add(it) }
@@ -188,7 +188,7 @@ class LectureTableTest {
         val newRoom = Room{
             name = "G.2.02"
             capacity = 15
-        }.also{
+        }.also {
             database.rooms.add(it)
         }
         val newLecture = Lecture {
