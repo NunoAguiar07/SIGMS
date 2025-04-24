@@ -53,14 +53,14 @@ class RoomService (
                 return@useTransaction failure(RoomError.RoomAlreadyExists)
             }
             if (type.isBlank()) {
-                return@useTransaction failure(RoomError.InvalidRoomData)
+                return@useTransaction failure(RoomError.InvalidRoomType)
             }
-            val room = roomRepository.createRoom(capacity, name) ?: return@useTransaction failure(RoomError.RoomNotFound)
+            val room = roomRepository.createRoom(capacity, name)
             when (type) {
                 "class" -> roomRepository.createClassRoom(room)
                 "office" -> roomRepository.createOfficeRoom(room)
                 "study" -> roomRepository.createStudyRoom(room)
-                else -> return@useTransaction failure(RoomError.InvalidRoomData)
+                else -> return@useTransaction failure(RoomError.InvalidRoomType)
             }
             return@useTransaction success(room)
         }

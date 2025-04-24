@@ -7,6 +7,7 @@ import repositories.DatabaseTestSetup
 import repositories.DatabaseTestSetup.Companion.database
 import kotlin.test.AfterTest
 import kotlin.test.Test
+import kotlin.test.assertNotNull
 
 class IssueReportRepositoryTest {
     private val kTransaction = KTransaction(database)
@@ -25,8 +26,8 @@ class IssueReportRepositoryTest {
             val room = roomRepository.createRoom(20, "testRoom")
             val newIssueReport = issueReportRepository.createIssueReport(room, "testDescription")
             val foundIssueReport = issueReportRepository.getIssueReportById(newIssueReport.id)
-            assert(foundIssueReport != null)
-            assert(foundIssueReport?.description == newIssueReport.description)
+            assertNotNull(foundIssueReport, "Expected to find the issue report by ID")
+            assert(foundIssueReport.description == newIssueReport.description)
         }
     }
 
@@ -36,8 +37,8 @@ class IssueReportRepositoryTest {
             val room = roomRepository.createRoom(20, "testRoom")
             val newIssueReport = issueReportRepository.createIssueReport(room, "testDescription")
             val foundIssueReport = issueReportRepository.getAllIssueReports(10, 0).firstOrNull { it.description == newIssueReport.description }
-            assert(foundIssueReport != null)
-            assert(foundIssueReport?.description == newIssueReport.description)
+            assertNotNull(foundIssueReport)
+            assert(foundIssueReport.description == newIssueReport.description)
         }
     }
 
@@ -49,7 +50,7 @@ class IssueReportRepositoryTest {
             val newIssueReport1 = issueReportRepository.createIssueReport(room1, "testDescription1")
             val newIssueReport2 = issueReportRepository.createIssueReport(room2, "testDescription2")
             val issueReports = issueReportRepository.getAllIssueReports(10, 0)
-            assert(issueReports.size == 2) // Assuming there are 6 objects in the database based on the tests
+            assert(issueReports.size == 2)
             assert(issueReports.contains(newIssueReport1))
             assert(issueReports.contains(newIssueReport2))
         }
@@ -70,18 +71,8 @@ class IssueReportRepositoryTest {
         kTransaction.useTransaction {
             val room = roomRepository.createRoom(20, "testRoom")
             val newIssueReport = issueReportRepository.createIssueReport(room, "testDescription")
-            val updatedIssueReport = issueReportRepository.updateIssueReport(newIssueReport.id, room.id, "updatedDescription")
-            assert(updatedIssueReport != null)
-            assert(updatedIssueReport?.description == "updatedDescription")
-        }
-    }
-    @Test
-    fun `Should not update an issue report with invalid room id`() {
-        kTransaction.useTransaction {
-            val room = roomRepository.createRoom(20, "testRoom")
-            val newIssueReport = issueReportRepository.createIssueReport(room, "testDescription")
-            val updatedIssueReport = issueReportRepository.updateIssueReport(newIssueReport.id, -1, "updatedDescription")
-            assert(updatedIssueReport == null)
+            val updatedIssueReport = issueReportRepository.updateIssueReport(newIssueReport,"updatedDescription")
+            assert(updatedIssueReport.description == "updatedDescription")
         }
     }
 

@@ -49,6 +49,27 @@ class IssuesReportService(private val issueReportRepository: IssueReportReposito
         }
     }
 
+    fun getIssuesReportByRoomId(roomId: String?, limit:String?, offset:String?): IssueReportListResult {
+        if (roomId == null || roomId.toIntOrNull() == null) {
+            return failure(IssueReportError.InvalidRoomId)
+        }
+        if (roomId.toInt() <= 0) {
+            return failure(IssueReportError.InvalidRoomId)
+        }
+        val newLimit = limit?.toInt() ?: 20
+        if (newLimit <= 0 || newLimit > 100) {
+            return failure(IssueReportError.InvalidIssueReportLimit)
+        }
+        val newOffset = offset?.toInt() ?: 0
+        if (newOffset < 0) {
+            return failure(IssueReportError.InvalidIssueReportOffSet)
+        }
+       return transactionInterface.useTransaction {
+           val issues = issueReportRepository.getIssuesReportByRoomId(roomId.toInt(), newLimit, newOffset)
+           return@useTransaction success(issues)
+       }
+    }
+
     fun createIssueReport(roomId: String?, description: String):IssueReportResult {
         if (roomId == null || roomId.toIntOrNull() == null) {
             return failure(IssueReportError.InvalidRoomId)
@@ -63,12 +84,14 @@ class IssuesReportService(private val issueReportRepository: IssueReportReposito
            val room = roomRepository.getRoomById(roomId.toInt())
                ?: return@useTransaction failure(IssueReportError.InvalidRoomId)
             val newIssue = issueReportRepository.createIssueReport(room, description)
-                ?: return@useTransaction failure(IssueReportError.FailedToAddToDatabase)
            return@useTransaction success(newIssue)
        }
     }
 
-    fun deleteIssueReport(id: String): IssueReportDeletionResult {
+    fun deleteIssueReport(id: String?): IssueReportDeletionResult {
+        if (id == null || id.toIntOrNull() == null) {
+            return failure(IssueReportError.InvalidIssueReportId)
+        }
         val parsedId = id.toInt()
         if (parsedId <= 0) {
             return failure(IssueReportError.InvalidIssueReportId)
@@ -81,25 +104,22 @@ class IssuesReportService(private val issueReportRepository: IssueReportReposito
         }
     }
 
-    fun updateIssueReport(id: String, roomId: String, description: String): IssueReportUpdateResult {
+    fun updateIssueReport(id: String?, description: String): IssueReportUpdateResult {
+        if (id == null || id.toIntOrNull() == null) {
+            return failure(IssueReportError.InvalidIssueReportId)
+        }
         val parsedId = id.toInt()
-        val parsedRoomId = roomId.toInt()
         if (description.isBlank()) {
             return failure(IssueReportError.InvalidDescription)
         }
-        if (parsedRoomId <= 0) {
-            return failure(IssueReportError.InvalidRoomId)
-        }
+
         if (parsedId <= 0) {
             return failure(IssueReportError.InvalidIssueReportId)
         }
        return transactionInterface.useTransaction {
-            issueReportRepository.getIssueReportById(parsedId)
+            val report = issueReportRepository.getIssueReportById(parsedId)
                 ?: return@useTransaction failure(IssueReportError.InvalidIssueReportId)
-            val room = issueReportRepository.getIssueReportById(parsedRoomId)
-                ?: return@useTransaction failure(IssueReportError.InvalidRoomId)
-            val updatedIssue = issueReportRepository.updateIssueReport(parsedId, room.id, description)
-                ?: return@useTransaction failure(IssueReportError.FailedToUpdateInDatabase)
+            val updatedIssue = issueReportRepository.updateIssueReport(report, description)
             return@useTransaction success(updatedIssue)
         }
     }
