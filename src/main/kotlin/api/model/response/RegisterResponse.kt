@@ -3,6 +3,10 @@ package api.model.response
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class RegisterResponse(
-    val token : String
-)
+sealed class RegisterResponse {
+    @Serializable
+    data class Success(val token: String) : RegisterResponse()
+
+    @Serializable
+    data class PendingApproval(val message: String = "Account pending admin approval") : RegisterResponse()
+}

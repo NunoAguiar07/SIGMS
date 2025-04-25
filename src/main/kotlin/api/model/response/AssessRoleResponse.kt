@@ -8,7 +8,7 @@ import kotlinx.serialization.Serializable
 import kotlin.time.ExperimentalTime
 
 @Serializable
-data class AssesRoleResponse (
+data class AssessRoleResponse (
     val id : Int,
     var user: UserResponse,
     var requestedRole: Role,
@@ -20,14 +20,14 @@ data class AssesRoleResponse (
 ) {
     companion object {
         @OptIn(ExperimentalTime::class)
-        fun from(roleApproval: RoleApproval): AssesRoleResponse {
+        fun from(roleApproval: RoleApproval): AssessRoleResponse {
             val verifiedByAmin = roleApproval.verifiedBy
             val verifiedBy = if (verifiedByAmin != null) {
                 UserResponse.fromUser(verifiedByAmin.user)
             } else {
                 null
             }
-            return AssesRoleResponse(
+            return AssessRoleResponse(
                 id = roleApproval.id,
                 user = UserResponse.fromUser(roleApproval.user),
                 requestedRole = roleApproval.requestedRole,
