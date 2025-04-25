@@ -25,9 +25,9 @@ fun Route.authRoutes(authService: AuthService) {
                 transformError = { error -> error.toProblem() },
                 transformSuccess = { token ->
                     if (token != null) {
-                        RegisterResponse(
-                            token = token,
-                        )
+                        RegisterResponse.Success(token = token)
+                    } else {
+                        RegisterResponse.PendingApproval()
                     }
                 },
                 successStatus = HttpStatusCode.Created
