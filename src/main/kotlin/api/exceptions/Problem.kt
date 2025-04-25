@@ -89,7 +89,13 @@ suspend fun <L, R> ApplicationCall.respondEither(
     successStatus: HttpStatusCode = HttpStatusCode.OK
 ) {
     when (either) {
-        is Either.Right -> respond(successStatus, transformSuccess(either.value))
+        is Either.Right -> {
+            val responseBody = when (val successValue = transformSuccess(either.value)) {
+                is List<*> -> mapOf("data" to successValue)
+                else -> successValue
+            }
+            respond(successStatus, responseBody)
+        }
         is Either.Left -> transformError(either.value).respond(this)
     }
 }
