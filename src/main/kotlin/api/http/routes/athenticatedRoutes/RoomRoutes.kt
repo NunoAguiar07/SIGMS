@@ -60,6 +60,33 @@ fun Route.roomRoutes(
                     }
                 )
             }
+            delete {
+                val id = call.parameters["roomId"] ?: return@delete call.respond(HttpStatusCode.BadRequest)
+                val result = roomService.deleteRoom(id)
+                call.respondEither(
+                    either = result,
+                    transformError = { error -> error.toProblem() },
+                    transformSuccess = {
+                        HttpStatusCode.NoContent
+                    }
+                )
+            }
+            put {
+                val id = call.parameters["roomId"] ?: return@put call.respond(HttpStatusCode.BadRequest)
+                val roomRequest = call.receive<RoomRequest>()
+                val result = roomService.updateRoom(
+                    id = id,
+                    name = roomRequest.name,
+                    capacity = roomRequest.capacity
+                )
+                call.respondEither(
+                    either = result,
+                    transformError = { error -> error.toProblem() },
+                    transformSuccess = { room ->
+                        RoomResponse.from(room)
+                    }
+                )
+            }
             route("/lectures") {
                 get {
                     val limit = call.queryParameters["limit"]

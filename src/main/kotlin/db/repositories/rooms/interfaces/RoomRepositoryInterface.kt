@@ -6,11 +6,11 @@ interface RoomRepositoryInterface {
     fun getAllRooms(): List<Room>
     fun getAllRooms(limit: Int, offset: Int): List<Room>
     fun getRoomById(id: Int): Room?
-    fun createRoom(capacity: Int, name: String): Room?
+    fun createRoom(capacity: Int, name: String): Room
     fun createClassRoom(room: Room): Int
     fun createOfficeRoom(room: Room): Int
     fun createStudyRoom(room: Room): Int
     fun deleteRoom(id: Int): Boolean
-    fun updateRoom(id: Int, name: String, capacity: Int): Room?
+    fun updateRoom(room:Room, name: String, capacity: Int): Room
 
 }

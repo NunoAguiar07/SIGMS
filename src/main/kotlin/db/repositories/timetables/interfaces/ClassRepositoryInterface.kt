@@ -4,7 +4,7 @@ import isel.leic.group25.db.entities.timetables.Subject
 import isel.leic.group25.db.entities.timetables.Class
 import isel.leic.group25.db.entities.users.User
 
-// still need to remove some methods after some time
+
 interface ClassRepositoryInterface {
     fun findAllClasses(): List<Class>
 

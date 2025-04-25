@@ -61,8 +61,7 @@ class RoomRepository (private val database: Database) : RoomRepositoryInterface 
         return condition == 0
     }
 
-    override fun updateRoom(id: Int, name: String, capacity: Int): Room? {
-        val room = database.rooms.firstOrNull { it.id eq id } ?: return null
+    override fun updateRoom(room: Room, name: String, capacity: Int): Room {
         room.name = name
         room.capacity = capacity
         database.rooms.update(room)

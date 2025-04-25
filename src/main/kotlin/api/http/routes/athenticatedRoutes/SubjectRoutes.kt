@@ -61,6 +61,17 @@ fun Route.subjectRoutes(
                     }
                 )
             }
+            delete {
+                val id = call.parameters["subjectId"]
+                val result = subjectService.deleteSubject(id)
+                call.respondEither(
+                    either = result,
+                    transformError = { error -> error.toProblem() },
+                    transformSuccess = {
+                        HttpStatusCode.NoContent
+                    }
+                )
+            }
             route("/classes") {
                 get {
                     val limit = call.queryParameters["limit"]

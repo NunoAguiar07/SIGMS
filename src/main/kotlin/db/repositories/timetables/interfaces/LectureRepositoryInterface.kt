@@ -12,7 +12,14 @@ interface LectureRepositoryInterface {
 
     fun getAllLectures(): List<Lecture>
     fun getAllLectures(limit: Int, offSet: Int): List<Lecture>
-
+    fun getLecture(
+        schoolClass: Class,
+        room: Room,
+        type: ClassType,
+        weekDay: WeekDay,
+        startTime: Duration,
+        endTime: Duration
+    ): Lecture?
     fun createLecture(
         schoolClass: Class,
         room: Room,
@@ -24,25 +31,15 @@ interface LectureRepositoryInterface {
     fun getLecturesByRoom(roomId: Int, limit: Int, offSet: Int): List<Lecture>
     fun getLecturesByClass(classId: Int, limit: Int, offSet: Int): List<Lecture>
     fun getLecturesByType(type: ClassType): List<Lecture>
-    fun deleteLecture(schoolClass: Class,
-                      room: Room,
-                      type: ClassType,
-                      weekDay: WeekDay,
-                      startTime: Duration,
-                      endTime: Duration): Boolean
+    fun deleteLecture(lecture: Lecture): Boolean //
 
     fun updateLecture(
-        schoolClass: Class,
-        room: Room,
-        type: ClassType,
-        weekDay: WeekDay,
-        startTime: Duration,
-        endTime: Duration,
+        lecture: Lecture,
         newSchoolClass: Class,
         newRoom: Room,
         newType: ClassType,
         newWeekDay: WeekDay,
         newStartTime: Duration,
         newEndTime: Duration
-    ): Boolean
+    ): Lecture //
 }

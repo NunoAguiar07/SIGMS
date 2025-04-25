@@ -5,6 +5,6 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class RoomRequest(
     val name: String,
-    val capacity: Int,
+    val capacity: String,
     val type: String,
 )

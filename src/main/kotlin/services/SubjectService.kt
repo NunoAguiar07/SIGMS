@@ -41,8 +41,11 @@ class SubjectService(
         }
     }
 
-    fun createSubject(name: String): SubjectResult {
+    fun createSubject(name: String?): SubjectResult {
         return transactionInterface.useTransaction {
+            if (name.isNullOrBlank()) {
+                return@useTransaction failure(SubjectError.InvalidSubjectData)
+            }
             val existingSubject = subjectRepository.findSubjectByName(name)
             if (existingSubject != null) {
                 return@useTransaction failure(SubjectError.SubjectAlreadyExists)
@@ -52,6 +55,20 @@ class SubjectService(
             }
             val newSubject = subjectRepository.createSubject(name)
             return@useTransaction success(newSubject)
+        }
+    }
+
+    fun deleteSubject(id: String?): SubjectResult {
+        return transactionInterface.useTransaction {
+            if (id == null || id.toIntOrNull() == null) {
+                return@useTransaction failure(SubjectError.InvalidSubjectId)
+            }
+            val subject = subjectRepository.findSubjectById(id.toInt()) ?: return@useTransaction failure(SubjectError.SubjectNotFound)
+            val deleted = subjectRepository.deleteSubject(subject.id)
+            if (!deleted) {
+                return@useTransaction failure(SubjectError.SubjectNotFound)
+            }
+            return@useTransaction success(subject)
         }
     }
 }
