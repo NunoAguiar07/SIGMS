@@ -41,22 +41,21 @@ class RoomService (
         }
     }
 
-    fun createRoom(capacity: String?, name: String?, type: String?): RoomResult {
+    fun createRoom(capacity: Int, name: String, type: String): RoomResult {
         return transactionInterface.useTransaction {
-            val newCapacity = capacity?.toInt() ?: 20
-            if (newCapacity <= 0) {
+            if (capacity <= 0) {
                 return@useTransaction failure(RoomError.InvalidRoomCapacity)
             }
-            if (name.isNullOrBlank()) {
+            if (name.isBlank()) {
                 return@useTransaction failure(RoomError.InvalidRoomData)
             }
             if (roomRepository.getAllRooms().any { it.name == name }) {
                 return@useTransaction failure(RoomError.RoomAlreadyExists)
             }
-            if (type.isNullOrBlank()) {
+            if (type.isBlank()) {
                 return@useTransaction failure(RoomError.InvalidRoomType)
             }
-            val room = roomRepository.createRoom(newCapacity, name)
+            val room = roomRepository.createRoom(capacity, name)
             when (type) {
                 "class" -> roomRepository.createClassRoom(room)
                 "office" -> roomRepository.createOfficeRoom(room)
@@ -79,23 +78,19 @@ class RoomService (
         }
     }
 
-    fun updateRoom(id: String?, name: String?, capacity: String?): RoomResult {
+    fun updateRoom(id: String?, name: String, capacity: Int): RoomResult {
         return transactionInterface.useTransaction {
             if (id == null || id.toIntOrNull() == null) {
                 return@useTransaction failure(RoomError.InvalidRoomId)
             }
-            if (capacity != null && capacity.toIntOrNull() == null) {
+            if (capacity <= 0) {
                 return@useTransaction failure(RoomError.InvalidRoomCapacity)
             }
-            if (name.isNullOrBlank()) {
+            if (name.isBlank()) {
                 return@useTransaction failure(RoomError.InvalidRoomData)
             }
-            val newCapacity = capacity?.toInt() ?: return@useTransaction failure(RoomError.InvalidRoomCapacity)
             val room = roomRepository.getRoomById(id.toInt()) ?: return@useTransaction failure(RoomError.RoomNotFound)
-            if (newCapacity <= 0) {
-                return@useTransaction failure(RoomError.InvalidRoomCapacity)
-            }
-            val updatedRoom = roomRepository.updateRoom(room, name, newCapacity)
+            val updatedRoom = roomRepository.updateRoom(room, name, capacity)
             return@useTransaction success(updatedRoom)
         }
     }
