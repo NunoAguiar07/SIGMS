@@ -8,10 +8,10 @@ import isel.leic.group25.api.jwt.getUserIdFromPrincipal
 import isel.leic.group25.api.model.response.AssessRoleResponse
 import isel.leic.group25.services.AuthService
 
-fun Route.assesRoleRoutes(
+fun Route.assessRoleRoutes(
     authService: AuthService
 ) {
-    route("/assesRole") {
+    route("/assessRole") {
         get {
             val limit = call.queryParameters["limit"]
             val offset = call.queryParameters["offset"]
