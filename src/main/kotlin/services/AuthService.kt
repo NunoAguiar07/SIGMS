@@ -20,7 +20,7 @@ import kotlin.time.Clock
 import kotlin.time.Duration.Companion.days
 import kotlin.time.ExperimentalTime
 
-typealias RegisterResult = Either<AuthError, String?>
+typealias RegisterResult = Either<AuthError, Boolean>
 
 typealias LoginResult = Either<AuthError, String>
 
@@ -29,6 +29,8 @@ typealias PendingRolesResult = Either<AuthError, List<RoleApproval>>
 typealias PendingRoleResult = Either<AuthError, RoleApproval>
 
 typealias AssesResult = Either<AuthError, Boolean>
+
+typealias VerificationResult = Either<AuthError, String>
 
 class AuthService(
     private val userRepository: UserRepository,
@@ -49,6 +51,8 @@ class AuthService(
         if(User.isNotSecurePassword(password)) {
             return failure(AuthError.InsecurePassword)
         }
+        val actualRole = role.uppercase(Locale.getDefault())
+        if(actualRole !in Role.entries.toString()) return failure(AuthError.InvalidRole)
         return transactionInterface.useTransaction {
             if(userRepository.findByEmail(email) != null) {
                 return@useTransaction failure(AuthError.UserAlreadyExists)
@@ -59,28 +63,32 @@ class AuthService(
                 this.password = User.hashPassword(password)
                 this.profileImage = ByteArray(0)
             }
+            userRepository.createWithoutRole(newUser)
+            val verificationToken = generateVerificationToken()
+            val expiresAt = Clock.System.now() + tokenExpirationDays.days
+            val roleApproval = RoleApproval {
+                this.user = newUser
+                this.requestedRole = Role.valueOf(actualRole)
+                this.verificationToken = verificationToken
+                this.verifiedBy = null
+                this.createdAt = Clock.System.now()
+                this.expiresAt = expiresAt
+                this.status = Status.PENDING
+            }
+            if(!roleApprovalRepository.addPendingApproval(roleApproval)) {
+                return@useTransaction failure(AuthError.RoleApprovedFailed)
+            }
             when(role) {
                 "student" -> {
-                    userRepository.createWithRole(newUser, Role.STUDENT)
-                    val token = jwtConfig.generateToken(newUser.id, role.uppercase(Locale.getDefault()))
-                    return@useTransaction success(token)
+                    val verificationLink = "${frontendUrl}verify-account?token=$verificationToken"
+                    emailService.sendStudentVerificationEmail(
+                        userEmail = newUser.email,
+                        username = newUser.username,
+                        verificationLink = verificationLink
+                    )
+                    return@useTransaction success(true)
                 }
                 "teacher", "technical_service" -> {
-                    userRepository.createWithoutRole(newUser)
-                    val verificationToken = generateVerificationToken()
-                    val expiresAt = Clock.System.now() + tokenExpirationDays.days
-                    val roleApproval = RoleApproval {
-                        this.user = newUser
-                        this.requestedRole = Role.valueOf(role.uppercase(Locale.getDefault()))
-                        this.verificationToken = verificationToken
-                        this.verifiedBy = null
-                        this.createdAt = Clock.System.now()
-                        this.expiresAt = expiresAt
-                        this.status = Status.PENDING
-                    }
-                    if(!roleApprovalRepository.addPendingApproval(roleApproval)) {
-                        return@useTransaction failure(AuthError.RoleApprovedFailed)
-                    }
                     val adminEmails = adminRepository.getAllAdminEmails()
                     val approvalLink = "${frontendUrl}approve-request?id=$verificationToken"
                     val userDetails = UserDetails(
@@ -89,10 +97,10 @@ class AuthService(
                         requestedRole = role.uppercase(Locale.getDefault())
                     )
                     emailService.sendAdminApprovalRequest(adminEmails, approvalLink, userDetails)
+                    return@useTransaction success(false)
                 }
                 else -> return@useTransaction failure(AuthError.InvalidRole)
             }
-            return@useTransaction success(null)
         }
     }
 
@@ -200,6 +208,32 @@ class AuthService(
         }
     }
 
+    @OptIn(ExperimentalTime::class)
+    fun verifyStudentAccount(token: String): VerificationResult{
+        return transactionInterface.useTransaction {
+            val roleApproval = roleApprovalRepository.getApprovalByToken(token)
+                ?: return@useTransaction failure(AuthError.TokenValidationFailed)
+            if (roleApproval.requestedRole != Role.STUDENT) {
+                return@useTransaction failure(AuthError.InvalidRole)
+            }
+            if (roleApproval.status != Status.PENDING) {
+                return@useTransaction failure(AuthError.AlreadyProcessed)
+            }
+            if (roleApproval.expiresAt.minus(Clock.System.now()).isNegative()) {
+                return@useTransaction failure(AuthError.TokenValidationFailed)
+            }
+            val user = userRepository.findById(roleApproval.user.id)
+                ?: return@useTransaction failure(AuthError.UserNotFound)
+            roleApproval.status = Status.APPROVED
+            if (!roleApprovalRepository.updateApproval(roleApproval)) {
+                return@useTransaction failure(AuthError.RoleApprovedFailed)
+            }
+            userRepository.associateWithRole(user, Role.STUDENT)
+            // Generate and return login token
+            val jwtToken = jwtConfig.generateToken(user.id, Role.STUDENT.name)
+            return@useTransaction success(jwtToken)
+        }
+    }
 
     private fun generateVerificationToken(): String {
         return UUID.randomUUID().toString()

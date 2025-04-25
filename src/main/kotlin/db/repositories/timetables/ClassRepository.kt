@@ -4,9 +4,7 @@ import isel.leic.group25.db.repositories.timetables.interfaces.ClassRepositoryIn
 import org.ktorm.database.Database
 import isel.leic.group25.db.entities.timetables.Class
 import isel.leic.group25.db.entities.timetables.Subject
-import isel.leic.group25.db.entities.users.Attend
-import isel.leic.group25.db.entities.users.User
-import isel.leic.group25.db.entities.users.Teach
+import isel.leic.group25.db.entities.users.*
 import isel.leic.group25.db.tables.Tables.Companion.classes
 import isel.leic.group25.db.tables.Tables.Companion.studentsClasses
 import isel.leic.group25.db.tables.Tables.Companion.teachersClasses
@@ -51,9 +49,9 @@ class ClassRepository(private val database: Database): ClassRepositoryInterface 
         return toBeDeletedClass.delete() > 0
     }
 
-    override fun addStudentToClass(user: User, schoolClass: Class): Boolean {
+    override fun addStudentToClass(student: Student, schoolClass: Class): Boolean {
         return database.studentsClasses.add(Attend {
-                this.user = user
+                this.user = student
                 this.schoolClass = schoolClass
             }) > 0
     }
@@ -62,9 +60,9 @@ class ClassRepository(private val database: Database): ClassRepositoryInterface 
         return database.studentsClasses.removeIf { (it.studentId eq user.id) and (it.classId eq schoolClass.id) } > 0
     }
 
-    override fun addTeacherToClass(user: User, schoolClass: Class): Boolean {
+    override fun addTeacherToClass(teacher: Teacher, schoolClass: Class): Boolean {
         return database.teachersClasses.add(Teach{
-                this.user = user
+                this.user = teacher
                 this.schoolClass = schoolClass
         }) > 0
     }

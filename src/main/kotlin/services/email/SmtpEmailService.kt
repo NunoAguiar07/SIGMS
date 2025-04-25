@@ -64,4 +64,31 @@ class SmtpEmailService(private val config: EmailConfig) : EmailService {
             throw EmailException("Failed to send approval notification")
         }
     }
+
+    override fun sendStudentVerificationEmail(userEmail: String, username: String, verificationLink: String) {
+        try {
+            val email = SimpleEmail().apply {
+                hostName = config.host
+                setSmtpPort(config.port)
+                setAuthenticator(DefaultAuthenticator(config.username, config.password))
+                isSSLOnConnect = config.useSsl
+                setFrom(config.from)
+                subject = "Verify Your Student Account"
+                setMsg("""
+                Hello $username,
+                
+                Thank you for registering as a student! 
+                Please click the link below to verify your account:
+                
+                $verificationLink
+                
+                This link will expire in 7 days.
+            """.trimIndent())
+                addTo(userEmail)
+            }
+            email.send()
+        } catch (e: Exception) {
+            throw EmailException("Failed to send verification email")
+        }
+    }
 }

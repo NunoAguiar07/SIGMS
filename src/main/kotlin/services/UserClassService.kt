@@ -4,15 +4,13 @@ import isel.leic.group25.db.repositories.interfaces.TransactionInterface
 import isel.leic.group25.db.repositories.timetables.ClassRepository
 import isel.leic.group25.db.repositories.users.UserRepository
 import isel.leic.group25.services.errors.UserClassError
-
-import isel.leic.group25.db.entities.timetables.Class
 import isel.leic.group25.db.entities.timetables.Lecture
 import isel.leic.group25.db.repositories.timetables.LectureRepository
+import isel.leic.group25.db.repositories.users.StudentRepository
+import isel.leic.group25.db.repositories.users.TeacherRepository
 import isel.leic.group25.utils.Either
 import isel.leic.group25.utils.failure
 import isel.leic.group25.utils.success
-
-typealias UserClassResult = Either<UserClassError, Class>
 
 typealias UserClassCreated = Either<UserClassError, Boolean>
 
@@ -22,6 +20,8 @@ typealias UserLectureListResult = Either<UserClassError, List<Lecture>>
 
 class UserClassService(
     private val userRepository: UserRepository,
+    private val studentRepository: StudentRepository,
+    private val teacherRepository: TeacherRepository,
     private val classRepository: ClassRepository,
     private val lectureRepository: LectureRepository,
     private val transactionInterface: TransactionInterface
@@ -37,24 +37,25 @@ class UserClassService(
             return failure(UserClassError.InvalidRole)
         }
         return transactionInterface.useTransaction {
-            val user = userRepository.findById(userId) ?: return@useTransaction failure(UserClassError.UserNotFound)
             val schoolClass = classRepository.findClassById(classId.toInt()) ?: return@useTransaction failure(UserClassError.ClassNotFound)
             when (role) {
                 "STUDENT" -> {
-                    if (classRepository.checkStudentInClass(user.id, schoolClass.id)) {
+                    val student = studentRepository.findStudentById(userId) ?: return@useTransaction failure(UserClassError.UserNotFound)
+                    if (classRepository.checkStudentInClass(student.user.id, schoolClass.id)) {
                         return@useTransaction failure(UserClassError.UserAlreadyInClass)
                     }
-                    val liked = classRepository.addStudentToClass(user, schoolClass)
+                    val liked = classRepository.addStudentToClass(student, schoolClass)
                     if (!liked) {
                         return@useTransaction failure(UserClassError.FailedToLinkUserToClass)
                     }
                     return@useTransaction success(true)
                 }
                 "TEACHER" -> {
-                    if (classRepository.checkTeacherInClass(user.id, schoolClass.id)) {
+                    val teacher = teacherRepository.findTeacherById(userId) ?: return@useTransaction failure(UserClassError.UserNotFound)
+                    if (classRepository.checkTeacherInClass(teacher.user.id, schoolClass.id)) {
                         return@useTransaction failure(UserClassError.UserAlreadyInClass)
                     }
-                    val liked = classRepository.addTeacherToClass(user, schoolClass)
+                    val liked = classRepository.addTeacherToClass(teacher, schoolClass)
                     if (!liked) {
                         return@useTransaction failure(UserClassError.FailedToLinkUserToClass)
                     }

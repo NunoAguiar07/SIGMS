@@ -2,6 +2,8 @@ package isel.leic.group25.db.repositories.timetables.interfaces
 
 import isel.leic.group25.db.entities.timetables.Subject
 import isel.leic.group25.db.entities.timetables.Class
+import isel.leic.group25.db.entities.users.Student
+import isel.leic.group25.db.entities.users.Teacher
 import isel.leic.group25.db.entities.users.User
 
 
@@ -22,11 +24,11 @@ interface ClassRepositoryInterface {
 
     fun deleteClass(toBeDeletedClass: Class): Boolean
 
-    fun addStudentToClass(user: User, schoolClass: Class): Boolean
+    fun addStudentToClass(student: Student, schoolClass: Class): Boolean
 
     fun removeStudentFromClass(user: User, schoolClass: Class): Boolean
 
-    fun addTeacherToClass(user: User, schoolClass: Class): Boolean
+    fun addTeacherToClass(teacher: Teacher, schoolClass: Class): Boolean
 
     fun removeTeacherFromClass(user: User, schoolClass: Class): Boolean
 

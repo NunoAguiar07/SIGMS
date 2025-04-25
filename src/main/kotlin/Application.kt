@@ -17,9 +17,7 @@ import isel.leic.group25.db.repositories.rooms.RoomRepository
 import isel.leic.group25.db.repositories.timetables.ClassRepository
 import isel.leic.group25.db.repositories.timetables.LectureRepository
 import isel.leic.group25.db.repositories.timetables.SubjectRepository
-import isel.leic.group25.db.repositories.users.AdminRepository
-import isel.leic.group25.db.repositories.users.RoleApprovalRepository
-import isel.leic.group25.db.repositories.users.UserRepository
+import isel.leic.group25.db.repositories.users.*
 import isel.leic.group25.services.*
 import isel.leic.group25.services.email.SmtpEmailService
 import isel.leic.group25.services.email.model.EmailConfig
@@ -56,6 +54,8 @@ fun Application.module() {
     val jwtConfig = JwtConfig(secret, issuer, audience, myRealm)
     val kTransaction = KTransaction(db)
     val userRepository = UserRepository(db)
+    val studentRepository = StudentRepository(db)
+    val teacherRepository = TeacherRepository(db)
     val adminRepository = AdminRepository(db)
     val roleApprovalRepository = RoleApprovalRepository(db)
     val classRepository = ClassRepository(db)
@@ -69,7 +69,7 @@ fun Application.module() {
     val emailService = SmtpEmailService(emailConfig)
     val authService = AuthService(userRepository, adminRepository, roleApprovalRepository, kTransaction, jwtConfig, emailService, frontendUrl)
     val subjectService = SubjectService(subjectRepository, kTransaction)
-    val userClassService = UserClassService(userRepository, classRepository, lectureRepository, kTransaction)
+    val userClassService = UserClassService(userRepository, studentRepository, teacherRepository, classRepository, lectureRepository, kTransaction)
     val roomService = RoomService(roomRepository, kTransaction)
     val lectureService = LectureService(lectureRepository, kTransaction, classRepository, roomRepository)
     val issueReportService = IssuesReportService(issueReportRepository, kTransaction, roomRepository)

@@ -7,12 +7,15 @@ import isel.leic.group25.db.entities.users.User
 import isel.leic.group25.db.repositories.ktorm.KTransaction
 import isel.leic.group25.db.repositories.timetables.ClassRepository
 import isel.leic.group25.db.repositories.timetables.SubjectRepository
+import isel.leic.group25.db.repositories.users.StudentRepository
 import isel.leic.group25.db.repositories.users.UserRepository
 import kotlin.test.*
 
 class ClassRepositoryTest {
     private val kTransaction = KTransaction(DatabaseTestSetup.database)
     private val userRepository = UserRepository(DatabaseTestSetup.database)
+    private val studentRepository = StudentRepository(DatabaseTestSetup.database)
+    private val teacherRepository = StudentRepository(DatabaseTestSetup.database)
     private val classRepository = ClassRepository(DatabaseTestSetup.database)
     private val subjectRepository = SubjectRepository(DatabaseTestSetup.database)
 
@@ -128,7 +131,9 @@ class ClassRepositoryTest {
             password = User.hashPassword("test")
             profileImage = byteArrayOf()
         }.let { userRepository.createWithRole(it, Role.STUDENT) }
-        val result = classRepository.addStudentToClass(newUser, clazz)
+        val student = studentRepository.findStudentById(newUser.id)
+        assertNotNull(student)
+        val result = classRepository.addStudentToClass(student, clazz)
         assertTrue(result)
         val foundClasses = classRepository.findClassesByStudentId(newUser.id)
         assertNotNull(foundClasses)
@@ -152,7 +157,9 @@ class ClassRepositoryTest {
             password = User.hashPassword("test")
             profileImage = byteArrayOf()
         }.let { userRepository.createWithRole(it, Role.STUDENT) }
-        classRepository.addStudentToClass(newUser, clazz)
+        val student = studentRepository.findStudentById(newUser.id)
+        assertNotNull(student)
+        classRepository.addStudentToClass(student, clazz)
         val result = classRepository.removeStudentFromClass(newUser, clazz)
         assertTrue(result)
         val foundClasses = classRepository.findClassesByStudentId(newUser.id)
@@ -176,7 +183,9 @@ class ClassRepositoryTest {
             password = User.hashPassword("test")
             profileImage = byteArrayOf()
         }.let { userRepository.createWithRole(it, Role.STUDENT) }
-        classRepository.addStudentToClass(newUser, clazz)
+        val student = studentRepository.findStudentById(newUser.id)
+        assertNotNull(student)
+        classRepository.addStudentToClass(student, clazz)
         val foundClasses = classRepository.findClassesByStudentId(newUser.id)
         assertNotNull(foundClasses)
         assertTrue(foundClasses.isNotEmpty())

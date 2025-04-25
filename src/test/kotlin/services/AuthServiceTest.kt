@@ -6,12 +6,11 @@ import isel.leic.group25.db.repositories.users.AdminRepository
 import isel.leic.group25.db.repositories.users.RoleApprovalRepository
 import isel.leic.group25.db.repositories.users.UserRepository
 import isel.leic.group25.services.AuthService
-import isel.leic.group25.services.email.SmtpEmailService
-import isel.leic.group25.services.email.model.EmailConfig
 import isel.leic.group25.services.errors.AuthError
 import isel.leic.group25.utils.Failure
 import isel.leic.group25.utils.Success
 import repositories.DatabaseTestSetup
+import services.mocks.MockEmailService
 import kotlin.test.*
 
 class AuthServiceTest {
@@ -32,19 +31,8 @@ class AuthServiceTest {
     // Test frontend URL
     private val frontendUrl = "http://localhost:8080"
 
-    // Email config
-    private val emailConfig = EmailConfig(
-        host = "smtp.yourdomain.com",
-        port = 587,
-        username = "noreply@yourdomain.com",
-        password = "your-email-password",
-        from = "noreply@yourdomain.com",
-        useSsl = true,
-        baseUrl = frontendUrl,
-    )
-
     // Test Email Service
-    private val emailService = SmtpEmailService(emailConfig)
+    private val mockEmailService = MockEmailService()
 
     private val authService = AuthService(
         userRepository = userRepository,
@@ -52,7 +40,7 @@ class AuthServiceTest {
         roleApprovalRepository = roleApprovalRepository,
         transactionInterface = transactionInterface,
         jwtConfig = jwtConfig,
-        emailService = emailService,
+        emailService = mockEmailService,
         frontendUrl = frontendUrl
     )
 
@@ -73,16 +61,8 @@ class AuthServiceTest {
         )
 
         assertTrue(result is Success, "Registration should succeed")
-        val token = result.value
-        assertNotNull(token, "Token should not be null")
-
-        // Verify the token
-        val decodedToken = jwtConfig.buildVerifier()
-            .verify(token)
-        assertNotNull(decodedToken, "Decoded token should not be null")
-        assertTrue(decodedToken.audience.contains("test-audience"), "Token audience should match")
-        assertTrue(decodedToken.issuer == "test-issuer", "Token issuer should match")
-        assertTrue(decodedToken.getClaim("role").asString() == "STUDENT", "Token role should match")
+        val check = result.value
+        assertTrue(check, "Registration should return true if student is created and email is sent")
     }
 
     @Test
@@ -93,7 +73,6 @@ class AuthServiceTest {
             password = "SecurePass123!",
             role = "MARIO"
         )
-
         assertTrue(result is Failure, "Registration should fail with invalid role")
         assertEquals(
             result.value,
@@ -176,6 +155,10 @@ class AuthServiceTest {
             password = "SecurePass123!",
             role = "student"
         )
+        val pendingApprovals = authService.getAllPendingApprovals(null, null)
+        assertTrue(pendingApprovals is Success)
+        assertNotNull(pendingApprovals.value.first())
+        authService.verifyStudentAccount(pendingApprovals.value.first().verificationToken)
         val result = authService.login("student@test.com", "SecurePass123!")
         assertTrue(result is Success, "Login should succeed")
 

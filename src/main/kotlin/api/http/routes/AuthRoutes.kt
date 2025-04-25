@@ -23,11 +23,11 @@ fun Route.authRoutes(authService: AuthService) {
             call.respondEither(
                 either = result,
                 transformError = { error -> error.toProblem() },
-                transformSuccess = { token ->
-                    if (token != null) {
-                        RegisterResponse.Success(token = token)
+                transformSuccess = { check ->
+                    if(check) {
+                        RegisterResponse.PendingCheckStudent
                     } else {
-                        RegisterResponse.PendingApproval()
+                        RegisterResponse.PendingApproval
                     }
                 },
                 successStatus = HttpStatusCode.Created
