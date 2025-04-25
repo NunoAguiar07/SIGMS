@@ -27,7 +27,7 @@ class TeacherRepositoryTest {
                 username = "tester"
                 password = User.hashPassword("test")
                 profileImage = byteArrayOf()
-            }.let { userRepository.createWithRole(it, Role.TEACHER) }
+            }.let { userRepository.createWithRole(it.email, it.username, it.password, Role.TEACHER) }
             val teacher = teacherRepository.findTeacherById(newUser.id)
             assertNotNull(teacher)
             assertEquals(newUser.id, teacher.user.id)
@@ -42,7 +42,7 @@ class TeacherRepositoryTest {
                 username = "tester"
                 password = User.hashPassword("test")
                 profileImage = byteArrayOf()
-            }.let { userRepository.createWithRole(it, Role.TEACHER) }
+            }.let { userRepository.createWithRole(it.email, it.username, it.password, Role.TEACHER) }
             val teacher = teacherRepository.findTeacherByEmail(newUser.email)
             assertNotNull(teacher)
             assertEquals(newUser.id, teacher.user.id)
@@ -57,7 +57,7 @@ class TeacherRepositoryTest {
                 username = "tester"
                 password = User.hashPassword("test")
                 profileImage = byteArrayOf()
-            }.let { userRepository.createWithRole(it, Role.TEACHER) }
+            }.let { userRepository.createWithRole(it.email, it.username, it.password, Role.TEACHER) }
             assertTrue(teacherRepository.isTeacher(newUser))
         }
     }
@@ -70,7 +70,7 @@ class TeacherRepositoryTest {
                 username = "tester"
                 password = User.hashPassword("test")
                 profileImage = byteArrayOf()
-            }.let { userRepository.createWithRole(it, Role.ADMIN) }
+            }.let { userRepository.createWithRole(it.email, it.username, it.password, Role.ADMIN) }
             assertFalse(teacherRepository.isTeacher(newUser))
         }
     }

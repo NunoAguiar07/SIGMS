@@ -2,12 +2,12 @@ package services
 
 import isel.leic.group25.db.entities.types.Role
 import isel.leic.group25.db.entities.users.User
-import isel.leic.group25.db.repositories.ktorm.KTransaction
-import isel.leic.group25.db.repositories.users.UserRepository
 import isel.leic.group25.services.UserService
 import isel.leic.group25.services.errors.AuthError
 import isel.leic.group25.utils.Failure
 import isel.leic.group25.utils.Success
+import mocks.repositories.utils.MockTransaction
+import mocks.repositories.users.MockUserRepository
 import repositories.DatabaseTestSetup
 import kotlin.test.AfterTest
 import kotlin.test.Test
@@ -16,8 +16,8 @@ import kotlin.test.assertTrue
 
 class UserServiceTest {
     // Test database setup
-    private val userRepository = UserRepository(DatabaseTestSetup.database)
-    private val transactionInterface = KTransaction(DatabaseTestSetup.database)
+    private val userRepository = MockUserRepository()
+    private val transactionInterface = MockTransaction()
 
     private val userService = UserService(userRepository, transactionInterface)
 
@@ -29,8 +29,9 @@ class UserServiceTest {
                 username = "testuser"
                 password = User.hashPassword("test123!")
                 profileImage = byteArrayOf(1, 2, 3)
+            }.let {
+                userRepository.createWithRole(it.email, it.username, it.password, role)
             }
-            userRepository.createWithRole(user, role)
             return@useTransaction user
         }
     }

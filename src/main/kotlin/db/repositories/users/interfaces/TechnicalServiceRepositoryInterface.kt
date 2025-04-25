@@ -3,7 +3,7 @@ package isel.leic.group25.db.repositories.users.interfaces
 import isel.leic.group25.db.entities.users.TechnicalService
 import isel.leic.group25.db.entities.users.User
 
-interface TechnicalServiceRepository {
+interface TechnicalServiceRepositoryInterface {
     fun findTechnicalServiceById(id: Int): TechnicalService?
 
     fun findTechnicalServiceByEmail(email: String): TechnicalService?

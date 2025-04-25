@@ -3,7 +3,7 @@ package isel.leic.group25.services
 import isel.leic.group25.db.entities.types.Role
 import isel.leic.group25.db.entities.users.User
 import isel.leic.group25.db.repositories.interfaces.TransactionInterface
-import isel.leic.group25.db.repositories.users.UserRepository
+import isel.leic.group25.db.repositories.users.interfaces.UserRepositoryInterface
 import isel.leic.group25.services.errors.AuthError
 import isel.leic.group25.utils.Either
 import isel.leic.group25.utils.failure
@@ -13,7 +13,7 @@ typealias UserResult = Either<AuthError, User>
 
 typealias RoleResult = Either<AuthError, Role?>
 
-class UserService(private val repository: UserRepository,
+class UserService(private val repository: UserRepositoryInterface,
                   private val transactionInterface: TransactionInterface) {
 
     fun getUserById(id: Int): UserResult {

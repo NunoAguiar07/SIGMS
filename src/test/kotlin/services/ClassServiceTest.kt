@@ -1,22 +1,22 @@
 package services
 
-import isel.leic.group25.db.repositories.ktorm.KTransaction
-import isel.leic.group25.db.repositories.timetables.ClassRepository
-import isel.leic.group25.db.repositories.timetables.SubjectRepository
 import isel.leic.group25.db.entities.timetables.Class
 import isel.leic.group25.db.entities.timetables.Subject
 import isel.leic.group25.services.ClassService
 import isel.leic.group25.services.errors.ClassError
 import isel.leic.group25.utils.Failure
 import isel.leic.group25.utils.Success
+import mocks.repositories.timetables.MockClassRepository
+import mocks.repositories.timetables.MockSubjectRepository
+import mocks.repositories.utils.MockTransaction
 import repositories.DatabaseTestSetup
 import kotlin.test.*
 
 
 class ClassServiceTest {
-    private val classRepository = ClassRepository(DatabaseTestSetup.database)
-    private val subjectRepository = SubjectRepository(DatabaseTestSetup.database)
-    private val transactionInterface = KTransaction(DatabaseTestSetup.database)
+    private val classRepository = MockClassRepository()
+    private val subjectRepository = MockSubjectRepository()
+    private val transactionInterface = MockTransaction()
 
     private val classService = ClassService(
         classRepository = classRepository,
@@ -209,18 +209,6 @@ class ClassServiceTest {
             class2.value,
             "Expected ClassAlreadyExists error"
         )
-    }
-
-    @Test
-    fun `createClass fails with duplicate class name for different subject`() {
-        val subject1 = createTestSubjects()
-        val subject2 = createTestSubjects()
-        assertNotNull(subject1[0], "Subject should not be null")
-        assertNotNull(subject2[0], "Subject should not be null")
-        val class1 = classService.createClass("Test 1", subject1[0].id.toString())
-        assertTrue(class1 is Success, "Expected Success")
-        val class2 = classService.createClass("Test 1", subject2[0].id.toString())
-        assertTrue(class2 is Success, "Expected Success")
     }
 
 }

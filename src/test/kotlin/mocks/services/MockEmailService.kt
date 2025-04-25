@@ -1,4 +1,4 @@
-package services.mocks
+package mocks.services
 
 import isel.leic.group25.services.email.EmailService
 import isel.leic.group25.services.email.model.UserDetails

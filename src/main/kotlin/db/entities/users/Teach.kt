@@ -7,6 +7,6 @@ import org.ktorm.entity.Entity
 @Serializable
 sealed interface Teach: Entity<Teach> {
     companion object: Entity.Factory<Teach>()
-    var user: Teacher
+    var teacher: Teacher
     var schoolClass: Class
 }

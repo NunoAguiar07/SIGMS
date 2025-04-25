@@ -51,7 +51,7 @@ class ClassRepository(private val database: Database): ClassRepositoryInterface 
 
     override fun addStudentToClass(student: Student, schoolClass: Class): Boolean {
         return database.studentsClasses.add(Attend {
-                this.user = student
+                this.student = student
                 this.schoolClass = schoolClass
             }) > 0
     }
@@ -62,7 +62,7 @@ class ClassRepository(private val database: Database): ClassRepositoryInterface 
 
     override fun addTeacherToClass(teacher: Teacher, schoolClass: Class): Boolean {
         return database.teachersClasses.add(Teach{
-                this.user = teacher
+                this.teacher = teacher
                 this.schoolClass = schoolClass
         }) > 0
     }

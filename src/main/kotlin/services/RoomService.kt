@@ -2,7 +2,7 @@ package isel.leic.group25.services
 
 import isel.leic.group25.db.entities.rooms.Room
 import isel.leic.group25.db.repositories.interfaces.TransactionInterface
-import isel.leic.group25.db.repositories.rooms.RoomRepository
+import isel.leic.group25.db.repositories.rooms.interfaces.RoomRepositoryInterface
 import isel.leic.group25.services.errors.RoomError
 import isel.leic.group25.utils.Either
 import isel.leic.group25.utils.failure
@@ -13,7 +13,7 @@ typealias RoomListResult = Either<RoomError, List<Room>>
 typealias RoomResult = Either<RoomError, Room>
 
 class RoomService (
-    private val roomRepository: RoomRepository,
+    private val roomRepository: RoomRepositoryInterface,
     private val transactionInterface: TransactionInterface,
 ) {
     fun getAllRooms(limit: String?, offset: String?): RoomListResult {

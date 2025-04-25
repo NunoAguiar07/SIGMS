@@ -1,20 +1,20 @@
 package isel.leic.group25.services
 
-import isel.leic.group25.db.repositories.timetables.ClassRepository
 import isel.leic.group25.services.errors.ClassError
 import isel.leic.group25.utils.Either
 import isel.leic.group25.utils.failure
 import isel.leic.group25.utils.success
 import isel.leic.group25.db.entities.timetables.Class
 import isel.leic.group25.db.repositories.interfaces.TransactionInterface
-import isel.leic.group25.db.repositories.timetables.SubjectRepository
+import isel.leic.group25.db.repositories.timetables.interfaces.ClassRepositoryInterface
+import isel.leic.group25.db.repositories.timetables.interfaces.SubjectRepositoryInterface
 
 typealias ClassListResult = Either<ClassError, List<Class>>
 
 typealias ClassResult = Either<ClassError, Class>
 
-class ClassService(private val classRepository: ClassRepository,
-                   private val subjectRepository: SubjectRepository,
+class ClassService(private val classRepository: ClassRepositoryInterface,
+                   private val subjectRepository: SubjectRepositoryInterface,
                    private val transactionInterface: TransactionInterface,
 ) {
     fun getAllClassesFromSubject(subjectId: String?, limit:String?, offset:String?): ClassListResult {

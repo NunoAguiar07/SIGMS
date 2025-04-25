@@ -2,7 +2,7 @@ package isel.leic.group25.services
 
 import isel.leic.group25.db.entities.timetables.Subject
 import isel.leic.group25.db.repositories.interfaces.TransactionInterface
-import isel.leic.group25.db.repositories.timetables.SubjectRepository
+import isel.leic.group25.db.repositories.timetables.interfaces.SubjectRepositoryInterface
 import isel.leic.group25.services.errors.SubjectError
 import isel.leic.group25.utils.Either
 import isel.leic.group25.utils.failure
@@ -13,7 +13,7 @@ typealias SubjectListResult = Either<SubjectError, List<Subject>>
 typealias SubjectResult = Either<SubjectError, Subject>
 
 class SubjectService(
-    private val subjectRepository: SubjectRepository,
+    private val subjectRepository: SubjectRepositoryInterface,
     private val transactionInterface: TransactionInterface,
 ) {
     fun getAllSubjects(limit:String?, offset:String?): SubjectListResult {

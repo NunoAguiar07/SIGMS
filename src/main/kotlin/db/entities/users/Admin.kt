@@ -9,6 +9,4 @@ sealed interface Admin: Entity<Admin> {
     companion object: Entity.Factory<Admin>()
     var user: User
     val role: Role get() = Role.ADMIN
-
-
 }

@@ -6,9 +6,9 @@ import isel.leic.group25.db.entities.types.Status
 import isel.leic.group25.db.entities.users.User
 import isel.leic.group25.db.entities.users.RoleApproval
 import isel.leic.group25.db.repositories.interfaces.TransactionInterface
-import isel.leic.group25.db.repositories.users.AdminRepository
-import isel.leic.group25.db.repositories.users.RoleApprovalRepository
-import isel.leic.group25.db.repositories.users.UserRepository
+import isel.leic.group25.db.repositories.users.interfaces.AdminRepositoryInterface
+import isel.leic.group25.db.repositories.users.interfaces.RoleApprovalRepositoryInterface
+import isel.leic.group25.db.repositories.users.interfaces.UserRepositoryInterface
 import isel.leic.group25.services.email.EmailService
 import isel.leic.group25.services.email.model.UserDetails
 import isel.leic.group25.services.errors.AuthError
@@ -17,7 +17,6 @@ import isel.leic.group25.utils.failure
 import isel.leic.group25.utils.success
 import java.util.*
 import kotlin.time.Clock
-import kotlin.time.Duration.Companion.days
 import kotlin.time.ExperimentalTime
 
 typealias RegisterResult = Either<AuthError, Boolean>
@@ -33,17 +32,14 @@ typealias AssesResult = Either<AuthError, Boolean>
 typealias VerificationResult = Either<AuthError, String>
 
 class AuthService(
-    private val userRepository: UserRepository,
-    private val adminRepository: AdminRepository,
-    private val roleApprovalRepository: RoleApprovalRepository,
+    private val userRepository: UserRepositoryInterface,
+    private val adminRepository: AdminRepositoryInterface,
+    private val roleApprovalRepository: RoleApprovalRepositoryInterface,
     private val transactionInterface: TransactionInterface,
     private val jwtConfig: JwtConfig,
     private val emailService: EmailService,
     private val frontendUrl: String
 ) {
-    private val tokenExpirationDays = 7
-
-    @OptIn(ExperimentalTime::class)
     fun register(email: String, username: String, password: String, role:String): RegisterResult {
         if(email.isBlank() || username.isBlank() || password.isBlank()) {
             return failure(AuthError.MissingCredentials)
@@ -57,33 +53,18 @@ class AuthService(
             if(userRepository.findByEmail(email) != null) {
                 return@useTransaction failure(AuthError.UserAlreadyExists)
             }
-            val newUser = User {
-                this.email = email
-                this.username = username
-                this.password = User.hashPassword(password)
-                this.profileImage = ByteArray(0)
-            }
-            userRepository.createWithoutRole(newUser)
+            val user = userRepository.createWithoutRole(email, username, User.hashPassword(password))
             val verificationToken = generateVerificationToken()
-            val expiresAt = Clock.System.now() + tokenExpirationDays.days
-            val roleApproval = RoleApproval {
-                this.user = newUser
-                this.requestedRole = Role.valueOf(actualRole)
-                this.verificationToken = verificationToken
-                this.verifiedBy = null
-                this.createdAt = Clock.System.now()
-                this.expiresAt = expiresAt
-                this.status = Status.PENDING
-            }
-            if(!roleApprovalRepository.addPendingApproval(roleApproval)) {
+            val requestedRole = Role.valueOf(actualRole)
+            if(!roleApprovalRepository.addPendingApproval(user, requestedRole, verificationToken, null)) {
                 return@useTransaction failure(AuthError.RoleApprovedFailed)
             }
             when(role) {
                 "student" -> {
                     val verificationLink = "${frontendUrl}verify-account?token=$verificationToken"
                     emailService.sendStudentVerificationEmail(
-                        userEmail = newUser.email,
-                        username = newUser.username,
+                        userEmail = user.email,
+                        username = user.username,
                         verificationLink = verificationLink
                     )
                     return@useTransaction success(true)
@@ -92,8 +73,8 @@ class AuthService(
                     val adminEmails = adminRepository.getAllAdminEmails()
                     val approvalLink = "${frontendUrl}approve-request?id=$verificationToken"
                     val userDetails = UserDetails(
-                        username = newUser.username,
-                        email = newUser.email,
+                        username = user.username,
+                        email = user.email,
                         requestedRole = role.uppercase(Locale.getDefault())
                     )
                     emailService.sendAdminApprovalRequest(adminEmails, approvalLink, userDetails)
@@ -229,7 +210,7 @@ class AuthService(
                 return@useTransaction failure(AuthError.RoleApprovedFailed)
             }
             userRepository.associateWithRole(user, Role.STUDENT)
-            // Generate and return login token
+
             val jwtToken = jwtConfig.generateToken(user.id, Role.STUDENT.name)
             return@useTransaction success(jwtToken)
         }

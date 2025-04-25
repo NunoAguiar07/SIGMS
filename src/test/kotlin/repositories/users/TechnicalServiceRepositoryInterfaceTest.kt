@@ -8,7 +8,7 @@ import isel.leic.group25.db.repositories.users.UserRepository
 import repositories.DatabaseTestSetup
 import kotlin.test.*
 
-class TechnicalServiceRepositoryTest {
+class TechnicalServiceRepositoryInterfaceTest {
 
     @AfterTest
     fun clearDatabase() {
@@ -27,7 +27,7 @@ class TechnicalServiceRepositoryTest {
                 username = "tester"
                 password = User.hashPassword("test")
                 profileImage = byteArrayOf()
-            }.let { userRepository.createWithRole(it, Role.TECHNICAL_SERVICE) }
+            }.let { userRepository.createWithRole(it.email, it.username, it.password, Role.TECHNICAL_SERVICE) }
             val technicalService = technicalServiceRepository.findTechnicalServiceById(newUser.id)
             assertNotNull(technicalService)
             assertEquals(newUser.id, technicalService.user.id)
@@ -42,7 +42,7 @@ class TechnicalServiceRepositoryTest {
                 username = "tester"
                 password = User.hashPassword("test")
                 profileImage = byteArrayOf()
-            }.let { userRepository.createWithRole(it, Role.TECHNICAL_SERVICE) }
+            }.let { userRepository.createWithRole(it.email, it.username, it.password, Role.TECHNICAL_SERVICE) }
             val technicalService = technicalServiceRepository.findTechnicalServiceByEmail(newUser.email)
             assertNotNull(technicalService)
             assertEquals(newUser.id, technicalService.user.id)
@@ -57,7 +57,7 @@ class TechnicalServiceRepositoryTest {
                 username = "tester"
                 password = User.hashPassword("test")
                 profileImage = byteArrayOf()
-            }.let { userRepository.createWithRole(it, Role.TECHNICAL_SERVICE) }
+            }.let { userRepository.createWithRole(it.email, it.username, it.password, Role.TECHNICAL_SERVICE) }
             assertTrue(technicalServiceRepository.isTechnicalService(newUser))
         }
     }
@@ -70,7 +70,7 @@ class TechnicalServiceRepositoryTest {
                 username = "tester"
                 password = User.hashPassword("test")
                 profileImage = byteArrayOf()
-            }.let { userRepository.createWithRole(it, Role.ADMIN) }
+            }.let { userRepository.createWithRole(it.email, it.username, it.password, Role.ADMIN) }
             assertFalse(technicalServiceRepository.isTechnicalService(newUser))
         }
     }

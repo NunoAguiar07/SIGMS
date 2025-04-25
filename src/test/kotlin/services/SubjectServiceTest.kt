@@ -1,12 +1,12 @@
 package services
 
 import isel.leic.group25.db.entities.timetables.Subject
-import isel.leic.group25.db.repositories.ktorm.KTransaction
-import isel.leic.group25.db.repositories.timetables.SubjectRepository
 import isel.leic.group25.services.SubjectService
 import isel.leic.group25.services.errors.SubjectError
 import isel.leic.group25.utils.Failure
 import isel.leic.group25.utils.Success
+import mocks.repositories.timetables.MockSubjectRepository
+import mocks.repositories.utils.MockTransaction
 import repositories.DatabaseTestSetup
 import kotlin.test.AfterTest
 import kotlin.test.Test
@@ -15,8 +15,8 @@ import kotlin.test.assertTrue
 
 class SubjectServiceTest {
     // Test database setup
-    private val subjectRepository = SubjectRepository(DatabaseTestSetup.database)
-    private val transactionInterface = KTransaction(DatabaseTestSetup.database)
+    private val subjectRepository = MockSubjectRepository()
+    private val transactionInterface = MockTransaction()
 
     private val subjectService = SubjectService(subjectRepository, transactionInterface)
 

@@ -2,13 +2,13 @@ package services
 
 import isel.leic.group25.db.entities.issues.IssueReport
 import isel.leic.group25.db.entities.rooms.Room
-import isel.leic.group25.db.repositories.issues.IssueReportRepository
-import isel.leic.group25.db.repositories.ktorm.KTransaction
-import isel.leic.group25.db.repositories.rooms.RoomRepository
 import isel.leic.group25.services.IssuesReportService
 import isel.leic.group25.services.errors.IssueReportError
 import isel.leic.group25.utils.Failure
 import isel.leic.group25.utils.Success
+import mocks.repositories.issues.MockIssueReportRepository
+import mocks.repositories.rooms.MockRoomRepository
+import mocks.repositories.utils.MockTransaction
 import org.junit.jupiter.api.Assertions.assertEquals
 import repositories.DatabaseTestSetup
 import kotlin.test.AfterTest
@@ -16,9 +16,9 @@ import kotlin.test.Test
 import kotlin.test.assertTrue
 
 class IssueReportServiceTest {
-    private val issueReportRepository = IssueReportRepository(DatabaseTestSetup.database)
-    private val roomRepository = RoomRepository(DatabaseTestSetup.database)
-    private val transactionInterface = KTransaction(DatabaseTestSetup.database)
+    private val issueReportRepository = MockIssueReportRepository()
+    private val roomRepository = MockRoomRepository()
+    private val transactionInterface = MockTransaction()
 
     private val issuesReportService = IssuesReportService(
         issueReportRepository = issueReportRepository,

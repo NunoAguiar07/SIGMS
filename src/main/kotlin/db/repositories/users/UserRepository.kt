@@ -39,12 +39,24 @@ class UserRepository(private val database: Database): UserRepositoryInterface {
         return newUser
     }
 
-    override fun createWithRole(newUser: User, role: Role): User {
+    override fun createWithRole(email: String, username: String, password: String, role: Role): User {
+        val newUser = User {
+            this.email = email
+            this.username = username
+            this.password = User.hashPassword(password)
+            this.profileImage = ByteArray(0)
+        }
         database.users.add(newUser)
         return associateWithRole(newUser, role)
     }
 
-    override fun createWithoutRole(newUser: User): User {
+    override fun createWithoutRole(email: String, username: String, password: String): User {
+        val newUser = User {
+            this.email = email
+            this.username = username
+            this.password = User.hashPassword(password)
+            this.profileImage = ByteArray(0)
+        }
         database.users.add(newUser)
         return newUser
     }
@@ -64,7 +76,7 @@ class UserRepository(private val database: Database): UserRepositoryInterface {
     }
 
     override fun delete(id: Int): Boolean {
-        val user = database.users.firstOrNull { it.id eq id } ?: return false
+        database.users.firstOrNull { it.id eq id } ?: return false
         database.useTransaction {
             database.admins.removeIf { it.user eq id }
             database.students.removeIf { it.user eq id }

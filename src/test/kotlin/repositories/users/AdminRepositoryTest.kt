@@ -27,7 +27,7 @@ class AdminRepositoryTest {
                 username = "tester"
                 password = User.hashPassword("test")
                 profileImage = byteArrayOf()
-            }.let { userRepository.createWithRole(it, Role.ADMIN) }
+            }.let { userRepository.createWithRole(it.email, it.username, it.password, Role.ADMIN) }
             val admin = adminRepository.findAdminById(newUser.id)
             assertNotNull(admin)
             assertEquals(newUser.id, admin.user.id)
@@ -42,7 +42,7 @@ class AdminRepositoryTest {
                 username = "tester"
                 password = User.hashPassword("test")
                 profileImage = byteArrayOf()
-            }.let { userRepository.createWithRole(it, Role.ADMIN) }
+            }.let { userRepository.createWithRole(it.email, it.username, it.password, Role.ADMIN) }
             val admin = adminRepository.findAdminByEmail(newUser.email)
             assertNotNull(admin)
             assertEquals(newUser.id, admin.user.id)
@@ -57,7 +57,7 @@ class AdminRepositoryTest {
                 username = "tester"
                 password = User.hashPassword("test")
                 profileImage = byteArrayOf()
-            }.let { userRepository.createWithRole(it, Role.ADMIN) }
+            }.let { userRepository.createWithRole(it.email, it.username, it.password, Role.ADMIN) }
             assertTrue(adminRepository.isAdmin(newUser))
         }
     }
@@ -70,7 +70,7 @@ class AdminRepositoryTest {
                 username = "tester"
                 password = User.hashPassword("test")
                 profileImage = byteArrayOf()
-            }.let { userRepository.createWithRole(it, Role.STUDENT) }
+            }.let { userRepository.createWithRole(it.email, it.username, it.password, Role.STUDENT) }
             assertFalse(adminRepository.isAdmin(newUser))
         }
     }

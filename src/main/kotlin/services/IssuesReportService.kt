@@ -39,7 +39,7 @@ class IssuesReportService(private val issueReportRepository: IssueReportReposito
         if (id == null || id.toIntOrNull() == null) {
             return failure(IssueReportError.InvalidIssueReportId)
         }
-        if (id.toInt() <= 0) {
+        if (id.toInt() < 0) {
             return failure(IssueReportError.InvalidIssueReportId)
         }
         return transactionInterface.useTransaction {
@@ -77,7 +77,7 @@ class IssuesReportService(private val issueReportRepository: IssueReportReposito
         if (description.isBlank()) {
             return failure(IssueReportError.InvalidDescription)
         }
-        if (roomId.toInt() <= 0) {
+        if (roomId.toInt() < 0) {
             return failure(IssueReportError.InvalidRoomId)
         }
        return transactionInterface.useTransaction {
@@ -93,7 +93,7 @@ class IssuesReportService(private val issueReportRepository: IssueReportReposito
             return failure(IssueReportError.InvalidIssueReportId)
         }
         val parsedId = id.toInt()
-        if (parsedId <= 0) {
+        if (parsedId < 0) {
             return failure(IssueReportError.InvalidIssueReportId)
         }
         return transactionInterface.useTransaction {
@@ -113,7 +113,7 @@ class IssuesReportService(private val issueReportRepository: IssueReportReposito
             return failure(IssueReportError.InvalidDescription)
         }
 
-        if (parsedId <= 0) {
+        if (parsedId < 0) {
             return failure(IssueReportError.InvalidIssueReportId)
         }
        return transactionInterface.useTransaction {

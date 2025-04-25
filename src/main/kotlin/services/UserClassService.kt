@@ -1,13 +1,13 @@
 package isel.leic.group25.services
 
 import isel.leic.group25.db.repositories.interfaces.TransactionInterface
-import isel.leic.group25.db.repositories.timetables.ClassRepository
-import isel.leic.group25.db.repositories.users.UserRepository
 import isel.leic.group25.services.errors.UserClassError
 import isel.leic.group25.db.entities.timetables.Lecture
-import isel.leic.group25.db.repositories.timetables.LectureRepository
-import isel.leic.group25.db.repositories.users.StudentRepository
-import isel.leic.group25.db.repositories.users.TeacherRepository
+import isel.leic.group25.db.repositories.timetables.interfaces.ClassRepositoryInterface
+import isel.leic.group25.db.repositories.timetables.interfaces.LectureRepositoryInterface
+import isel.leic.group25.db.repositories.users.interfaces.StudentRepositoryInterface
+import isel.leic.group25.db.repositories.users.interfaces.TeacherRepositoryInterface
+import isel.leic.group25.db.repositories.users.interfaces.UserRepositoryInterface
 import isel.leic.group25.utils.Either
 import isel.leic.group25.utils.failure
 import isel.leic.group25.utils.success
@@ -19,11 +19,11 @@ typealias UserClassDeleted = Either<UserClassError, Boolean>
 typealias UserLectureListResult = Either<UserClassError, List<Lecture>>
 
 class UserClassService(
-    private val userRepository: UserRepository,
-    private val studentRepository: StudentRepository,
-    private val teacherRepository: TeacherRepository,
-    private val classRepository: ClassRepository,
-    private val lectureRepository: LectureRepository,
+    private val userRepository: UserRepositoryInterface,
+    private val studentRepository: StudentRepositoryInterface,
+    private val teacherRepository: TeacherRepositoryInterface,
+    private val classRepository: ClassRepositoryInterface,
+    private val lectureRepository: LectureRepositoryInterface,
     private val transactionInterface: TransactionInterface
 ) {
     fun addUserToClass(userId: Int?, classId: String?, role: String?): UserClassCreated {

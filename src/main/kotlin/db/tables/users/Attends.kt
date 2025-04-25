@@ -7,6 +7,6 @@ import org.ktorm.schema.int
 
 
 object Attends: Table<Attend>("attend") {
-    val studentId = int("student_id").primaryKey().references(Students) { it.user }
+    val studentId = int("student_id").primaryKey().references(Students) { it.student }
     val classId = int("class_id").primaryKey().references(Classes) { it.schoolClass }
 }

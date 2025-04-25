@@ -1,12 +1,12 @@
 package services
 
 import isel.leic.group25.db.entities.rooms.Room
-import isel.leic.group25.db.repositories.ktorm.KTransaction
-import isel.leic.group25.db.repositories.rooms.RoomRepository
 import isel.leic.group25.services.RoomService
 import isel.leic.group25.services.errors.RoomError
 import isel.leic.group25.utils.Failure
 import isel.leic.group25.utils.Success
+import mocks.repositories.rooms.MockRoomRepository
+import mocks.repositories.utils.MockTransaction
 import repositories.DatabaseTestSetup
 import kotlin.test.AfterTest
 import kotlin.test.Test
@@ -14,13 +14,11 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class RoomServiceTest {
-    // Test database setup
-    private val roomRepository = RoomRepository(DatabaseTestSetup.database)
-    private val transactionInterface = KTransaction(DatabaseTestSetup.database)
+    private val roomRepository = MockRoomRepository()
+    private val transactionInterface = MockTransaction()
 
     private val roomService = RoomService(roomRepository, transactionInterface)
 
-    // Helper function to create test rooms
     private fun createTestRooms(count: Int = 1): List<Room> {
         return transactionInterface.useTransaction {
             (1..count).map { i ->

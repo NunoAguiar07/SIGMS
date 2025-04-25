@@ -1,23 +1,23 @@
 package services
 
 import isel.leic.group25.api.jwt.JwtConfig
-import isel.leic.group25.db.repositories.ktorm.KTransaction
-import isel.leic.group25.db.repositories.users.AdminRepository
-import isel.leic.group25.db.repositories.users.RoleApprovalRepository
-import isel.leic.group25.db.repositories.users.UserRepository
 import isel.leic.group25.services.AuthService
 import isel.leic.group25.services.errors.AuthError
 import isel.leic.group25.utils.Failure
 import isel.leic.group25.utils.Success
+import mocks.repositories.users.MockUserRepository
+import mocks.repositories.users.MockAdminRepository
+import mocks.repositories.users.MockRoleApprovalRepository
+import mocks.repositories.utils.MockTransaction
+import mocks.services.MockEmailService
 import repositories.DatabaseTestSetup
-import services.mocks.MockEmailService
 import kotlin.test.*
 
 class AuthServiceTest {
-    private val userRepository = UserRepository(DatabaseTestSetup.database)
-    private val adminRepository = AdminRepository(DatabaseTestSetup.database)
-    private val roleApprovalRepository = RoleApprovalRepository(DatabaseTestSetup.database)
-    private val transactionInterface = KTransaction(DatabaseTestSetup.database)
+    private val userRepository = MockUserRepository()
+    private val adminRepository = MockAdminRepository(userRepository)
+    private val roleApprovalRepository = MockRoleApprovalRepository()
+    private val transactionInterface = MockTransaction()
 
     // Test JWT config
     private val jwtConfig = JwtConfig(
@@ -158,7 +158,8 @@ class AuthServiceTest {
         val pendingApprovals = authService.getAllPendingApprovals(null, null)
         assertTrue(pendingApprovals is Success)
         assertNotNull(pendingApprovals.value.first())
-        authService.verifyStudentAccount(pendingApprovals.value.first().verificationToken)
+        val tempToken = authService.verifyStudentAccount(pendingApprovals.value.first().verificationToken)
+        assertTrue(tempToken is Success, "Account approved")
         val result = authService.login("student@test.com", "SecurePass123!")
         assertTrue(result is Success, "Login should succeed")
 
