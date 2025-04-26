@@ -1,9 +1,12 @@
 package isel.leic.group25.services
 
 import isel.leic.group25.db.entities.issues.IssueReport
+import isel.leic.group25.db.entities.types.Role
 import isel.leic.group25.db.repositories.interfaces.TransactionInterface
 import isel.leic.group25.db.repositories.issues.interfaces.IssueReportRepositoryInterface
 import isel.leic.group25.db.repositories.rooms.interfaces.RoomRepositoryInterface
+import isel.leic.group25.db.repositories.users.interfaces.TechnicalServiceRepositoryInterface
+import isel.leic.group25.db.repositories.users.interfaces.UserRepositoryInterface
 import isel.leic.group25.services.errors.IssueReportError
 import isel.leic.group25.utils.Either
 import isel.leic.group25.utils.failure
@@ -17,6 +20,8 @@ typealias IssueReportUpdateResult = Either<IssueReportError, IssueReport>
 typealias IssueReportDeletionResult = Either<IssueReportError, Boolean>
 
 class IssuesReportService(private val issueReportRepository: IssueReportRepositoryInterface,
+                          private val userRepository: UserRepositoryInterface,
+                          private val technicalServiceRepository: TechnicalServiceRepositoryInterface,
                           private val transactionInterface: TransactionInterface,
                           private val roomRepository: RoomRepositoryInterface
 ) {
@@ -70,7 +75,10 @@ class IssuesReportService(private val issueReportRepository: IssueReportReposito
        }
     }
 
-    fun createIssueReport(roomId: String?, description: String):IssueReportResult {
+    fun createIssueReport(userId: Int?, roomId: String?, description: String):IssueReportResult {
+        if (userId == null) {
+            return failure(IssueReportError.InvalidUserId)
+        }
         if (roomId == null || roomId.toIntOrNull() == null) {
             return failure(IssueReportError.InvalidRoomId)
         }
@@ -80,15 +88,33 @@ class IssuesReportService(private val issueReportRepository: IssueReportReposito
         if (roomId.toInt() < 0) {
             return failure(IssueReportError.InvalidRoomId)
         }
-       return transactionInterface.useTransaction {
-           val room = roomRepository.getRoomById(roomId.toInt())
-               ?: return@useTransaction failure(IssueReportError.InvalidRoomId)
-            val newIssue = issueReportRepository.createIssueReport(room, description)
-           return@useTransaction success(newIssue)
-       }
+        return transactionInterface.useTransaction {
+            val room = roomRepository.getRoomById(roomId.toInt())
+                ?: return@useTransaction failure(IssueReportError.InvalidRoomId)
+            val user = userRepository.findById(userId) ?: return@useTransaction failure(IssueReportError.UserNotFound)
+            val newIssue = issueReportRepository.createIssueReport(user, room, description)
+            return@useTransaction success(newIssue)
+        }
     }
 
-    fun deleteIssueReport(id: String?): IssueReportDeletionResult {
+    fun assignTechnicianToIssueReport(technicianId: Int?, reportId: String?) : IssueReportResult{
+        if (technicianId == null) {
+            return failure(IssueReportError.InvalidUserId)
+        }
+        if (reportId == null || reportId.toIntOrNull() == null) {
+            return failure(IssueReportError.InvalidUserId)
+        }
+        return transactionInterface.useTransaction {
+            val issueReport = issueReportRepository.getIssueReportById(reportId.toInt())
+                ?: return@useTransaction failure(IssueReportError.InvalidIssueReportId)
+            val technician = technicalServiceRepository.findTechnicalServiceById(technicianId)
+                ?: return@useTransaction failure(IssueReportError.UserNotFound)
+            val updatedIssueReport = issueReportRepository.assignIssueTo(issueReport, technician)
+            return@useTransaction success(updatedIssueReport)
+        }
+    }
+
+    fun deleteIssueReport(id: String?, role :String?): IssueReportDeletionResult {
         if (id == null || id.toIntOrNull() == null) {
             return failure(IssueReportError.InvalidIssueReportId)
         }
@@ -96,6 +122,7 @@ class IssuesReportService(private val issueReportRepository: IssueReportReposito
         if (parsedId < 0) {
             return failure(IssueReportError.InvalidIssueReportId)
         }
+        if(isTechnicalServices(role)) failure(IssueReportError.InvalidRole)
         return transactionInterface.useTransaction {
             issueReportRepository.getIssueReportById(parsedId)
                 ?: return@useTransaction failure(IssueReportError.InvalidIssueReportId)
@@ -104,7 +131,7 @@ class IssuesReportService(private val issueReportRepository: IssueReportReposito
         }
     }
 
-    fun updateIssueReport(id: String?, description: String): IssueReportUpdateResult {
+    fun updateIssueReport(id: String?, description: String, role:String?): IssueReportUpdateResult {
         if (id == null || id.toIntOrNull() == null) {
             return failure(IssueReportError.InvalidIssueReportId)
         }
@@ -112,10 +139,10 @@ class IssuesReportService(private val issueReportRepository: IssueReportReposito
         if (description.isBlank()) {
             return failure(IssueReportError.InvalidDescription)
         }
-
         if (parsedId < 0) {
             return failure(IssueReportError.InvalidIssueReportId)
         }
+        if(isTechnicalServices(role)) failure(IssueReportError.InvalidRole)
        return transactionInterface.useTransaction {
             val report = issueReportRepository.getIssueReportById(parsedId)
                 ?: return@useTransaction failure(IssueReportError.InvalidIssueReportId)
@@ -123,4 +150,9 @@ class IssuesReportService(private val issueReportRepository: IssueReportReposito
             return@useTransaction success(updatedIssue)
         }
     }
+
+    private fun isTechnicalServices(role :String?): Boolean {
+        return (role != null && role != Role.TECHNICAL_SERVICE.name)
+    }
+
 }

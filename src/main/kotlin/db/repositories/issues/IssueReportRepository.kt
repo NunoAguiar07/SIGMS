@@ -2,6 +2,8 @@ package isel.leic.group25.db.repositories.issues
 
 import isel.leic.group25.db.entities.issues.IssueReport
 import isel.leic.group25.db.entities.rooms.Room
+import isel.leic.group25.db.entities.users.TechnicalService
+import isel.leic.group25.db.entities.users.User
 import isel.leic.group25.db.repositories.issues.interfaces.IssueReportRepositoryInterface
 import isel.leic.group25.db.tables.Tables.Companion.issueReports
 import org.ktorm.database.Database
@@ -34,10 +36,17 @@ class IssueReportRepository(private val database: Database) : IssueReportReposit
         return database.issueReports.firstOrNull { it.id eq id }
     }
 
-    override fun createIssueReport(room: Room, description: String): IssueReport {
+    override fun assignIssueTo(issueReport: IssueReport, technician: TechnicalService) : IssueReport{
+        issueReport.assignedTo = technician
+        database.issueReports.update(issueReport)
+        return issueReport
+    }
+
+    override fun createIssueReport(user: User, room: Room, description: String): IssueReport {
         val newIssueReport = IssueReport {
             this.room = room
             this.description = description
+            this.createdBy = user
         }
         database.issueReports.add(newIssueReport)
         return newIssueReport

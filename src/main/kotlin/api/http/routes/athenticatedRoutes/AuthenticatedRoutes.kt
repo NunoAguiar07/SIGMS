@@ -7,6 +7,7 @@ import isel.leic.group25.services.*
 fun Route.authenticatedRoutes(
     authService: AuthService,
     userService: UserService,
+    teacherRoomService: TeacherRoomService,
     classService: ClassService,
     userClassService: UserClassService,
     subjectService: SubjectService,
@@ -18,7 +19,7 @@ fun Route.authenticatedRoutes(
         assessRoleRoutes(authService)
         profileRoutes(userService)
         subjectRoutes(subjectService, classService, userClassService, lectureService)
-        roomRoutes(roomService, lectureService, issuesReportService)
+        roomRoutes(roomService, lectureService, issuesReportService, teacherRoomService)
         lectureRoutes(lectureService)
         scheduleRoutes(userClassService)
     }

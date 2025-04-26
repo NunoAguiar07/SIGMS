@@ -4,6 +4,7 @@ import isel.leic.group25.db.entities.rooms.Classroom
 import isel.leic.group25.db.entities.rooms.OfficeRoom
 import isel.leic.group25.db.entities.rooms.Room
 import isel.leic.group25.db.entities.rooms.StudyRoom
+import isel.leic.group25.db.entities.users.Teacher
 import isel.leic.group25.db.repositories.rooms.interfaces.RoomRepositoryInterface
 
 class MockRoomRepository : RoomRepositoryInterface {
@@ -19,6 +20,10 @@ class MockRoomRepository : RoomRepositoryInterface {
 
     override fun getRoomById(id: Int): Room? =
         rooms.firstOrNull { it.id == id }
+
+    override fun getOfficeRoomById(id: Int): OfficeRoom? =
+        officeRooms.firstOrNull { it.room.id == id }
+
 
     override fun createRoom(capacity: Int, name: String): Room {
         val newRoom = Room {
@@ -45,7 +50,7 @@ class MockRoomRepository : RoomRepositoryInterface {
     }
 
     override fun deleteRoom(id: Int): Boolean {
-        val room = rooms.firstOrNull { it.id == id } ?: return false
+        rooms.firstOrNull { it.id == id } ?: return false
         classrooms.removeIf { it.room.id == id }
         officeRooms.removeIf { it.room.id == id }
         studyRooms.removeIf { it.room.id == id }
@@ -57,6 +62,16 @@ class MockRoomRepository : RoomRepositoryInterface {
         room.name = name
         room.capacity = capacity
         return room
+    }
+
+    override fun addTeacherToOffice(teacher: Teacher, office: OfficeRoom): Teacher {
+        teacher.office = office
+        return teacher
+    }
+
+    override fun removeTeacherFromOffice(teacher: Teacher, office: OfficeRoom): Teacher {
+        teacher.office = null
+        return teacher
     }
 
     fun clear() {
