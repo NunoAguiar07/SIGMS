@@ -1,7 +1,9 @@
-package isel.leic.group25.api.http.routes.athenticatedRoutes
+package isel.leic.group25.api.http.routes
 
 import io.ktor.server.auth.*
 import io.ktor.server.routing.*
+import isel.leic.group25.api.http.routes.athenticatedRoutes.*
+import isel.leic.group25.api.http.routes.athenticatedRoutes.assessRoleRoutes
 import isel.leic.group25.services.*
 
 fun Route.authenticatedRoutes(

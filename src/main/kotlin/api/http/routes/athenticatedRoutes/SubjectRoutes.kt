@@ -23,155 +23,174 @@ fun Route.subjectRoutes(
     lectureService: LectureService
 ) {
     route("/subjects") {
-        get {
-            val limit = call.queryParameters["limit"]
-            val offset = call.queryParameters["offset"]
-            val result = subjectService.getAllSubjects(limit, offset)
-            call.respondEither(
-                either = result,
-                transformError = { error -> error.toProblem() },
-                transformSuccess = { subjects ->
-                    subjects.map { SubjectResponse.fromSubject(it) }
-                }
-            )
+        baseSubjectRoutes(subjectService)
+        specificSubjectRoutes(subjectService)
+        subjectClassesRoutes(classService)
+
+        route("/{subjectId}/classes/{classId}") {
+            classManagementRoutes(classService)
+            classUserRoutes(usersClassService)
+            classLecturesRoutes(lectureService)
         }
-        post {
-            val subjectRequest = call.receive<SubjectRequest>()
-            val result = subjectService.createSubject(
-                name = subjectRequest.name
-            )
+    }
+}
+
+fun Route.baseSubjectRoutes(subjectService: SubjectService) {
+    get {
+        val limit = call.queryParameters["limit"]
+        val offset = call.queryParameters["offset"]
+        val result = subjectService.getAllSubjects(limit, offset)
+        call.respondEither(
+            either = result,
+            transformError = { error -> error.toProblem() },
+            transformSuccess = { subjects ->
+                subjects.map { SubjectResponse.fromSubject(it) }
+            }
+        )
+    }
+
+    post {
+        val subjectRequest = call.receive<SubjectRequest>()
+        val result = subjectService.createSubject(
+            name = subjectRequest.name
+        )
+        call.respondEither(
+            either = result,
+            transformError = { error -> error.toProblem() },
+            transformSuccess = { subject ->
+                SubjectResponse.fromSubject(subject)
+            },
+            successStatus = HttpStatusCode.Created
+        )
+    }
+}
+
+fun Route.specificSubjectRoutes(subjectService: SubjectService) {
+    route("/{subjectId}") {
+        get {
+            val id = call.parameters["subjectId"]
+            val result = subjectService.getSubjectById(id)
             call.respondEither(
                 either = result,
                 transformError = { error -> error.toProblem() },
                 transformSuccess = { subject ->
                     SubjectResponse.fromSubject(subject)
+                }
+            )
+        }
+
+        delete {
+            val id = call.parameters["subjectId"]
+            val result = subjectService.deleteSubject(id)
+            call.respondEither(
+                either = result,
+                transformError = { error -> error.toProblem() },
+                transformSuccess = {
+                    HttpStatusCode.NoContent
+                }
+            )
+        }
+    }
+}
+
+fun Route.subjectClassesRoutes(classService: ClassService) {
+    route("/{subjectId}/classes") {
+        get {
+            val limit = call.queryParameters["limit"]
+            val offset = call.queryParameters["offset"]
+            val id = call.parameters["subjectId"]
+            val result = classService.getAllClassesFromSubject(id, limit, offset)
+            call.respondEither(
+                either = result,
+                transformError = { error -> error.toProblem() },
+                transformSuccess = { classes ->
+                    classes.map { ClassResponse.fromClass(it) }
+                }
+            )
+        }
+
+        post {
+            val id = call.parameters["subjectId"]
+            val classRequest = call.receive<ClassRequest>()
+            val result = classService.createClass(
+                name = classRequest.name,
+                subjectId = id
+            )
+            call.respondEither(
+                either = result,
+                transformError = { error -> error.toProblem() },
+                transformSuccess = { schoolClass ->
+                    ClassResponse.fromClass(schoolClass)
                 },
                 successStatus = HttpStatusCode.Created
             )
         }
-        route("/{subjectId}") {
-            get {
-                val id = call.parameters["subjectId"]
-                val result = subjectService.getSubjectById(id)
-                call.respondEither(
-                    either = result,
-                    transformError = { error -> error.toProblem() },
-                    transformSuccess = { subject ->
-                        SubjectResponse.fromSubject(subject)
-                    }
-                )
-            }
-            delete {
-                val id = call.parameters["subjectId"]
-                val result = subjectService.deleteSubject(id)
-                call.respondEither(
-                    either = result,
-                    transformError = { error -> error.toProblem() },
-                    transformSuccess = {
-                        HttpStatusCode.NoContent
-                    }
-                )
-            }
-            route("/classes") {
-                get {
-                    val limit = call.queryParameters["limit"]
-                    val offset = call.queryParameters["offset"]
-                    val id = call.parameters["subjectId"]
-                    val result = classService.getAllClassesFromSubject(id, limit, offset)
-                    call.respondEither(
-                        either = result,
-                        transformError = { error -> error.toProblem() },
-                        transformSuccess = { classes ->
-                            classes.map { ClassResponse.fromClass(it) }
-                        }
-                    )
+    }
+}
+
+fun Route.classManagementRoutes(classService: ClassService) {
+    route("/{classId}") {
+        get {
+            val id = call.parameters["classId"]
+            val result = classService.getClassById(id)
+            call.respondEither(
+                either = result,
+                transformError = { error -> error.toProblem() },
+                transformSuccess = { schoolClass ->
+                    ClassResponse.fromClass(schoolClass)
                 }
-                post {
-                    val id = call.parameters["subjectId"]
-                    val classRequest = call.receive<ClassRequest>()
-                    val result = classService.createClass(
-                        name = classRequest.name,
-                        subjectId = id
-                    )
-                    call.respondEither(
-                        either = result,
-                        transformError = { error -> error.toProblem() },
-                        transformSuccess = { schoolClass ->
-                            ClassResponse.fromClass(schoolClass)
-                        },
-                        successStatus = HttpStatusCode.Created
-                    )
-                }
-                route("/{classId}") {
-                    get {
-                        val id = call.parameters["classId"]
-                        val result = classService.getClassById(id)
-                        call.respondEither(
-                            either = result,
-                            transformError = { error -> error.toProblem() },
-                            transformSuccess = { schoolClass ->
-                                ClassResponse.fromClass(schoolClass)
-                            }
-                        )
-                    }
-                    route("/users") {
-//                        get {
-//                            val limit = call.parameters["limit"]
-//                            val offset = call.parameters["offset"]
-//                            val id = call.parameters["classId"]
-//                            val result = classService.getUsersByClass(id, limit, offset)
-//                            call.respondEither(
-//                                either = result,
-//                                transformError = { error -> error.toProblem() },
-//                                transformSuccess = { users ->
-//                                    users.map { UserResponse.fromUser(it) }
-//                                }
-//                            )
-//                        }
-                        post {
-                            val role = call.getUserRoleFromPrincipal()
-                            val userId = call.getUserIdFromPrincipal()
-                            val id = call.parameters["classId"]
-                            val result = usersClassService.addUserToClass(userId, id, role)
-                            call.respondEither(
-                                either = result,
-                                transformError = { error -> error.toProblem() },
-                                transformSuccess = {
-                                    HttpStatusCode.NoContent
-                                }
-                            )
-                        }
-                        delete {
-                            val role = call.getUserRoleFromPrincipal()
-                            val userId = call.getUserIdFromPrincipal()
-                            val classId = call.parameters["classId"]
-                            val result = usersClassService.removeUserFromClass(userId, classId, role)
-                            call.respondEither(
-                                either = result,
-                                transformError = { error -> error.toProblem() },
-                                transformSuccess = {
-                                    HttpStatusCode.NoContent
-                                }
-                            )
-                        }
-                    }
-                    route("/lectures") {
-                        get {
-                            val limit = call.queryParameters["limit"]
-                            val offset = call.queryParameters["offset"]
-                            val id = call.parameters["classId"]
-                            val result = lectureService.getLecturesByClass(id, limit, offset)
-                            call.respondEither(
-                                either = result,
-                                transformError = { error -> error.toProblem() },
-                                transformSuccess = { lectures ->
-                                    lectures.map { LectureResponse.from(it) }
-                                }
-                            )
-                        }
-                    }
-                }
-            }
+            )
         }
     }
 }
+
+fun Route.classUserRoutes(usersClassService: UserClassService) {
+    route("/users") {
+        post {
+            val role = call.getUserRoleFromPrincipal()
+            val userId = call.getUserIdFromPrincipal()
+            val id = call.parameters["classId"]
+            val result = usersClassService.addUserToClass(userId, id, role)
+            call.respondEither(
+                either = result,
+                transformError = { error -> error.toProblem() },
+                transformSuccess = {
+                    HttpStatusCode.NoContent
+                }
+            )
+        }
+
+        delete {
+            val role = call.getUserRoleFromPrincipal()
+            val userId = call.getUserIdFromPrincipal()
+            val classId = call.parameters["classId"]
+            val result = usersClassService.removeUserFromClass(userId, classId, role)
+            call.respondEither(
+                either = result,
+                transformError = { error -> error.toProblem() },
+                transformSuccess = {
+                    HttpStatusCode.NoContent
+                }
+            )
+        }
+    }
+}
+
+fun Route.classLecturesRoutes(lectureService: LectureService) {
+    route("/lectures") {
+        get {
+            val limit = call.queryParameters["limit"]
+            val offset = call.queryParameters["offset"]
+            val id = call.parameters["classId"]
+            val result = lectureService.getLecturesByClass(id, limit, offset)
+            call.respondEither(
+                either = result,
+                transformError = { error -> error.toProblem() },
+                transformSuccess = { lectures ->
+                    lectures.map { LectureResponse.from(it) }
+                }
+            )
+        }
+    }
+}
+

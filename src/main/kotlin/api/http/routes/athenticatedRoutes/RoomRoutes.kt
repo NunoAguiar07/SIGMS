@@ -28,213 +28,221 @@ fun Route.roomRoutes(
     teacherRoomService: TeacherRoomService
 ) {
     route("/rooms") {
+        baseRoomRoutes(roomService)
+        teacherOfficeRoutes(teacherRoomService)
+        specificRoomRoutes(roomService)
+        roomLecturesRoutes(lectureService)
+        roomIssuesRoutes(issuesReportService)
+    }
+}
+
+fun Route.baseRoomRoutes(roomService: RoomService) {
+    get {
+        val limit = call.queryParameters["limit"]
+        val offset = call.queryParameters["offset"]
+        val result = roomService.getAllRooms(limit, offset)
+        call.respondEither(
+            either = result,
+            transformError = { error -> error.toProblem() },
+            transformSuccess = { rooms -> rooms.map { RoomResponse.from(it) } }
+        )
+    }
+
+    post {
+        val roomRequest = call.receive<RoomRequest>()
+        val result = roomService.createRoom(
+            name = roomRequest.name,
+            capacity = roomRequest.capacity,
+            type = roomRequest.type
+        )
+        call.respondEither(
+            either = result,
+            transformError = { error -> error.toProblem() },
+            transformSuccess = { room -> RoomResponse.from(room) },
+            successStatus = HttpStatusCode.Created
+        )
+    }
+}
+
+fun Route.teacherOfficeRoutes(teacherRoomService: TeacherRoomService) {
+    route("/offices/{roomId}/teachers") {
+        put {
+            val id = call.parameters["roomId"] ?: return@put call.respond(HttpStatusCode.BadRequest)
+            val request = call.receive<TeacherOfficeRequest>()
+            val result = teacherRoomService.addTeacherToOffice(
+                teacherId = request.teacherId,
+                officeId = id
+            )
+            call.respondEither(
+                either = result,
+                transformError = { error -> error.toProblem() },
+                transformSuccess = { teacher -> TeacherOfficeResponse.from(teacher) }
+            )
+        }
+
+        delete {
+            val id = call.parameters["roomId"] ?: return@delete call.respond(HttpStatusCode.BadRequest)
+            val request = call.receive<TeacherOfficeRequest>()
+            val result = teacherRoomService.removeTeacherFromRoom(
+                teacherId = request.teacherId,
+                officeId = id
+            )
+            call.respondEither(
+                either = result,
+                transformError = { error -> error.toProblem() },
+                transformSuccess = { teacher -> TeacherOfficeResponse.from(teacher) }
+            )
+        }
+    }
+}
+
+fun Route.specificRoomRoutes(roomService: RoomService) {
+    route("/{roomId}") {
+        get {
+            val id = call.parameters["roomId"] ?: return@get call.respond(HttpStatusCode.BadRequest)
+            val result = roomService.getRoomById(id)
+            call.respondEither(
+                either = result,
+                transformError = { error -> error.toProblem() },
+                transformSuccess = { room -> RoomResponse.from(room) }
+            )
+        }
+
+        delete {
+            val id = call.parameters["roomId"] ?: return@delete call.respond(HttpStatusCode.BadRequest)
+            val result = roomService.deleteRoom(id)
+            call.respondEither(
+                either = result,
+                transformError = { error -> error.toProblem() },
+                transformSuccess = { HttpStatusCode.NoContent }
+            )
+        }
+
+        put {
+            val id = call.parameters["roomId"] ?: return@put call.respond(HttpStatusCode.BadRequest)
+            val roomRequest = call.receive<RoomRequest>()
+            val result = roomService.updateRoom(
+                id = id,
+                name = roomRequest.name,
+                capacity = roomRequest.capacity
+            )
+            call.respondEither(
+                either = result,
+                transformError = { error -> error.toProblem() },
+                transformSuccess = { room -> RoomResponse.from(room) }
+            )
+        }
+    }
+}
+
+fun Route.roomLecturesRoutes(lectureService: LectureService) {
+    route("/{roomId}/lectures") {
         get {
             val limit = call.queryParameters["limit"]
             val offset = call.queryParameters["offset"]
-            val result = roomService.getAllRooms(limit, offset)
+            val id = call.parameters["roomId"] ?: return@get call.respond(HttpStatusCode.BadRequest)
+            val result = lectureService.getLecturesByRoom(id, limit, offset)
             call.respondEither(
                 either = result,
                 transformError = { error -> error.toProblem() },
-                transformSuccess = { rooms ->
-                    rooms.map { RoomResponse.from(it) }
-                }
+                transformSuccess = { lectures -> lectures.map { LectureResponse.from(it) } }
             )
         }
+    }
+}
+
+fun Route.roomIssuesRoutes(issuesReportService: IssuesReportService) {
+    route("/{roomId}/issues") {
+        get {
+            val limit = call.queryParameters["limit"]
+            val offset = call.queryParameters["offset"]
+            val result = issuesReportService.getAllIssueReports(limit, offset)
+            call.respondEither(
+                either = result,
+                transformError = { error -> error.toProblem() },
+                transformSuccess = { issues -> issues.map { IssueReportResponse.from(it) } }
+            )
+        }
+
         post {
-            val roomRequest = call.receive<RoomRequest>()
-            val result = roomService.createRoom(
-                name = roomRequest.name,
-                capacity = roomRequest.capacity,
-                type = roomRequest.type
+            val userId = call.getUserIdFromPrincipal()
+            val roomId = call.parameters["roomId"] ?: return@post call.respond(HttpStatusCode.BadRequest)
+            val issueRequest = call.receive<IssueReportRequest>()
+            val result = issuesReportService.createIssueReport(
+                userId = userId,
+                roomId = roomId,
+                description = issueRequest.description
             )
             call.respondEither(
                 either = result,
                 transformError = { error -> error.toProblem() },
-                transformSuccess = { room ->
-                    RoomResponse.from(room)
-                },
+                transformSuccess = { issue -> IssueReportResponse.from(issue) },
                 successStatus = HttpStatusCode.Created
             )
         }
-        route("/offices/{roomId}/teachers") {
-            put {
-                val id = call.parameters["roomId"] ?: return@put call.respond(HttpStatusCode.BadRequest)
-                val request = call.receive<TeacherOfficeRequest>()
-                val result = teacherRoomService.addTeacherToOffice(
-                    teacherId = request.teacherId,
-                    officeId = id
-                )
-                call.respondEither(
-                    either = result,
-                    transformError = { error -> error.toProblem() },
-                    transformSuccess = { teacher ->
-                        TeacherOfficeResponse.from(teacher)
-                    }
-                )
-            }
-            delete {
-                val id = call.parameters["roomId"] ?: return@delete call.respond(HttpStatusCode.BadRequest)
-                val request = call.receive<TeacherOfficeRequest>()
-                val result = teacherRoomService.removeTeacherFromRoom(
-                    teacherId = request.teacherId,
-                    officeId = id
-                )
-                call.respondEither(
-                    either = result,
-                    transformError = { error -> error.toProblem() },
-                    transformSuccess = { teacher ->
-                        TeacherOfficeResponse.from(teacher)
-                    }
-                )
-            }
+
+        route("{issueId}") {
+            issueCrudRoutes(issuesReportService)
+            issueAssignmentRoutes(issuesReportService)
         }
-        route("/{roomId}") {
-            get {
-                val id = call.parameters["roomId"] ?: return@get call.respond(HttpStatusCode.BadRequest)
-                val result = roomService.getRoomById(id)
-                call.respondEither(
-                    either = result,
-                    transformError = { error -> error.toProblem() },
-                    transformSuccess = { room ->
-                        RoomResponse.from(room)
-                    }
-                )
-            }
-            delete {
-                val id = call.parameters["roomId"] ?: return@delete call.respond(HttpStatusCode.BadRequest)
-                val result = roomService.deleteRoom(id)
-                call.respondEither(
-                    either = result,
-                    transformError = { error -> error.toProblem() },
-                    transformSuccess = {
-                        HttpStatusCode.NoContent
-                    }
-                )
-            }
-            put {
-                val id = call.parameters["roomId"] ?: return@put call.respond(HttpStatusCode.BadRequest)
-                val roomRequest = call.receive<RoomRequest>()
-                val result = roomService.updateRoom(
-                    id = id,
-                    name = roomRequest.name,
-                    capacity = roomRequest.capacity
-                )
-                call.respondEither(
-                    either = result,
-                    transformError = { error -> error.toProblem() },
-                    transformSuccess = { room ->
-                        RoomResponse.from(room)
-                    }
-                )
-            }
-            route("/lectures") {
-                get {
-                    val limit = call.queryParameters["limit"]
-                    val offset = call.queryParameters["offset"]
-                    val id = call.parameters["roomId"] ?: return@get call.respond(HttpStatusCode.BadRequest)
-                    val result = lectureService.getLecturesByRoom(id, limit, offset)
-                    call.respondEither(
-                        either = result,
-                        transformError = { error -> error.toProblem() },
-                        transformSuccess = { lectures ->
-                            lectures.map { LectureResponse.from(it) }
-                        }
-                    )
-                }
-            }
-            route("/issues") {
-                get {
-                    val limit = call.queryParameters["limit"]
-                    val offset = call.queryParameters["offset"]
-                    val result = issuesReportService.getAllIssueReports(limit, offset)
-                    call.respondEither(
-                        either = result,
-                        transformError = { error -> error.toProblem() },
-                        transformSuccess = { issues ->
-                            issues.map { IssueReportResponse.from(it) }
-                        }
-                    )
-                }
-                post {
-                    val userId = call.getUserIdFromPrincipal()
-                    val roomId = call.parameters["roomId"] ?: return@post call.respond(HttpStatusCode.BadRequest)
-                    val issueRequest = call.receive<IssueReportRequest>()
-                    val result = issuesReportService.createIssueReport(
-                        userId = userId,
-                        roomId = roomId,
-                        description = issueRequest.description
-                    )
-                    call.respondEither(
-                        either = result,
-                        transformError = { error -> error.toProblem() },
-                        transformSuccess = { issue ->
-                            IssueReportResponse.from(issue)
-                        },
-                        successStatus = HttpStatusCode.Created
-                    )
-                }
-                route("{issueId}") {
-                    get {
-                        val id = call.parameters["issueId"] ?: return@get call.respond(HttpStatusCode.BadRequest)
-                        val result = issuesReportService.getIssueReportById(id)
-                        call.respondEither(
-                            either = result,
-                            transformError = { error -> error.toProblem() },
-                            transformSuccess = { issue ->
-                                IssueReportResponse.from(issue)
-                            }
-                        )
-                    }
-                    withRole(Role.TECHNICAL_SERVICE){
-                        delete {
-                            val role = call.getUserRoleFromPrincipal()
-                            val id = call.parameters["issueId"]
-                            val result = issuesReportService.deleteIssueReport(id, role)
-                            call.respondEither(
-                                either = result,
-                                transformError = { error -> error.toProblem() },
-                                transformSuccess = {
-                                    HttpStatusCode.NoContent
-                                }
-                            )
-                        }
-                    }
-                    put {
-                        val role = call.getUserRoleFromPrincipal()
-                        val id = call.parameters["issueId"]
-                        val issueRequest = call.receive<IssueReportRequest>()
-                        val result = issuesReportService.updateIssueReport(
-                            id = id,
-                            description = issueRequest.description,
-                            role = role
-                        )
-                        call.respondEither(
-                            either = result,
-                            transformError = { error -> error.toProblem() },
-                            transformSuccess = { issue ->
-                                IssueReportResponse.from(issue)
-                            }
-                        )
-                    }
-                    route("/assign") {
-                        put {
-                            val userId = call.getUserIdFromPrincipal()
-                            val issueId = call.parameters["issueId"]
-                            val result = issuesReportService.assignTechnicianToIssueReport(
-                                technicianId = userId,
-                                reportId = issueId
-                            )
-                            call.respondEither(
-                                either = result,
-                                transformError = { error -> error.toProblem() },
-                                transformSuccess = { issue ->
-                                    IssueReportResponse.from(issue)
-                                }
-                            )
-                        }
-                    }
-                }
-            }
+    }
+}
+
+fun Route.issueCrudRoutes(issuesReportService: IssuesReportService) {
+    get {
+        val id = call.parameters["issueId"] ?: return@get call.respond(HttpStatusCode.BadRequest)
+        val result = issuesReportService.getIssueReportById(id)
+        call.respondEither(
+            either = result,
+            transformError = { error -> error.toProblem() },
+            transformSuccess = { issue -> IssueReportResponse.from(issue) }
+        )
+    }
+
+    withRole(Role.TECHNICAL_SERVICE) {
+        delete {
+            val role = call.getUserRoleFromPrincipal()
+            val id = call.parameters["issueId"]
+            val result = issuesReportService.deleteIssueReport(id, role)
+            call.respondEither(
+                either = result,
+                transformError = { error -> error.toProblem() },
+                transformSuccess = { HttpStatusCode.NoContent }
+            )
+        }
+    }
+
+    put {
+        val role = call.getUserRoleFromPrincipal()
+        val id = call.parameters["issueId"]
+        val issueRequest = call.receive<IssueReportRequest>()
+        val result = issuesReportService.updateIssueReport(
+            id = id,
+            description = issueRequest.description,
+            role = role
+        )
+        call.respondEither(
+            either = result,
+            transformError = { error -> error.toProblem() },
+            transformSuccess = { issue -> IssueReportResponse.from(issue) }
+        )
+    }
+}
+
+fun Route.issueAssignmentRoutes(issuesReportService: IssuesReportService) {
+    route("/assign") {
+        put {
+            val userId = call.getUserIdFromPrincipal()
+            val issueId = call.parameters["issueId"]
+            val result = issuesReportService.assignTechnicianToIssueReport(
+                technicianId = userId,
+                reportId = issueId
+            )
+            call.respondEither(
+                either = result,
+                transformError = { error -> error.toProblem() },
+                transformSuccess = { issue -> IssueReportResponse.from(issue) }
+            )
         }
     }
 }

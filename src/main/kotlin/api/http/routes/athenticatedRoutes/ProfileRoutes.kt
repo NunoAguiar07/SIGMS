@@ -13,48 +13,61 @@ import isel.leic.group25.services.UserService
 
 fun Route.profileRoutes(userService: UserService) {
     route("/profile") {
-        get {
-            val userId = call.getUserIdFromPrincipal() ?: return@get call.respond(HttpStatusCode.Unauthorized)
-            val result = userService.getUserById(userId)
-            call.respondEither(
-                either = result,
-                transformError = { error -> error.toProblem() },
-                transformSuccess = { user ->
-                    UserResponse.fromUser(user)
-                }
-            )
-        }
-        put {
-            val userId = call.getUserIdFromPrincipal() ?: return@put call.respond(HttpStatusCode.Unauthorized)
-            val updateRequest = call.receive<UserUpdateRequest>()
-            val result = userService.updateUser(
-                id = userId,
-                username = updateRequest.username,
-                image = updateRequest.image
-            )
-            call.respondEither(
-                either = result,
-                transformError = { error -> error.toProblem() },
-                transformSuccess = { user ->
-                    UserResponse.fromUser(user)
-                }
-            )
-        }
-        post("/password") {
-            val userId = call.getUserIdFromPrincipal() ?: return@post call.respond(HttpStatusCode.Unauthorized)
-            val passwordRequest = call.receive<ChangePasswordRequest>()
-            val result = userService.changePassword(
-                userId = userId,
-                oldPassword = passwordRequest.oldPassword,
-                newPassword = passwordRequest.newPassword
-            )
-            call.respondEither(
-                either = result,
-                transformError = { error -> error.toProblem() },
-                transformSuccess = { user ->
-                    UserResponse.fromUser(user)
-                }
-            )
-        }
+        getProfileRoute(userService)
+        updateProfileRoute(userService)
+        changePasswordRoute(userService)
     }
 }
+
+fun Route.getProfileRoute(userService: UserService) {
+    get {
+        val userId = call.getUserIdFromPrincipal() ?: return@get call.respond(HttpStatusCode.Unauthorized)
+        val result = userService.getUserById(userId)
+        call.respondEither(
+            either = result,
+            transformError = { error -> error.toProblem() },
+            transformSuccess = { user ->
+                UserResponse.fromUser(user)
+            }
+        )
+    }
+}
+
+fun Route.updateProfileRoute(userService: UserService) {
+    put {
+        val userId = call.getUserIdFromPrincipal() ?: return@put call.respond(HttpStatusCode.Unauthorized)
+        val updateRequest = call.receive<UserUpdateRequest>()
+        val result = userService.updateUser(
+            id = userId,
+            username = updateRequest.username,
+            image = updateRequest.image
+        )
+        call.respondEither(
+            either = result,
+            transformError = { error -> error.toProblem() },
+            transformSuccess = { user ->
+                UserResponse.fromUser(user)
+            }
+        )
+    }
+}
+
+fun Route.changePasswordRoute(userService: UserService) {
+    post("/password") {
+        val userId = call.getUserIdFromPrincipal() ?: return@post call.respond(HttpStatusCode.Unauthorized)
+        val passwordRequest = call.receive<ChangePasswordRequest>()
+        val result = userService.changePassword(
+            userId = userId,
+            oldPassword = passwordRequest.oldPassword,
+            newPassword = passwordRequest.newPassword
+        )
+        call.respondEither(
+            either = result,
+            transformError = { error -> error.toProblem() },
+            transformSuccess = { user ->
+                UserResponse.fromUser(user)
+            }
+        )
+    }
+}
+

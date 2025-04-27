@@ -2,7 +2,7 @@ package isel.leic.group25.api.http
 
 import io.ktor.server.application.*
 import io.ktor.server.routing.*
-import isel.leic.group25.api.http.routes.athenticatedRoutes.authenticatedRoutes
+import isel.leic.group25.api.http.routes.authenticatedRoutes
 import isel.leic.group25.api.http.routes.authRoutes
 import isel.leic.group25.api.http.routes.welcomeRoutes
 import isel.leic.group25.services.*
