@@ -5,7 +5,539 @@ info:
   version: 1.0.0
 servers:
   - url: 'https://localhost:8080'
+tags:
+  - name: Lecture
+    description: Lecture operations
+  - name: AssessRole
+    description: Account pending approval operations
+  - name: API
+    description: General API information
+  - name: Profile
+    description: Profile operations
+  - name: Room
+    description: Room operations
 paths:
+  /api:
+    get:
+      tags:
+        - API
+      description: API Welcome page
+      responses:
+        200:
+          description: API information
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WelcomePageResponse"
+  /api/verifyAccount:
+    post:
+      tags:
+        - AssessRole
+      security:
+        - bearerJWT: [ ]
+      description: Verify account ownership on creation
+      parameters:
+        - in: query
+          name: token
+          schema:
+            type: string
+          description: The onetime token for account verification
+      responses:
+        204:
+          description: Successfully verified account
+  /api/assessRole:
+    get:
+      tags:
+        - AssessRole
+      security:
+        - bearerJWT: []
+      description: Return pending approvals
+      parameters:
+        - in: query
+          name: offset
+          schema:
+            type: integer
+            default: 0
+          required: false
+          description: Item return list offset
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 20
+          required: false
+          description: Item return list limit
+      responses:
+        200:
+          description: Pending approvals as AssessRoleResponses
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AssessRole"
+        400:
+          description: Either limit or offset are not a valid integer
+    put:
+      tags:
+        - AssessRole
+      security:
+        - bearerJWT: []
+      description: Approve/reject a pending user
+      parameters:
+        - in: query
+          name: token
+          required: true
+          schema:
+            type: string
+            example: "UUID Token"
+          description: The token of the to be approved/rejected user
+        - in: query
+          name: status
+          required: true
+          schema:
+            type: string
+            enum:
+              - approved
+              - rejected
+          description: To be set status of the pending user
+      responses:
+        204:
+          description: Successfully set new pending user approval request status
+  /api/assessRole/{token}:
+    get:
+      tags:
+        - AssessRole
+      security:
+        - bearerJWT: []
+      parameters:
+        - in: path
+          name: token
+          schema:
+            type: string
+          required: true
+          description: The token of the pending approval request
+      description: "Retrieve the pending approval by token"
+      responses:
+        200:
+          description: Successfully retrieved the pending approval
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AssessRole"
+        401:
+          description: Token not found
+  /api/lectures:
+    get:
+      tags:
+        - Lecture
+      security:
+        - bearerJWT: []
+      description: Return pending approvals
+      parameters:
+        - in: query
+          name: offset
+          schema:
+            type: integer
+            default: 0
+          required: false
+          description: Item return list offset
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 20
+          required: false
+          description: Item return list limit
+      responses:
+        200:
+          description: Successfully retrieved lectures
+          content:
+            application:/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/LectureResponse"
+    post:
+      tags:
+        - Lecture
+      security:
+        - bearerJWT: []
+      description: Create a new lecture
+      requestBody:
+        $ref: "#/components/schemas/LectureRequest"
+      responses:
+        201:
+          description: Successfully created a new lecture
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LectureResponse"
+    put:
+      tags:
+        - Lecture
+      security:
+        - bearerJWT: []
+      description: Update an existing lecture
+      requestBody:
+        $ref: "#/components/schemas/UpdateLectureRequest"
+      responses:
+        200:
+          description: Successfully updated the lecture
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LectureResponse"
+    delete:
+      tags:
+        - Lecture
+      security:
+        - bearerJWT: []
+      description: Delete an existing lecture
+      requestBody:
+        $ref: "#/components/schemas/LectureRequest"
+      responses:
+        204:
+          description: Successfully deleted the lecture
+  /api/profile:
+    get:
+      security:
+        - bearerJWT: []
+      tags:
+        - Profile
+      description: Return user information from account token in authentication
+      responses:
+        200:
+          description: Return the user object with basic informations
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+    put:
+      security:
+        - bearerJWT: []
+      tags:
+        - Profile
+      requestBody:
+        $ref: "#/components/schemas/UserUpdateRequest"
+      responses:
+        200:
+          description: Successfully updated user information
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+
+  /api/profile/password:
+    post:
+      security:
+        - bearerJWT: []
+      tags:
+        - Profile
+      requestBody:
+        $ref: "#/components/schemas/ChangePassword"
+      description: Update user credentials
+      responses:
+        200:
+          description: Successfully updated user credentials
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+  /rooms:
+    get:
+      parameters:
+        - in: query
+          name: offset
+          schema:
+            type: integer
+            default: 0
+          required: false
+          description: Item return list offset
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 20
+          required: false
+          description: Item return list limit
+      security:
+        - bearerJWT: [ ]
+      tags:
+        - Room
+      responses:
+        200:
+          description: Successfully retrieved rooms
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/RoomResponse"
+    post:
+      security:
+        - bearerJWT: [ ]
+      tags:
+        - Room
+      requestBody:
+        $ref: "#/components/schemas/RoomRequest"
+      description: Add a new room
+      responses:
+        201:
+          description: Successfully created a new room
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RoomResponse"
+  /rooms/{roomId}:
+    get:
+      security:
+        - bearerJWT: [ ]
+      tags:
+        - Room
+      parameters:
+        - in: path
+          name: roomId
+          schema:
+            type: integer
+            example: 1
+          required: true
+          description: The id of the room to be obtained
+      description: Obtain room by Id
+      responses:
+        200:
+          description: Successfully retrieved room by Id
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RoomResponse"
+    delete:
+      security:
+        - bearerJWT: [ ]
+      tags:
+        - Room
+      parameters:
+        - in: path
+          name: roomId
+          schema:
+            type: integer
+            example: 1
+          required: true
+          description: The id of the room to be obtained
+      description: Delete room by Id
+      responses:
+        204:
+          description: Successfully deleted room by Id
+    put:
+      security:
+        - bearerJWT: [ ]
+      tags:
+        - Room
+      parameters:
+        - in: path
+          name: roomId
+          schema:
+            type: integer
+            example: 1
+          required: true
+          description: The id of the room to be obtained
+      requestBody:
+        $ref: "#/components/schemas/RoomRequest"
+      description: Update room by Id
+      responses:
+        200:
+          description: Successfully updated room by Id
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RoomResponse"
+  /rooms/{roomId}/lectures:
+    get:
+      security:
+        - bearerJWT: [ ]
+      tags:
+        - Room
+      parameters:
+        - in: path
+          name: roomId
+          schema:
+            type: integer
+            example: 1
+          required: true
+          description: The id of the room to be obtained
+        - in: query
+          name: offset
+          schema:
+            type: integer
+            default: 0
+          required: false
+          description: Item return list offset
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 20
+          required: false
+          description: Item return list limit
+      description: Retrieve room associated lectures
+      responses:
+        200:
+          description: Successfully retrieved room associated lectures
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/LectureResponse"
+  /rooms/{roomId}/issues:
+    get:
+      security:
+        - bearerJWT: [ ]
+      tags:
+        - Room
+      parameters:
+        - in: path
+          name: roomId
+          schema:
+            type: integer
+            example: 1
+          required: true
+          description: The id of the room to be obtained
+        - in: query
+          name: offset
+          schema:
+            type: integer
+            default: 0
+          required: false
+          description: Item return list offset
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 20
+          required: false
+          description: Item return list limit
+      description: Retrieve room associated issues
+      responses:
+        200:
+          description: Successfully retrieved room associated issues
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/IssueReportResponse"
+    post:
+      security:
+        - bearerJWT: [ ]
+      tags:
+        - Room
+      parameters:
+        - in: path
+          name: roomId
+          schema:
+            type: integer
+            example: 1
+          required: true
+          description: The id of the room to be obtained
+      description: Create a new issue report for room of Id
+      requestBody:
+        $ref: "#/components/schemas/IssueReportRequest"
+      responses:
+        201:
+          description: Successfully created a new issue report for room of Id
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IssueReportResponse"
+
+  /rooms/{roomId}/issues/{issueId}:
+    get:
+      security:
+        - bearerJWT: [ ]
+      tags:
+        - Room
+      parameters:
+        - in: path
+          name: roomId
+          schema:
+            type: integer
+            example: 1
+          required: true
+          description: The id of the room to be obtained
+        - in: path
+          name: issueId
+          schema:
+            type: integer
+            example: 1
+          required: true
+          description: The id of the issue to be obtained
+      description: Retrieve issue by Id associated with room of Id
+      responses:
+        200:
+          description: Successfully retrieved issue by Id associated with room of Id
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IssueReportResponse"
+    delete:
+      security:
+        - bearerJWT: [ ]
+      tags:
+        - Room
+      parameters:
+        - in: path
+          name: roomId
+          schema:
+            type: integer
+            example: 1
+          required: true
+          description: The id of the room to be obtained
+        - in: path
+          name: issueId
+          schema:
+            type: integer
+            example: 1
+          required: true
+          description: The id of the issue to be deleted
+      description: Delete issue by Id associated with room of Id
+      responses:
+        204:
+          description: Successfully deleted issue by Id associated with room of Id
+    put:
+      security:
+        - bearerJWT: [ ]
+      tags:
+        - Room
+      parameters:
+        - in: path
+          name: roomId
+          schema:
+            type: integer
+            example: 1
+          required: true
+          description: The id of the room to be obtained
+        - in: path
+          name: issueId
+          schema:
+            type: integer
+            example: 1
+          required: true
+          description: The id of the issue to be updated
+      description: Update issue by Id associated with room of Id
+      requestBody:
+        $ref: "#/components/schemas/IssueReportRequest"
+      responses:
+        200:
+          description: Successfully updated issue by Id associated with room of Id
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IssueReportResponse"
+
+
+
+
 
 components:
   schemas:
@@ -61,6 +593,41 @@ components:
           type: string
           example: "11:00"
         endTime:
+          type: string
+          example: "13:00"
+    UpdateLectureRequest:
+      type: object
+      properties:
+        schoolClassId:
+          type: integer
+          example: 1
+        roomId:
+          type: integer
+          example: 1
+        type:
+          $ref: "#/components/schemas/ClassType"
+        weekDay:
+          $ref: "#/components/schemas/WeekDay"
+        startTime:
+          type: string
+          example: "11:00"
+        endTime:
+          type: string
+          example: "13:00"
+        newSchoolClassId:
+          type: integer
+          example: 1
+        newRoomId:
+          type: integer
+          example: 1
+        newType:
+          $ref: "#/components/schemas/ClassType"
+        newWeekDay:
+          $ref: "#/components/schemas/WeekDay"
+        newStartTime:
+          type: string
+          example: "11:00"
+        newEndTime:
           type: string
           example: "13:00"
     LoginCredentialsRequest:
@@ -286,3 +853,8 @@ components:
         - TEACHER
         - ADMIN
         - TECHNICIAN
+  securitySchemes:
+    bearerJWT:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

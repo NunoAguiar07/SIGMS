@@ -44,7 +44,7 @@ fun Route.assessRoleRoutes(
             val status = call.queryParameters["status"]
             val adminId = call.getUserIdFromPrincipal() ?: return@put call.respond(HttpStatusCode.Unauthorized)
 
-            val result = authService.assesRoleRequest(
+            val result = authService.assessRoleRequest(
                 token = token,
                 adminUserId = adminId,
                 status = status

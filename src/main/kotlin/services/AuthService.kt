@@ -16,6 +16,7 @@ import isel.leic.group25.utils.Either
 import isel.leic.group25.utils.failure
 import isel.leic.group25.utils.success
 import java.util.*
+import kotlin.math.absoluteValue
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
@@ -87,20 +88,17 @@ class AuthService(
 
     fun getAllPendingApprovals(limit:String?, offset:String?): PendingRolesResult {
         val newLimit = if (limit != null) {
-            limit.toIntOrNull() ?: return failure(AuthError.InvalidLimit)
+            limit.toIntOrNull()?.absoluteValue ?: return failure(AuthError.InvalidLimit)
         } else {
             10
         }
         val newOffset = if (offset != null) {
-            offset.toIntOrNull() ?: return failure(AuthError.InvalidOffset)
+            offset.toIntOrNull()?.absoluteValue ?: return failure(AuthError.InvalidOffset)
         } else {
             0
         }
         return transactionInterface.useTransaction {
             val approvals = roleApprovalRepository.getApprovals(newLimit, newOffset)
-            if(approvals.isEmpty()) {
-                return@useTransaction success(emptyList())
-            }
             return@useTransaction success(approvals)
         }
     }
@@ -117,7 +115,7 @@ class AuthService(
     }
 
     @OptIn(ExperimentalTime::class)
-    fun assesRoleRequest(token: String?, adminUserId: Int, status: String?): AssesResult {
+    fun assessRoleRequest(token: String?, adminUserId: Int, status: String?): AssesResult {
         return transactionInterface.useTransaction {
             if(token.isNullOrBlank()) {
                 return@useTransaction failure(AuthError.TokenValidationFailed)
