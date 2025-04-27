@@ -55,6 +55,7 @@ class RoomService (
             if (type.isBlank()) {
                 return@useTransaction failure(RoomError.InvalidRoomType)
             }
+            if(checkRoomType(type)) return@useTransaction failure(RoomError.InvalidRoomType)
             val room = roomRepository.createRoom(capacity, name)
             when (type) {
                 "class" -> roomRepository.createClassRoom(room)
@@ -94,4 +95,7 @@ class RoomService (
             return@useTransaction success(updatedRoom)
         }
     }
+
+    private fun checkRoomType(type:String): Boolean = (type == "office" || type == "class" || type == "study")
+
 }

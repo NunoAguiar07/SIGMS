@@ -1,27 +1,31 @@
 
 ###
+# checked
 POST {{baseUrl}}/auth/register
 Content-Type: application/json
 
 {
-  "email": "antonioStudent6@gmail.com",
-  "username": "Antonio_123",
-  "password": "Antonio_123",
+  "email": "antonioStudent9@gmail.com",
+  "username": "Antonio_124",
+  "password": "Antonio_124",
   "role": "student"
 }
 
 ###
 # @name login
+# checked
 POST {{baseUrl}}/auth/login
 Content-Type: application/json
 
 {
-  "email": "admin2@example.com",
-  "password": "Antonio_123"
+  "email": "admin1@example.com",
+  "password": "Antonio_124"
 }
 
+
 ###
-PUT {{baseUrl}}/auth/verifyAccount?token=6c50d37a-67a4-4e8d-8ebc-2b545e7b0f2b
+#checked
+PUT {{baseUrl}}/auth/verifyAccount?token=96ec6464-005d-4aea-91e5-72f3b89fa3e9
 
 ###
 GET {{baseUrl}}/assessRole

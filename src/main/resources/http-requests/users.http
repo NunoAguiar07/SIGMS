@@ -20,6 +20,6 @@ Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "oldPassword": "Antonio_123",
+  "oldPassword": "Antonio_124",
   "newPassword": "Antonio_567"
 }

@@ -9,7 +9,7 @@ Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "name": "CDI"
+  "name": "PG"
 }
 
 ###
@@ -21,7 +21,7 @@ GET {{baseUrl}}/subjects/1/classes
 Authorization: Bearer {{token}}
 
 ###
-POST {{baseUrl}}/subjects/2/classes
+POST {{baseUrl}}/subjects/1/classes
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
@@ -30,5 +30,5 @@ Content-Type: application/json
 }
 
 ###
-GET {{baseUrl}}/subjects/1/classes/1/lectures
+GET {{baseUrl}}/subjects/1/classes/3/lectures
 Authorization: Bearer {{token}}

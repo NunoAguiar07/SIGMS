@@ -54,7 +54,7 @@ class AuthService(
             if(userRepository.findByEmail(email) != null) {
                 return@useTransaction failure(AuthError.UserAlreadyExists)
             }
-            val user = userRepository.createWithoutRole(email, username, User.hashPassword(password))
+            val user = userRepository.createWithoutRole(email, username, password)
             val verificationToken = generateVerificationToken()
             val requestedRole = Role.valueOf(actualRole)
             if(!roleApprovalRepository.addPendingApproval(user, requestedRole, verificationToken, null)) {

@@ -29,7 +29,7 @@ class MockUserRepository : UserRepositoryInterface {
         val newUser = User {
             this.email = email
             this.username = username
-            this.password = password
+            this.password = User.hashPassword(password)
         }
         users.add(newUser)
         return associateWithRole(newUser, role)
@@ -39,7 +39,7 @@ class MockUserRepository : UserRepositoryInterface {
         val newUser = User {
             this.email = email
             this.username = username
-            this.password = password
+            this.password = User.hashPassword(password)
         }
         users.add(newUser)
         return newUser

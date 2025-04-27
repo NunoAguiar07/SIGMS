@@ -13,9 +13,9 @@ Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "name": "F.2.01",
+  "name": "F.2.05",
   "capacity": 30,
-  "type": "office"
+  "type": "class"
 }
 
 ###
