@@ -83,7 +83,9 @@ fun Application.module() {
                 jwtConfig.buildVerifier()
             )
             validate { credential ->
-                if (credential.payload.getClaim("userId").asInt() != null) {
+                val userId = credential.payload.getClaim("userId").asInt()
+                val role = credential.payload.getClaim("role").asString()
+                if (userId != null && role != null) {
                     JWTPrincipal(credential.payload)
                 } else {
                     null

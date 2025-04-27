@@ -6,3 +6,9 @@ enum class Role {
     ADMIN,
     TECHNICAL_SERVICE
 }
+
+fun String.toRoleOrNull(): Role? {
+    return Role.entries.firstOrNull {
+        it.name.equals(this.trim(), ignoreCase = true)
+    }
+}

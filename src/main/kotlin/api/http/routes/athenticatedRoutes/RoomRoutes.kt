@@ -5,6 +5,7 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import isel.leic.group25.api.exceptions.respondEither
+import isel.leic.group25.api.http.utils.withRole
 import isel.leic.group25.api.jwt.getUserIdFromPrincipal
 import isel.leic.group25.api.jwt.getUserRoleFromPrincipal
 import isel.leic.group25.api.model.request.IssueReportRequest
@@ -14,6 +15,7 @@ import isel.leic.group25.api.model.response.IssueReportResponse
 import isel.leic.group25.api.model.response.LectureResponse
 import isel.leic.group25.api.model.response.RoomResponse
 import isel.leic.group25.api.model.response.TeacherOfficeResponse
+import isel.leic.group25.db.entities.types.Role
 import isel.leic.group25.services.IssuesReportService
 import isel.leic.group25.services.LectureService
 import isel.leic.group25.services.RoomService
@@ -183,17 +185,19 @@ fun Route.roomRoutes(
                             }
                         )
                     }
-                    delete {
-                        val role = call.getUserRoleFromPrincipal()
-                        val id = call.parameters["issueId"]
-                        val result = issuesReportService.deleteIssueReport(id, role)
-                        call.respondEither(
-                            either = result,
-                            transformError = { error -> error.toProblem() },
-                            transformSuccess = {
-                                HttpStatusCode.NoContent
-                            }
-                        )
+                    withRole(Role.TECHNICAL_SERVICE){
+                        delete {
+                            val role = call.getUserRoleFromPrincipal()
+                            val id = call.parameters["issueId"]
+                            val result = issuesReportService.deleteIssueReport(id, role)
+                            call.respondEither(
+                                either = result,
+                                transformError = { error -> error.toProblem() },
+                                transformSuccess = {
+                                    HttpStatusCode.NoContent
+                                }
+                            )
+                        }
                     }
                     put {
                         val role = call.getUserRoleFromPrincipal()

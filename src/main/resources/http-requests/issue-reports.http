@@ -8,19 +8,19 @@ Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "description": "The projector is not working"
+  "description": "The projector is not working properly"
 }
 
 ###
-GET {{baseUrl}}/rooms/1/issues/1
+GET {{baseUrl}}/rooms/1/issues/3
 Authorization: Bearer {{token}}
 
 ###
-DELETE {{baseUrl}}/rooms/1/issues/1
+DELETE {{baseUrl}}/rooms/1/issues/3
 Authorization: Bearer {{token}}
 
 ###
-PUT {{baseUrl}}/rooms/1/issues/1
+PUT {{baseUrl}}/rooms/1/issues/3
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
