@@ -6,16 +6,22 @@ info:
 servers:
   - url: 'https://localhost:8080'
 tags:
-  - name: Lecture
-    description: Lecture operations
-  - name: AssessRole
-    description: Account pending approval operations
   - name: API
     description: General API information
+  - name: AssessRole
+    description: Pending account approval operations
+  - name: Auth
+    description: Authentication operations
+  - name: Lecture
+    description: Lecture operations
   - name: Profile
     description: Profile operations
   - name: Room
     description: Room operations
+  - name: Schedule
+    description: Schedule operations
+  - name: Subject
+    description: Subject operations
 paths:
   /api:
     get:
@@ -534,11 +540,319 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/IssueReportResponse"
-
-
-
-
-
+  /api/schedule:
+    get:
+      security:
+        - bearerJWT: [ ]
+      tags:
+        - Schedule
+      description: Retrieve authenticated user related schedule
+      responses:
+        200:
+          description: Successfully retrieved authenticated user realted schedule
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ScheduleResponse"
+  /api/subjects:
+    get:
+      security:
+        - bearerJWT: [ ]
+      tags:
+        - Subject
+      parameters:
+        - in: query
+          name: offset
+          schema:
+            type: integer
+            default: 0
+          required: false
+          description: Item return list offset
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 20
+          required: false
+          description: Item return list limit
+      description: Retrieve all subjects from offset within limit
+      responses:
+        200:
+          description: Successfully retrieved all subjects from offset within limit
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SubjectResponse"
+    post:
+      security:
+        - bearerJWT: [ ]
+      tags:
+        - Subject
+      requestBody:
+        $ref: "#/components/schemas/SubjectRequest"
+      description: Create a new subject
+      responses:
+        201:
+          description: Successfully created a new subject
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SubjectResponse"
+  /api/subject/{subjectId}:
+    get:
+      security:
+        - bearerJWT: [ ]
+      tags:
+        - Subject
+      parameters:
+        - in: path
+          name: subjectId
+          required: true
+          schema:
+            type: integer
+            example: 1
+      description: Retrieve subject by Id
+      responses:
+        200:
+          description: Successfully retrieved subject by Id
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SubjectResponse"
+    delete:
+      security:
+        - bearerJWT: [ ]
+      tags:
+        - Subject
+      parameters:
+        - in: path
+          name: subjectId
+          required: true
+          schema:
+            type: integer
+            example: 1
+      description: Delete subject by Id
+      responses:
+        204:
+          description: Successfully deleted subject by Id
+  /api/subject/{subjectId}/classes:
+    get:
+      security:
+        - bearerJWT: [ ]
+      tags:
+        - Subject
+      parameters:
+        - in: path
+          name: subjectId
+          required: true
+          schema:
+            type: integer
+            example: 1
+        - in: query
+          name: offset
+          schema:
+            type: integer
+            default: 0
+          required: false
+          description: Item return list offset
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 20
+          required: false
+          description: Item return list limit
+      description: Retrieve classes of subject by Id
+      responses:
+        200:
+          description: Successfully retrieved classes of subject by Id
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ClassResponse"
+    post:
+      security:
+        - bearerJWT: [ ]
+      tags:
+        - Subject
+      parameters:
+        - in: path
+          name: subjectId
+          required: true
+          schema:
+            type: integer
+            example: 1
+      requestBody:
+        $ref: "#/components/schemas/ClassRequest"
+      description: Create a new class of subject by Id
+      responses:
+        201:
+          description: Successfully created a new class of subject by Id
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClassResponse"
+  /api/subject/{subjectId}/classes/{classId}:
+    get:
+      security:
+        - bearerJWT: [ ]
+      tags:
+        - Subject
+      parameters:
+        - in: path
+          name: subjectId
+          required: true
+          schema:
+            type: integer
+            example: 1
+        - in: path
+          name: classId
+          required: true
+          schema:
+            type: integer
+            example: 1
+      description: Retrieve class by id for subject by id
+      responses:
+        200:
+          description: Successfully retrieved class by id for subject by id
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClassResponse"
+  /api/subject/{subjectId}/classes/{classId}/users:
+    post:
+      security:
+        - bearerJWT: [ ]
+      tags:
+        - Subject
+      parameters:
+        - in: path
+          name: subjectId
+          required: true
+          schema:
+            type: integer
+            example: 1
+        - in: path
+          name: classId
+          required: true
+          schema:
+            type: integer
+            example: 1
+      description: Add authenticated user to class by id for subject by id
+      responses:
+        204:
+          description: Successfully added authenticated user to class by id for subject by id
+    delete:
+      security:
+        - bearerJWT: [ ]
+      tags:
+        - Subject
+      parameters:
+        - in: path
+          name: subjectId
+          required: true
+          schema:
+            type: integer
+            example: 1
+        - in: path
+          name: classId
+          required: true
+          schema:
+            type: integer
+            example: 1
+      description: Remove authenticated user to class by id for subject by id
+      responses:
+        204:
+          description: Successfully removed authenticated user to class by id for subject by id
+  /api/subject/{subjectId}/classes/{classId}/lectures:
+    get:
+      security:
+        - bearerJWT: [ ]
+      tags:
+        - Subject
+      parameters:
+        - in: path
+          name: subjectId
+          required: true
+          schema:
+            type: integer
+            example: 1
+        - in: path
+          name: classId
+          required: true
+          schema:
+            type: integer
+            example: 1
+        - in: query
+          name: offset
+          schema:
+            type: integer
+            default: 0
+          required: false
+          description: Item return list offset
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 20
+          required: false
+          description: Item return list limit
+      description: Retrieve lectures of class by id of subject by id
+      responses:
+        200:
+          description: Successfully retrieve lectures of class by id of subject by id
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/LectureResponse"
+  /auth/register:
+    post:
+      tags:
+        - Auth
+      requestBody:
+        $ref: "#/components/schemas/UserCredentialsRequest"
+      description: Register a new user
+      responses:
+        200:
+          description: Successfully registered a new user and awaiting for email confirmation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RegisterResponse"
+  /auth/login:
+    post:
+      tags:
+        - Auth
+      requestBody:
+        $ref: "#/components/schemas/LoginCredentialsRequest"
+      description: Login an user
+      responses:
+        200:
+          description: Successfully logged in an user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginResponse"
+  /auth/verifyAccount:
+    put:
+      tags:
+        - Auth
+      parameters:
+        - in: query
+          name: token
+          schema:
+            type: string
+            example: UUID token
+      description: Verify a new student user
+      responses:
+        204:
+          description: Successfully verified and registered a new user
 components:
   schemas:
     ChangePassword:
