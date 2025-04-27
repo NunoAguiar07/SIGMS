@@ -7,6 +7,16 @@ import isel.leic.group25.api.jwt.getUserIdFromPrincipal
 import isel.leic.group25.api.jwt.getUserRoleFromPrincipal
 import isel.leic.group25.services.UserClassService
 
+/**
+ * Defines the schedule retrieval route for authenticated users.
+ *
+ * This endpoint returns the class schedule for the current user based on their role
+ * (either as a student or teacher). The schedule includes all classes and lectures
+ * associated with the user.
+ *
+ * @receiver Route The Ktor route to which this endpoint will be added
+ * @param userClassService Service handling user-class relationships and schedule logic
+ */
 fun Route.scheduleRoutes(
     userClassService: UserClassService
 ) {

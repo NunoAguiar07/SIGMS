@@ -12,6 +12,13 @@ import isel.leic.group25.api.model.response.LectureResponse
 import isel.leic.group25.db.entities.types.Role
 import isel.leic.group25.services.LectureService
 
+/**
+ * Defines lecture management routes including creation, retrieval, updating and deletion.
+ * Routes have role-based access control with different operations available to different roles.
+ *
+ * @receiver Route The Ktor route to which these endpoints will be added
+ * @param lectureService Service handling lecture business logic
+ */
 fun Route.lectureRoutes(lectureService: LectureService) {
     route("/lectures") {
         getAllLecturesRoute(lectureService)
@@ -25,6 +32,12 @@ fun Route.lectureRoutes(lectureService: LectureService) {
     }
 }
 
+/**
+ * Retrieves all lectures with optional pagination parameters.
+ *
+ * @receiver Route The Ktor route for this endpoint
+ * @param lectureService Service handling lecture retrieval logic
+ */
 fun Route.getAllLecturesRoute(lectureService: LectureService) {
     get {
         val limit = call.queryParameters["limit"]
@@ -40,6 +53,12 @@ fun Route.getAllLecturesRoute(lectureService: LectureService) {
     }
 }
 
+/**
+ * Creates a new lecture. Requires ADMIN role.
+ *
+ * @receiver Route The Ktor route for this endpoint
+ * @param lectureService Service handling lecture creation logic
+ */
 fun Route.createLectureRoute(lectureService: LectureService) {
     post {
         val lectureRequest = call.receive<LectureRequest>()
@@ -62,6 +81,12 @@ fun Route.createLectureRoute(lectureService: LectureService) {
     }
 }
 
+/**
+ * Updates an existing lecture. Available to ADMIN and TEACHER roles.
+ *
+ * @receiver Route The Ktor route for this endpoint
+ * @param lectureService Service handling lecture update logic
+ */
 fun Route.updateLectureRoute(lectureService: LectureService) {
     put {
         val updateLectureRequest = call.receive<UpdateLectureRequest>()
@@ -89,6 +114,12 @@ fun Route.updateLectureRoute(lectureService: LectureService) {
     }
 }
 
+/**
+ * Deletes a lecture. Requires ADMIN role.
+ *
+ * @receiver Route The Ktor route for this endpoint
+ * @param lectureService Service handling lecture deletion logic
+ */
 fun Route.deleteLectureRoute(lectureService: LectureService) {
     delete {
         val lectureRequest = call.receive<LectureRequest>()

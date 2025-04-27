@@ -4,7 +4,7 @@ POST {{baseUrl}}/auth/register
 Content-Type: application/json
 
 {
-  "email": "antonioStudent2@gmail.com",
+  "email": "antonioStudent6@gmail.com",
   "username": "Antonio_123",
   "password": "Antonio_123",
   "role": "student"
@@ -21,7 +21,7 @@ Content-Type: application/json
 }
 
 ###
-PUT {{baseUrl}}/auth/verifyAccount?token=fb0d707d-2e0c-432d-ab66-b379c8ff207e
+PUT {{baseUrl}}/auth/verifyAccount?token=6c50d37a-67a4-4e8d-8ebc-2b545e7b0f2b
 
 ###
 GET {{baseUrl}}/assessRole

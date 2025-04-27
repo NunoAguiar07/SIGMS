@@ -21,6 +21,20 @@ import isel.leic.group25.services.LectureService
 import isel.leic.group25.services.RoomService
 import isel.leic.group25.services.TeacherRoomService
 
+/**
+ * Defines all room-related routes including:
+ * - Room management (CRUD operations)
+ * - Teacher-office assignments
+ * - Room lectures
+ * - Room issue reporting
+ *
+ * Routes have role-based access control with different operations available to different roles.
+ *
+ * @param roomService Service handling room operations
+ * @param lectureService Service handling lecture operations
+ * @param issuesReportService Service handling issue reports
+ * @param teacherRoomService Service handling teacher-room assignments
+ */
 fun Route.roomRoutes(
     roomService: RoomService,
     lectureService: LectureService,
@@ -29,13 +43,20 @@ fun Route.roomRoutes(
 ) {
     route("/rooms") {
         baseRoomRoutes(roomService)
-        teacherOfficeRoutes(teacherRoomService)
+        withRole(Role.ADMIN){
+            teacherOfficeRoutes(teacherRoomService)
+        }
         specificRoomRoutes(roomService)
         roomLecturesRoutes(lectureService)
         roomIssuesRoutes(issuesReportService)
     }
 }
 
+/**
+ * Defines basic room operations including:
+ * - Listing all rooms (public)
+ * - Creating new rooms (admin only)
+ */
 fun Route.baseRoomRoutes(roomService: RoomService) {
     get {
         val limit = call.queryParameters["limit"]
@@ -47,23 +68,29 @@ fun Route.baseRoomRoutes(roomService: RoomService) {
             transformSuccess = { rooms -> rooms.map { RoomResponse.from(it) } }
         )
     }
-
-    post {
-        val roomRequest = call.receive<RoomRequest>()
-        val result = roomService.createRoom(
-            name = roomRequest.name,
-            capacity = roomRequest.capacity,
-            type = roomRequest.type
-        )
-        call.respondEither(
-            either = result,
-            transformError = { error -> error.toProblem() },
-            transformSuccess = { room -> RoomResponse.from(room) },
-            successStatus = HttpStatusCode.Created
-        )
+    withRole(Role.ADMIN){
+        post {
+            val roomRequest = call.receive<RoomRequest>()
+            val result = roomService.createRoom(
+                name = roomRequest.name,
+                capacity = roomRequest.capacity,
+                type = roomRequest.type
+            )
+            call.respondEither(
+                either = result,
+                transformError = { error -> error.toProblem() },
+                transformSuccess = { room -> RoomResponse.from(room) },
+                successStatus = HttpStatusCode.Created
+            )
+        }
     }
 }
 
+/**
+ * Handles teacher-office assignment operations (admin only)
+ * - Assign teacher to office
+ * - Remove teacher from office
+ */
 fun Route.teacherOfficeRoutes(teacherRoomService: TeacherRoomService) {
     route("/offices/{roomId}/teachers") {
         put {
@@ -96,6 +123,12 @@ fun Route.teacherOfficeRoutes(teacherRoomService: TeacherRoomService) {
     }
 }
 
+/**
+ * Handles operations for specific rooms:
+ * - Get room details (public)
+ * - Update room (admin only)
+ * - Delete room (admin only)
+ */
 fun Route.specificRoomRoutes(roomService: RoomService) {
     route("/{roomId}") {
         get {
@@ -107,34 +140,39 @@ fun Route.specificRoomRoutes(roomService: RoomService) {
                 transformSuccess = { room -> RoomResponse.from(room) }
             )
         }
+        withRole(Role.ADMIN){
+            delete {
+                val id = call.parameters["roomId"] ?: return@delete call.respond(HttpStatusCode.BadRequest)
+                val result = roomService.deleteRoom(id)
+                call.respondEither(
+                    either = result,
+                    transformError = { error -> error.toProblem() },
+                    transformSuccess = { HttpStatusCode.NoContent }
+                )
+            }
 
-        delete {
-            val id = call.parameters["roomId"] ?: return@delete call.respond(HttpStatusCode.BadRequest)
-            val result = roomService.deleteRoom(id)
-            call.respondEither(
-                either = result,
-                transformError = { error -> error.toProblem() },
-                transformSuccess = { HttpStatusCode.NoContent }
-            )
-        }
-
-        put {
-            val id = call.parameters["roomId"] ?: return@put call.respond(HttpStatusCode.BadRequest)
-            val roomRequest = call.receive<RoomRequest>()
-            val result = roomService.updateRoom(
-                id = id,
-                name = roomRequest.name,
-                capacity = roomRequest.capacity
-            )
-            call.respondEither(
-                either = result,
-                transformError = { error -> error.toProblem() },
-                transformSuccess = { room -> RoomResponse.from(room) }
-            )
+            put {
+                val id = call.parameters["roomId"] ?: return@put call.respond(HttpStatusCode.BadRequest)
+                val roomRequest = call.receive<RoomRequest>()
+                val result = roomService.updateRoom(
+                    id = id,
+                    name = roomRequest.name,
+                    capacity = roomRequest.capacity
+                )
+                call.respondEither(
+                    either = result,
+                    transformError = { error -> error.toProblem() },
+                    transformSuccess = { room -> RoomResponse.from(room) }
+                )
+            }
         }
     }
 }
 
+/**
+ * Handles lecture-related operations for specific rooms:
+ * - Get all lectures scheduled in a room (public)
+ */
 fun Route.roomLecturesRoutes(lectureService: LectureService) {
     route("/{roomId}/lectures") {
         get {
@@ -151,6 +189,12 @@ fun Route.roomLecturesRoutes(lectureService: LectureService) {
     }
 }
 
+/**
+ * Handles room issue reporting and management:
+ * - Get all issues (public)
+ * - Create new issue (authenticated users)
+ * - Issue CRUD operations (technical service only)
+ */
 fun Route.roomIssuesRoutes(issuesReportService: IssuesReportService) {
     route("/{roomId}/issues") {
         get {
@@ -181,13 +225,21 @@ fun Route.roomIssuesRoutes(issuesReportService: IssuesReportService) {
             )
         }
 
-        route("{issueId}") {
+        route("/{issueId}") {
             issueCrudRoutes(issuesReportService)
-            issueAssignmentRoutes(issuesReportService)
+            withRole(Role.TECHNICAL_SERVICE){
+                issueAssignmentRoutes(issuesReportService)
+            }
         }
     }
 }
 
+/**
+ * Handles basic issue operations:
+ * - Get issue details (public)
+ * - Update issue (technical service only)
+ * - Delete issue (technical service only)
+ */
 fun Route.issueCrudRoutes(issuesReportService: IssuesReportService) {
     get {
         val id = call.parameters["issueId"] ?: return@get call.respond(HttpStatusCode.BadRequest)
@@ -210,25 +262,27 @@ fun Route.issueCrudRoutes(issuesReportService: IssuesReportService) {
                 transformSuccess = { HttpStatusCode.NoContent }
             )
         }
-    }
-
-    put {
-        val role = call.getUserRoleFromPrincipal()
-        val id = call.parameters["issueId"]
-        val issueRequest = call.receive<IssueReportRequest>()
-        val result = issuesReportService.updateIssueReport(
-            id = id,
-            description = issueRequest.description,
-            role = role
-        )
-        call.respondEither(
-            either = result,
-            transformError = { error -> error.toProblem() },
-            transformSuccess = { issue -> IssueReportResponse.from(issue) }
-        )
+        put {
+            val role = call.getUserRoleFromPrincipal()
+            val id = call.parameters["issueId"]
+            val issueRequest = call.receive<IssueReportRequest>()
+            val result = issuesReportService.updateIssueReport(
+                id = id,
+                description = issueRequest.description,
+                role = role
+            )
+            call.respondEither(
+                either = result,
+                transformError = { error -> error.toProblem() },
+                transformSuccess = { issue -> IssueReportResponse.from(issue) }
+            )
+        }
     }
 }
 
+/**
+ * Handles technician assignment to issues (technical service only)
+ */
 fun Route.issueAssignmentRoutes(issuesReportService: IssuesReportService) {
     route("/assign") {
         put {

@@ -11,6 +11,17 @@ import isel.leic.group25.api.exceptions.respondEither
 import isel.leic.group25.api.jwt.getUserIdFromPrincipal
 import isel.leic.group25.services.UserService
 
+/**
+ * Defines user profile management routes including:
+ * - Profile retrieval
+ * - Profile updates
+ * - Password changes
+ *
+ * All endpoints require authenticated user access.
+ *
+ * @receiver Route The Ktor route to which these endpoints will be added
+ * @param userService Service handling user profile operations
+ */
 fun Route.profileRoutes(userService: UserService) {
     route("/profile") {
         getProfileRoute(userService)
@@ -19,6 +30,13 @@ fun Route.profileRoutes(userService: UserService) {
     }
 }
 
+/**
+ * Retrieves the current user's profile information.
+ * Requires valid authentication.
+ *
+ * @receiver Route The Ktor route for this endpoint
+ * @param userService Service handling user data retrieval
+ */
 fun Route.getProfileRoute(userService: UserService) {
     get {
         val userId = call.getUserIdFromPrincipal() ?: return@get call.respond(HttpStatusCode.Unauthorized)
@@ -33,6 +51,13 @@ fun Route.getProfileRoute(userService: UserService) {
     }
 }
 
+/**
+ * Updates the current user's profile information.
+ * Requires valid authentication.
+ *
+ * @receiver Route The Ktor route for this endpoint
+ * @param userService Service handling profile updates
+ */
 fun Route.updateProfileRoute(userService: UserService) {
     put {
         val userId = call.getUserIdFromPrincipal() ?: return@put call.respond(HttpStatusCode.Unauthorized)
@@ -52,6 +77,13 @@ fun Route.updateProfileRoute(userService: UserService) {
     }
 }
 
+/**
+ * Changes the current user's password.
+ * Requires valid authentication and current password verification.
+ *
+ * @receiver Route The Ktor route for this endpoint
+ * @param userService Service handling password changes
+ */
 fun Route.changePasswordRoute(userService: UserService) {
     post("/password") {
         val userId = call.getUserIdFromPrincipal() ?: return@post call.respond(HttpStatusCode.Unauthorized)

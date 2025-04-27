@@ -4,6 +4,8 @@ import io.ktor.http.*
 import io.ktor.server.request.*
 import io.ktor.server.routing.*
 import isel.leic.group25.api.exceptions.respondEither
+import isel.leic.group25.api.http.utils.withRole
+import isel.leic.group25.api.http.utils.withRoles
 import isel.leic.group25.api.jwt.getUserIdFromPrincipal
 import isel.leic.group25.api.jwt.getUserRoleFromPrincipal
 import isel.leic.group25.api.model.request.ClassRequest
@@ -11,11 +13,26 @@ import isel.leic.group25.api.model.request.SubjectRequest
 import isel.leic.group25.api.model.response.ClassResponse
 import isel.leic.group25.api.model.response.LectureResponse
 import isel.leic.group25.api.model.response.SubjectResponse
+import isel.leic.group25.db.entities.types.Role
 import isel.leic.group25.services.ClassService
 import isel.leic.group25.services.LectureService
 import isel.leic.group25.services.SubjectService
 import isel.leic.group25.services.UserClassService
 
+/**
+ * Defines all subject-related routes including:
+ * - Subject management (CRUD operations)
+ * - Class management within subjects
+ * - User enrollment in classes
+ * - Class lecture scheduling
+ *
+ * Routes have role-based access control with different operations available to different roles.
+ *
+ * @param subjectService Service handling subject operations
+ * @param classService Service handling class operations
+ * @param usersClassService Service handling user-class relationships
+ * @param lectureService Service handling lecture scheduling
+ */
 fun Route.subjectRoutes(
     subjectService: SubjectService,
     classService: ClassService,
@@ -29,12 +46,19 @@ fun Route.subjectRoutes(
 
         route("/{subjectId}/classes/{classId}") {
             classManagementRoutes(classService)
-            classUserRoutes(usersClassService)
+            withRoles(setOf(Role.TEACHER, Role.STUDENT)){
+                classUserRoutes(usersClassService)
+            }
             classLecturesRoutes(lectureService)
         }
     }
 }
 
+/**
+ * Handles basic subject operations:
+ * - List all subjects (public)
+ * - Create new subject (admin only)
+ */
 fun Route.baseSubjectRoutes(subjectService: SubjectService) {
     get {
         val limit = call.queryParameters["limit"]
@@ -49,22 +73,30 @@ fun Route.baseSubjectRoutes(subjectService: SubjectService) {
         )
     }
 
-    post {
-        val subjectRequest = call.receive<SubjectRequest>()
-        val result = subjectService.createSubject(
-            name = subjectRequest.name
-        )
-        call.respondEither(
-            either = result,
-            transformError = { error -> error.toProblem() },
-            transformSuccess = { subject ->
-                SubjectResponse.fromSubject(subject)
-            },
-            successStatus = HttpStatusCode.Created
-        )
+    withRole(Role.ADMIN){
+        post {
+            val subjectRequest = call.receive<SubjectRequest>()
+            val result = subjectService.createSubject(
+                name = subjectRequest.name
+            )
+            call.respondEither(
+                either = result,
+                transformError = { error -> error.toProblem() },
+                transformSuccess = { subject ->
+                    SubjectResponse.fromSubject(subject)
+                },
+                successStatus = HttpStatusCode.Created
+            )
+        }
     }
+
 }
 
+/**
+ * Handles operations for specific subjects:
+ * - Get subject details (public)
+ * - Delete subject (admin only)
+ */
 fun Route.specificSubjectRoutes(subjectService: SubjectService) {
     route("/{subjectId}") {
         get {
@@ -79,20 +111,27 @@ fun Route.specificSubjectRoutes(subjectService: SubjectService) {
             )
         }
 
-        delete {
-            val id = call.parameters["subjectId"]
-            val result = subjectService.deleteSubject(id)
-            call.respondEither(
-                either = result,
-                transformError = { error -> error.toProblem() },
-                transformSuccess = {
-                    HttpStatusCode.NoContent
-                }
-            )
+        withRole(Role.ADMIN){
+            delete {
+                val id = call.parameters["subjectId"]
+                val result = subjectService.deleteSubject(id)
+                call.respondEither(
+                    either = result,
+                    transformError = { error -> error.toProblem() },
+                    transformSuccess = {
+                        HttpStatusCode.NoContent
+                    }
+                )
+            }
         }
     }
 }
 
+/**
+ * Handles class operations within subjects:
+ * - List all classes for a subject (public)
+ * - Create new class (admin only)
+ */
 fun Route.subjectClassesRoutes(classService: ClassService) {
     route("/{subjectId}/classes") {
         get {
@@ -109,25 +148,31 @@ fun Route.subjectClassesRoutes(classService: ClassService) {
             )
         }
 
-        post {
-            val id = call.parameters["subjectId"]
-            val classRequest = call.receive<ClassRequest>()
-            val result = classService.createClass(
-                name = classRequest.name,
-                subjectId = id
-            )
-            call.respondEither(
-                either = result,
-                transformError = { error -> error.toProblem() },
-                transformSuccess = { schoolClass ->
-                    ClassResponse.fromClass(schoolClass)
-                },
-                successStatus = HttpStatusCode.Created
-            )
+        withRole(Role.ADMIN){
+            post {
+                val id = call.parameters["subjectId"]
+                val classRequest = call.receive<ClassRequest>()
+                val result = classService.createClass(
+                    name = classRequest.name,
+                    subjectId = id
+                )
+                call.respondEither(
+                    either = result,
+                    transformError = { error -> error.toProblem() },
+                    transformSuccess = { schoolClass ->
+                        ClassResponse.fromClass(schoolClass)
+                    },
+                    successStatus = HttpStatusCode.Created
+                )
+            }
         }
     }
 }
 
+/**
+ * Handles operations for specific classes:
+ * - Get class details (public)
+ */
 fun Route.classManagementRoutes(classService: ClassService) {
     route("/{classId}") {
         get {
@@ -144,6 +189,11 @@ fun Route.classManagementRoutes(classService: ClassService) {
     }
 }
 
+/**
+ * Handles user enrollment in classes:
+ * - Add user to class (teacher/student only)
+ * - Remove user from class (teacher/student only)
+ */
 fun Route.classUserRoutes(usersClassService: UserClassService) {
     route("/users") {
         post {
@@ -176,6 +226,10 @@ fun Route.classUserRoutes(usersClassService: UserClassService) {
     }
 }
 
+/**
+ * Handles lecture operations for classes:
+ * - List all lectures for a class (public)
+ */
 fun Route.classLecturesRoutes(lectureService: LectureService) {
     route("/lectures") {
         get {

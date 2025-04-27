@@ -11,16 +11,28 @@ import io.ktor.server.routing.*
 import isel.leic.group25.api.exceptions.respondEither
 import isel.leic.group25.services.AuthService
 
+/**
+ * Defines authentication-related routes including registration, login, and account verification.
+ *
+ * @receiver Route The Ktor route to which these endpoints will be added
+ * @param authService The authentication service handling business logic
+ */
 fun Route.authRoutes(authService: AuthService) {
     route("/auth") {
         registerRoute(authService)
         loginRoute(authService)
-        route("verifyAccount") {
+        route("/verifyAccount") {
             accountVerificationRoute(authService)
         }
     }
 }
 
+/**
+ * Handles user registration endpoint.
+ *
+ * @receiver Route The Ktor route for this endpoint
+ * @param authService The authentication service handling registration logic
+ */
 fun Route.registerRoute(authService: AuthService) {
     post("/register") {
         val credentials = call.receive<UserCredentialsRequest>()
@@ -46,6 +58,13 @@ fun Route.registerRoute(authService: AuthService) {
     }
 }
 
+
+/**
+ * Handles user login endpoint.
+ *
+ * @receiver Route The Ktor route for this endpoint
+ * @param authService The authentication service handling login logic
+ */
 fun Route.loginRoute(authService: AuthService) {
     post("/login") {
         val credentials = call.receive<LoginCredentialsRequest>()
@@ -63,8 +82,14 @@ fun Route.loginRoute(authService: AuthService) {
     }
 }
 
+/**
+ * Handles account verification endpoint for the student using email token.
+ *
+ * @receiver Route The Ktor route for this endpoint
+ * @param authService The authentication service handling verification logic
+ */
 fun Route.accountVerificationRoute(authService: AuthService) {
-    put("/verifyAccount") {
+    put {
         val token = call.request.queryParameters["token"] ?: return@put call.respond(HttpStatusCode.BadRequest)
         val result = authService.verifyStudentAccount(token)
         call.respondEither(
