@@ -3,7 +3,7 @@ package isel.leic.group25.db.tables.timetables
 import isel.leic.group25.db.entities.timetables.Lecture
 import isel.leic.group25.db.entities.types.ClassType
 import isel.leic.group25.db.entities.types.WeekDay
-import isel.leic.group25.db.tables.rooms.Rooms
+import isel.leic.group25.db.tables.rooms.Classrooms
 import isel.leic.group25.utils.hoursAndMinutesToDuration
 import isel.leic.group25.utils.toHoursAndMinutes
 import org.ktorm.schema.Table
@@ -15,7 +15,7 @@ import java.time.format.DateTimeFormatter
 
 object Lectures: Table<Lecture>("lecture") {
     val classId = int("class_id").references(Classes){ it.schoolClass }
-    val roomId = int("room_id").references(Rooms){ it.room }
+    val roomId = int("room_id").references(Classrooms){ it.classroom }
     val type = varchar("class_type").transform({ ClassType.valueOf(it.uppercase()) }, {it.name.lowercase()}).bindTo { it.type }
     val weekDay = int("week_day").transform({ WeekDay.fromValue(it)},{it.value}).bindTo { it.weekDay }
     val startTime = time("start_time").transform({ "${it.hour}:${it.minute}".hoursAndMinutesToDuration() },{

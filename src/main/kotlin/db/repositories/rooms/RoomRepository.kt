@@ -4,11 +4,13 @@ import isel.leic.group25.db.entities.rooms.Classroom
 import isel.leic.group25.db.entities.rooms.OfficeRoom
 import isel.leic.group25.db.entities.rooms.Room
 import isel.leic.group25.db.entities.rooms.StudyRoom
+import isel.leic.group25.db.entities.users.Teacher
 import isel.leic.group25.db.repositories.rooms.interfaces.RoomRepositoryInterface
 import isel.leic.group25.db.tables.Tables.Companion.classrooms
 import isel.leic.group25.db.tables.Tables.Companion.officeRooms
 import isel.leic.group25.db.tables.Tables.Companion.rooms
 import isel.leic.group25.db.tables.Tables.Companion.studyRooms
+import isel.leic.group25.db.tables.Tables.Companion.teachers
 import org.ktorm.database.Database
 import org.ktorm.dsl.eq
 import org.ktorm.entity.*
@@ -24,6 +26,14 @@ class RoomRepository (private val database: Database) : RoomRepositoryInterface 
 
     override fun getRoomById(id: Int): Room? {
         return database.rooms.firstOrNull { it.id eq id }
+    }
+
+    override fun getOfficeRoomById(id: Int): OfficeRoom? {
+        return database.officeRooms.firstOrNull { it.id eq id }
+    }
+
+    override fun getClassRoomById(id: Int): Classroom? {
+        return database.classrooms.firstOrNull { it.id eq id }
     }
 
     override fun createRoom(capacity: Int, name: String): Room {
@@ -66,6 +76,18 @@ class RoomRepository (private val database: Database) : RoomRepositoryInterface 
         room.capacity = capacity
         database.rooms.update(room)
         return room
+    }
+
+    override fun addTeacherToOffice(teacher: Teacher, office: OfficeRoom) : Teacher{
+        teacher.office = office
+        database.teachers.update(teacher)
+        return teacher
+    }
+
+    override fun removeTeacherFromOffice(teacher: Teacher, office: OfficeRoom): Teacher {
+        teacher.office = null
+        database.teachers.update(teacher)
+        return teacher
     }
 
 }

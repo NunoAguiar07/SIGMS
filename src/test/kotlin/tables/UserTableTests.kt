@@ -54,6 +54,7 @@ class UserTableTests {
             
             CREATE TABLE IF NOT EXISTS TEACHER (
                  user_id INT UNIQUE NOT NULL REFERENCES USERS(id) ON DELETE CASCADE,
+                 office_id INT DEFAULT NULL REFERENCES OFFICE_ROOM(id) ON DELETE SET NULL,
                  primary key (user_id)
             );
             

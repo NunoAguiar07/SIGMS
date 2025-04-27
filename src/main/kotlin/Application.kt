@@ -57,6 +57,7 @@ fun Application.module() {
     val studentRepository = StudentRepository(db)
     val teacherRepository = TeacherRepository(db)
     val adminRepository = AdminRepository(db)
+    val technicalServiceRepository = TechnicalServiceRepository(db)
     val roleApprovalRepository = RoleApprovalRepository(db)
     val classRepository = ClassRepository(db)
     val subjectRepository = SubjectRepository(db)
@@ -66,13 +67,14 @@ fun Application.module() {
 
     val classService = ClassService(classRepository, subjectRepository, kTransaction)
     val userService = UserService(userRepository, kTransaction)
+    val teacherRoomService = TeacherRoomService(teacherRepository, roomRepository, kTransaction)
     val emailService = SmtpEmailService(emailConfig)
     val authService = AuthService(userRepository, adminRepository, roleApprovalRepository, kTransaction, jwtConfig, emailService, frontendUrl)
     val subjectService = SubjectService(subjectRepository, kTransaction)
     val userClassService = UserClassService(userRepository, studentRepository, teacherRepository, classRepository, lectureRepository, kTransaction)
     val roomService = RoomService(roomRepository, kTransaction)
     val lectureService = LectureService(lectureRepository, kTransaction, classRepository, roomRepository)
-    val issueReportService = IssuesReportService(issueReportRepository, kTransaction, roomRepository)
+    val issueReportService = IssuesReportService(issueReportRepository, userRepository, technicalServiceRepository, kTransaction, roomRepository)
 
     install(Authentication) {
         jwt("auth-jwt") {
@@ -81,7 +83,9 @@ fun Application.module() {
                 jwtConfig.buildVerifier()
             )
             validate { credential ->
-                if (credential.payload.getClaim("userId").asInt() != null) {
+                val userId = credential.payload.getClaim("userId").asInt()
+                val role = credential.payload.getClaim("role").asString()
+                if (userId != null && role != null) {
                     JWTPrincipal(credential.payload)
                 } else {
                     null
@@ -98,5 +102,5 @@ fun Application.module() {
         maxFrameSize = Long.MAX_VALUE
         masking = false
     }
-    configureRouting(userService, authService, classService, userClassService, subjectService, roomService, lectureService, issueReportService)
+    configureRouting(userService, teacherRoomService, authService, classService, userClassService, subjectService, roomService, lectureService, issueReportService)
 }

@@ -1,0 +1,34 @@
+
+###
+GET {{baseUrl}}/subjects
+Authorization: Bearer {{token}}
+
+###
+POST {{baseUrl}}/subjects
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "CDI"
+}
+
+###
+GET {{baseUrl}}/subjects/1
+Authorization: Bearer {{token}}
+
+###
+GET {{baseUrl}}/subjects/1/classes
+Authorization: Bearer {{token}}
+
+###
+POST {{baseUrl}}/subjects/2/classes
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "LEIC51D"
+}
+
+###
+GET {{baseUrl}}/subjects/1/classes/1/lectures
+Authorization: Bearer {{token}}

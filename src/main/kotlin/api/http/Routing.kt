@@ -10,6 +10,7 @@ import isel.leic.group25.websockets.hardware.route.DeviceRoute
 
 fun Application.configureRouting(
     userService: UserService,
+    teacherRoomService: TeacherRoomService,
     authService: AuthService,
     classService: ClassService,
     userClassService: UserClassService,
@@ -25,6 +26,7 @@ fun Application.configureRouting(
             authenticatedRoutes(
                 authService,
                 userService,
+                teacherRoomService,
                 classService,
                 userClassService,
                 subjectService,

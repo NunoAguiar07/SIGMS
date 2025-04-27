@@ -1,0 +1,10 @@
+
+###
+POST {{baseUrl}}/subjects/1/classes/1/users
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+###
+DELETE {{baseUrl}}/subjects/1/classes/1/users
+Authorization: Bearer {{token}}
+Content-Type: application/json

@@ -1,6 +1,6 @@
 package mocks.repositories.timetables
 
-import isel.leic.group25.db.entities.rooms.Room
+import isel.leic.group25.db.entities.rooms.Classroom
 import isel.leic.group25.db.entities.timetables.Lecture
 import isel.leic.group25.db.entities.timetables.Class
 import isel.leic.group25.db.entities.types.ClassType
@@ -21,7 +21,7 @@ class MockLectureRepository : LectureRepositoryInterface {
 
     override fun getLecture(
         schoolClass: Class,
-        room: Room,
+        classroom: Classroom,
         type: ClassType,
         weekDay: WeekDay,
         startTime: Duration,
@@ -29,7 +29,7 @@ class MockLectureRepository : LectureRepositoryInterface {
     ): Lecture? {
         return lectures.firstOrNull {
             it.schoolClass.id == schoolClass.id &&
-                    it.room.id == room.id &&
+                    it.classroom.room.id == classroom.room .id &&
                     it.type == type &&
                     it.weekDay == weekDay &&
                     it.startTime == startTime &&
@@ -39,7 +39,7 @@ class MockLectureRepository : LectureRepositoryInterface {
 
     override fun createLecture(
         schoolClass: Class,
-        room: Room,
+        classroom: Classroom,
         type: ClassType,
         weekDay: WeekDay,
         startTime: Duration,
@@ -47,7 +47,7 @@ class MockLectureRepository : LectureRepositoryInterface {
     ): Lecture {
         val newLecture = Lecture {
             this.schoolClass = schoolClass
-            this.room = room
+            this.classroom = classroom
             this.type = type
             this.weekDay = weekDay
             this.startTime = startTime
@@ -58,7 +58,7 @@ class MockLectureRepository : LectureRepositoryInterface {
     }
 
     override fun getLecturesByRoom(roomId: Int, limit: Int, offSet: Int): List<Lecture> {
-        return lectures.filter { it.room.id == roomId }
+        return lectures.filter { it.classroom.room.id == roomId }
             .drop(offSet)
             .take(limit)
     }
@@ -76,7 +76,7 @@ class MockLectureRepository : LectureRepositoryInterface {
     override fun deleteLecture(lecture: Lecture): Boolean {
         return lectures.removeIf {
                    it.schoolClass == lecture.schoolClass &&
-                    it.room == lecture.room &&
+                    it.classroom == lecture.classroom &&
                     it.type == lecture.type &&
                     it.startTime == lecture.startTime &&
                     it.endTime == lecture.endTime
@@ -86,7 +86,7 @@ class MockLectureRepository : LectureRepositoryInterface {
     override fun updateLecture(
         lecture: Lecture,
         newSchoolClass: Class,
-        newRoom: Room,
+        newClassroom: Classroom,
         newType: ClassType,
         newWeekDay: WeekDay,
         newStartTime: Duration,
@@ -94,7 +94,7 @@ class MockLectureRepository : LectureRepositoryInterface {
     ): Lecture {
         return lecture.apply {
             schoolClass = newSchoolClass
-            room = newRoom
+            classroom = classroom
             type = newType
             weekDay = newWeekDay
             startTime = newStartTime

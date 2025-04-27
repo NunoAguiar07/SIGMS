@@ -13,6 +13,7 @@ import isel.leic.group25.db.repositories.timetables.SubjectRepository
 import repositories.DatabaseTestSetup
 import kotlin.test.AfterTest
 import kotlin.test.Test
+import kotlin.test.assertNotNull
 import kotlin.time.Duration.Companion.minutes
 
 class LectureRepositoryTest {
@@ -45,9 +46,12 @@ class LectureRepositoryTest {
             val newSubject = subjectRepository.createSubject(subject1.name)
             val newClass = classRepository.addClass(clazz.name, newSubject)
             val newRoom = roomRepository.createRoom(room.capacity,room.name)
+            roomRepository.createClassRoom(newRoom)
+            val newClassroom = roomRepository.getClassRoomById(newRoom.id)
+            assertNotNull(newClassroom)
             val newLecture = lectureRepository.createLecture(
                 schoolClass = newClass,
-                room = newRoom,
+                classroom = newClassroom,
                 type = ClassType.THEORETICAL,
                 weekDay = WeekDay.MONDAY,
                 startTime = 9.minutes,
@@ -56,7 +60,7 @@ class LectureRepositoryTest {
             val foundLecture = lectureRepository.getAllLectures().firstOrNull { it == newLecture }
             assert(foundLecture != null)
             assert(foundLecture?.schoolClass == newLecture.schoolClass)
-            assert(foundLecture?.room == newLecture.room)
+            assert(foundLecture?.classroom == newLecture.classroom)
             assert(foundLecture?.type == newLecture.type)
             assert(foundLecture?.weekDay == newLecture.weekDay)
             assert(foundLecture?.startTime == newLecture.startTime)
@@ -82,9 +86,12 @@ class LectureRepositoryTest {
             val newSubject = subjectRepository.createSubject(subject1.name)
             val newClass = classRepository.addClass(clazz.name, newSubject)
             val newRoom = roomRepository.createRoom(room.capacity,room.name)
+            roomRepository.createClassRoom(newRoom)
+            val newClassroom = roomRepository.getClassRoomById(newRoom.id)
+            assertNotNull(newClassroom)
             val newLecture = lectureRepository.createLecture(
                 schoolClass = newClass,
-                room = newRoom,
+                classroom = newClassroom,
                 type = ClassType.THEORETICAL,
                 weekDay = WeekDay.MONDAY,
                 startTime = 9.minutes,
@@ -93,7 +100,7 @@ class LectureRepositoryTest {
             val foundLecture = lectureRepository.getLecturesByClass(newClass.id, 10, 0).firstOrNull { it == newLecture }
             assert(foundLecture != null)
             assert(foundLecture?.schoolClass == newLecture.schoolClass)
-            assert(foundLecture?.room == newLecture.room)
+            assert(foundLecture?.classroom == newLecture.classroom)
             assert(foundLecture?.type == newLecture.type)
             assert(foundLecture?.weekDay == newLecture.weekDay)
             assert(foundLecture?.startTime == newLecture.startTime)
@@ -119,9 +126,12 @@ class LectureRepositoryTest {
             val newSubject = subjectRepository.createSubject(subject1.name)
             val newClass = classRepository.addClass(clazz.name, newSubject)
             val newRoom = roomRepository.createRoom(room.capacity,room.name)
+            roomRepository.createClassRoom(newRoom)
+            val newClassroom = roomRepository.getClassRoomById(newRoom.id)
+            assertNotNull(newClassroom)
             val newLecture = lectureRepository.createLecture(
                 schoolClass = newClass,
-                room = newRoom,
+                classroom = newClassroom,
                 type = ClassType.THEORETICAL,
                 weekDay = WeekDay.MONDAY,
                 startTime = 9.minutes,
@@ -130,7 +140,7 @@ class LectureRepositoryTest {
             val foundLecture = lectureRepository.getLecturesByRoom(newRoom.id, 10, 0).firstOrNull { it == newLecture }
             assert(foundLecture != null)
             assert(foundLecture?.schoolClass == newLecture.schoolClass)
-            assert(foundLecture?.room == newLecture.room)
+            assert(foundLecture?.classroom == newLecture.classroom)
             assert(foundLecture?.type == newLecture.type)
             assert(foundLecture?.weekDay == newLecture.weekDay)
             assert(foundLecture?.startTime == newLecture.startTime)
@@ -156,9 +166,12 @@ class LectureRepositoryTest {
             val newSubject = subjectRepository.createSubject(subject1.name)
             val newClass = classRepository.addClass(clazz.name, newSubject)
             val newRoom = roomRepository.createRoom(room.capacity,room.name)
+            roomRepository.createClassRoom(newRoom)
+            val newClassroom = roomRepository.getClassRoomById(newRoom.id)
+            assertNotNull(newClassroom)
             val newLecture = lectureRepository.createLecture(
                 schoolClass = newClass,
-                room = newRoom,
+                classroom = newClassroom,
                 type = ClassType.THEORETICAL,
                 weekDay = WeekDay.MONDAY,
                 startTime = 9.minutes,
@@ -167,7 +180,7 @@ class LectureRepositoryTest {
             val foundLecture = lectureRepository.getLecturesByType(ClassType.THEORETICAL).firstOrNull { it == newLecture }
             assert(foundLecture != null)
             assert(foundLecture?.schoolClass == newLecture.schoolClass)
-            assert(foundLecture?.room == newLecture.room)
+            assert(foundLecture?.classroom == newLecture.classroom)
             assert(foundLecture?.type == newLecture.type)
             assert(foundLecture?.weekDay == newLecture.weekDay)
             assert(foundLecture?.startTime == newLecture.startTime)

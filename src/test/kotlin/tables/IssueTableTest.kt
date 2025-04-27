@@ -2,8 +2,10 @@ package tables
 
 import isel.leic.group25.db.entities.issues.IssueReport
 import isel.leic.group25.db.entities.rooms.Room
+import isel.leic.group25.db.entities.users.User
 import isel.leic.group25.db.tables.Tables.Companion.issueReports
 import isel.leic.group25.db.tables.Tables.Companion.rooms
+import isel.leic.group25.db.tables.Tables.Companion.users
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertNull
 import org.h2.jdbcx.JdbcDataSource
@@ -28,6 +30,7 @@ class IssueTableTest {
         RunScript.execute(connection, StringReader("""
             DELETE FROM ISSUE_REPORT;
             DELETE FROM ROOM;
+            DELETE FROM USERS;
             """)
         )
     }
@@ -41,6 +44,19 @@ class IssueTableTest {
         connection = dataSource.connection
         database = Database.connect(dataSource)
         RunScript.execute(connection, StringReader("""
+            CREATE TABLE IF NOT EXISTS USERS (
+                id SERIAL PRIMARY KEY,
+                email VARCHAR(255) UNIQUE NOT NULL,
+                username VARCHAR(255) NOT NULL,
+                password VARCHAR(255) NOT NULL,
+                profile_image VARCHAR(255)
+            );
+            
+            CREATE TABLE IF NOT EXISTS TECHNICAL_SERVICES (
+                user_id INT UNIQUE NOT NULL REFERENCES USERS(id) ON DELETE CASCADE,
+                primary key (user_id)
+            );
+            
             CREATE TABLE IF NOT EXISTS ROOM (
                 id SERIAL PRIMARY KEY,
                 room_name VARCHAR(255) NOT NULL,
@@ -51,6 +67,8 @@ class IssueTableTest {
             CREATE TABLE IF NOT EXISTS ISSUE_REPORT (
                 id SERIAL PRIMARY KEY,
                 room_id INT NOT NULL REFERENCES ROOM(id) ON DELETE CASCADE,
+                created_by INT NOT NULL REFERENCES USERS(id) ON DELETE CASCADE,
+                assigned_to INT DEFAULT NULL REFERENCES TECHNICAL_SERVICES(user_id) ON DELETE SET NULL,
                 description TEXT NOT NULL
             );
         """)
@@ -63,6 +81,17 @@ class IssueTableTest {
             name = "G.0.02"
             capacity = 15
         }.also{ database.rooms.add(it) }
+        // Arrange
+        val testEmail = "teste69mail@email.com"
+        val testUsername = "jhondoe123"
+        val testPassword = "supersecretpassword123"
+        val newUser = User {
+            email = testEmail
+            username = testUsername
+            password = User.hashPassword(testPassword)
+            profileImage = byteArrayOf()
+        }
+        database.users.add(newUser)
         val newIssue = IssueReport {
             room = newRoom
             description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean efficitur ex ac dui dictum " +
@@ -73,6 +102,8 @@ class IssueTableTest {
                     "facilisis at iaculis eget, viverra ac sem. Aenean sagittis diam id aliquet condimentum. " +
                     "Integer accumsan fringilla scelerisque. Duis consectetur pharetra nibh nec faucibus. " +
                     "Praesent consequat aliquam finibus. Fusce quis ante nec mi cursus facilisis. "
+            createdBy = newUser
+            assignedTo = null
         }.also{ database.issueReports.add(it) }
         val issue = database.issueReports.first { it.id eq newIssue.id }
         assertEquals(newIssue.id, issue.id)
@@ -86,6 +117,17 @@ class IssueTableTest {
             name = "G.0.02"
             capacity = 15
         }.also{ database.rooms.add(it) }
+        // Arrange
+        val testEmail = "teste69mail@email.com"
+        val testUsername = "jhondoe123"
+        val testPassword = "supersecretpassword123"
+        val newUser = User {
+            email = testEmail
+            username = testUsername
+            password = User.hashPassword(testPassword)
+            profileImage = byteArrayOf()
+        }
+        database.users.add(newUser)
         val newIssue = IssueReport {
             room = newRoom
             description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean efficitur ex ac dui dictum " +
@@ -96,6 +138,8 @@ class IssueTableTest {
                     "facilisis at iaculis eget, viverra ac sem. Aenean sagittis diam id aliquet condimentum. " +
                     "Integer accumsan fringilla scelerisque. Duis consectetur pharetra nibh nec faucibus. " +
                     "Praesent consequat aliquam finibus. Fusce quis ante nec mi cursus facilisis. "
+            createdBy = newUser
+            assignedTo = null
         }.also{ database.issueReports.add(it) }
         val issue = database.issueReports.first { it.id eq newIssue.id }
         assertEquals(newIssue.id, issue.id)
@@ -115,6 +159,17 @@ class IssueTableTest {
             name = "G.0.02"
             capacity = 15
         }.also{ database.rooms.add(it) }
+        // Arrange
+        val testEmail = "teste69mail@email.com"
+        val testUsername = "jhondoe123"
+        val testPassword = "supersecretpassword123"
+        val newUser = User {
+            email = testEmail
+            username = testUsername
+            password = User.hashPassword(testPassword)
+            profileImage = byteArrayOf()
+        }
+        database.users.add(newUser)
         val newIssue = IssueReport {
             room = newRoom
             description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean efficitur ex ac dui dictum " +
@@ -125,6 +180,8 @@ class IssueTableTest {
                     "facilisis at iaculis eget, viverra ac sem. Aenean sagittis diam id aliquet condimentum. " +
                     "Integer accumsan fringilla scelerisque. Duis consectetur pharetra nibh nec faucibus. " +
                     "Praesent consequat aliquam finibus. Fusce quis ante nec mi cursus facilisis. "
+            createdBy = newUser
+            assignedTo = null
         }.also{ database.issueReports.add(it) }
         newIssue.delete()
         assertNull(database.issueReports.firstOrNull { it.id eq newIssue.id })

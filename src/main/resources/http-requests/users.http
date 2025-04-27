@@ -1,0 +1,25 @@
+@baseUrl = http://localhost:8080/api
+
+###
+GET {{baseUrl}}/profile
+Authorization: Bearer {{token}}
+
+###
+PUT {{baseUrl}}/profile
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "username": "Antonio_124",
+  "image": []
+}
+
+###
+POST {{baseUrl}}/profile/password
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "oldPassword": "Antonio_123",
+  "newPassword": "Antonio_567"
+}

@@ -1,0 +1,4 @@
+###
+GET {{baseUrl}}/schedule
+Authorization: Bearer {{token}}
+Content-Type: application/json
