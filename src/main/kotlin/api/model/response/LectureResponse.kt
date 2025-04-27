@@ -18,7 +18,7 @@ data class LectureResponse(
         fun from(lecture: Lecture): LectureResponse {
             return LectureResponse(
                 schoolClass = ClassResponse.fromClass(lecture.schoolClass),
-                room = RoomResponse.from(lecture.room),
+                room = RoomResponse.from(lecture.classroom.room),
                 type = lecture.type,
                 weekDay = lecture.weekDay,
                 startTime = lecture.startTime.toString(),

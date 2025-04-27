@@ -24,6 +24,9 @@ class MockRoomRepository : RoomRepositoryInterface {
     override fun getOfficeRoomById(id: Int): OfficeRoom? =
         officeRooms.firstOrNull { it.room.id == id }
 
+    override fun getClassRoomById(id: Int): Classroom? =
+        classrooms.firstOrNull { it.room.id == id }
+
 
     override fun createRoom(capacity: Int, name: String): Room {
         val newRoom = Room {

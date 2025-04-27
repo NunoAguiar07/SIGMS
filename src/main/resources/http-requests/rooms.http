@@ -1,0 +1,23 @@
+
+###
+GET {{baseUrl}}/rooms
+Authorization: Bearer {{token}}
+
+###
+GET {{baseUrl}}/rooms/1
+Authorization: Bearer {{token}}
+
+###
+POST {{baseUrl}}/rooms
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "F.2.01",
+  "capacity": 30,
+  "type": "office"
+}
+
+###
+GET {{baseUrl}}/rooms/3/lectures
+Authorization: Bearer {{token}}

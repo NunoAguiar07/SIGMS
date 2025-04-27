@@ -32,6 +32,10 @@ class RoomRepository (private val database: Database) : RoomRepositoryInterface 
         return database.officeRooms.firstOrNull { it.id eq id }
     }
 
+    override fun getClassRoomById(id: Int): Classroom? {
+        return database.classrooms.firstOrNull { it.id eq id }
+    }
+
     override fun createRoom(capacity: Int, name: String): Room {
         val newRoom = Room {
             this.name = name

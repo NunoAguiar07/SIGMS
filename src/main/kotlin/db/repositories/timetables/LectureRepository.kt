@@ -1,6 +1,6 @@
 package isel.leic.group25.db.repositories.timetables
 
-import isel.leic.group25.db.entities.rooms.Room
+import isel.leic.group25.db.entities.rooms.Classroom
 import isel.leic.group25.db.entities.timetables.Class
 import isel.leic.group25.db.entities.timetables.Lecture
 import isel.leic.group25.db.entities.types.ClassType
@@ -26,7 +26,7 @@ class LectureRepository(private val database: Database) : LectureRepositoryInter
 
     override fun getLecture(
         schoolClass: Class,
-        room: Room,
+        classroom: Classroom,
         type: ClassType,
         weekDay: WeekDay,
         startTime: Duration,
@@ -34,7 +34,7 @@ class LectureRepository(private val database: Database) : LectureRepositoryInter
     ): Lecture? {
        val lecture = database.lectures.firstOrNull {
             (it.classId eq schoolClass.id) and
-                    (it.roomId eq room.id) and
+                    (it.roomId eq classroom.room.id) and
                     (it.type eq type) and
                     (it.weekDay eq weekDay) and
                     (it.startTime eq startTime) and
@@ -45,7 +45,7 @@ class LectureRepository(private val database: Database) : LectureRepositoryInter
 
     override fun createLecture(
         schoolClass: Class,
-        room: Room,
+        classroom: Classroom,
         type: ClassType,
         weekDay: WeekDay,
         startTime: Duration,
@@ -53,7 +53,7 @@ class LectureRepository(private val database: Database) : LectureRepositoryInter
     ): Lecture {
         val newLecture = Lecture {
             this.schoolClass = schoolClass
-            this.room = room
+            this.classroom = classroom
             this.type = type
             this.weekDay = weekDay
             this.startTime = startTime
@@ -78,7 +78,7 @@ class LectureRepository(private val database: Database) : LectureRepositoryInter
     override fun deleteLecture(lecture: Lecture): Boolean {
          val deletedLecture = database.lectures.removeIf {
             (it.classId eq lecture.schoolClass.id) and
-                    (it.roomId eq lecture.room.id) and
+                    (it.roomId eq lecture.classroom.room.id) and
                     (it.type eq lecture.type) and
                     (it.weekDay eq lecture.weekDay) and
                     (it.startTime eq lecture.startTime) and
@@ -88,16 +88,16 @@ class LectureRepository(private val database: Database) : LectureRepositoryInter
     }
 
     override fun updateLecture(
-       lecture: Lecture,
+        lecture: Lecture,
         newSchoolClass: Class,
-        newRoom: Room,
+        newClassroom: Classroom,
         newType: ClassType,
         newWeekDay: WeekDay,
         newStartTime: Duration,
         newEndTime: Duration
     ): Lecture {
             lecture.schoolClass = newSchoolClass
-            lecture.room = newRoom
+            lecture.classroom = newClassroom
             lecture.type = newType
             lecture.weekDay = newWeekDay
             lecture.startTime = newStartTime

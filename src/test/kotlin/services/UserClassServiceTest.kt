@@ -196,10 +196,13 @@ class UserClassServiceTest {
         val studentUser = createTestUser(Role.STUDENT)
         val testClass = createTestClass()
         val room = roomRepository.createRoom(20, "2.01")
+        roomRepository.createClassRoom(room)
+        val classroom = roomRepository.getClassRoomById(room.id)
+        assertNotNull(classroom)
         lectureRepository.createLecture(
             schoolClass = testClass,
             type = ClassType.PRACTICAL,
-            room = room,
+            classroom = classroom,
             weekDay = WeekDay.MONDAY,
             startTime = "10:00".hoursAndMinutesToDuration(),
             endTime = "11:00".hoursAndMinutesToDuration(),
@@ -207,7 +210,7 @@ class UserClassServiceTest {
         lectureRepository.createLecture(
             schoolClass = testClass,
             type = ClassType.PRACTICAL,
-            room = room,
+            classroom = classroom,
             weekDay = WeekDay.MONDAY,
             startTime = "15:00".hoursAndMinutesToDuration(),
             endTime = "17:00".hoursAndMinutesToDuration(),
@@ -223,11 +226,11 @@ class UserClassServiceTest {
 
         assertNotNull(result.value.first())
         assertEquals(testClass, result.value.first().schoolClass)
-        assertEquals(room, result.value.first().room)
+        assertEquals(classroom, result.value.first().classroom)
 
         assertNotNull(result.value[1])
         assertEquals(testClass, result.value[1].schoolClass)
-        assertEquals(room, result.value[1].room)
+        assertEquals(classroom, result.value[1].classroom)
 
     }
 

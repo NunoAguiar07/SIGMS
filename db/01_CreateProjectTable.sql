@@ -83,7 +83,7 @@ CREATE TABLE IF NOT EXISTS ATTEND (
 
 CREATE TABLE IF NOT EXISTS LECTURE (
     class_id INT NOT NULL REFERENCES CLASS(id) ON DELETE CASCADE,
-    room_id INT NOT NULL REFERENCES ROOM(id) ON DELETE CASCADE,
+    room_id INT NOT NULL REFERENCES CLASSROOM(id) ON DELETE CASCADE,
     class_type VARCHAR(20) CHECK (class_type IN ('theoretical', 'practical', 'theoretical_practical')),
     week_day int CHECK(week_day > 0 and week_day < 8),
     start_time time NOT NULL,

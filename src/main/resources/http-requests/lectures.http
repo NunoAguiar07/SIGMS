@@ -1,0 +1,21 @@
+###
+GET {{baseUrl}}/lectures
+Authorization: Bearer {{token}}
+
+###
+POST {{baseUrl}}/lectures
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "schoolClassId": 3,
+  "roomId": 2,
+  "startTime": "17:30",
+  "endTime": "18:00",
+  "type": "THEORETICAL",
+  "weekDay": "TUESDAY",
+  "newType": "THEORETICAL",
+  "newWeekDay": "MONDAY",
+  "newStartTime": "17:30",
+  "newEndTime": "18:00"
+}

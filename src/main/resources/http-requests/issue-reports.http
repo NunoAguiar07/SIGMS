@@ -1,0 +1,33 @@
+###
+GET {{baseUrl}}/rooms/1/issues
+Authorization: Bearer {{token}}
+
+###
+POST {{baseUrl}}/rooms/1/issues
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "description": "The projector is not working"
+}
+
+###
+GET {{baseUrl}}/rooms/1/issues/1
+Authorization: Bearer {{token}}
+
+###
+DELETE {{baseUrl}}/rooms/1/issues/1
+Authorization: Bearer {{token}}
+
+###
+PUT {{baseUrl}}/rooms/1/issues/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "description": "The projector is still not working"
+}
+
+###
+PUT {{baseUrl}}/rooms/1/issues/1/assign
+Authorization: Bearer {{token}}

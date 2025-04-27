@@ -11,19 +11,6 @@ import isel.leic.group25.services.AuthService
 fun Route.assessRoleRoutes(
     authService: AuthService
 ) {
-    route("verifyAccount") {
-        post {
-            val token = call.request.queryParameters["token"] ?: return@post call.respond(HttpStatusCode.BadRequest)
-            val result = authService.verifyStudentAccount(token)
-            call.respondEither(
-                either = result,
-                transformError = { error -> error.toProblem() },
-                transformSuccess = {
-                    HttpStatusCode.NoContent
-                }
-            )
-        }
-    }
     route("/assessRole") {
         get {
             val limit = call.queryParameters["limit"]

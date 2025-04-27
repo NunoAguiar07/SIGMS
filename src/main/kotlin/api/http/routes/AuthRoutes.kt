@@ -6,6 +6,7 @@ import api.model.response.LoginResponse
 import api.model.response.RegisterResponse
 import io.ktor.http.*
 import io.ktor.server.request.*
+import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import isel.leic.group25.api.exceptions.respondEither
 import isel.leic.group25.services.AuthService
@@ -24,11 +25,12 @@ fun Route.authRoutes(authService: AuthService) {
                 either = result,
                 transformError = { error -> error.toProblem() },
                 transformSuccess = { check ->
-                    if(check) {
-                        RegisterResponse.PendingCheckStudent
+                    val message = if(check) {
+                        "Check your email to approve your account"
                     } else {
-                        RegisterResponse.PendingApproval
+                        "Thanks for registering. We will send you an email once your account has been verified"
                     }
+                    RegisterResponse(message)
                 },
                 successStatus = HttpStatusCode.Created
             )
@@ -48,6 +50,19 @@ fun Route.authRoutes(authService: AuthService) {
                     )
                 }
             )
+        }
+        route("verifyAccount") {
+            put {
+                val token = call.request.queryParameters["token"] ?: return@put call.respond(HttpStatusCode.BadRequest)
+                val result = authService.verifyStudentAccount(token)
+                call.respondEither(
+                    either = result,
+                    transformError = { error -> error.toProblem() },
+                    transformSuccess = {
+                        HttpStatusCode.NoContent
+                    }
+                )
+            }
         }
     }
 }
