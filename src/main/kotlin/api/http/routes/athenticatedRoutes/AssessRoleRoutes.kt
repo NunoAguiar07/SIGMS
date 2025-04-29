@@ -18,7 +18,7 @@ import isel.leic.group25.services.AuthService
  * @param authService Service handling role approval logic
  */
 fun Route.assessRoleRoutes(authService: AuthService) {
-    route("/assessRoles") {
+    route("/assess-roles") {
         withRole(Role.ADMIN){
             getAllPendingApprovalsRoute(authService)
             processRoleApprovalRoute(authService)

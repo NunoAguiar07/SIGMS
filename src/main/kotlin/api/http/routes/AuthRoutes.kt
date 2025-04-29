@@ -21,7 +21,7 @@ fun Route.authRoutes(authService: AuthService) {
     route("/auth") {
         registerRoute(authService)
         loginRoute(authService)
-        route("/verifyAccount") {
+        route("/verify-account") {
             accountVerificationRoute(authService)
         }
     }
