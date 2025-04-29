@@ -17,6 +17,7 @@ sealed class LectureError {
     data object InvalidLectureLimit : LectureError()
     data object InvalidLectureOffset : LectureError()
     data object LectureNotFound : LectureError()
+    data object LectureTimeConflict : LectureError()
 
     fun toProblem(): Problem {
         return when (this) {
@@ -75,6 +76,10 @@ sealed class LectureError {
             InvalidLectureOffset -> Problem.badRequest(
                 title = "Invalid lecture offset",
                 detail = "The offset parameter must be a positive integer."
+            )
+            LectureTimeConflict -> Problem.conflict(
+                title = "Lecture time conflict",
+                detail = "Room 101 is already booked from 09:00 to 10:30 on Monday"
             )
         }
     }

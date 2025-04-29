@@ -73,7 +73,7 @@ fun Application.module() {
     val subjectService = SubjectService(subjectRepository, kTransaction)
     val userClassService = UserClassService(userRepository, studentRepository, teacherRepository, classRepository, lectureRepository, kTransaction)
     val roomService = RoomService(roomRepository, kTransaction)
-    val lectureService = LectureService(lectureRepository, kTransaction, classRepository, roomRepository)
+    val lectureService = LectureService(lectureRepository, kTransaction, classRepository, roomRepository, emailService)
     val issueReportService = IssuesReportService(issueReportRepository, userRepository, technicalServiceRepository, kTransaction, roomRepository)
 
     install(Authentication) {

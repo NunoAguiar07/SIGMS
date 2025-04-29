@@ -87,6 +87,14 @@ class MockClassRepository : ClassRepositoryInterface {
         return teachersClasses.filter { it.teacher.user.id == userId }.map { it.schoolClass }
     }
 
+    override fun findStudentsByClassId(classId: Int): List<Student> {
+        return studentsClasses.filter { it.schoolClass.id == classId}.map { it.student }
+    }
+
+    override fun findTeachersByClassId(classId: Int): List<Teacher> {
+        return teachersClasses.filter { it.schoolClass.id == classId}.map { it.teacher }
+    }
+
     fun clearAll() {
         classes.clear()
         studentsClasses.clear()

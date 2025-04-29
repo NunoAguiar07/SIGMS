@@ -42,4 +42,12 @@ interface LectureRepositoryInterface {
         newStartTime: Duration,
         newEndTime: Duration
     ): Lecture //
+
+    fun findConflictingLectures(
+        newRoomId: Int,
+        newWeekDay: WeekDay,
+        newStartTime: Duration,
+        newEndTime: Duration,
+        currentLecture: Lecture
+    ) : Boolean
 }

@@ -102,6 +102,31 @@ class MockLectureRepository : LectureRepositoryInterface {
         }
     }
 
+    override fun findConflictingLectures(
+        newRoomId: Int,
+        newWeekDay: WeekDay,
+        newStartTime: Duration,
+        newEndTime: Duration,
+        currentLecture: Lecture
+    ): Boolean {
+        return lectures.any { existingLecture ->
+            (existingLecture.classroom.room.id == newRoomId) &&
+                    (existingLecture.weekDay == newWeekDay) &&
+                    !(
+                            existingLecture.schoolClass.id == currentLecture.schoolClass.id &&
+                                    existingLecture.classroom.room.id == currentLecture.classroom.room.id &&
+                                    existingLecture.type == currentLecture.type &&
+                                    existingLecture.weekDay == currentLecture.weekDay &&
+                                    existingLecture.startTime == currentLecture.startTime &&
+                                    existingLecture.endTime == currentLecture.endTime
+                            ) &&
+
+                    ((newStartTime >= existingLecture.startTime && newStartTime < existingLecture.endTime) ||
+                            (newEndTime > existingLecture.startTime && newEndTime <= existingLecture.endTime) ||
+                            (newStartTime <= existingLecture.startTime && newEndTime >= existingLecture.endTime))
+        }
+    }
+
     fun clear() {
         lectures.clear()
     }

@@ -8,8 +8,7 @@ import isel.leic.group25.db.entities.types.WeekDay
 import isel.leic.group25.db.repositories.timetables.interfaces.LectureRepositoryInterface
 import isel.leic.group25.db.tables.Tables.Companion.lectures
 import org.ktorm.database.Database
-import org.ktorm.dsl.and
-import org.ktorm.dsl.eq
+import org.ktorm.dsl.*
 import org.ktorm.entity.*
 import kotlin.time.Duration
 
@@ -104,6 +103,33 @@ class LectureRepository(private val database: Database) : LectureRepositoryInter
             lecture.endTime = newEndTime
             database.lectures.update(lecture)
             return lecture
+    }
+
+    override fun findConflictingLectures(
+        newRoomId: Int,
+        newWeekDay: WeekDay,
+        newStartTime: Duration,
+        newEndTime: Duration,
+        currentLecture: Lecture
+    ): Boolean {
+        return database.lectures.any { existingLecture ->
+            // Check if in same room and same day
+            (existingLecture.roomId eq newRoomId) and
+                    (existingLecture.weekDay eq newWeekDay) and
+                    // Exclude the lecture we're updating
+                    !(
+                        (existingLecture.classId eq currentLecture.schoolClass.id) and
+                        (existingLecture.roomId eq currentLecture.classroom.room.id) and
+                        (existingLecture.type eq currentLecture.type) and
+                        (existingLecture.weekDay eq currentLecture.weekDay) and
+                        (existingLecture.startTime eq currentLecture.startTime) and
+                        (existingLecture.endTime eq currentLecture.endTime)
+                    ) and
+                    // Check for time overlap
+                    ((newStartTime greaterEq existingLecture.startTime) and (newStartTime less existingLecture.endTime)) or // New starts during existing
+                    ((newEndTime greater  existingLecture.startTime) and (newEndTime lessEq existingLecture.endTime)) or    // New ends during existing
+                    ((newStartTime lessEq  existingLecture.startTime) and (newEndTime greaterEq existingLecture.endTime))   // New completely contains existing
+        }
     }
 
 }

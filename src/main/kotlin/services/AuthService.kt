@@ -78,7 +78,9 @@ class AuthService(
                         email = user.email,
                         requestedRole = role.uppercase(Locale.getDefault())
                     )
-                    emailService.sendAdminApprovalRequest(adminEmails, approvalLink, userDetails)
+                    if(adminEmails.isNotEmpty()){
+                        emailService.sendAdminApprovalRequest(adminEmails, approvalLink, userDetails)
+                    }
                     return@useTransaction success(false)
                 }
                 else -> return@useTransaction failure(AuthError.InvalidRole)

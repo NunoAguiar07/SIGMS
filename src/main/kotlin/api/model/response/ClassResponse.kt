@@ -6,14 +6,14 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class ClassResponse(
     val id: Int,
-    val subjectId: Int,
+    val subject: SubjectResponse,
     val name: String,
 ) {
     companion object {
         fun fromClass(classEntity: Class): ClassResponse {
             return ClassResponse(
                 id = classEntity.id,
-                subjectId = classEntity.subject.id,
+                subject = SubjectResponse.fromSubject(classEntity.subject),
                 name = classEntity.name,
             )
         }

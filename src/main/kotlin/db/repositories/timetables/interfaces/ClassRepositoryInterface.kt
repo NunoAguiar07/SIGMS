@@ -39,4 +39,8 @@ interface ClassRepositoryInterface {
     fun findClassesByStudentId(userId: Int): List<Class>
 
     fun findClassesByTeacherId(userId: Int): List<Class>
+
+    fun findStudentsByClassId(classId: Int): List<Student>
+
+    fun findTeachersByClassId(classId: Int): List<Teacher>
 }

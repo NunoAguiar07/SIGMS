@@ -1,5 +1,6 @@
 package isel.leic.group25.services.email
 
+import isel.leic.group25.db.entities.timetables.Lecture
 import isel.leic.group25.services.email.model.EmailConfig
 import isel.leic.group25.services.email.model.UserDetails
 import org.apache.commons.mail.DefaultAuthenticator
@@ -89,6 +90,38 @@ class SmtpEmailService(private val config: EmailConfig) : EmailService {
             email.send()
         } catch (e: Exception) {
             throw EmailException("Failed to send verification email")
+        }
+    }
+
+    override fun sendStudentsChangeInLecture(toStudents: List<String>, lecture: Lecture) {
+        try {
+            val email = SimpleEmail().apply {
+                hostName = config.host
+                setSmtpPort(config.port)
+                setAuthenticator(DefaultAuthenticator(config.username, config.password))
+                isSSLOnConnect = config.useSsl
+                setFrom(config.from)
+                subject = "Change in schedule for your ${lecture.schoolClass.subject.name} lecture"
+                setMsg("""
+                    There has been a change for your lecture of ${lecture.schoolClass.subject.name} for class ${lecture.schoolClass.name}. 
+                    Here is the updated lecture:
+                    
+                    Lecture:
+                    - Subject: ${lecture.schoolClass.subject.name}
+                    - Class: ${lecture.schoolClass.name}
+                    - Room: ${lecture.classroom.room.name}
+                    - On: ${lecture.weekDay.name}
+                    - Starts at: ${lecture.startTime}
+                    - Ends at: ${lecture.endTime}
+                    - Type: ${lecture.type.name}
+                    
+                    Hope you have an amazing class!!
+                """.trimIndent())
+                toStudents.forEach { addTo(it) }
+            }
+            email.send()
+        } catch (e: Exception) {
+            throw EmailException("Failed to send approval request")
         }
     }
 }

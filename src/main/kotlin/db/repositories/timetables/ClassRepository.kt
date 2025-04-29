@@ -88,4 +88,13 @@ class ClassRepository(private val database: Database): ClassRepositoryInterface 
         return database.teachersClasses.filter { it.teacherId eq userId }.map { it.schoolClass }
     }
 
+    override fun findStudentsByClassId(classId: Int): List<Student> {
+        return database.studentsClasses.filter { it.classId eq classId }.map { it.student }
+    }
+
+
+    override fun findTeachersByClassId(classId: Int): List<Teacher> {
+        return database.teachersClasses.filter { it.classId eq classId }.map { it.teacher }
+    }
+
 }

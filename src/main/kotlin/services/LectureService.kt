@@ -3,10 +3,12 @@ package isel.leic.group25.services
 import isel.leic.group25.db.entities.timetables.Lecture
 import isel.leic.group25.db.entities.types.ClassType
 import isel.leic.group25.db.entities.types.WeekDay
+import isel.leic.group25.db.repositories.interfaces.IsolationLevel
 import isel.leic.group25.db.repositories.interfaces.TransactionInterface
 import isel.leic.group25.db.repositories.rooms.RoomRepository
 import isel.leic.group25.db.repositories.timetables.ClassRepository
 import isel.leic.group25.db.repositories.timetables.LectureRepository
+import isel.leic.group25.services.email.EmailService
 import isel.leic.group25.services.errors.LectureError
 import isel.leic.group25.utils.*
 
@@ -18,10 +20,13 @@ typealias LectureResult = Either<LectureError, Lecture>
 
 
 
-class LectureService(private val lectureRepository: LectureRepository,
-                     private val transactionInterface: TransactionInterface,
-                     private val classRepository: ClassRepository,
-                     private val roomRepository: RoomRepository) {
+class LectureService(
+    private val lectureRepository: LectureRepository,
+    private val transactionInterface: TransactionInterface,
+    private val classRepository: ClassRepository,
+    private val roomRepository: RoomRepository,
+    private val emailService: EmailService,
+    ) {
 
     fun getAllLectures(limit: String?, offSet: String?): LectureListResult {
         val newLimit = limit?.toInt() ?: 20
@@ -161,17 +166,37 @@ class LectureService(private val lectureRepository: LectureRepository,
         if (newParsedStartTime >= newParsedEndTime) {
             return failure(LectureError.InvalidLectureDate)
         }
-        return transactionInterface.useTransaction {
+        return transactionInterface.useTransaction(IsolationLevel.SERIALIZABLE) {
             val schoolClass = classRepository.findClassById(schoolClassId) ?: return@useTransaction failure(LectureError.InvalidLectureClass)
-            val room = roomRepository.getClassRoomById(roomId) ?: return@useTransaction failure(LectureError.InvalidLectureRoom)
+            val classroom = roomRepository.getClassRoomById(roomId) ?: return@useTransaction failure(LectureError.InvalidLectureRoom)
             val parsedStartTime = startTime.hoursAndMinutesToDuration()
             val parsedEndTime = endTime.hoursAndMinutesToDuration()
             val lecture =
-                lectureRepository.getLecture(schoolClass, room, type, weekDay, parsedStartTime, parsedEndTime )
+                lectureRepository.getLecture(schoolClass, classroom, type, weekDay, parsedStartTime, parsedEndTime )
                     ?: return@useTransaction failure(LectureError.LectureNotFound)
-            val newRoom = roomRepository.getClassRoomById(newRoomId) ?: return@useTransaction failure(LectureError.InvalidLectureRoom)
+            val newClassroom = roomRepository.getClassRoomById(newRoomId) ?: return@useTransaction failure(LectureError.InvalidLectureRoom)
             val newSchoolClass = classRepository.findClassById(newSchoolClassId) ?: return@useTransaction failure(LectureError.InvalidLectureClass)
-            val updatedLecture = lectureRepository.updateLecture(lecture, newSchoolClass, newRoom, newType, newWeekDay, newParsedStartTime, newParsedEndTime)
+            if (newClassroom.room.id != classroom.room.id || newWeekDay != weekDay ||
+                newParsedStartTime != parsedStartTime || newParsedEndTime != parsedEndTime) {
+
+                val conflictingLectures = lectureRepository.findConflictingLectures(
+                    newRoomId = newClassroom.room.id,
+                    newWeekDay = newWeekDay,
+                    newStartTime = newParsedStartTime,
+                    newEndTime = newParsedEndTime,
+                    currentLecture = lecture
+                )
+
+                if (conflictingLectures) {
+                    return@useTransaction failure(LectureError.LectureTimeConflict)
+                }
+            }
+            val updatedLecture = lectureRepository.updateLecture(lecture, newSchoolClass, newClassroom, newType, newWeekDay, newParsedStartTime, newParsedEndTime)
+
+            val students = classRepository.findStudentsByClassId(schoolClassId)
+            if(students.isNotEmpty()){
+                emailService.sendStudentsChangeInLecture(students.map { it.user.email }, updatedLecture)
+            }
             return@useTransaction success(updatedLecture)
         }
     }
