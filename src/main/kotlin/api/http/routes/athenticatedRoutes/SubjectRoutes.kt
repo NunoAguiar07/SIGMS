@@ -74,7 +74,7 @@ fun Route.baseSubjectRoutes(subjectService: SubjectService) {
     }
 
     withRole(Role.ADMIN){
-        post {
+        post("/add") {
             val subjectRequest = call.receive<SubjectRequest>()
             val result = subjectService.createSubject(
                 name = subjectRequest.name
@@ -112,7 +112,7 @@ fun Route.specificSubjectRoutes(subjectService: SubjectService) {
         }
 
         withRole(Role.ADMIN){
-            delete {
+            delete("/delete") {
                 val id = call.parameters["subjectId"]
                 val result = subjectService.deleteSubject(id)
                 call.respondEither(
@@ -149,7 +149,7 @@ fun Route.subjectClassesRoutes(classService: ClassService) {
         }
 
         withRole(Role.ADMIN){
-            post {
+            post("/add") {
                 val id = call.parameters["subjectId"]
                 val classRequest = call.receive<ClassRequest>()
                 val result = classService.createClass(
@@ -196,7 +196,7 @@ fun Route.classManagementRoutes(classService: ClassService) {
  */
 fun Route.classUserRoutes(usersClassService: UserClassService) {
     route("/users") {
-        post {
+        post("/add") {
             val role = call.getUserRoleFromPrincipal()
             val userId = call.getUserIdFromPrincipal()
             val id = call.parameters["classId"]
@@ -210,7 +210,7 @@ fun Route.classUserRoutes(usersClassService: UserClassService) {
             )
         }
 
-        delete {
+        delete("/delete") {
             val role = call.getUserRoleFromPrincipal()
             val userId = call.getUserIdFromPrincipal()
             val classId = call.parameters["classId"]

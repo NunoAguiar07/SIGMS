@@ -18,7 +18,7 @@ import isel.leic.group25.services.AuthService
  * @param authService Service handling role approval logic
  */
 fun Route.assessRoleRoutes(authService: AuthService) {
-    route("/assessRole") {
+    route("/assessRoles") {
         withRole(Role.ADMIN){
             getAllPendingApprovalsRoute(authService)
             processRoleApprovalRoute(authService)
@@ -58,23 +58,25 @@ fun Route.getAllPendingApprovalsRoute(authService: AuthService) {
  * @param authService Service handling approval processing logic
  */
 fun Route.processRoleApprovalRoute(authService: AuthService) {
-    put {
-        val token = call.queryParameters["token"]
-        val status = call.queryParameters["status"]
-        val adminId = call.getUserIdFromPrincipal() ?: return@put call.respond(HttpStatusCode.Unauthorized)
+    route("/validate"){
+        put {
+            val token = call.queryParameters["token"]
+            val status = call.queryParameters["status"]
+            val adminId = call.getUserIdFromPrincipal() ?: return@put call.respond(HttpStatusCode.Unauthorized)
 
-        val result = authService.assessRoleRequest(
-            token = token,
-            adminUserId = adminId,
-            status = status
-        )
-        call.respondEither(
-            either = result,
-            transformError = { error -> error.toProblem() },
-            transformSuccess = {
-                HttpStatusCode.NoContent
-            }
-        )
+            val result = authService.assessRoleRequest(
+                token = token,
+                adminUserId = adminId,
+                status = status
+            )
+            call.respondEither(
+                either = result,
+                transformError = { error -> error.toProblem() },
+                transformSuccess = {
+                    HttpStatusCode.NoContent
+                }
+            )
+        }
     }
 }
 

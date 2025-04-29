@@ -60,7 +60,7 @@ fun Route.getAllLecturesRoute(lectureService: LectureService) {
  * @param lectureService Service handling lecture creation logic
  */
 fun Route.createLectureRoute(lectureService: LectureService) {
-    post {
+    post("/add") {
         val lectureRequest = call.receive<LectureRequest>()
         val result = lectureService.createLecture(
             schoolClassId = lectureRequest.schoolClassId,
@@ -88,7 +88,7 @@ fun Route.createLectureRoute(lectureService: LectureService) {
  * @param lectureService Service handling lecture update logic
  */
 fun Route.updateLectureRoute(lectureService: LectureService) {
-    put {
+    put("/update") {
         val updateLectureRequest = call.receive<UpdateLectureRequest>()
         val result = lectureService.updateLecture(
             schoolClassId = updateLectureRequest.schoolClassId,
@@ -121,7 +121,7 @@ fun Route.updateLectureRoute(lectureService: LectureService) {
  * @param lectureService Service handling lecture deletion logic
  */
 fun Route.deleteLectureRoute(lectureService: LectureService) {
-    delete {
+    delete("/delete") {
         val lectureRequest = call.receive<LectureRequest>()
         val result = lectureService.deleteLecture(
             schoolClassId = lectureRequest.schoolClassId,

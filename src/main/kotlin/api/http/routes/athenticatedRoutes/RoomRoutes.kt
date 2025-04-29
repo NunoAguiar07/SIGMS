@@ -69,7 +69,7 @@ fun Route.baseRoomRoutes(roomService: RoomService) {
         )
     }
     withRole(Role.ADMIN){
-        post {
+        post("/add") {
             val roomRequest = call.receive<RoomRequest>()
             val result = roomService.createRoom(
                 name = roomRequest.name,
@@ -93,7 +93,7 @@ fun Route.baseRoomRoutes(roomService: RoomService) {
  */
 fun Route.teacherOfficeRoutes(teacherRoomService: TeacherRoomService) {
     route("/offices/{roomId}/teachers") {
-        put {
+        put("/add") {
             val id = call.parameters["roomId"] ?: return@put call.respond(HttpStatusCode.BadRequest)
             val request = call.receive<TeacherOfficeRequest>()
             val result = teacherRoomService.addTeacherToOffice(
@@ -107,7 +107,7 @@ fun Route.teacherOfficeRoutes(teacherRoomService: TeacherRoomService) {
             )
         }
 
-        delete {
+        delete("/remove") {
             val id = call.parameters["roomId"] ?: return@delete call.respond(HttpStatusCode.BadRequest)
             val request = call.receive<TeacherOfficeRequest>()
             val result = teacherRoomService.removeTeacherFromRoom(
@@ -141,7 +141,7 @@ fun Route.specificRoomRoutes(roomService: RoomService) {
             )
         }
         withRole(Role.ADMIN){
-            delete {
+            delete("/delete") {
                 val id = call.parameters["roomId"] ?: return@delete call.respond(HttpStatusCode.BadRequest)
                 val result = roomService.deleteRoom(id)
                 call.respondEither(
@@ -151,7 +151,7 @@ fun Route.specificRoomRoutes(roomService: RoomService) {
                 )
             }
 
-            put {
+            put("update") {
                 val id = call.parameters["roomId"] ?: return@put call.respond(HttpStatusCode.BadRequest)
                 val roomRequest = call.receive<RoomRequest>()
                 val result = roomService.updateRoom(
@@ -208,7 +208,7 @@ fun Route.roomIssuesRoutes(issuesReportService: IssuesReportService) {
             )
         }
 
-        post {
+        post("/add") {
             val userId = call.getUserIdFromPrincipal()
             val roomId = call.parameters["roomId"] ?: return@post call.respond(HttpStatusCode.BadRequest)
             val issueRequest = call.receive<IssueReportRequest>()
@@ -252,7 +252,7 @@ fun Route.issueCrudRoutes(issuesReportService: IssuesReportService) {
     }
 
     withRole(Role.TECHNICAL_SERVICE) {
-        delete {
+        delete("/delete") {
             val role = call.getUserRoleFromPrincipal()
             val id = call.parameters["issueId"]
             val result = issuesReportService.deleteIssueReport(id, role)
@@ -262,7 +262,7 @@ fun Route.issueCrudRoutes(issuesReportService: IssuesReportService) {
                 transformSuccess = { HttpStatusCode.NoContent }
             )
         }
-        put {
+        put("/update") {
             val role = call.getUserRoleFromPrincipal()
             val id = call.parameters["issueId"]
             val issueRequest = call.receive<IssueReportRequest>()

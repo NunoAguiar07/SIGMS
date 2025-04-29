@@ -59,7 +59,7 @@ fun Route.getProfileRoute(userService: UserService) {
  * @param userService Service handling profile updates
  */
 fun Route.updateProfileRoute(userService: UserService) {
-    put {
+    put("/update") {
         val userId = call.getUserIdFromPrincipal() ?: return@put call.respond(HttpStatusCode.Unauthorized)
         val updateRequest = call.receive<UserUpdateRequest>()
         val result = userService.updateUser(
