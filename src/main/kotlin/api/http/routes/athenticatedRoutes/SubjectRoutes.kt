@@ -210,7 +210,7 @@ fun Route.classUserRoutes(usersClassService: UserClassService) {
             )
         }
 
-        delete("/delete") {
+        delete("/remove") {
             val role = call.getUserRoleFromPrincipal()
             val userId = call.getUserIdFromPrincipal()
             val classId = call.parameters["classId"]

@@ -35,23 +35,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/WelcomePageResponse"
-  /api/verifyAccount:
-    post:
-      tags:
-        - AssessRole
-      security:
-        - bearerJWT: [ ]
-      description: Verify account ownership on creation
-      parameters:
-        - in: query
-          name: token
-          schema:
-            type: string
-          description: The onetime token for account verification
-      responses:
-        204:
-          description: Successfully verified account
-  /api/assessRole:
+  /api/assess-role:
     get:
       tags:
         - AssessRole
@@ -84,6 +68,7 @@ paths:
                   $ref: "#/components/schemas/AssessRole"
         400:
           description: Either limit or offset are not a valid integer
+  /api/assess-role/validate:
     put:
       tags:
         - AssessRole
@@ -110,7 +95,7 @@ paths:
       responses:
         204:
           description: Successfully set new pending user approval request status
-  /api/assessRole/{token}:
+  /api/assess-role/{token}:
     get:
       tags:
         - AssessRole
@@ -164,6 +149,7 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/LectureResponse"
+  /api/lectures/add:
     post:
       tags:
         - Lecture
@@ -179,6 +165,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/LectureResponse"
+  /api/lectures/update:
     put:
       tags:
         - Lecture
@@ -194,6 +181,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/LectureResponse"
+  /api/lectures/delete:
     delete:
       tags:
         - Lecture
@@ -219,6 +207,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/User"
+  /api/profile/update:
     put:
       security:
         - bearerJWT: []
@@ -233,7 +222,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/User"
-
   /api/profile/password:
     post:
       security:
@@ -280,6 +268,7 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/RoomResponse"
+  /rooms/add:
     post:
       security:
         - bearerJWT: [ ]
@@ -317,6 +306,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/RoomResponse"
+  /rooms/{roomId}/delete:
     delete:
       security:
         - bearerJWT: [ ]
@@ -334,6 +324,7 @@ paths:
       responses:
         204:
           description: Successfully deleted room by Id
+  /rooms/{roomId}/update:
     put:
       security:
         - bearerJWT: [ ]
@@ -433,6 +424,7 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/IssueReportResponse"
+  /rooms/{roomId}/issues/add:
     post:
       security:
         - bearerJWT: [ ]
@@ -456,7 +448,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/IssueReportResponse"
-
   /rooms/{roomId}/issues/{issueId}:
     get:
       security:
@@ -486,6 +477,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/IssueReportResponse"
+  /rooms/{roomId}/issues/{issueId}/delete:
     delete:
       security:
         - bearerJWT: [ ]
@@ -510,6 +502,7 @@ paths:
       responses:
         204:
           description: Successfully deleted issue by Id associated with room of Id
+  /rooms/{roomId}/issues/{issueId}/update:
     put:
       security:
         - bearerJWT: [ ]
@@ -540,6 +533,75 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/IssueReportResponse"
+  /rooms/{roomId}/issues/{issueId}/assign:
+    put:
+      security:
+        - bearerJWT: [ ]
+      tags:
+        - Room
+      parameters:
+        - in: path
+          name: roomId
+          schema:
+            type: integer
+            example: 1
+          required: true
+          description: The id of the room to be obtained
+        - in: path
+          name: issueId
+          schema:
+            type: integer
+            example: 1
+          required: true
+          description: The id of the issue to be updated
+      description: Assign an issue by Id associated with room of Id to the authenticated technician
+      responses:
+        200:
+          description: Successfully assigned an issue by Id associated with room of Id to the authenticated technician
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IssueReportResponse"
+  /offices/{roomId}/teachers/add:
+    put:
+      security:
+        - bearerJWT: [ ]
+      tags:
+        - Room
+      parameters:
+        - in: path
+          name: roomId
+          schema:
+            type: integer
+            example: 1
+          required: true
+          description: The id of the room to be obtained
+      requestBody:
+        $ref: "#/components/schemas/TeacherOfficeRequest"
+      description: Add a teacher to an office room by id
+      responses:
+        200:
+          description: Successfully added a teacher to the office room by id
+  /offices/{roomId}/teachers/remove:
+    delete:
+      security:
+        - bearerJWT: [ ]
+      tags:
+        - Room
+      parameters:
+        - in: path
+          name: roomId
+          schema:
+            type: integer
+            example: 1
+          required: true
+          description: The id of the room to be obtained
+      requestBody:
+        $ref: "#/components/schemas/TeacherOfficeRequest"
+      description: Remove a teacher from an office room by id
+      responses:
+        204:
+          description: Removed a teacher from an office room by id
   /api/schedule:
     get:
       security:
@@ -549,7 +611,7 @@ paths:
       description: Retrieve authenticated user related schedule
       responses:
         200:
-          description: Successfully retrieved authenticated user realted schedule
+          description: Successfully retrieved authenticated user related schedule
           content:
             application/json:
               schema:
@@ -585,6 +647,7 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/SubjectResponse"
+  /api/subjects/add:
     post:
       security:
         - bearerJWT: [ ]
@@ -621,6 +684,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/SubjectResponse"
+  /api/subject/{subjectId}/delete:
     delete:
       security:
         - bearerJWT: [ ]
@@ -674,6 +738,7 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/ClassResponse"
+  /api/subject/{subjectId}/classes/add:
     post:
       security:
         - bearerJWT: [ ]
@@ -723,7 +788,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ClassResponse"
-  /api/subject/{subjectId}/classes/{classId}/users:
+  /api/subject/{subjectId}/classes/{classId}/users/add:
     post:
       security:
         - bearerJWT: [ ]
@@ -746,6 +811,7 @@ paths:
       responses:
         204:
           description: Successfully added authenticated user to class by id for subject by id
+  /api/subject/{subjectId}/classes/{classId}/users/remove:
     delete:
       security:
         - bearerJWT: [ ]
@@ -839,7 +905,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/LoginResponse"
-  /auth/verifyAccount:
+  /auth/verify-account:
     put:
       tags:
         - Auth
@@ -1138,6 +1204,32 @@ components:
         profileImage:
           type: string
           format: binary
+    TeacherOfficeRequest:
+      type: object
+      properties:
+        teacherId:
+          type: integer
+          example: 1
+    TeacherOfficeResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        email:
+          type: string
+          example: "example@email.com"
+        username:
+          type: string
+          example: "UseHerName?IWouldNever"
+        officeId:
+          type: integer
+          example: 1
+          default: 0
+        officeRoom:
+          type: string
+          example: "F.0.21"
+          default: ""
     Status:
       type: string
       enum:

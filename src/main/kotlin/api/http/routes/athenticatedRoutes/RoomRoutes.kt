@@ -117,7 +117,7 @@ fun Route.teacherOfficeRoutes(teacherRoomService: TeacherRoomService) {
             call.respondEither(
                 either = result,
                 transformError = { error -> error.toProblem() },
-                transformSuccess = { teacher -> TeacherOfficeResponse.from(teacher) }
+                transformSuccess = { HttpStatusCode.NoContent }
             )
         }
     }
