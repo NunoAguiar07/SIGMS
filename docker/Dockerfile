@@ -4,6 +4,8 @@ WORKDIR /app
 # Copy only the built artifact
 COPY  build/libs/SIGMS-all.jar ./SIGMS.jar
 
+COPY .env ./
+
 # Expose the port Ktor runs on
 EXPOSE 8080
 
