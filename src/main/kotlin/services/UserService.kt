@@ -14,9 +14,9 @@ typealias UserResult = Either<AuthError, User>
 typealias RoleResult = Either<AuthError, Role?>
 
 class UserService(private val repository: UserRepositoryInterface,
-                  private val transactionInterface: TransactionInterface) {
+                  private val transactionInterface: TransactionInterface) { //check every method for nullability
 
-    fun getUserById(id: Int): UserResult {
+    fun getUserById(id: Int): UserResult { // id should be nullable?
         return transactionInterface.useTransaction {
             val user = repository.findById(id)
                 ?: return@useTransaction failure(AuthError.UserNotFound)
@@ -24,7 +24,7 @@ class UserService(private val repository: UserRepositoryInterface,
         }
     }
 
-    fun updateUser(id: Int, username: String?, image: ByteArray?): UserResult {
+    fun updateUser(id: Int, username: String?, image: ByteArray?): UserResult { // id should be nullable? and why is username nullable?
         return transactionInterface.useTransaction {
             val user = repository.findById(id)
                 ?: return@useTransaction failure(AuthError.UserNotFound)
@@ -42,7 +42,7 @@ class UserService(private val repository: UserRepositoryInterface,
         }
     }
 
-    fun changePassword(userId: Int, oldPassword: String, newPassword: String) : UserResult {
+    fun changePassword(userId: Int, oldPassword: String, newPassword: String) : UserResult { // id should be nullable?
         if(oldPassword.isBlank() || newPassword.isBlank()) {
             return failure(AuthError.MissingCredentials)
         }
