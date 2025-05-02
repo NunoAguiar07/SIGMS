@@ -16,7 +16,6 @@ import isel.leic.group25.utils.Either
 import isel.leic.group25.utils.failure
 import isel.leic.group25.utils.success
 import java.util.*
-import kotlin.math.absoluteValue
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
@@ -28,7 +27,7 @@ typealias PendingRolesResult = Either<AuthError, List<RoleApproval>>
 
 typealias PendingRoleResult = Either<AuthError, RoleApproval>
 
-typealias AssesResult = Either<AuthError, Boolean>
+typealias AssessResult = Either<AuthError, Boolean>
 
 typealias VerificationResult = Either<AuthError, String>
 
@@ -41,27 +40,18 @@ class AuthService(
     private val emailService: EmailService,
     private val frontendUrl: String
 ) {
-    fun register(email: String, username: String, password: String, role:String): RegisterResult {
-        if(email.isBlank() || username.isBlank() || password.isBlank()) {
-            return failure(AuthError.MissingCredentials)
-        }
-        if(User.isNotSecurePassword(password)) {
-            return failure(AuthError.InsecurePassword)
-        }
-        val actualRole = role.uppercase(Locale.getDefault())
-        if(actualRole !in Role.entries.toString()) return failure(AuthError.InvalidRole)
+    fun register(email: String, username: String, password: String, role:Role): RegisterResult {
+        val verificationToken = generateVerificationToken()
         return transactionInterface.useTransaction {
             if(userRepository.findByEmail(email) != null) {
                 return@useTransaction failure(AuthError.UserAlreadyExists)
             }
             val user = userRepository.createWithoutRole(email, username, password)
-            val verificationToken = generateVerificationToken()
-            val requestedRole = Role.valueOf(actualRole)
-            if(!roleApprovalRepository.addPendingApproval(user, requestedRole, verificationToken, null)) {
+            if(!roleApprovalRepository.addPendingApproval(user, role, verificationToken, null)) {
                 return@useTransaction failure(AuthError.RoleApprovedFailed)
             }
             when(role) {
-                "student" -> {
+                Role.STUDENT -> {
                     val verificationLink = "${frontendUrl}verify-account?token=$verificationToken"
                     emailService.sendStudentVerificationEmail(
                         userEmail = user.email,
@@ -70,45 +60,32 @@ class AuthService(
                     )
                     return@useTransaction success(true)
                 }
-                "teacher", "technical_service" -> {
+                Role.TEACHER, Role.TECHNICAL_SERVICE -> {
                     val adminEmails = adminRepository.getAllAdminEmails()
                     val approvalLink = "${frontendUrl}approve-request?id=$verificationToken"
                     val userDetails = UserDetails(
                         username = user.username,
                         email = user.email,
-                        requestedRole = role.uppercase(Locale.getDefault())
+                        requestedRole = role.name,
                     )
                     if(adminEmails.isNotEmpty()){
                         emailService.sendAdminApprovalRequest(adminEmails, approvalLink, userDetails)
                     }
                     return@useTransaction success(false)
                 }
-                else -> return@useTransaction failure(AuthError.InvalidRole)
+                else -> return@useTransaction failure(AuthError.UnauthorizedRole)
             }
         }
     }
 
-    fun getAllPendingApprovals(limit:String?, offset:String?): PendingRolesResult {
-        val newLimit = if (limit != null) {
-            limit.toIntOrNull()?.absoluteValue ?: return failure(AuthError.InvalidLimit)
-        } else {
-            10
-        }
-        val newOffset = if (offset != null) {
-            offset.toIntOrNull()?.absoluteValue ?: return failure(AuthError.InvalidOffset)
-        } else {
-            0
-        }
+    fun getAllPendingApprovals(limit:Int, offset:Int): PendingRolesResult {
         return transactionInterface.useTransaction {
-            val approvals = roleApprovalRepository.getApprovals(newLimit, newOffset)
+            val approvals = roleApprovalRepository.getApprovals(limit, offset)
             return@useTransaction success(approvals)
         }
     }
 
-    fun getApprovalByToken(token: String?): PendingRoleResult {
-        if(token.isNullOrBlank()) {
-            return failure(AuthError.TokenValidationFailed)
-        }
+    fun getApprovalByToken(token: String): PendingRoleResult {
         return transactionInterface.useTransaction {
             val roleApproval = roleApprovalRepository.getApprovalByToken(token)
                 ?: return@useTransaction failure(AuthError.TokenValidationFailed)
@@ -117,19 +94,8 @@ class AuthService(
     }
 
     @OptIn(ExperimentalTime::class)
-    fun assessRoleRequest(token: String?, adminUserId: Int, status: String?): AssesResult {
+    fun assessRoleRequest(token: String, adminUserId: Int, status: Status): AssessResult {
         return transactionInterface.useTransaction {
-            if(token.isNullOrBlank()) {
-                return@useTransaction failure(AuthError.TokenValidationFailed)
-            }
-            if(status.isNullOrBlank()) {
-                return@useTransaction failure(AuthError.TokenValidationFailed)
-            }
-            val newStatus = when(status) {
-                "approved" -> Status.APPROVED
-                "rejected" -> Status.REJECTED
-                else -> return@useTransaction failure(AuthError.TokenValidationFailed)
-            }
             val roleApproval = roleApprovalRepository.getApprovalByToken(token)
                 ?: return@useTransaction failure(AuthError.TokenValidationFailed)
             if(roleApproval.status != Status.PENDING) {
@@ -144,11 +110,11 @@ class AuthService(
                 return@useTransaction failure(AuthError.UserNotFound)
             }
             roleApproval.verifiedBy = admin
-            roleApproval.status = newStatus
+            roleApproval.status = status
             if(!roleApprovalRepository.updateApproval(roleApproval)) {
                 return@useTransaction failure(AuthError.RoleApprovedFailed)
             }
-            if(newStatus == Status.REJECTED) {
+            if(status == Status.REJECTED) {
                 emailService.sendUserApprovalNotification(roleApproval.user.email, false)
                 return@useTransaction success(true)
             }
@@ -164,8 +130,8 @@ class AuthService(
                     userRepository.associateWithRole(user, Role.TECHNICAL_SERVICE)
                     emailService.sendUserApprovalNotification(user.email, true)
                 }
-               else -> {
-                    return@useTransaction failure(AuthError.InvalidRole)
+                else -> {
+                    return@useTransaction failure(AuthError.UnauthorizedRole)
                 }
             }
             return@useTransaction success(true)
@@ -173,9 +139,6 @@ class AuthService(
     }
 
     fun login(email: String, password: String): LoginResult {
-        if(email.isBlank() || password.isBlank()) {
-            return failure(AuthError.MissingCredentials)
-        }
         return transactionInterface.useTransaction {
             val user = userRepository.findByEmail(email)
                 ?: return@useTransaction failure(AuthError.UserNotFound)
@@ -195,7 +158,7 @@ class AuthService(
             val roleApproval = roleApprovalRepository.getApprovalByToken(token)
                 ?: return@useTransaction failure(AuthError.TokenValidationFailed)
             if (roleApproval.requestedRole != Role.STUDENT) {
-                return@useTransaction failure(AuthError.InvalidRole)
+                return@useTransaction failure(AuthError.UnauthorizedRole)
             }
             if (roleApproval.status != Status.PENDING) {
                 return@useTransaction failure(AuthError.AlreadyProcessed)

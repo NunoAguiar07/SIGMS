@@ -17,56 +17,32 @@ class ClassService(private val classRepository: ClassRepositoryInterface,
                    private val subjectRepository: SubjectRepositoryInterface,
                    private val transactionInterface: TransactionInterface,
 ) {
-    fun getAllClassesFromSubject(subjectId: String?, limit:String?, offset:String?): ClassListResult {
+    fun getAllClassesFromSubject(subjectId: Int, limit:Int, offset:Int): ClassListResult {
         return transactionInterface.useTransaction {
-            val newLimit = limit?.toInt() ?: 20
-            if (newLimit <= 0 || newLimit > 100) {
-                return@useTransaction failure(ClassError.InvalidClassLimit)
-            }
-            val newOffset = offset?.toInt() ?: 0
-            if (newOffset < 0) {
-                return@useTransaction failure(ClassError.InvalidClassOffset)
-            }
-            if (subjectId == null || subjectId.toIntOrNull() == null) {
-                return@useTransaction failure(ClassError.InvalidSubjectId)
-            }
-            val subject = subjectRepository.findSubjectById(subjectId.toInt())
+            val subject = subjectRepository.findSubjectById(subjectId)
                 ?: return@useTransaction failure(ClassError.SubjectNotFound)
-            val classes = classRepository.findClassesBySubject(subject, newLimit, newOffset)
+            val classes = classRepository.findClassesBySubject(subject, limit, offset)
             return@useTransaction success(classes)
         }
     }
 
-    fun getClassById(id: String?): ClassResult {
+    fun getClassById(id: Int): ClassResult {
         return transactionInterface.useTransaction {
-            if (id == null || id.toIntOrNull() == null) {
-                return@useTransaction failure(ClassError.InvalidClassData)
-            }
-            val schoolClass = classRepository.findClassById(id.toInt())
+            val schoolClass = classRepository.findClassById(id)
                 ?: return@useTransaction failure(ClassError.ClassNotFound)
             return@useTransaction success(schoolClass)
         }
     }
 
-    fun createClass(name: String, subjectId: String?): ClassResult {
+    fun createClass(name: String, subjectId: Int): ClassResult {
         return transactionInterface.useTransaction {
-            if (name.isBlank()) {
-                return@useTransaction failure(ClassError.InvalidClassData)
-            }
-            if (subjectId == null || subjectId.toIntOrNull() == null) {
-                return@useTransaction failure(ClassError.InvalidSubjectId)
-            }
             val existingClass = classRepository.findClassByName(name)
-            if(existingClass != null && existingClass.subject.id == subjectId.toInt()) {
+            if(existingClass != null && existingClass.subject.id == subjectId) {
                 return@useTransaction failure(ClassError.ClassAlreadyExists)
             }
-            val existingSubject = subjectRepository.findSubjectById(subjectId.toInt())
+            val existingSubject = subjectRepository.findSubjectById(subjectId)
                 ?: return@useTransaction failure(ClassError.SubjectNotFound)
-            val newClass = Class {
-                this.name = name
-                this.subject = existingSubject
-            }
-            classRepository.addClass(newClass.name, newClass.subject)
+            val newClass = classRepository.addClass(name, existingSubject)
             return@useTransaction success(newClass)
         }
     }

@@ -18,24 +18,22 @@ class TeacherRoomService (
     private val roomRepository: RoomRepositoryInterface,
     private val transactionInterface: TransactionInterface
 ) {
-    fun addTeacherToOffice(teacherId: Int, officeId: String) : AddTeacherRoomResult{
-        if(officeId.toIntOrNull() == null) return failure(TeacherRoomError.InvalidRoomId)
+    fun addTeacherToOffice(teacherId: Int, officeId: Int) : AddTeacherRoomResult{
         return transactionInterface.useTransaction {
             val teacher = teacherRepository.findTeacherById(teacherId)
                 ?: return@useTransaction failure(TeacherRoomError.TeacherNotFound)
-            val room = roomRepository.getOfficeRoomById(officeId.toInt())
+            val room = roomRepository.getOfficeRoomById(officeId)
                 ?: return@useTransaction failure(TeacherRoomError.RoomNotFound)
             val newTeacher = roomRepository.addTeacherToOffice(teacher, room)
             return@useTransaction success(newTeacher)
         }
     }
 
-    fun removeTeacherFromRoom(teacherId: Int, officeId: String) : RemoveTeacherRoomResult {
-        if(officeId.toIntOrNull() == null) return failure(TeacherRoomError.InvalidRoomId)
+    fun removeTeacherFromRoom(teacherId: Int, officeId: Int) : RemoveTeacherRoomResult {
         return transactionInterface.useTransaction {
             val teacher = teacherRepository.findTeacherById(teacherId)
                 ?: return@useTransaction failure(TeacherRoomError.TeacherNotFound)
-            val room = roomRepository.getOfficeRoomById(officeId.toInt())
+            val room = roomRepository.getOfficeRoomById(officeId)
                 ?: return@useTransaction failure(TeacherRoomError.RoomNotFound)
             val newTeacher = roomRepository.removeTeacherFromOffice(teacher, room)
             return@useTransaction success(newTeacher)

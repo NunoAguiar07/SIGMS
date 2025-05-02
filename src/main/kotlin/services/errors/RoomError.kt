@@ -3,7 +3,6 @@ package isel.leic.group25.services.errors
 import isel.leic.group25.api.exceptions.Problem
 
 sealed class RoomError {
-    data object InvalidRoomData : RoomError()
     data object RoomAlreadyExists : RoomError()
     data object RoomNotFound : RoomError()
     data object InvalidRoomId : RoomError()
@@ -21,10 +20,6 @@ sealed class RoomError {
             RoomAlreadyExists -> Problem.conflict(
                 title = "Room already exists",
                 detail = "The room with the given name already exists."
-            )
-            InvalidRoomData -> Problem.badRequest(
-                title = "Invalid room data",
-                detail = "The provided room data is invalid."
             )
             InvalidRoomId -> Problem.badRequest(
                 title = "Invalid room ID",

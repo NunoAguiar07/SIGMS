@@ -43,12 +43,6 @@ class UserService(private val repository: UserRepositoryInterface,
     }
 
     fun changePassword(userId: Int, oldPassword: String, newPassword: String) : UserResult {
-        if(oldPassword.isBlank() || newPassword.isBlank()) {
-            return failure(AuthError.MissingCredentials)
-        }
-        if(User.isNotSecurePassword(newPassword)) {
-            return failure(AuthError.InsecurePassword)
-        }
         return transactionInterface.useTransaction {
             val user = repository.findById(userId)
                 ?: return@useTransaction failure(AuthError.UserNotFound)

@@ -1,10 +1,13 @@
 package isel.leic.group25.api.http.routes.athenticatedRoutes
 
 import api.model.response.ScheduleResponse
+import io.ktor.http.*
+import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import isel.leic.group25.api.exceptions.respondEither
 import isel.leic.group25.api.jwt.getUserIdFromPrincipal
 import isel.leic.group25.api.jwt.getUserRoleFromPrincipal
+import isel.leic.group25.db.entities.types.Role
 import isel.leic.group25.services.UserClassService
 
 /**
@@ -22,9 +25,9 @@ fun Route.scheduleRoutes(
 ) {
     route("/schedule") {
         get {
-            val id = call.getUserIdFromPrincipal()
-            val role = call.getUserRoleFromPrincipal()
-            val result = userClassService.getScheduleByUserId(id, role)
+            val id = call.getUserIdFromPrincipal() ?: return@get call.respond(HttpStatusCode.Unauthorized)
+            val role = call.getUserRoleFromPrincipal() ?: return@get call.respond(HttpStatusCode.Unauthorized)
+            val result = userClassService.getScheduleByUserId(id, Role.valueOf(role.uppercase()))
             call.respondEither(
                 either = result,
                 transformError = { error -> error.toProblem() },

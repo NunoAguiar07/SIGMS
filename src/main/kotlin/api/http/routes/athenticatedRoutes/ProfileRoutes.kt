@@ -88,6 +88,9 @@ fun Route.changePasswordRoute(userService: UserService) {
     post("/password") {
         val userId = call.getUserIdFromPrincipal() ?: return@post call.respond(HttpStatusCode.Unauthorized)
         val passwordRequest = call.receive<ChangePasswordRequest>()
+        passwordRequest.validate()?.let{ error ->
+            return@post call.respond(error.toProblem())
+        }
         val result = userService.changePassword(
             userId = userId,
             oldPassword = passwordRequest.oldPassword,
@@ -95,7 +98,7 @@ fun Route.changePasswordRoute(userService: UserService) {
         )
         call.respondEither(
             either = result,
-            transformError = { error -> error.toProblem() },
+            transformError = { it.toProblem() },
             transformSuccess = { user ->
                 UserResponse.fromUser(user)
             }

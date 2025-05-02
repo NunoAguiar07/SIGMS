@@ -6,5 +6,9 @@ import kotlinx.serialization.Serializable
 enum class ClassType {
     THEORETICAL,
     PRACTICAL,
-    THEORETICAL_PRACTICAL,
+    THEORETICAL_PRACTICAL;
+
+    companion object {
+        fun fromValue(value: String): ClassType? = entries.find { it.name == value }
+    }
 }

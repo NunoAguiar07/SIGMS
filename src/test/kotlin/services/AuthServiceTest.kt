@@ -1,6 +1,7 @@
 package services
 
 import isel.leic.group25.api.jwt.JwtConfig
+import isel.leic.group25.db.entities.types.Role
 import isel.leic.group25.services.AuthService
 import isel.leic.group25.services.errors.AuthError
 import isel.leic.group25.utils.Failure
@@ -57,7 +58,7 @@ class AuthServiceTest {
             email = "student@test.com",
             username = "student1",
             password = "SecurePass123!",
-            role = "student"
+            role = Role.STUDENT
         )
 
         assertTrue(result is Success, "Registration should succeed")
@@ -66,34 +67,18 @@ class AuthServiceTest {
     }
 
     @Test
-    fun `register should fail with invalid role`() {
-        val result = authService.register(
-            email = "student@test.com",
-            username = "student1",
-            password = "SecurePass123!",
-            role = "MARIO"
-        )
-        assertTrue(result is Failure, "Registration should fail with invalid role")
-        assertEquals(
-            result.value,
-            AuthError.InvalidRole,
-            "Error should be InvalidRole"
-        )
-    }
-
-    @Test
     fun `register should fail with duplicated email`() {
         authService.register(
             email = "student@test.com",
             username = "student1",
             password = "SecurePass123!",
-            role = "student"
+            role = Role.STUDENT
         )
         val result = authService.register(
             email = "student@test.com",
             username = "student2",
             password = "SecurePass123!",
-            role = "student"
+            role = Role.STUDENT
         )
         assertTrue(result is Failure, "Registration should fail with duplicated email")
         assertEquals(
@@ -104,58 +89,14 @@ class AuthServiceTest {
     }
 
     @Test
-    fun `register should fail with missing credentials`() {
-        val emptyEmailResult = authService.register("", "student1", "pass", "student")
-        val emptyUsernameResult = authService.register("student@test.com", "", "pass", "student")
-        val emptyPasswordResult = authService.register("student@test.com", "student1", "", "student")
-
-        assertTrue(emptyEmailResult is Failure, "Registration should fail with empty email")
-        assertTrue(emptyUsernameResult is Failure, "Registration should fail with empty username")
-        assertTrue(emptyPasswordResult is Failure, "Registration should fail with empty password")
-
-        assertEquals(
-            emptyEmailResult.value,
-            AuthError.MissingCredentials,
-            "Error should be MissingCredentials"
-        )
-        assertEquals(
-            emptyUsernameResult.value,
-            AuthError.MissingCredentials,
-            "Error should be MissingCredentials"
-        )
-        assertEquals(
-            emptyPasswordResult.value,
-            AuthError.MissingCredentials,
-            "Error should be MissingCredentials"
-        )
-    }
-
-    @Test
-    fun `register should fail with insecure password`() {
-        val result = authService.register(
-            email = "student@test.com",
-            username = "student2",
-            password = "NotSecureEnough",
-            role = "student"
-        )
-
-        assertTrue(result is Failure, "Registration should fail with insecure password")
-        assertEquals(
-            result.value,
-            AuthError.InsecurePassword,
-            "Error should be InsecurePassword"
-        )
-    }
-
-    @Test
     fun `login should return token with valid credentials`() {
         authService.register(
             email = "student@test.com",
             username = "student1",
             password = "SecurePass123!",
-            role = "student"
+                role = Role.STUDENT
         )
-        val pendingApprovals = authService.getAllPendingApprovals(null, null)
+        val pendingApprovals = authService.getAllPendingApprovals(5, 0)
         assertTrue(pendingApprovals is Success)
         assertNotNull(pendingApprovals.value.first())
         val tempToken = authService.verifyStudentAccount(pendingApprovals.value.first().verificationToken)
@@ -179,7 +120,7 @@ class AuthServiceTest {
             email = "student@test.com",
             username = "student1",
             password = "SecurePass123!",
-            role = "student"
+            role = Role.STUDENT
         )
         val result = authService.login("student@test.com", "Luigi")
         assertTrue(result is Failure, "Login should fail with wrong password")
@@ -196,7 +137,7 @@ class AuthServiceTest {
             email = "student@test.com",
             username = "student1",
             password = "SecurePass123!",
-            role = "student"
+            role = Role.STUDENT
         )
         val result = authService.login("bowser@test.com", "SecurePass123!")
         assertTrue(result is Failure, "Login should fail for non-existent user")
@@ -204,26 +145,6 @@ class AuthServiceTest {
             result.value,
             AuthError.UserNotFound,
             "Error should be UserNotFound"
-        )
-    }
-
-    @Test
-    fun `login should fail with empty credentials`() {
-        val emptyEmailResult = authService.login("", "password")
-        val emptyPassResult = authService.login("email@test.com", "")
-
-        assertTrue(emptyEmailResult is Failure, "Login should fail with empty email")
-        assertTrue(emptyPassResult is Failure, "Login should fail with empty password")
-
-        assertEquals(
-            emptyEmailResult.value,
-            AuthError.MissingCredentials,
-            "Error should be MissingCredentials"
-        )
-        assertEquals(
-            emptyPassResult.value,
-            AuthError.MissingCredentials,
-            "Error should be MissingCredentials"
         )
     }
 }

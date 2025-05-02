@@ -28,17 +28,9 @@ class LectureService(
     private val emailService: EmailService,
     ) {
 
-    fun getAllLectures(limit: String?, offSet: String?): LectureListResult {
-        val newLimit = limit?.toInt() ?: 20
-        if (newLimit <= 0 || newLimit > 100) {
-            return failure(LectureError.InvalidLectureLimit)
-        }
-        val newOffSet = offSet?.toInt() ?: 0
-        if (newOffSet < 0) {
-            return failure(LectureError.InvalidLectureOffset)
-        }
+    fun getAllLectures(limit: Int, offSet: Int): LectureListResult {
         return transactionInterface.useTransaction {
-            val lectures = lectureRepository.getAllLectures(newLimit, newOffSet)
+            val lectures = lectureRepository.getAllLectures(limit, offSet)
             return@useTransaction success(lectures)
         }
     }
@@ -77,44 +69,16 @@ class LectureService(
         }
     }
 
-    fun getLecturesByRoom(roomId: String?, limit: String?, offSet: String?): LectureListResult {
-        if (roomId == null || roomId.toIntOrNull() == null) {
-            return failure(LectureError.InvalidLectureRoom)
-        }
-        if (roomId.toInt() <= 0) {
-            return failure(LectureError.InvalidLectureRoom)
-        }
-        val newLimit = limit?.toInt() ?: 20
-        if (newLimit <= 0 || newLimit > 100) {
-            return failure(LectureError.InvalidLectureLimit)
-        }
-        val newOffSet = offSet?.toInt() ?: 0
-        if (newOffSet < 0) {
-            return failure(LectureError.InvalidLectureOffset)
-        }
+    fun getLecturesByRoom(roomId: Int, limit: Int, offSet: Int): LectureListResult {
         return transactionInterface.useTransaction {
-            val lectures = lectureRepository.getLecturesByRoom(roomId.toInt(), newLimit, newOffSet)
+            val lectures = lectureRepository.getLecturesByRoom(roomId, limit, offSet)
             return@useTransaction success(lectures)
         }
     }
 
-    fun getLecturesByClass(classId: String?, limit: String?, offset:String?): LectureListResult {
-        val newLimit = limit?.toInt() ?: 20
-        if (newLimit <= 0 || newLimit > 100) {
-            return failure(LectureError.InvalidLectureLimit)
-        }
-        val newOffset = offset?.toInt() ?: 0
-        if (newOffset < 0) {
-            return failure(LectureError.InvalidLectureOffset)
-        }
-        if (classId == null || classId.toIntOrNull() == null) {
-            return failure(LectureError.InvalidLectureSubject)
-        }
-        if (classId.toInt() <= 0) {
-            return failure(LectureError.InvalidLectureSubject)
-        }
+    fun getLecturesByClass(classId: Int, limit: Int, offset:Int): LectureListResult {
         return transactionInterface.useTransaction {
-            val lectures = lectureRepository.getLecturesByClass(classId.toInt(), newLimit, newOffset)
+            val lectures = lectureRepository.getLecturesByClass(classId, limit, offset)
             return@useTransaction success(lectures)
         }
     }

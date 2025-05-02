@@ -6,7 +6,6 @@ import io.ktor.server.auth.jwt.*
 
 fun ApplicationCall.getUserIdFromPrincipal(): Int? {
     return principal<JWTPrincipal>()?.payload?.getClaim("userId")?.asInt()
-
 }
 
 fun ApplicationCall.getUserRoleFromPrincipal(): String? {

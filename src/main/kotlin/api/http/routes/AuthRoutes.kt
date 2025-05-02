@@ -8,7 +8,9 @@ import io.ktor.http.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import isel.leic.group25.api.exceptions.RequestError
 import isel.leic.group25.api.exceptions.respondEither
+import isel.leic.group25.db.entities.types.Role
 import isel.leic.group25.services.AuthService
 
 /**
@@ -36,15 +38,18 @@ fun Route.authRoutes(authService: AuthService) {
 fun Route.registerRoute(authService: AuthService) {
     post("/register") {
         val credentials = call.receive<UserCredentialsRequest>()
+        credentials.validate()?.let { error ->
+            return@post call.respond(error.toProblem())
+        }
         val result = authService.register(
             email = credentials.email,
             username = credentials.username,
             password = credentials.password,
-            role = credentials.role
+            role = Role.valueOf(credentials.role.uppercase())
         )
         call.respondEither(
             either = result,
-            transformError = { error -> error.toProblem() },
+            transformError = { it.toProblem() },
             transformSuccess = { check ->
                 val message = if(check) {
                     "Check your email to approve your account"
@@ -68,13 +73,16 @@ fun Route.registerRoute(authService: AuthService) {
 fun Route.loginRoute(authService: AuthService) {
     post("/login") {
         val credentials = call.receive<LoginCredentialsRequest>()
+        credentials.validate()?.let { error ->
+            return@post call.respond(error.toProblem())
+        }
         val result = authService.login(
             email = credentials.email,
             password = credentials.password
         )
         call.respondEither(
             either = result,
-            transformError = { error -> error.toProblem() },
+            transformError = { it.toProblem() },
             transformSuccess = { token ->
                 LoginResponse(token = token)
             }
@@ -90,7 +98,8 @@ fun Route.loginRoute(authService: AuthService) {
  */
 fun Route.accountVerificationRoute(authService: AuthService) {
     put {
-        val token = call.request.queryParameters["token"] ?: return@put call.respond(HttpStatusCode.BadRequest)
+        val token = call.request.queryParameters["token"]
+            ?: return@put call.respond(RequestError.Missing("token").toProblem())
         val result = authService.verifyStudentAccount(token)
         call.respondEither(
             either = result,

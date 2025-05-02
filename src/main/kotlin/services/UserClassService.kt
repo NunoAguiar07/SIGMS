@@ -3,6 +3,7 @@ package isel.leic.group25.services
 import isel.leic.group25.db.repositories.interfaces.TransactionInterface
 import isel.leic.group25.services.errors.UserClassError
 import isel.leic.group25.db.entities.timetables.Lecture
+import isel.leic.group25.db.entities.types.Role
 import isel.leic.group25.db.repositories.timetables.interfaces.ClassRepositoryInterface
 import isel.leic.group25.db.repositories.timetables.interfaces.LectureRepositoryInterface
 import isel.leic.group25.db.repositories.users.interfaces.StudentRepositoryInterface
@@ -26,20 +27,11 @@ class UserClassService(
     private val lectureRepository: LectureRepositoryInterface,
     private val transactionInterface: TransactionInterface
 ) {
-    fun addUserToClass(userId: Int?, classId: String?, role: String?): UserClassCreated {
-        if(userId == null) {
-            return failure(UserClassError.InvalidUserId)
-        }
-        if (classId == null || classId.toIntOrNull() == null) {
-            return failure(UserClassError.InvalidClassId)
-        }
-        if (role.isNullOrBlank()) {
-            return failure(UserClassError.InvalidRole)
-        }
+    fun addUserToClass(userId: Int, classId: Int, role: Role): UserClassCreated {
         return transactionInterface.useTransaction {
-            val schoolClass = classRepository.findClassById(classId.toInt()) ?: return@useTransaction failure(UserClassError.ClassNotFound)
+            val schoolClass = classRepository.findClassById(classId) ?: return@useTransaction failure(UserClassError.ClassNotFound)
             when (role) {
-                "STUDENT" -> {
+                Role.STUDENT -> {
                     val student = studentRepository.findStudentById(userId) ?: return@useTransaction failure(UserClassError.UserNotFound)
                     if (classRepository.checkStudentInClass(student.user.id, schoolClass.id)) {
                         return@useTransaction failure(UserClassError.UserAlreadyInClass)
@@ -50,7 +42,7 @@ class UserClassService(
                     }
                     return@useTransaction success(true)
                 }
-                "TEACHER" -> {
+                Role.TEACHER -> {
                     val teacher = teacherRepository.findTeacherById(userId) ?: return@useTransaction failure(UserClassError.UserNotFound)
                     if (classRepository.checkTeacherInClass(teacher.user.id, schoolClass.id)) {
                         return@useTransaction failure(UserClassError.UserAlreadyInClass)
@@ -66,21 +58,12 @@ class UserClassService(
         }
     }
 
-    fun removeUserFromClass(userId: Int?, classId: String?, role:String?): UserClassDeleted {
-        if(userId == null) {
-            return failure(UserClassError.InvalidUserId)
-        }
-        if (classId == null || classId.toIntOrNull() == null) {
-            return failure(UserClassError.InvalidClassId)
-        }
-        if (role.isNullOrBlank()) {
-            return failure(UserClassError.InvalidRole)
-        }
+    fun removeUserFromClass(userId: Int, classId: Int, role:Role): UserClassDeleted {
         return transactionInterface.useTransaction {
             val user = userRepository.findById(userId) ?: return@useTransaction failure(UserClassError.UserNotFound)
-            val schoolClass = classRepository.findClassById(classId.toInt()) ?: return@useTransaction failure(UserClassError.ClassNotFound)
+            val schoolClass = classRepository.findClassById(classId) ?: return@useTransaction failure(UserClassError.ClassNotFound)
             when (role) {
-                "STUDENT" -> {
+                Role.STUDENT -> {
                     if (!classRepository.checkStudentInClass(user.id, schoolClass.id)) {
                         return@useTransaction failure(UserClassError.UserNotInClass)
                     }
@@ -90,7 +73,7 @@ class UserClassService(
                     }
                     return@useTransaction success(true)
                 }
-                "TEACHER" -> {
+                Role.TEACHER -> {
                     if (!classRepository.checkTeacherInClass(user.id, schoolClass.id)) {
                         return@useTransaction failure(UserClassError.UserNotInClass)
                     }
@@ -105,17 +88,11 @@ class UserClassService(
         }
     }
 
-    fun getScheduleByUserId(userId: Int?, role: String?): UserLectureListResult {
-        if(userId == null) {
-            return failure(UserClassError.InvalidUserId)
-        }
-        if (role.isNullOrBlank()) {
-            return failure(UserClassError.InvalidRole)
-        }
+    fun getScheduleByUserId(userId: Int, role: Role): UserLectureListResult {
         return transactionInterface.useTransaction {
             val user = userRepository.findById(userId) ?: return@useTransaction failure(UserClassError.UserNotFound)
             when (role) {
-                "STUDENT" -> {
+                Role.STUDENT -> {
                     val classes = classRepository.findClassesByStudentId(user.id)
                     if(classes.isEmpty()) {
                         return@useTransaction success(emptyList<Lecture>())
@@ -126,7 +103,7 @@ class UserClassService(
                     }
                     return@useTransaction success(lectures)
                 }
-                "TEACHER" -> {
+                Role.TEACHER -> {
                     val classes = classRepository.findClassesByTeacherId(user.id)
                     if(classes.isEmpty()) {
                         return@useTransaction success(emptyList<Lecture>())

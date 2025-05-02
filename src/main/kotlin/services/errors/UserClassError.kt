@@ -6,11 +6,6 @@ sealed class UserClassError {
     data object UserNotFound : UserClassError()
     data object ClassNotFound : UserClassError()
     data object InvalidRole : UserClassError()
-    data object InvalidUserClassData : UserClassError()
-    data object UserClassChangesFailed : UserClassError()
-    data object MissingUserClassData : UserClassError()
-    data object InvalidUserId : UserClassError()
-    data object InvalidClassId : UserClassError()
     data object FailedToLinkUserToClass : UserClassError()
     data object FailedToUnlinkUserFromClass : UserClassError()
     data object UserNotInClass : UserClassError()
@@ -28,26 +23,6 @@ sealed class UserClassError {
         InvalidRole -> Problem.badRequest(
             title = "Invalid role",
             detail = "The provided role is invalid."
-        )
-        InvalidUserClassData -> Problem.badRequest(
-            title = "Invalid user class data",
-            detail = "The provided user class data is invalid."
-        )
-        UserClassChangesFailed -> Problem.internalServerError(
-            title = "User class changes failed",
-            detail = "Failed to update the user class information."
-        )
-        MissingUserClassData -> Problem.badRequest(
-            title = "Missing user class data",
-            detail = "The request is missing required user class data."
-        )
-        InvalidUserId -> Problem.badRequest(
-            title = "Invalid user ID",
-            detail = "The provided user ID is invalid."
-        )
-        InvalidClassId -> Problem.badRequest(
-            title = "Invalid class ID",
-            detail = "The provided class ID is invalid."
         )
         FailedToLinkUserToClass -> Problem.internalServerError(
             title = "Failed to link user to class",

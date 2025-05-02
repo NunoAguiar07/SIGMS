@@ -2,7 +2,9 @@ package isel.leic.group25.api.http.routes.athenticatedRoutes
 
 import io.ktor.http.*
 import io.ktor.server.request.*
+import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import isel.leic.group25.api.exceptions.RequestError
 import isel.leic.group25.api.exceptions.respondEither
 import isel.leic.group25.api.http.utils.withRole
 import isel.leic.group25.api.http.utils.withRoles
@@ -61,8 +63,10 @@ fun Route.subjectRoutes(
  */
 fun Route.baseSubjectRoutes(subjectService: SubjectService) {
     get {
-        val limit = call.queryParameters["limit"]
-        val offset = call.queryParameters["offset"]
+        val limit = call.queryParameters["limit"] ?.toIntOrNull()?: 10
+        if(limit < 1 || limit > 100) return@get call.respond(RequestError.Invalid("limit").toProblem())
+        val offset = call.queryParameters["offset"] ?.toIntOrNull() ?: 0
+        if(offset < 0) return@get call.respond(RequestError.Invalid("offset").toProblem())
         val result = subjectService.getAllSubjects(limit, offset)
         call.respondEither(
             either = result,
@@ -76,12 +80,15 @@ fun Route.baseSubjectRoutes(subjectService: SubjectService) {
     withRole(Role.ADMIN){
         post("/add") {
             val subjectRequest = call.receive<SubjectRequest>()
+            subjectRequest.validate()?.let { error ->
+                return@post call.respond(error.toProblem())
+            }
             val result = subjectService.createSubject(
                 name = subjectRequest.name
             )
             call.respondEither(
                 either = result,
-                transformError = { error -> error.toProblem() },
+                transformError = { it.toProblem() },
                 transformSuccess = { subject ->
                     SubjectResponse.fromSubject(subject)
                 },
@@ -100,8 +107,10 @@ fun Route.baseSubjectRoutes(subjectService: SubjectService) {
 fun Route.specificSubjectRoutes(subjectService: SubjectService) {
     route("/{subjectId}") {
         get {
-            val id = call.parameters["subjectId"]
-            val result = subjectService.getSubjectById(id)
+            val subjectId = call.parameters["subjectId"]
+            if(subjectId.isNullOrBlank()) return@get call.respond(RequestError.Missing("subjectId").toProblem())
+            if(subjectId.toIntOrNull() == null) return@get call.respond(RequestError.Invalid("subjectId").toProblem())
+            val result = subjectService.getSubjectById(subjectId.toInt())
             call.respondEither(
                 either = result,
                 transformError = { error -> error.toProblem() },
@@ -113,8 +122,10 @@ fun Route.specificSubjectRoutes(subjectService: SubjectService) {
 
         withRole(Role.ADMIN){
             delete("/delete") {
-                val id = call.parameters["subjectId"]
-                val result = subjectService.deleteSubject(id)
+                val subjectId = call.parameters["subjectId"]
+                if(subjectId.isNullOrBlank()) return@delete call.respond(RequestError.Missing("subjectId").toProblem())
+                if(subjectId.toIntOrNull() == null) return@delete call.respond(RequestError.Invalid("subjectId").toProblem())
+                val result = subjectService.deleteSubject(subjectId.toInt())
                 call.respondEither(
                     either = result,
                     transformError = { error -> error.toProblem() },
@@ -135,10 +146,14 @@ fun Route.specificSubjectRoutes(subjectService: SubjectService) {
 fun Route.subjectClassesRoutes(classService: ClassService) {
     route("/{subjectId}/classes") {
         get {
-            val limit = call.queryParameters["limit"]
-            val offset = call.queryParameters["offset"]
-            val id = call.parameters["subjectId"]
-            val result = classService.getAllClassesFromSubject(id, limit, offset)
+            val limit = call.queryParameters["limit"] ?.toIntOrNull()?: 10
+            if(limit < 1 || limit > 100) return@get call.respond(RequestError.Invalid("limit").toProblem())
+            val offset = call.queryParameters["offset"] ?.toIntOrNull() ?: 0
+            if(offset < 0) return@get call.respond(RequestError.Invalid("offset").toProblem())
+            val subjectId = call.parameters["subjectId"]
+            if(subjectId.isNullOrBlank()) return@get call.respond(RequestError.Missing("subjectId").toProblem())
+            if(subjectId.toIntOrNull() == null) return@get call.respond(RequestError.Invalid("subjectId").toProblem())
+            val result = classService.getAllClassesFromSubject(subjectId.toInt(), limit, offset)
             call.respondEither(
                 either = result,
                 transformError = { error -> error.toProblem() },
@@ -150,11 +165,13 @@ fun Route.subjectClassesRoutes(classService: ClassService) {
 
         withRole(Role.ADMIN){
             post("/add") {
-                val id = call.parameters["subjectId"]
+                val subjectId = call.parameters["subjectId"]
+                if(subjectId.isNullOrBlank()) return@post call.respond(RequestError.Missing("subjectId").toProblem())
+                if(subjectId.toIntOrNull() == null) return@post call.respond(RequestError.Invalid("subjectId").toProblem())
                 val classRequest = call.receive<ClassRequest>()
                 val result = classService.createClass(
                     name = classRequest.name,
-                    subjectId = id
+                    subjectId = subjectId.toInt()
                 )
                 call.respondEither(
                     either = result,
@@ -176,8 +193,10 @@ fun Route.subjectClassesRoutes(classService: ClassService) {
 fun Route.classManagementRoutes(classService: ClassService) {
     route("/{classId}") {
         get {
-            val id = call.parameters["classId"]
-            val result = classService.getClassById(id)
+            val classId = call.parameters["classId"]
+            if(classId.isNullOrBlank()) return@get call.respond(RequestError.Missing("classId").toProblem())
+            if(classId.toIntOrNull() == null) return@get call.respond(RequestError.Invalid("classId").toProblem())
+            val result = classService.getClassById(classId.toInt())
             call.respondEither(
                 either = result,
                 transformError = { error -> error.toProblem() },
@@ -197,10 +216,12 @@ fun Route.classManagementRoutes(classService: ClassService) {
 fun Route.classUserRoutes(usersClassService: UserClassService) {
     route("/users") {
         post("/add") {
-            val role = call.getUserRoleFromPrincipal()
-            val userId = call.getUserIdFromPrincipal()
-            val id = call.parameters["classId"]
-            val result = usersClassService.addUserToClass(userId, id, role)
+            val role = call.getUserRoleFromPrincipal() ?: return@post call.respond(HttpStatusCode.Unauthorized)
+            val userId = call.getUserIdFromPrincipal() ?: return@post call.respond(HttpStatusCode.Unauthorized)
+            val classId = call.parameters["classId"]
+            if(classId.isNullOrBlank()) return@post call.respond(RequestError.Missing("classId").toProblem())
+            if(classId.toIntOrNull() == null) return@post call.respond(RequestError.Invalid("classId").toProblem())
+            val result = usersClassService.addUserToClass(userId, classId.toInt(), Role.valueOf(role.uppercase()))
             call.respondEither(
                 either = result,
                 transformError = { error -> error.toProblem() },
@@ -211,10 +232,12 @@ fun Route.classUserRoutes(usersClassService: UserClassService) {
         }
 
         delete("/remove") {
-            val role = call.getUserRoleFromPrincipal()
-            val userId = call.getUserIdFromPrincipal()
+            val role = call.getUserRoleFromPrincipal() ?: return@delete call.respond(HttpStatusCode.Unauthorized)
+            val userId = call.getUserIdFromPrincipal() ?: return@delete call.respond(HttpStatusCode.Unauthorized)
             val classId = call.parameters["classId"]
-            val result = usersClassService.removeUserFromClass(userId, classId, role)
+            if(classId.isNullOrBlank()) return@delete call.respond(RequestError.Missing("classId").toProblem())
+            if(classId.toIntOrNull() == null) return@delete call.respond(RequestError.Invalid("classId").toProblem())
+            val result = usersClassService.removeUserFromClass(userId, classId.toInt(), Role.valueOf(role.uppercase()))
             call.respondEither(
                 either = result,
                 transformError = { error -> error.toProblem() },
@@ -233,10 +256,14 @@ fun Route.classUserRoutes(usersClassService: UserClassService) {
 fun Route.classLecturesRoutes(lectureService: LectureService) {
     route("/lectures") {
         get {
-            val limit = call.queryParameters["limit"]
-            val offset = call.queryParameters["offset"]
+            val limit = call.queryParameters["limit"] ?.toIntOrNull()?: 10
+            if(limit < 1 || limit > 100) return@get call.respond(RequestError.Invalid("limit").toProblem())
+            val offset = call.queryParameters["offset"] ?.toIntOrNull() ?: 0
+            if(offset < 0) return@get call.respond(RequestError.Invalid("offset").toProblem())
             val id = call.parameters["classId"]
-            val result = lectureService.getLecturesByClass(id, limit, offset)
+            if(id.isNullOrBlank()) return@get call.respond(RequestError.Missing("classId").toProblem())
+            if(id.toIntOrNull() == null) return@get call.respond(RequestError.Invalid("classId").toProblem())
+            val result = lectureService.getLecturesByClass(id.toInt(), limit, offset)
             call.respondEither(
                 either = result,
                 transformError = { error -> error.toProblem() },

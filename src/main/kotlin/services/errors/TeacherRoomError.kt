@@ -5,7 +5,6 @@ import isel.leic.group25.api.exceptions.Problem
 sealed class TeacherRoomError {
     data object TeacherNotFound : TeacherRoomError()
     data object RoomNotFound : TeacherRoomError()
-    data object InvalidRoomId : TeacherRoomError()
 
     fun toProblem(): Problem {
         return when (this) {
@@ -15,10 +14,6 @@ sealed class TeacherRoomError {
             RoomNotFound -> Problem.notFound(
                 title = "Room not found",
                 detail = "The room with the given ID was not found."
-            )
-            InvalidRoomId -> Problem.badRequest(
-                title = "Invalid room ID",
-                detail = "The provided room ID is invalid."
             )
         }
     }
