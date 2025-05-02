@@ -7,7 +7,6 @@ import isel.leic.group25.db.entities.timetables.Class
 import isel.leic.group25.db.entities.types.ClassType
 import isel.leic.group25.db.entities.types.WeekDay
 import isel.leic.group25.services.UserClassService
-import isel.leic.group25.services.errors.ClassError
 import isel.leic.group25.services.errors.UserClassError
 import isel.leic.group25.utils.Failure
 import isel.leic.group25.utils.Success
@@ -51,7 +50,7 @@ class UserClassServiceTest {
         when (role)  {
             Role.STUDENT -> studentRepository.addMockStudent(user)
             Role.TEACHER -> teacherRepository.addMockTeacher(user)
-            else -> ClassError.InvalidRole
+            else -> fail("Unexpected role: $role")
         }
         return user
     }
@@ -78,7 +77,7 @@ class UserClassServiceTest {
     fun `addUserToClass should succeed for valid student`() {
         val studentUser = createTestUser(Role.STUDENT)
         val testClass = createTestClass()
-        val result = service.addUserToClass(studentUser.id, testClass.id.toString(), "STUDENT")
+        val result = service.addUserToClass(studentUser.id, testClass.id, Role.STUDENT)
         assertTrue(result is Success)
         assertTrue(result.value)
         assertTrue(classRepository.checkStudentInClass(studentUser.id, testClass.id))
@@ -89,7 +88,7 @@ class UserClassServiceTest {
         val teacherUser = createTestUser(Role.TEACHER)
         val testClass = createTestClass()
 
-        val result = service.addUserToClass(teacherUser.id, testClass.id.toString(), "TEACHER")
+        val result = service.addUserToClass(teacherUser.id, testClass.id, Role.TEACHER)
 
         assertTrue(result is Success)
         assertTrue(result.value)
@@ -97,35 +96,9 @@ class UserClassServiceTest {
     }
 
     @Test
-    fun `addUserToClass should fail for invalid user ID`() {
-        val result = service.addUserToClass(null, "1", "STUDENT")
-        assertTrue(result is Failure)
-        assertEquals(UserClassError.InvalidUserId, result.value)
-    }
-
-    @Test
-    fun `addUserToClass should fail for invalid class ID`() {
-        val studentUser = createTestUser(Role.STUDENT)
-        val result = service.addUserToClass(studentUser.id, "invalid", "STUDENT")
-        assertTrue(result is Failure)
-        assertEquals(UserClassError.InvalidClassId, result.value)
-    }
-
-    @Test
-    fun `addUserToClass should fail for invalid role`() {
-        val studentUser = createTestUser(Role.STUDENT)
-        val testClass = createTestClass()
-
-        val result = service.addUserToClass(studentUser.id, testClass.id.toString(), "INVALID_ROLE")
-
-        assertTrue(result is Failure)
-        assertEquals(UserClassError.InvalidRole, result.value)
-    }
-
-    @Test
     fun `addUserToClass should fail for non-existent class`() {
         val studentUser = createTestUser(Role.STUDENT)
-        val result = service.addUserToClass(studentUser.id, "9999", "STUDENT")
+        val result = service.addUserToClass(studentUser.id, 999, Role.STUDENT)
         assertTrue(result is Failure)
         assertEquals(UserClassError.ClassNotFound, result.value)
     }
@@ -133,7 +106,7 @@ class UserClassServiceTest {
     @Test
     fun `addUserToClass should fail for non-existent user`() {
         val testClass = createTestClass()
-        val result = service.addUserToClass(9999, testClass.id.toString(), "STUDENT")
+        val result = service.addUserToClass(9999, testClass.id, Role.STUDENT)
         assertTrue(result is Failure)
         assertEquals(UserClassError.UserNotFound, result.value)
     }
@@ -144,11 +117,11 @@ class UserClassServiceTest {
         val testClass = createTestClass()
 
         // First addition should succeed
-        val firstResult = service.addUserToClass(studentUser.id, testClass.id.toString(), "STUDENT")
+        val firstResult = service.addUserToClass(studentUser.id, testClass.id, Role.STUDENT)
         assertTrue(firstResult is Success)
 
         // Second addition should fail
-        val secondResult = service.addUserToClass(studentUser.id, testClass.id.toString(), "STUDENT")
+        val secondResult = service.addUserToClass(studentUser.id, testClass.id, Role.STUDENT)
         assertTrue(secondResult is Failure)
         assertEquals(UserClassError.UserAlreadyInClass, secondResult.value)
     }
@@ -159,10 +132,10 @@ class UserClassServiceTest {
         val testClass = createTestClass()
 
         // Add student first
-        service.addUserToClass(studentUser.id, testClass.id.toString(), "STUDENT")
+        service.addUserToClass(studentUser.id, testClass.id, Role.STUDENT)
 
         // Then remove
-        val result = service.removeUserFromClass(studentUser.id, testClass.id.toString(), "STUDENT")
+        val result = service.removeUserFromClass(studentUser.id, testClass.id, Role.STUDENT)
 
         assertTrue(result is Success)
         assertTrue(result.value)
@@ -174,21 +147,10 @@ class UserClassServiceTest {
         val studentUser = createTestUser(Role.STUDENT)
         val testClass = createTestClass()
 
-        val result = service.removeUserFromClass(studentUser.id, testClass.id.toString(), "STUDENT")
+        val result = service.removeUserFromClass(studentUser.id, testClass.id, Role.STUDENT)
 
         assertTrue(result is Failure)
         assertEquals(UserClassError.UserNotInClass, result.value)
-    }
-
-    @Test
-    fun `removeUserFromClass should fail for invalid role`() {
-        val studentUser = createTestUser(Role.STUDENT)
-        val testClass = createTestClass()
-
-        val result = service.removeUserFromClass(studentUser.id, testClass.id.toString(), "INVALID_ROLE")
-
-        assertTrue(result is Failure)
-        assertEquals(UserClassError.InvalidRole, result.value)
     }
 
     @Test
@@ -217,9 +179,9 @@ class UserClassServiceTest {
         )
 
         // Add student to class
-        service.addUserToClass(studentUser.id, testClass.id.toString(), "STUDENT")
+        service.addUserToClass(studentUser.id, testClass.id, Role.STUDENT)
 
-        val result = service.getScheduleByUserId(studentUser.id, "STUDENT")
+        val result = service.getScheduleByUserId(studentUser.id, Role.STUDENT)
 
         assertTrue(result is Success)
         assertEquals(2, result.value.size)
@@ -238,25 +200,10 @@ class UserClassServiceTest {
     fun `getScheduleByUserId should return empty list for student with no classes`() {
         val studentUser = createTestUser(Role.STUDENT)
 
-        val result = service.getScheduleByUserId(studentUser.id, "STUDENT")
+        val result = service.getScheduleByUserId(studentUser.id, Role.STUDENT)
 
         assertTrue(result is Success)
         assertTrue(result.value.isEmpty())
-    }
-
-    @Test
-    fun `getScheduleByUserId should fail for invalid user ID`() {
-        val result = service.getScheduleByUserId(null, "STUDENT")
-        assertTrue(result is Failure)
-        assertEquals(UserClassError.InvalidUserId, result.value)
-    }
-
-    @Test
-    fun `getScheduleByUserId should fail for invalid role`() {
-        val studentUser = createTestUser(Role.STUDENT)
-        val result = service.getScheduleByUserId(studentUser.id, "INVALID_ROLE")
-        assertTrue(result is Failure)
-        assertEquals(UserClassError.InvalidRole, result.value)
     }
 
 }

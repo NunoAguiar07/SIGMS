@@ -5,62 +5,42 @@ import isel.leic.group25.api.exceptions.Problem
 sealed class AuthError {
     data object UserAlreadyExists : AuthError()
     data object UserChangesFailed : AuthError()
-    data object InsecurePassword : AuthError()
-    data object MissingCredentials : AuthError()
     data object UserNotFound : AuthError()
-    data object InvalidCredentials : AuthError()
-    data object TokenCreationFailed : AuthError()
-    data object TokenValidationFailed : AuthError()
-    data object TokenExpired : AuthError()
-    data object InvalidRole : AuthError()
+    data object UserDeleteFailed : AuthError()
     data object RoleApprovedFailed : AuthError()
     data object AlreadyProcessed : AuthError()
-    data object InvalidLimit : AuthError()
-    data object InvalidOffset : AuthError()
-    data object UserDeleteFailed : AuthError()
-
+    data object InsecurePassword : AuthError()
+    data object TokenValidationFailed : AuthError()
+    data object UnauthorizedRole : AuthError()
+    data object InvalidCredentials: AuthError()
+    data class ConnectionDbError(val message: String?) : AuthError()
+    data class EmailError(val message: String?) : AuthError()
 
     fun toProblem(): Problem {
         return when (this) {
             UserAlreadyExists -> Problem.conflict(
                 title = "User already exists",
-                detail = "The user with the given username already exists."
+                detail = "The user with the given email already exists."
             )
             UserChangesFailed -> Problem.internalServerError(
                 title = "User changes failed",
                 detail = "Failed to update the user information."
             )
-            InsecurePassword -> Problem.badRequest(
-                title = "Insecure password",
-                detail = "The provided password does not meet security requirements."
-            )
-            MissingCredentials -> Problem.badRequest(
-                title = "Missing credentials",
-                detail = "The request is missing required authentication credentials."
-            )
             UserNotFound -> Problem.notFound(
                 title = "User not found",
                 detail = "The user with the given ID was not found."
             )
-            InvalidCredentials -> Problem.unauthorized(
-                title = "Invalid credentials",
-                detail = "The provided credentials are invalid."
+            UserDeleteFailed -> Problem.internalServerError(
+                title = "User delete failed",
+                detail = "Failed to delete the user."
             )
-            TokenCreationFailed -> Problem.internalServerError(
-                title = "Token creation failed",
-                detail = "Failed to create the authentication token."
+            InsecurePassword -> Problem.badRequest(
+                title = "Insecure password",
+                detail = "The provided password does not meet security requirements."
             )
             TokenValidationFailed -> Problem.unauthorized(
                 title = "Token validation failed",
                 detail = "The provided token is invalid or expired."
-            )
-            TokenExpired -> Problem.unauthorized(
-                title = "Token expired",
-                detail = "The provided token has expired."
-            )
-            InvalidRole -> Problem.badRequest(
-                title = "Invalid role",
-                detail = "The provided role is invalid."
             )
             RoleApprovedFailed -> Problem.internalServerError(
                 title = "Role approval failed",
@@ -70,17 +50,21 @@ sealed class AuthError {
                 title = "Already processed",
                 detail = "The request has already been processed."
             )
-            InvalidLimit -> Problem.badRequest(
-                title = "Invalid limit",
-                detail = "The provided limit is invalid."
+            UnauthorizedRole -> Problem.unauthorized(
+                title = "Unauthorized role",
+                detail = "You do not have the required role to perform this action."
             )
-            InvalidOffset -> Problem.badRequest(
-                title = "Invalid offset",
-                detail = "The provided offset is invalid."
+            InvalidCredentials -> Problem.badRequest(
+                title = "Invalid credentials",
+                detail = "Invalid email or password."
             )
-            UserDeleteFailed -> Problem.internalServerError(
-                title = "User delete failed",
-                detail = "Failed to delete the user."
+            is ConnectionDbError -> Problem.internalServerError(
+                title = "Database Connection Error",
+                detail = "Could not establish connection to the database"
+            )
+            is EmailError -> Problem.badRequest(
+                title = "Invalid Email",
+                detail = "Could not send email properly"
             )
         }
     }

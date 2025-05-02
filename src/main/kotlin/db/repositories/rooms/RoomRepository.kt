@@ -6,6 +6,7 @@ import isel.leic.group25.db.entities.rooms.Room
 import isel.leic.group25.db.entities.rooms.StudyRoom
 import isel.leic.group25.db.entities.users.Teacher
 import isel.leic.group25.db.repositories.rooms.interfaces.RoomRepositoryInterface
+import isel.leic.group25.db.repositories.utils.withDatabase
 import isel.leic.group25.db.tables.Tables.Companion.classrooms
 import isel.leic.group25.db.tables.Tables.Companion.officeRooms
 import isel.leic.group25.db.tables.Tables.Companion.rooms
@@ -16,27 +17,27 @@ import org.ktorm.dsl.eq
 import org.ktorm.entity.*
 
 class RoomRepository (private val database: Database) : RoomRepositoryInterface {
-    override fun getAllRooms(): List<Room> {
+    override fun getAllRooms(): List<Room> = withDatabase {
         return database.rooms.toList()
     }
 
-    override fun getAllRooms(limit:Int, offset:Int): List<Room> {
+    override fun getAllRooms(limit:Int, offset:Int): List<Room> = withDatabase {
         return database.rooms.drop(offset).take(limit).toList()
     }
 
-    override fun getRoomById(id: Int): Room? {
+    override fun getRoomById(id: Int): Room? = withDatabase {
         return database.rooms.firstOrNull { it.id eq id }
     }
 
-    override fun getOfficeRoomById(id: Int): OfficeRoom? {
+    override fun getOfficeRoomById(id: Int): OfficeRoom? = withDatabase {
         return database.officeRooms.firstOrNull { it.id eq id }
     }
 
-    override fun getClassRoomById(id: Int): Classroom? {
+    override fun getClassRoomById(id: Int): Classroom? = withDatabase {
         return database.classrooms.firstOrNull { it.id eq id }
     }
 
-    override fun createRoom(capacity: Int, name: String): Room {
+    override fun createRoom(capacity: Int, name: String): Room = withDatabase {
         val newRoom = Room {
             this.name = name
             this.capacity = capacity
@@ -45,46 +46,46 @@ class RoomRepository (private val database: Database) : RoomRepositoryInterface 
         return newRoom
     }
 
-    override fun createClassRoom(room: Room): Int {
+    override fun createClassRoom(room: Room): Int = withDatabase {
         val newRoom = Classroom {
             this.room = room
         }
         return database.classrooms.add(newRoom)
     }
 
-    override fun createOfficeRoom(room: Room): Int {
+    override fun createOfficeRoom(room: Room): Int = withDatabase {
         val newRoom = OfficeRoom {
             this.room = room
         }
         return database.officeRooms.add(newRoom)
     }
 
-    override fun createStudyRoom(room: Room): Int {
+    override fun createStudyRoom(room: Room): Int = withDatabase {
         val newRoom = StudyRoom {
             this.room = room
         }
         return database.studyRooms.add(newRoom)
     }
 
-    override fun deleteRoom(id: Int): Boolean {
+    override fun deleteRoom(id: Int): Boolean = withDatabase {
         val condition = database.rooms.removeIf { it.id eq id }
         return condition == 0
     }
 
-    override fun updateRoom(room: Room, name: String, capacity: Int): Room {
+    override fun updateRoom(room: Room, name: String, capacity: Int): Room = withDatabase {
         room.name = name
         room.capacity = capacity
         database.rooms.update(room)
         return room
     }
 
-    override fun addTeacherToOffice(teacher: Teacher, office: OfficeRoom) : Teacher{
+    override fun addTeacherToOffice(teacher: Teacher, office: OfficeRoom) : Teacher = withDatabase {
         teacher.office = office
         database.teachers.update(teacher)
         return teacher
     }
 
-    override fun removeTeacherFromOffice(teacher: Teacher, office: OfficeRoom): Teacher {
+    override fun removeTeacherFromOffice(teacher: Teacher, office: OfficeRoom): Teacher = withDatabase {
         teacher.office = null
         database.teachers.update(teacher)
         return teacher

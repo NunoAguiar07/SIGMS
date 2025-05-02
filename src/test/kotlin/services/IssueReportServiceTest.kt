@@ -76,7 +76,7 @@ class IssueReportServiceTest {
         val room = createTestRooms()[0]
         val user = createTestUser()
         val reports = createTestIssueReports(5, room, user)
-        val result = issuesReportService.getAllIssueReports(null, null)
+        val result = issuesReportService.getAllIssueReports(10, 0)
         assertTrue(result is Success, "Expected Success")
         val successResult = result.value
         assertEquals(5, successResult.size, "Expected 5 reports")
@@ -84,55 +84,22 @@ class IssueReportServiceTest {
     }
 
     @Test
-    fun `getAllIssueReports fails with invalid limit`() {
-        val result = issuesReportService.getAllIssueReports("200", null)
-        assertTrue(result is Failure, "Expected Failure")
-        assertEquals(
-            IssueReportError.InvalidIssueReportLimit,
-            result.value,
-            "Expected InvalidIssueReportLimit error"
-        )
-    }
-
-    @Test
-    fun `getAllIssueReports fails with invalid offset`() {
-        val result = issuesReportService.getAllIssueReports(null, "-1")
-        assertTrue(result is Failure, "Expected Failure")
-        assertEquals(
-            IssueReportError.InvalidIssueReportOffSet,
-            result.value,
-            "Expected InvalidIssueReportOffSet error"
-        )
-    }
-
-    @Test
     fun `getIssueReportById returns report when exists`() {
         val room = createTestRooms()[0]
         val user = createTestUser()
         val report = createTestIssueReports(1, room, user)[0]
-        val result = issuesReportService.getIssueReportById(report.id.toString())
+        val result = issuesReportService.getIssueReportById(report.id)
         assertTrue(result is Success, "Expected Success")
         val successResult = result.value
         assertEquals(report.id, successResult.id, "Expected report ID to match")
     }
 
     @Test
-    fun `getIssueReportById fails with invalid ID`() {
-        val result = issuesReportService.getIssueReportById("invalid")
-        assertTrue(result is Failure, "Expected Failure")
-        assertEquals(
-            IssueReportError.InvalidIssueReportId,
-            result.value,
-            "Expected InvalidIssueReportId error"
-        )
-    }
-
-    @Test
     fun `getIssueReportById fails with non-existing ID`() {
-        val result = issuesReportService.getIssueReportById("99999")
+        val result = issuesReportService.getIssueReportById(999)
         assertTrue(result is Failure, "Expected Failure")
         assertEquals(
-            IssueReportError.InvalidIssueReportId,
+            IssueReportError.IssueReportNotFound,
             result.value,
             "Expected InvalidIssueReportId error"
         )
@@ -142,7 +109,7 @@ class IssueReportServiceTest {
     fun `createIssueReport succeeds with valid parameters`() {
         val room = createTestRooms()[0]
         val user = createTestUser()
-        val result = issuesReportService.createIssueReport(user.id, room.id.toString(), "Test Description")
+        val result = issuesReportService.createIssueReport(user.id, room.id, "Test Description")
         assertTrue(result is Success, "Expected Success")
         val successResult = result.value
         assertEquals(room.id, successResult.room.id, "Expected room ID to match")
@@ -150,34 +117,9 @@ class IssueReportServiceTest {
     }
 
     @Test
-    fun `createIssueReport fails with blank description`() {
-        val room = createTestRooms()[0]
-        val user = createTestUser()
-        val result = issuesReportService.createIssueReport(user.id, room.id.toString(), "")
-        assertTrue(result is Failure, "Expected Failure")
-        assertEquals(
-            IssueReportError.InvalidDescription,
-            result.value,
-            "Expected InvalidDescription error"
-        )
-    }
-
-    @Test
-    fun `createIssueReport fails with invalid room ID`() {
-        val user = createTestUser()
-        val result = issuesReportService.createIssueReport(user.id, "invalid", "Test Description")
-        assertTrue(result is Failure, "Expected Failure")
-        assertEquals(
-            IssueReportError.InvalidRoomId,
-            result.value,
-            "Expected InvalidRoomId error"
-        )
-    }
-
-    @Test
     fun `createIssueReport fails with non-existing room ID`() {
         val user = createTestUser()
-        val result = issuesReportService.createIssueReport(user.id, "99999", "Test Description")
+        val result = issuesReportService.createIssueReport(user.id, 999, "Test Description")
         assertTrue(result is Failure, "Expected Failure")
         assertEquals(
             IssueReportError.InvalidRoomId,
@@ -191,25 +133,14 @@ class IssueReportServiceTest {
         val room = createTestRooms()[0]
         val user = createTestUser()
         val report = createTestIssueReports(1, room, user)[0]
-        val result = issuesReportService.deleteIssueReport(report.id.toString(), Role.TECHNICAL_SERVICE.name)
+        val result = issuesReportService.deleteIssueReport(report.id)
         assertTrue(result is Success, "Expected Success")
         assertTrue(result.value, "Expected deletion to be successful")
     }
 
     @Test
-    fun `deleteIssueReport fails with invalid ID`() {
-        val result = issuesReportService.deleteIssueReport("invalid", Role.TECHNICAL_SERVICE.name)
-        assertTrue(result is Failure, "Expected Failure")
-        assertEquals(
-            IssueReportError.InvalidIssueReportId,
-            result.value,
-            "Expected InvalidIssueReportId error"
-        )
-    }
-
-    @Test
     fun `deleteIssueReport fails with non-existing ID`() {
-        val result = issuesReportService.deleteIssueReport("99999", Role.TECHNICAL_SERVICE.name)
+        val result = issuesReportService.deleteIssueReport(999)
         assertTrue(result is Failure, "Expected Failure")
         assertEquals(
             IssueReportError.InvalidIssueReportId,
@@ -224,9 +155,8 @@ class IssueReportServiceTest {
         val user = createTestUser()
         val report = createTestIssueReports(1, room, user)[0]
         val result = issuesReportService.updateIssueReport(
-            report.id.toString(),
-            "Updated Description",
-            Role.TECHNICAL_SERVICE.name
+            report.id,
+            "Updated Description"
         )
         assertTrue(result is Success, "Expected Success")
         val successResult = result.value
@@ -235,37 +165,8 @@ class IssueReportServiceTest {
     }
 
     @Test
-    fun `updateIssueReport fails with blank description`() {
-        val room = createTestRooms()[0]
-        val user = createTestUser()
-        val report = createTestIssueReports(1, room, user)[0]
-        val result = issuesReportService.updateIssueReport(
-            report.id.toString(),
-            "",
-            Role.TECHNICAL_SERVICE.name
-        )
-        assertTrue(result is Failure, "Expected Failure")
-        assertEquals(
-            IssueReportError.InvalidDescription,
-            result.value,
-            "Expected InvalidDescription error"
-        )
-    }
-
-    @Test
-    fun `updateIssueReport fails with invalid report ID`() {
-        val result = issuesReportService.updateIssueReport("invalid",  "Updated Description", Role.TECHNICAL_SERVICE.name)
-        assertTrue(result is Failure, "Expected Failure")
-        assertEquals(
-            IssueReportError.InvalidIssueReportId,
-            result.value,
-            "Expected InvalidIssueReportId error"
-        )
-    }
-
-    @Test
     fun `updateIssueReport fails with non-existing report ID`() {
-        val result = issuesReportService.updateIssueReport("99999", "Updated Description", Role.TECHNICAL_SERVICE.name)
+        val result = issuesReportService.updateIssueReport(999, "Updated Description")
         assertTrue(result is Failure, "Expected Failure")
         assertEquals(
             IssueReportError.InvalidIssueReportId,

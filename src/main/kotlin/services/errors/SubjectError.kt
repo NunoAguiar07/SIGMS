@@ -3,26 +3,21 @@ package isel.leic.group25.services.errors
 import isel.leic.group25.api.exceptions.Problem
 
 sealed class SubjectError {
+
     data object SubjectNotFound : SubjectError()
     data object FailedToAddToDatabase : SubjectError()
     data object SubjectAlreadyExists : SubjectError()
-    data object InvalidSubjectData : SubjectError()
-    data object InvalidSubjectId : SubjectError()
     data object SubjectChangesFailed : SubjectError()
-    data object MissingSubjectData : SubjectError()
-    data object InvalidRole : SubjectError()
-    data object InvalidSubjectLimit : SubjectError()
-    data object InvalidSubjectOffset : SubjectError()
+    data object TokenCreationFailed : SubjectError()
+    data object AlreadyProcessed : SubjectError()
+    data object UnauthorizedRole : SubjectError()
+    data class ConnectionDbError(val message: String?) : SubjectError()
 
     fun toProblem(): Problem {
         return when (this) {
             SubjectNotFound -> Problem.notFound(
                 title = "Subject not found",
                 detail = "The subject with the given ID was not found."
-            )
-            InvalidRole -> Problem.badRequest(
-                title = "Invalid role",
-                detail = "The provided role is invalid."
             )
             SubjectAlreadyExists -> Problem.conflict(
                 title = "Subject already exists",
@@ -32,29 +27,25 @@ sealed class SubjectError {
                 title = "Subject changes failed",
                 detail = "Failed to update the subject information."
             )
-            InvalidSubjectData -> Problem.badRequest(
-                title = "Invalid subject data",
-                detail = "The provided subject data is invalid."
-            )
-            MissingSubjectData -> Problem.badRequest(
-                title = "Missing subject data",
-                detail = "The request is missing required subject data."
-            )
             FailedToAddToDatabase -> Problem.internalServerError(
                 title = "Failed to add subject to database",
                 detail = "Failed to add the subject to the database."
             )
-            InvalidSubjectId -> Problem.badRequest(
-                title = "Invalid subject ID",
-                detail = "The provided subject ID is invalid."
+            AlreadyProcessed -> Problem.conflict(
+                title = "Already processed",
+                detail = "The request has already been processed."
             )
-            InvalidSubjectLimit -> Problem.badRequest(
-                title = "Invalid subject limit",
-                detail = "The provided subject limit is invalid. It should be between 1 and 100."
+            UnauthorizedRole -> Problem.unauthorized(
+                title = "Unauthorized role",
+                detail = "You don't have permission to perform this action."
             )
-            InvalidSubjectOffset -> Problem.badRequest(
-                title = "Invalid subject offset",
-                detail = "The provided subject offset is invalid. It should be a non-negative integer."
+            TokenCreationFailed -> Problem.internalServerError(
+                title = "Token creation failed",
+                detail = "Failed to create the authentication token."
+            )
+            is ConnectionDbError -> Problem.internalServerError(
+                title = "Database Connection Error",
+                detail = "Could not establish connection to the database"
             )
         }
     }

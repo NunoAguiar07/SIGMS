@@ -17,7 +17,7 @@ object Lectures: Table<Lecture>("lecture") {
     val classId = int("class_id").references(Classes){ it.schoolClass }
     val roomId = int("room_id").references(Classrooms){ it.classroom }
     val type = varchar("class_type").transform({ ClassType.valueOf(it.uppercase()) }, {it.name.lowercase()}).bindTo { it.type }
-    val weekDay = int("week_day").transform({ WeekDay.fromValue(it)},{it.value}).bindTo { it.weekDay }
+    val weekDay = int("week_day").transform({ WeekDay.fromValueDB(it)},{it.value}).bindTo { it.weekDay }
     val startTime = time("start_time").transform({ "${it.hour}:${it.minute}".hoursAndMinutesToDuration() },{
         val formatter = DateTimeFormatter.ofPattern("H:mm")
         LocalTime.parse(it.toHoursAndMinutes(), formatter) }).bindTo { it.startTime }

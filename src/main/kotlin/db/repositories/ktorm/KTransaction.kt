@@ -13,7 +13,7 @@ class KTransaction(private val database: Database): TransactionInterface {
     }
 
     override fun <T> useTransaction(isolationLevel: IsolationLevel, transaction: () -> T): T {
-        database.useTransaction(TransactionIsolation.valueOf(isolationLevel.name)){
+        database.useTransaction(TransactionIsolation.valueOf(isolationLevel.name.uppercase())){
             return transaction()
         }
     }

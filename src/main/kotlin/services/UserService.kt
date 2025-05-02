@@ -8,78 +8,88 @@ import isel.leic.group25.services.errors.AuthError
 import isel.leic.group25.utils.Either
 import isel.leic.group25.utils.failure
 import isel.leic.group25.utils.success
+import java.sql.SQLException
 
 typealias UserResult = Either<AuthError, User>
 
 typealias RoleResult = Either<AuthError, Role?>
 
 class UserService(private val repository: UserRepositoryInterface,
-                  private val transactionInterface: TransactionInterface) { //check every method for nullability
-
-    fun getUserById(id: Int): UserResult { // id should be nullable?
-        return transactionInterface.useTransaction {
-            val user = repository.findById(id)
-                ?: return@useTransaction failure(AuthError.UserNotFound)
-            return@useTransaction success(user)
+                  private val transactionInterface: TransactionInterface) {
+    private inline fun <T> runCatching(block: () -> Either<AuthError, T>): Either<AuthError, T> {
+        return try {
+            block()
+        } catch (e: SQLException) {
+            failure(AuthError.ConnectionDbError(e.message))
         }
     }
 
-    fun updateUser(id: Int, username: String?, image: ByteArray?): UserResult { // id should be nullable? and why is username nullable?
-        return transactionInterface.useTransaction {
+    fun getUserById(id: Int): UserResult {
+        return runCatching {
             val user = repository.findById(id)
-                ?: return@useTransaction failure(AuthError.UserNotFound)
-            if (username != null) {
-                user.username = username
-            }
-            if (image != null) {
-                user.profileImage = image
-            }
-            val rowsChanged = repository.update(user)
-            if (rowsChanged == 0) {
-                return@useTransaction failure(AuthError.UserChangesFailed)
-            }
-            return@useTransaction success(user)
+                ?: return@runCatching failure(AuthError.UserNotFound)
+            return@runCatching success(user)
         }
     }
 
-    fun changePassword(userId: Int, oldPassword: String, newPassword: String) : UserResult { // id should be nullable?
-        if(oldPassword.isBlank() || newPassword.isBlank()) {
-            return failure(AuthError.MissingCredentials)
-        }
-        if(User.isNotSecurePassword(newPassword)) {
-            return failure(AuthError.InsecurePassword)
-        }
-        return transactionInterface.useTransaction {
-            val user = repository.findById(userId)
-                ?: return@useTransaction failure(AuthError.UserNotFound)
-            if(!User.verifyPassword(user.password, oldPassword)) {
-                return@useTransaction failure(AuthError.InvalidCredentials)
+    fun updateUser(id: Int, username: String?, image: ByteArray?): UserResult {
+        return runCatching {
+            transactionInterface.useTransaction {
+                val user = repository.findById(id)
+                    ?: return@useTransaction failure(AuthError.UserNotFound)
+                if (username != null) {
+                    user.username = username
+                }
+                if (image != null) {
+                    user.profileImage = image
+                }
+                val rowsChanged = repository.update(user)
+                if (rowsChanged == 0) {
+                    return@useTransaction failure(AuthError.UserChangesFailed)
+                }
+                return@useTransaction success(user)
             }
-            user.password = User.hashPassword(newPassword)
-            val rowsChanged = repository.update(user)
-            if (rowsChanged == 0) {
-                return@useTransaction failure(AuthError.UserChangesFailed)
+        }
+    }
+
+    fun changePassword(userId: Int, oldPassword: String, newPassword: String) : UserResult {
+        return runCatching {
+            transactionInterface.useTransaction {
+                val user = repository.findById(userId)
+                    ?: return@useTransaction failure(AuthError.UserNotFound)
+                if(!User.verifyPassword(user.password, oldPassword)) {
+                    return@useTransaction failure(AuthError.InvalidCredentials)
+                }
+                user.password = User.hashPassword(newPassword)
+                val rowsChanged = repository.update(user)
+                if (rowsChanged == 0) {
+                    return@useTransaction failure(AuthError.UserChangesFailed)
+                }
+                return@useTransaction success(user)
             }
-            return@useTransaction success(user)
         }
     }
 
     fun getRoleByUserId(userId: Int): RoleResult {
-        return transactionInterface.useTransaction {
-            val role = repository.getRoleById(userId)
-                ?: return@useTransaction failure(AuthError.UserNotFound)
-            return@useTransaction success(role)
+        return runCatching {
+            transactionInterface.useTransaction {
+                val role = repository.getRoleById(userId)
+                    ?: return@useTransaction failure(AuthError.UserNotFound)
+                return@useTransaction success(role)
+            }
         }
     }
     fun deleteUser(id: Int): UserResult {
-        return transactionInterface.useTransaction {
-            val user = repository.findById(id)
-                ?: return@useTransaction failure(AuthError.UserNotFound)
-            val deleted = repository.delete(id)
-            if (!deleted) {
-                return@useTransaction failure(AuthError.UserDeleteFailed)
+        return runCatching {
+            transactionInterface.useTransaction {
+                val user = repository.findById(id)
+                    ?: return@useTransaction failure(AuthError.UserNotFound)
+                val deleted = repository.delete(id)
+                if (!deleted) {
+                    return@useTransaction failure(AuthError.UserDeleteFailed)
+                }
+                return@useTransaction success(user)
             }
-            return@useTransaction success(user)
         }
     }
 }

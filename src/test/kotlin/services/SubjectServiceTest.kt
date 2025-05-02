@@ -38,7 +38,7 @@ class SubjectServiceTest {
     @Test
     fun `getAllSubjects should return subjects with default limit and offset`() {
         val subjects = createTestSubjects(5)
-        val result = subjectService.getAllSubjects(null, null)
+        val result = subjectService.getAllSubjects(10, 0)
 
         assertTrue(result is Success, "Expected Success")
         val successResult = result.value
@@ -49,7 +49,7 @@ class SubjectServiceTest {
     @Test
     fun `getAllSubjects should return subjects with specified limit and offset`() {
         val subjects = createTestSubjects(10)
-        val result = subjectService.getAllSubjects("5", "2")
+        val result = subjectService.getAllSubjects(5, 2)
 
         assertTrue(result is Success, "Expected Success")
         val successResult = result.value
@@ -58,29 +58,9 @@ class SubjectServiceTest {
     }
 
     @Test
-    fun `getAllSubjects should return error for invalid limit`() {
-        val upperResult = subjectService.getAllSubjects("200", null)
-        val lowerResult = subjectService.getAllSubjects("0", null)
-
-        assertTrue(upperResult is Failure, "Expected Failure")
-        assertEquals(SubjectError.InvalidSubjectLimit, upperResult.value,"Expected InvalidSubjectLimit error")
-
-        assertTrue(lowerResult is Failure, "Expected Failure")
-        assertEquals(SubjectError.InvalidSubjectLimit, lowerResult.value,"Expected InvalidSubjectLimit error")
-    }
-
-    @Test
-    fun `getAllSubjects should return error for invalid offset`() {
-        val result = subjectService.getAllSubjects(null, "-1")
-
-        assertTrue(result is Failure, "Expected Failure")
-        assertEquals(SubjectError.InvalidSubjectOffset, result.value,"Expected InvalidSubjectOffset error")
-    }
-
-    @Test
     fun `getSubjectById should return subject when exists`() {
         val subject = createTestSubjects(1).first()
-        val result = subjectService.getSubjectById(subject.id.toString())
+        val result = subjectService.getSubjectById(subject.id)
 
         assertTrue(result is Success, "Expected Success")
         val successResult = result.value
@@ -90,18 +70,10 @@ class SubjectServiceTest {
 
     @Test
     fun `getSubjectById should return error when subject doesn't exist`() {
-        val result = subjectService.getSubjectById("999")
+        val result = subjectService.getSubjectById(999)
 
         assertTrue(result is Failure, "Expected Failure")
         assertEquals(SubjectError.SubjectNotFound, result.value,"Expected SubjectNotFound error")
-    }
-
-    @Test
-    fun `getSubjectById should return InvalidSubjectId when id is invalid`() {
-        val result = subjectService.getSubjectById(null)
-
-        assertTrue(result is Failure, "Expected Failure")
-        assertEquals(SubjectError.InvalidSubjectId, result.value,"Expected InvalidSubjectId error")
     }
 
     @Test
@@ -120,21 +92,5 @@ class SubjectServiceTest {
 
         assertTrue(result is Failure, "Expected Failure")
         assertEquals(SubjectError.SubjectAlreadyExists, result.value,"Expected SubjectAlreadyExists error")
-    }
-
-    @Test
-    fun `createSubject should handle empty name`() {
-        val result = subjectService.createSubject("")
-
-        assertTrue(result is Failure, "Expected Failure")
-        assertEquals(SubjectError.InvalidSubjectData, result.value,"Expected InvalidSubjectData error")
-    }
-
-    @Test
-    fun `createSubject should handle long names`() {
-        val longName = "a".repeat(256)
-        val result = subjectService.createSubject(longName)
-        assertTrue(result is Failure, "Expected Failure")
-        assertEquals(SubjectError.InvalidSubjectData, result.value,"Expected InvalidSubjectData error")
     }
 }

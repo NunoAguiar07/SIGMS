@@ -100,18 +100,6 @@ class UserServiceTest {
         assertEquals(AuthError.UserNotFound, result.value, "Expected UserNotFound error")
     }
 
-//    @Test
-//    fun `changePassword should update password when old password matches`() {
-//        val user = createTestUser()
-//        val newPassword = "NewPassword123!"
-//        val result = userService.changePassword(user.id, "test123!", newPassword)
-//        val hashedPassword = User.hashPassword(newPassword)
-//        assertTrue(result is Success, "Expected success result")
-//        val updatedUser = result.value
-//        assertEquals(hashedPassword, updatedUser.password, "Password should be updated")
-//        clearDatabase(dataSource)
-//    }
-
     @Test
     fun `changePassword should return InvalidCredentials when old password is wrong`() {
         val user = createTestUser()
@@ -127,28 +115,6 @@ class UserServiceTest {
         val result = userService.changePassword(33, "test123!", newPassword)
         assertTrue(result is Failure, "User with this id should not exist")
         assertEquals(AuthError.UserNotFound, result.value, "Expected UserNotFound error")
-    }
-
-    @Test
-    fun `changePassword should return MissingCredentials when passwords are blank`() {
-        val user = createTestUser()
-        val emptyOldResult = userService.changePassword(user.id, "", "new")
-        val emptyNewResult = userService.changePassword(user.id, "old", "")
-
-        assertTrue(emptyOldResult is Failure, "Expected MissingCredentials error")
-        assertEquals(AuthError.MissingCredentials, emptyOldResult.value, "Expected MissingCredentials error")
-
-        assertTrue(emptyNewResult is Failure, "Expected MissingCredentials error")
-        assertEquals(AuthError.MissingCredentials, emptyNewResult.value, "Expected MissingCredentials error")
-    }
-
-    @Test
-    fun `changePassword should return InsecurePassword when new password is insecure`() {
-        val user = createTestUser()
-        val result = userService.changePassword(user.id, "test123!", "123")
-
-        assertTrue(result is Failure, "Expected InsecurePassword error")
-        assertEquals(AuthError.InsecurePassword, result.value, "Expected InsecurePassword error")
     }
 
     @Test

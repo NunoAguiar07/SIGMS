@@ -1,6 +1,7 @@
 package services
 
 import isel.leic.group25.db.entities.rooms.Room
+import isel.leic.group25.db.entities.types.RoomType
 import isel.leic.group25.services.RoomService
 import isel.leic.group25.services.errors.RoomError
 import isel.leic.group25.utils.Failure
@@ -35,7 +36,7 @@ class RoomServiceTest {
     @Test
     fun `getAllRooms returns rooms with default parameters`() {
         val rooms = createTestRooms(5)
-        val result = roomService.getAllRooms(null, null)
+        val result = roomService.getAllRooms(10, 0)
         assertTrue(result is Success, "Expected Success")
         val successResult = result.value
         assertTrue(successResult.size == 5, "Expected 5 rooms")
@@ -45,7 +46,7 @@ class RoomServiceTest {
     @Test
     fun `getAllRooms returns rooms with specified limit and offset`() {
         val rooms = createTestRooms(10)
-        val result = roomService.getAllRooms("5", "2")
+        val result = roomService.getAllRooms(5, 2)
         assertTrue(result is Success, "Expected Success")
         val successResult = result.value
         assertTrue(successResult.size == 5, "Expected 5 rooms")
@@ -53,50 +54,17 @@ class RoomServiceTest {
     }
 
     @Test
-    fun `getAllRooms fails with invalid limit`() {
-        val result = roomService.getAllRooms("200", null)
-        assertTrue(result is Failure, "Expected Failure")
-        assertEquals(
-            RoomError.InvalidRoomLimit,
-            result.value,
-            "Expected InvalidRoomLimit error"
-        )
-    }
-
-    @Test
-    fun `getAllRooms fails with invalid offset`() {
-        val result = roomService.getAllRooms(null, "-1")
-        assertTrue(result is Failure, "Expected Failure")
-        assertEquals(
-            RoomError.InvalidRoomOffSet,
-            result.value,
-            "Expected InvalidRoomOffSet error"
-        )
-    }
-
-    @Test
     fun `getRoomById returns room when exists`() {
         val room = createTestRooms(1)[0]
-        val result = roomService.getRoomById(room.id.toString())
+        val result = roomService.getRoomById(room.id)
         assertTrue(result is Success, "Expected Success")
         val successResult = result.value
         assertEquals(room, successResult, "Expected room to match")
     }
 
     @Test
-    fun `getRoomById fails with invalid ID`() {
-        val result = roomService.getRoomById("invalid")
-        assertTrue(result is Failure, "Expected Failure")
-        assertEquals(
-            RoomError.InvalidRoomId,
-            result.value,
-            "Expected InvalidRoomId error"
-        )
-    }
-
-    @Test
     fun `getRoomById fails when room does not exist`() {
-        val result = roomService.getRoomById("9999")
+        val result = roomService.getRoomById(999)
         assertTrue(result is Failure, "Expected Failure")
         assertEquals(
             RoomError.RoomNotFound,
@@ -107,7 +75,7 @@ class RoomServiceTest {
 
     @Test
     fun `createRoom succeeds with valid parameters for class room`() {
-        val result = roomService.createRoom(10, "Class Room 1", "class")
+        val result = roomService.createRoom(10, "Class Room 1", RoomType.CLASS)
         assertTrue(result is Success, "Expected Success")
         val successResult = result.value
         assertEquals("Class Room 1", successResult.name, "Expected room name to match")
@@ -116,7 +84,7 @@ class RoomServiceTest {
 
     @Test
     fun `createRoom succeeds with valid parameters for office room`() {
-        val result = roomService.createRoom(10, "Office Room 1", "office")
+        val result = roomService.createRoom(10, "Office Room 1", RoomType.OFFICE)
         assertTrue(result is Success, "Expected Success")
         val successResult = result.value
         assertEquals("Office Room 1", successResult.name, "Expected room name to match")
@@ -125,67 +93,11 @@ class RoomServiceTest {
 
     @Test
     fun `createRoom succeeds with valid parameters for study room`() {
-        val result = roomService.createRoom(10, "Study Room 1", "study")
+        val result = roomService.createRoom(10, "Study Room 1", RoomType.STUDY)
         assertTrue(result is Success, "Expected Success")
         val successResult = result.value
         assertEquals("Study Room 1", successResult.name, "Expected room name to match")
         assertEquals(10, successResult.capacity, "Expected room capacity to match")
-    }
-
-    @Test
-    fun `createRoom fails with invalid capacity`() {
-        val result = roomService.createRoom(-5, "Invalid Room", "class")
-        assertTrue(result is Failure, "Expected Failure")
-        assertEquals(
-            RoomError.InvalidRoomCapacity,
-            result.value,
-            "Expected InvalidRoomCapacity error"
-        )
-    }
-
-    @Test
-    fun `createRoom fails with blank name`() {
-        val result = roomService.createRoom(10, "", "class")
-        assertTrue(result is Failure, "Expected Failure")
-        assertEquals(
-            RoomError.InvalidRoomData,
-            result.value,
-            "Expected InvalidRoomData error"
-        )
-    }
-
-    @Test
-    fun `createRoom fails with duplicate name`() {
-        val room1 = createTestRooms(1)
-        val result = roomService.createRoom(10, room1[0].name, "class")
-        assertTrue(result is Failure, "Expected Failure")
-        assertEquals(
-            RoomError.RoomAlreadyExists,
-            result.value,
-            "Expected RoomAlreadyExists error"
-        )
-    }
-
-    @Test
-    fun `createRoom fails with invalid type`() {
-        val result = roomService.createRoom(10, "Invalid Room", "invalid")
-        assertTrue(result is Failure, "Expected Failure")
-        assertEquals(
-            RoomError.InvalidRoomType,
-            result.value,
-            "Expected InvalidRoomType error"
-        )
-    }
-
-    @Test
-    fun `createRoom fails with blank type`() {
-        val result = roomService.createRoom(10, "Invalid Room", "")
-        assertTrue(result is Failure, "Expected Failure")
-        assertEquals(
-            RoomError.InvalidRoomType,
-            result.value,
-            "Expected InvalidRoomType error"
-        )
     }
 
 }

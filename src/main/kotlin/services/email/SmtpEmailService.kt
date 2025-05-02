@@ -62,7 +62,7 @@ class SmtpEmailService(private val config: EmailConfig) : EmailService {
             }
             email.send()
         } catch (e: Exception) {
-            throw EmailException("Failed to send approval notification")
+            throw e
         }
     }
 
@@ -89,7 +89,7 @@ class SmtpEmailService(private val config: EmailConfig) : EmailService {
             }
             email.send()
         } catch (e: Exception) {
-            throw EmailException("Failed to send verification email")
+            throw e
         }
     }
 
@@ -121,7 +121,7 @@ class SmtpEmailService(private val config: EmailConfig) : EmailService {
             }
             email.send()
         } catch (e: Exception) {
-            throw EmailException("Failed to send approval request")
+            throw e
         }
     }
 }
