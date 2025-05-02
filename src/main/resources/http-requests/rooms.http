@@ -4,18 +4,18 @@ GET {{baseUrl}}/rooms
 Authorization: Bearer {{token}}
 
 ###
-GET {{baseUrl}}/rooms/1
+GET {{baseUrl}}/rooms/asfgsfagd
 Authorization: Bearer {{token}}
 
 ###
-POST {{baseUrl}}/rooms
+POST {{baseUrl}}/rooms/add
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "name": "F.2.05",
+  "name": "F.2.03",
   "capacity": 30,
-  "type": "class"
+  "type": "study"
 }
 
 ###

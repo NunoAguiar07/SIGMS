@@ -4,16 +4,16 @@ GET {{baseUrl}}/subjects
 Authorization: Bearer {{token}}
 
 ###
-POST {{baseUrl}}/subjects
+POST {{baseUrl}}/subjects/add
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "name": "PG"
+  "name": "AC"
 }
 
 ###
-GET {{baseUrl}}/subjects/1
+GET {{baseUrl}}/subjects/ffhdxhf
 Authorization: Bearer {{token}}
 
 ###

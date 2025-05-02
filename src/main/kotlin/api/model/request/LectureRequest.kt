@@ -20,7 +20,7 @@ data class LectureRequest(
         if (endTime.isBlank()) return RequestError.Missing("endTime")
         if (startTime > endTime) return RequestError.Invalid("startTime must be before endTime")
         if (type.isBlank()) return RequestError.Missing("type"  )
-        if (type!in ClassType.entries.map { it.name }) return RequestError.Invalid("type")
+        if (type.uppercase() !in ClassType.entries.map { it.name }) return RequestError.Invalid("type")
         if (weekDay !in 1..7) return RequestError.Invalid("weekDay")
         return null
     }

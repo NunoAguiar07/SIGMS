@@ -17,7 +17,7 @@ data class RoomRequest(
         if(capacity <= 0){
             return RequestError.Invalid("capacity")
         }
-        if(RoomType.fromValue(type) == null){
+        if(RoomType.fromValue(type.uppercase()) == null){
             return RequestError.Invalid("type")
         }
         return null

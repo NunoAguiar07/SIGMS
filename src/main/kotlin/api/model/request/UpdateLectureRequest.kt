@@ -26,7 +26,7 @@ data class UpdateLectureRequest (
         if (endTime.isBlank()) return RequestError.Missing("endTime")
         if (startTime > endTime) return RequestError.Invalid("startTime must be before endTime")
         if (type.isBlank()) return RequestError.Missing("type"  )
-        if (type!in ClassType.entries.map { it.name }) return RequestError.Invalid("type")
+        if (type.uppercase() !in ClassType.entries.map { it.name }) return RequestError.Invalid("type")
         if (weekDay !in 1..7) return RequestError.Invalid("weekDay")
         if (newSchoolClassId <= 0) return RequestError.Invalid("newSchoolClassId")
         if (newRoomId <= 0) return RequestError.Invalid("newRoomId")
@@ -34,8 +34,8 @@ data class UpdateLectureRequest (
         if (newEndTime.isBlank()) return RequestError.Missing("newEndTime")
         if (newStartTime > newEndTime) return RequestError.Invalid("newStartTime must be before newEndTime")
         if (newType.isBlank()) return RequestError.Missing("newType")
-        if (newType!in ClassType.entries.map { it.name }) return RequestError.Invalid("newType")
-        if (newWeekDay!in 1..7) return RequestError.Invalid("newWeekDay")
+        if (newType.uppercase() !in ClassType.entries.map { it.name }) return RequestError.Invalid("newType")
+        if (newWeekDay !in 1..7) return RequestError.Invalid("newWeekDay")
         return null
     }
 }

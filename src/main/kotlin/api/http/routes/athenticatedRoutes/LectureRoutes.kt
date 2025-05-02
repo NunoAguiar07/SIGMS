@@ -46,8 +46,8 @@ fun Route.getAllLecturesRoute(lectureService: LectureService) {
     get {
         val limit = call.queryParameters["limit"]?.toIntOrNull() ?: 10
         val offset = call.queryParameters["offset"]?.toIntOrNull() ?: 0
-        if(offset < 0) return@get call.respond(RequestError.Invalid("offset").toProblem())
-        if(limit < 1 || limit > 100) return@get call.respond(RequestError.Invalid("limit").toProblem())
+        if(offset < 0) return@get RequestError.Invalid("offset").toProblem().respond(call)
+        if(limit < 1 || limit > 100) return@get RequestError.Invalid("limit").toProblem().respond(call)
         val result = lectureService.getAllLectures(limit, offset)
         call.respondEither(
             either = result,
@@ -69,12 +69,12 @@ fun Route.createLectureRoute(lectureService: LectureService) {
     post("/add") {
         val lectureRequest = call.receive<LectureRequest>()
         lectureRequest.validate()?.let { error ->
-            return@post call.respond(error.toProblem())
+            return@post error.toProblem().respond(call)
         }
         val weekday = WeekDay.fromValue(lectureRequest.weekDay)
-            ?: return@post call.respond(RequestError.Invalid("weekday").toProblem())
-        val type = ClassType.fromValue(lectureRequest.type)
-            ?: return@post call.respond(RequestError.Invalid("type").toProblem())
+            ?: return@post RequestError.Invalid("weekday").toProblem().respond(call)
+        val type = ClassType.fromValue(lectureRequest.type.uppercase())
+            ?: return@post RequestError.Invalid("type").toProblem().respond(call)
         val result = lectureService.createLecture(
             schoolClassId = lectureRequest.schoolClassId,
             roomId = lectureRequest.roomId,
@@ -107,13 +107,13 @@ fun Route.updateLectureRoute(lectureService: LectureService) {
             return@put call.respond(error.toProblem())
         }
         val weekday = WeekDay.fromValue(updateLectureRequest.weekDay)
-            ?: return@put call.respond(RequestError.Invalid("weekday").toProblem())
+            ?: return@put RequestError.Invalid("weekday").toProblem().respond(call)
         val type = ClassType.fromValue(updateLectureRequest.type)
-            ?: return@put call.respond(RequestError.Invalid("type").toProblem())
+            ?: return@put RequestError.Invalid("type").toProblem().respond(call)
         val newWeekday = WeekDay.fromValue(updateLectureRequest.newWeekDay)
-            ?: return@put call.respond(RequestError.Invalid("newWeekday").toProblem())
+            ?: return@put RequestError.Invalid("newWeekday").toProblem().respond(call)
         val newType = ClassType.fromValue(updateLectureRequest.newType)
-            ?: return@put call.respond(RequestError.Invalid("newType").toProblem())
+            ?: return@put RequestError.Invalid("newType").toProblem().respond(call)
         val result = lectureService.updateLecture(
             schoolClassId = updateLectureRequest.schoolClassId,
             roomId = updateLectureRequest.roomId,
@@ -148,12 +148,12 @@ fun Route.deleteLectureRoute(lectureService: LectureService) {
     delete("/delete") {
         val lectureRequest = call.receive<LectureRequest>()
         lectureRequest.validate()?.let { error ->
-            return@delete call.respond(error.toProblem())
+            return@delete error.toProblem().respond(call)
         }
         val weekday = WeekDay.fromValue(lectureRequest.weekDay)
-            ?: return@delete call.respond(RequestError.Invalid("weekday").toProblem())
+            ?: return@delete RequestError.Invalid("weekday").toProblem().respond(call)
         val type = ClassType.fromValue(lectureRequest.type)
-            ?: return@delete call.respond(RequestError.Invalid("type").toProblem())
+            ?: return@delete RequestError.Invalid("type").toProblem().respond(call)
         val result = lectureService.deleteLecture(
             schoolClassId = lectureRequest.schoolClassId,
             roomId = lectureRequest.roomId,
