@@ -14,6 +14,8 @@ typealias ClassListResult = Either<ClassError, List<Class>>
 
 typealias ClassResult = Either<ClassError, Class>
 
+typealias DeleteClassResult = Either<ClassError, Boolean>
+
 class ClassService(private val classRepository: ClassRepositoryInterface,
                    private val subjectRepository: SubjectRepositoryInterface,
                    private val transactionInterface: TransactionInterface,
@@ -51,7 +53,7 @@ class ClassService(private val classRepository: ClassRepositoryInterface,
         return runCatching {
             transactionInterface.useTransaction {
                 val existingClass = classRepository.findClassByName(name)
-                if(existingClass != null && existingClass.subject.id == subjectId) {
+                if(existingClass != null) {
                     return@useTransaction failure(ClassError.ClassAlreadyExists)
                 }
                 val existingSubject = subjectRepository.findSubjectById(subjectId)

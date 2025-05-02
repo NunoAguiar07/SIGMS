@@ -14,6 +14,8 @@ typealias UserResult = Either<AuthError, User>
 
 typealias RoleResult = Either<AuthError, Role?>
 
+typealias DeleteUserResult = Either<AuthError, Boolean>
+
 class UserService(private val repository: UserRepositoryInterface,
                   private val transactionInterface: TransactionInterface) {
     private inline fun <T> runCatching(block: () -> Either<AuthError, T>): Either<AuthError, T> {
@@ -79,16 +81,16 @@ class UserService(private val repository: UserRepositoryInterface,
             }
         }
     }
-    fun deleteUser(id: Int): UserResult {
+    fun deleteUser(id: Int): DeleteUserResult {
         return runCatching {
             transactionInterface.useTransaction {
-                val user = repository.findById(id)
+                repository.findById(id)
                     ?: return@useTransaction failure(AuthError.UserNotFound)
                 val deleted = repository.delete(id)
                 if (!deleted) {
                     return@useTransaction failure(AuthError.UserDeleteFailed)
                 }
-                return@useTransaction success(user)
+                return@useTransaction success(true)
             }
         }
     }
