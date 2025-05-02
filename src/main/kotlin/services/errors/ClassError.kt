@@ -7,6 +7,7 @@ sealed class ClassError {
     data object ClassAlreadyExists : ClassError()
     data object ClassChangesFailed : ClassError()
     data object SubjectNotFound : ClassError()
+    data class ConnectionDbError(val message: String?) : ClassError()
 
     fun toProblem(): Problem {
         return when (this) {
@@ -25,6 +26,10 @@ sealed class ClassError {
             SubjectNotFound -> Problem.notFound(
                 title = "Subject not found",
                 detail = "The subject with the given ID was not found."
+            )
+            is ConnectionDbError -> Problem.internalServerError(
+                title = "Database Connection Error",
+                detail = "Could not establish connection to the database"
             )
         }
     }

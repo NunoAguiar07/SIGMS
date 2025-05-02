@@ -8,6 +8,7 @@ sealed class IssueReportError {
     data object UserNotFound : IssueReportError()
     data object InvalidIssueReportId : IssueReportError()
     data object InvalidRoomId : IssueReportError()
+    data class ConnectionDbError(val message: String?) : IssueReportError()
 
     fun toProblem(): Problem {
         return when (this) {
@@ -26,6 +27,10 @@ sealed class IssueReportError {
             InvalidRoomId -> Problem.badRequest(
                 title = "Invalid room ID",
                 detail = "The provided room ID is invalid."
+            )
+            is ConnectionDbError -> Problem.internalServerError(
+                title = "Database Connection Error",
+                detail = "Could not establish connection to the database"
             )
         }
     }

@@ -10,6 +10,7 @@ sealed class RoomError {
     data object InvalidRoomLimit : RoomError()
     data object InvalidRoomOffSet : RoomError()
     data object InvalidRoomType : RoomError()
+    data class ConnectionDbError(val message: String?) : RoomError()
 
     fun toProblem(): Problem {
         return when (this) {
@@ -40,6 +41,10 @@ sealed class RoomError {
             InvalidRoomType -> Problem.badRequest(
                 title = "Invalid room type",
                 detail = "The provided room type is invalid."
+            )
+            is ConnectionDbError -> Problem.internalServerError(
+                title = "Database Connection Error",
+                detail = "Could not establish connection to the database"
             )
         }
     }

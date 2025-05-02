@@ -3,6 +3,7 @@ package isel.leic.group25.db.repositories.users
 import isel.leic.group25.db.entities.types.Role
 import isel.leic.group25.db.entities.users.*
 import isel.leic.group25.db.repositories.users.interfaces.UserRepositoryInterface
+import isel.leic.group25.db.repositories.utils.withDatabase
 import isel.leic.group25.db.tables.Tables.Companion.admins
 import isel.leic.group25.db.tables.Tables.Companion.students
 import isel.leic.group25.db.tables.Tables.Companion.teachers
@@ -13,15 +14,15 @@ import org.ktorm.dsl.*
 import org.ktorm.entity.*
 
 class UserRepository(private val database: Database): UserRepositoryInterface {
-    override fun findById(id: Int): User? {
+    override fun findById(id: Int): User? = withDatabase {
         return database.users.firstOrNull { it.id eq id }
     }
 
-    override fun findByEmail(email:String): User? {
+    override fun findByEmail(email:String): User? = withDatabase {
         return database.users.firstOrNull { it.email eq email }
     }
 
-    override fun associateWithRole(newUser: User, role: Role): User {
+    override fun associateWithRole(newUser: User, role: Role): User = withDatabase {
         when(role){
             Role.ADMIN -> {
                 database.admins.add(Admin{user=newUser})
@@ -39,7 +40,7 @@ class UserRepository(private val database: Database): UserRepositoryInterface {
         return newUser
     }
 
-    override fun createWithRole(email: String, username: String, password: String, role: Role): User {
+    override fun createWithRole(email: String, username: String, password: String, role: Role): User = withDatabase {
         val newUser = User {
             this.email = email
             this.username = username
@@ -50,7 +51,7 @@ class UserRepository(private val database: Database): UserRepositoryInterface {
         return associateWithRole(newUser, role)
     }
 
-    override fun createWithoutRole(email: String, username: String, password: String): User {
+    override fun createWithoutRole(email: String, username: String, password: String): User = withDatabase {
         val newUser = User {
             this.email = email
             this.username = username
@@ -61,11 +62,11 @@ class UserRepository(private val database: Database): UserRepositoryInterface {
         return newUser
     }
 
-    override fun update(user: User): Int {
+    override fun update(user: User): Int = withDatabase {
         return database.users.update(user)
     }
 
-    override fun getRoleById(id: Int): Role? {
+    override fun getRoleById(id: Int): Role? = withDatabase {
         return when {
             database.admins.any { it.user eq id } -> Role.ADMIN
             database.students.any { it.user eq id } -> Role.STUDENT
@@ -75,7 +76,7 @@ class UserRepository(private val database: Database): UserRepositoryInterface {
         }
     }
 
-    override fun delete(id: Int): Boolean {
+    override fun delete(id: Int): Boolean = withDatabase {
         database.users.firstOrNull { it.id eq id } ?: return false
         database.useTransaction {
             database.admins.removeIf { it.user eq id }

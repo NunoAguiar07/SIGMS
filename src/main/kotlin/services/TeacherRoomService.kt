@@ -8,6 +8,7 @@ import isel.leic.group25.services.errors.TeacherRoomError
 import isel.leic.group25.utils.Either
 import isel.leic.group25.utils.failure
 import isel.leic.group25.utils.success
+import java.sql.SQLException
 
 typealias AddTeacherRoomResult = Either<TeacherRoomError, Teacher>
 
@@ -18,25 +19,37 @@ class TeacherRoomService (
     private val roomRepository: RoomRepositoryInterface,
     private val transactionInterface: TransactionInterface
 ) {
+    private inline fun <T> runCatching(block: () -> Either<TeacherRoomError, T>): Either<TeacherRoomError, T> {
+        return try {
+            block()
+        } catch (e: SQLException) {
+            failure(TeacherRoomError.ConnectionDbError(e.message))
+        }
+    }
+
     fun addTeacherToOffice(teacherId: Int, officeId: Int) : AddTeacherRoomResult{
-        return transactionInterface.useTransaction {
-            val teacher = teacherRepository.findTeacherById(teacherId)
-                ?: return@useTransaction failure(TeacherRoomError.TeacherNotFound)
-            val room = roomRepository.getOfficeRoomById(officeId)
-                ?: return@useTransaction failure(TeacherRoomError.RoomNotFound)
-            val newTeacher = roomRepository.addTeacherToOffice(teacher, room)
-            return@useTransaction success(newTeacher)
+        return runCatching {
+            transactionInterface.useTransaction {
+                val teacher = teacherRepository.findTeacherById(teacherId)
+                    ?: return@useTransaction failure(TeacherRoomError.TeacherNotFound)
+                val room = roomRepository.getOfficeRoomById(officeId)
+                    ?: return@useTransaction failure(TeacherRoomError.RoomNotFound)
+                val newTeacher = roomRepository.addTeacherToOffice(teacher, room)
+                return@useTransaction success(newTeacher)
+            }
         }
     }
 
     fun removeTeacherFromRoom(teacherId: Int, officeId: Int) : RemoveTeacherRoomResult {
-        return transactionInterface.useTransaction {
-            val teacher = teacherRepository.findTeacherById(teacherId)
-                ?: return@useTransaction failure(TeacherRoomError.TeacherNotFound)
-            val room = roomRepository.getOfficeRoomById(officeId)
-                ?: return@useTransaction failure(TeacherRoomError.RoomNotFound)
-            val newTeacher = roomRepository.removeTeacherFromOffice(teacher, room)
-            return@useTransaction success(newTeacher)
+        return runCatching {
+            transactionInterface.useTransaction {
+                val teacher = teacherRepository.findTeacherById(teacherId)
+                    ?: return@useTransaction failure(TeacherRoomError.TeacherNotFound)
+                val room = roomRepository.getOfficeRoomById(officeId)
+                    ?: return@useTransaction failure(TeacherRoomError.RoomNotFound)
+                val newTeacher = roomRepository.removeTeacherFromOffice(teacher, room)
+                return@useTransaction success(newTeacher)
+            }
         }
     }
 }

@@ -6,6 +6,7 @@ import isel.leic.group25.db.entities.users.Admin
 import isel.leic.group25.db.entities.users.RoleApproval
 import isel.leic.group25.db.entities.users.User
 import isel.leic.group25.db.repositories.users.interfaces.RoleApprovalRepositoryInterface
+import isel.leic.group25.db.repositories.utils.withDatabase
 import isel.leic.group25.db.tables.Tables.Companion.pendingRoleApprovals
 import org.ktorm.database.Database
 import org.ktorm.dsl.eq
@@ -17,19 +18,19 @@ import kotlin.time.ExperimentalTime
 class RoleApprovalRepository(private val database: Database) : RoleApprovalRepositoryInterface {
     private val tokenExpirationDays = 7
 
-    override fun getApprovals(limit: Int, offset: Int): List<RoleApproval> {
+    override fun getApprovals(limit: Int, offset: Int): List<RoleApproval> = withDatabase {
         return database.pendingRoleApprovals.drop(offset).take(limit).toList()
     }
-    override fun getApprovalByUserId(userId: Int): RoleApproval? {
+    override fun getApprovalByUserId(userId: Int): RoleApproval? = withDatabase {
         return database.pendingRoleApprovals.find { it.userId eq userId }
     }
-    override fun getApprovalByToken(token: String): RoleApproval? {
+    override fun getApprovalByToken(token: String): RoleApproval? = withDatabase {
         return database.pendingRoleApprovals.find { it.verificationToken eq token }
     }
     @OptIn(ExperimentalTime::class)
     override fun addPendingApproval(user: User, requestedRole: Role,
                                     verificationToken: String, verifiedBy: Admin?
-    ): Boolean {
+    ): Boolean = withDatabase {
         val expiresAt = Clock.System.now() + tokenExpirationDays.days
         val roleApproval = RoleApproval {
             this.user = user
@@ -42,10 +43,12 @@ class RoleApprovalRepository(private val database: Database) : RoleApprovalRepos
         }
         return database.pendingRoleApprovals.add(roleApproval) > 0
     }
-    override fun updateApproval(roleApproval: RoleApproval): Boolean {
+
+    override fun updateApproval(roleApproval: RoleApproval): Boolean = withDatabase {
         return database.pendingRoleApprovals.update(roleApproval) > 0
     }
-    override fun removeApproval(roleApproval: RoleApproval): Boolean {
+
+    override fun removeApproval(roleApproval: RoleApproval): Boolean = withDatabase {
         return database.pendingRoleApprovals.removeIf { it.id eq roleApproval.id } > 0
     }
 }

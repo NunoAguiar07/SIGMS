@@ -10,6 +10,7 @@ sealed class LectureError {
     data object InvalidLectureDate : LectureError()
     data object LectureNotFound : LectureError()
     data object LectureTimeConflict : LectureError()
+    data class ConnectionDbError(val message: String?) : LectureError()
 
     fun toProblem(): Problem {
         return when (this) {
@@ -40,6 +41,10 @@ sealed class LectureError {
             LectureTimeConflict -> Problem.conflict(
                 title = "Lecture time conflict",
                 detail = "Room 101 is already booked from 09:00 to 10:30 on Monday"
+            )
+            is ConnectionDbError -> Problem.internalServerError(
+                title = "Database Connection Error",
+                detail = "Could not establish connection to the database"
             )
         }
     }

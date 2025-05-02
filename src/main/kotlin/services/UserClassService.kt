@@ -12,6 +12,7 @@ import isel.leic.group25.db.repositories.users.interfaces.UserRepositoryInterfac
 import isel.leic.group25.utils.Either
 import isel.leic.group25.utils.failure
 import isel.leic.group25.utils.success
+import java.sql.SQLException
 
 typealias UserClassCreated = Either<UserClassError, Boolean>
 
@@ -27,94 +28,108 @@ class UserClassService(
     private val lectureRepository: LectureRepositoryInterface,
     private val transactionInterface: TransactionInterface
 ) {
+    private inline fun <T> runCatching(block: () -> Either<UserClassError, T>): Either<UserClassError, T> {
+        return try {
+            block()
+        } catch (e: SQLException) {
+            failure(UserClassError.ConnectionDbError(e.message))
+        }
+    }
+
     fun addUserToClass(userId: Int, classId: Int, role: Role): UserClassCreated {
-        return transactionInterface.useTransaction {
-            val schoolClass = classRepository.findClassById(classId) ?: return@useTransaction failure(UserClassError.ClassNotFound)
-            when (role) {
-                Role.STUDENT -> {
-                    val student = studentRepository.findStudentById(userId) ?: return@useTransaction failure(UserClassError.UserNotFound)
-                    if (classRepository.checkStudentInClass(student.user.id, schoolClass.id)) {
-                        return@useTransaction failure(UserClassError.UserAlreadyInClass)
+        return runCatching {
+            transactionInterface.useTransaction {
+                val schoolClass = classRepository.findClassById(classId) ?: return@useTransaction failure(UserClassError.ClassNotFound)
+                when (role) {
+                    Role.STUDENT -> {
+                        val student = studentRepository.findStudentById(userId) ?: return@useTransaction failure(UserClassError.UserNotFound)
+                        if (classRepository.checkStudentInClass(student.user.id, schoolClass.id)) {
+                            return@useTransaction failure(UserClassError.UserAlreadyInClass)
+                        }
+                        val liked = classRepository.addStudentToClass(student, schoolClass)
+                        if (!liked) {
+                            return@useTransaction failure(UserClassError.FailedToLinkUserToClass)
+                        }
+                        return@useTransaction success(true)
                     }
-                    val liked = classRepository.addStudentToClass(student, schoolClass)
-                    if (!liked) {
-                        return@useTransaction failure(UserClassError.FailedToLinkUserToClass)
+                    Role.TEACHER -> {
+                        val teacher = teacherRepository.findTeacherById(userId) ?: return@useTransaction failure(UserClassError.UserNotFound)
+                        if (classRepository.checkTeacherInClass(teacher.user.id, schoolClass.id)) {
+                            return@useTransaction failure(UserClassError.UserAlreadyInClass)
+                        }
+                        val liked = classRepository.addTeacherToClass(teacher, schoolClass)
+                        if (!liked) {
+                            return@useTransaction failure(UserClassError.FailedToLinkUserToClass)
+                        }
+                        return@useTransaction success(true)
                     }
-                    return@useTransaction success(true)
+                    else -> return@useTransaction failure(UserClassError.InvalidRole)
                 }
-                Role.TEACHER -> {
-                    val teacher = teacherRepository.findTeacherById(userId) ?: return@useTransaction failure(UserClassError.UserNotFound)
-                    if (classRepository.checkTeacherInClass(teacher.user.id, schoolClass.id)) {
-                        return@useTransaction failure(UserClassError.UserAlreadyInClass)
-                    }
-                    val liked = classRepository.addTeacherToClass(teacher, schoolClass)
-                    if (!liked) {
-                        return@useTransaction failure(UserClassError.FailedToLinkUserToClass)
-                    }
-                    return@useTransaction success(true)
-                }
-                else -> return@useTransaction failure(UserClassError.InvalidRole)
             }
         }
     }
 
     fun removeUserFromClass(userId: Int, classId: Int, role:Role): UserClassDeleted {
-        return transactionInterface.useTransaction {
-            val user = userRepository.findById(userId) ?: return@useTransaction failure(UserClassError.UserNotFound)
-            val schoolClass = classRepository.findClassById(classId) ?: return@useTransaction failure(UserClassError.ClassNotFound)
-            when (role) {
-                Role.STUDENT -> {
-                    if (!classRepository.checkStudentInClass(user.id, schoolClass.id)) {
-                        return@useTransaction failure(UserClassError.UserNotInClass)
+        return runCatching {
+            transactionInterface.useTransaction {
+                val user = userRepository.findById(userId) ?: return@useTransaction failure(UserClassError.UserNotFound)
+                val schoolClass = classRepository.findClassById(classId) ?: return@useTransaction failure(UserClassError.ClassNotFound)
+                when (role) {
+                    Role.STUDENT -> {
+                        if (!classRepository.checkStudentInClass(user.id, schoolClass.id)) {
+                            return@useTransaction failure(UserClassError.UserNotInClass)
+                        }
+                        val liked = classRepository.removeStudentFromClass(user, schoolClass)
+                        if (!liked) {
+                            return@useTransaction failure(UserClassError.FailedToUnlinkUserFromClass)
+                        }
+                        return@useTransaction success(true)
                     }
-                    val liked = classRepository.removeStudentFromClass(user, schoolClass)
-                    if (!liked) {
-                        return@useTransaction failure(UserClassError.FailedToUnlinkUserFromClass)
+                    Role.TEACHER -> {
+                        if (!classRepository.checkTeacherInClass(user.id, schoolClass.id)) {
+                            return@useTransaction failure(UserClassError.UserNotInClass)
+                        }
+                        val liked = classRepository.removeTeacherFromClass(user, schoolClass)
+                        if (!liked) {
+                            return@useTransaction failure(UserClassError.FailedToUnlinkUserFromClass)
+                        }
+                        return@useTransaction success(true)
                     }
-                    return@useTransaction success(true)
+                    else -> return@useTransaction failure(UserClassError.InvalidRole)
                 }
-                Role.TEACHER -> {
-                    if (!classRepository.checkTeacherInClass(user.id, schoolClass.id)) {
-                        return@useTransaction failure(UserClassError.UserNotInClass)
-                    }
-                    val liked = classRepository.removeTeacherFromClass(user, schoolClass)
-                    if (!liked) {
-                        return@useTransaction failure(UserClassError.FailedToUnlinkUserFromClass)
-                    }
-                    return@useTransaction success(true)
-                }
-                else -> return@useTransaction failure(UserClassError.InvalidRole)
             }
         }
     }
 
     fun getScheduleByUserId(userId: Int, role: Role): UserLectureListResult {
-        return transactionInterface.useTransaction {
-            val user = userRepository.findById(userId) ?: return@useTransaction failure(UserClassError.UserNotFound)
-            when (role) {
-                Role.STUDENT -> {
-                    val classes = classRepository.findClassesByStudentId(user.id)
-                    if(classes.isEmpty()) {
-                        return@useTransaction success(emptyList<Lecture>())
+        return runCatching {
+            transactionInterface.useTransaction {
+                val user = userRepository.findById(userId) ?: return@useTransaction failure(UserClassError.UserNotFound)
+                when (role) {
+                    Role.STUDENT -> {
+                        val classes = classRepository.findClassesByStudentId(user.id)
+                        if(classes.isEmpty()) {
+                            return@useTransaction success(emptyList<Lecture>())
+                        }
+                        val lectures = lectureRepository.getLecturesByClass(classes[0].id, 50, 0)
+                        if(lectures.isEmpty()) {
+                            return@useTransaction success(emptyList<Lecture>())
+                        }
+                        return@useTransaction success(lectures)
                     }
-                    val lectures = lectureRepository.getLecturesByClass(classes[0].id, 50, 0)
-                    if(lectures.isEmpty()) {
-                        return@useTransaction success(emptyList<Lecture>())
+                    Role.TEACHER -> {
+                        val classes = classRepository.findClassesByTeacherId(user.id)
+                        if(classes.isEmpty()) {
+                            return@useTransaction success(emptyList<Lecture>())
+                        }
+                        val lectures = lectureRepository.getLecturesByClass(classes[0].id, 100, 0)
+                        if(lectures.isEmpty()) {
+                            return@useTransaction success(emptyList<Lecture>())
+                        }
+                        return@useTransaction success(lectures)
                     }
-                    return@useTransaction success(lectures)
+                    else -> return@useTransaction failure(UserClassError.InvalidRole)
                 }
-                Role.TEACHER -> {
-                    val classes = classRepository.findClassesByTeacherId(user.id)
-                    if(classes.isEmpty()) {
-                        return@useTransaction success(emptyList<Lecture>())
-                    }
-                    val lectures = lectureRepository.getLecturesByClass(classes[0].id, 100, 0)
-                    if(lectures.isEmpty()) {
-                        return@useTransaction success(emptyList<Lecture>())
-                    }
-                    return@useTransaction success(lectures)
-                }
-                else -> return@useTransaction failure(UserClassError.InvalidRole)
             }
         }
     }

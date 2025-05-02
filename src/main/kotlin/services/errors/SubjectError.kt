@@ -11,6 +11,7 @@ sealed class SubjectError {
     data object TokenCreationFailed : SubjectError()
     data object AlreadyProcessed : SubjectError()
     data object UnauthorizedRole : SubjectError()
+    data class ConnectionDbError(val message: String?) : SubjectError()
 
     fun toProblem(): Problem {
         return when (this) {
@@ -41,6 +42,10 @@ sealed class SubjectError {
             TokenCreationFailed -> Problem.internalServerError(
                 title = "Token creation failed",
                 detail = "Failed to create the authentication token."
+            )
+            is ConnectionDbError -> Problem.internalServerError(
+                title = "Database Connection Error",
+                detail = "Could not establish connection to the database"
             )
         }
     }

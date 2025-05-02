@@ -6,6 +6,7 @@ import isel.leic.group25.db.entities.timetables.Lecture
 import isel.leic.group25.db.entities.types.ClassType
 import isel.leic.group25.db.entities.types.WeekDay
 import isel.leic.group25.db.repositories.timetables.interfaces.LectureRepositoryInterface
+import isel.leic.group25.db.repositories.utils.withDatabase
 import isel.leic.group25.db.tables.Tables.Companion.lectures
 import org.ktorm.database.Database
 import org.ktorm.dsl.*
@@ -15,11 +16,11 @@ import kotlin.time.Duration
 
 class LectureRepository(private val database: Database) : LectureRepositoryInterface {
 
-    override fun getAllLectures(): List<Lecture> {
+    override fun getAllLectures(): List<Lecture> = withDatabase {
         return database.lectures.toList()
     }
 
-    override fun getAllLectures(limit:Int, offSet: Int): List<Lecture> {
+    override fun getAllLectures(limit:Int, offSet: Int): List<Lecture> = withDatabase {
         return database.lectures.drop(offSet).take(limit).toList()
     }
 
@@ -30,7 +31,7 @@ class LectureRepository(private val database: Database) : LectureRepositoryInter
         weekDay: WeekDay,
         startTime: Duration,
         endTime: Duration
-    ): Lecture? {
+    ): Lecture? = withDatabase {
        val lecture = database.lectures.firstOrNull {
             (it.classId eq schoolClass.id) and
                     (it.roomId eq classroom.room.id) and
@@ -49,7 +50,7 @@ class LectureRepository(private val database: Database) : LectureRepositoryInter
         weekDay: WeekDay,
         startTime: Duration,
         endTime: Duration
-    ): Lecture {
+    ): Lecture = withDatabase {
         val newLecture = Lecture {
             this.schoolClass = schoolClass
             this.classroom = classroom
@@ -62,19 +63,19 @@ class LectureRepository(private val database: Database) : LectureRepositoryInter
         return newLecture
     }
 
-    override fun getLecturesByRoom(roomId: Int, limit:Int, offSet:Int): List<Lecture> {
+    override fun getLecturesByRoom(roomId: Int, limit:Int, offSet:Int): List<Lecture> = withDatabase {
         return database.lectures.filter { it.roomId eq roomId }.drop(offSet).take(limit).toList()
     }
 
-    override fun getLecturesByClass(classId: Int, limit:Int, offSet:Int): List<Lecture> {
+    override fun getLecturesByClass(classId: Int, limit:Int, offSet:Int): List<Lecture> = withDatabase {
         return database.lectures.filter { it.classId eq classId }.drop(offSet).take(limit).toList()
     }
 
-    override fun getLecturesByType(type: ClassType): List<Lecture> {
+    override fun getLecturesByType(type: ClassType): List<Lecture> = withDatabase {
         return database.lectures.filter { it.type eq type }.map { it }
     }
 
-    override fun deleteLecture(lecture: Lecture): Boolean {
+    override fun deleteLecture(lecture: Lecture): Boolean = withDatabase {
          val deletedLecture = database.lectures.removeIf {
             (it.classId eq lecture.schoolClass.id) and
                     (it.roomId eq lecture.classroom.room.id) and
@@ -94,7 +95,7 @@ class LectureRepository(private val database: Database) : LectureRepositoryInter
         newWeekDay: WeekDay,
         newStartTime: Duration,
         newEndTime: Duration
-    ): Lecture {
+    ): Lecture = withDatabase {
             lecture.schoolClass = newSchoolClass
             lecture.classroom = newClassroom
             lecture.type = newType
@@ -111,7 +112,7 @@ class LectureRepository(private val database: Database) : LectureRepositoryInter
         newStartTime: Duration,
         newEndTime: Duration,
         currentLecture: Lecture
-    ): Boolean {
+    ): Boolean = withDatabase {
         return database.lectures.any { existingLecture ->
             // Check if in same room and same day
             (existingLecture.roomId eq newRoomId) and

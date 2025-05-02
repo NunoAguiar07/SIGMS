@@ -13,6 +13,8 @@ sealed class AuthError {
     data object TokenValidationFailed : AuthError()
     data object UnauthorizedRole : AuthError()
     data object InvalidCredentials: AuthError()
+    data class ConnectionDbError(val message: String?) : AuthError()
+    data class EmailError(val message: String?) : AuthError()
 
     fun toProblem(): Problem {
         return when (this) {
@@ -55,6 +57,14 @@ sealed class AuthError {
             InvalidCredentials -> Problem.badRequest(
                 title = "Invalid credentials",
                 detail = "Invalid email or password."
+            )
+            is ConnectionDbError -> Problem.internalServerError(
+                title = "Database Connection Error",
+                detail = "Could not establish connection to the database"
+            )
+            is EmailError -> Problem.badRequest(
+                title = "Invalid Email",
+                detail = "Could not send email properly"
             )
         }
     }
