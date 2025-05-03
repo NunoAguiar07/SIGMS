@@ -64,9 +64,9 @@ fun Route.subjectRoutes(
 fun Route.baseSubjectRoutes(subjectService: SubjectService) {
     get {
         val limit = call.queryParameters["limit"] ?.toIntOrNull()?: 10
-        if(limit < 1 || limit > 100) return@get call.respond(RequestError.Invalid("limit").toProblem())
+        if(limit < 1 || limit > 100) return@get RequestError.Invalid("limit").toProblem().respond(call)
         val offset = call.queryParameters["offset"] ?.toIntOrNull() ?: 0
-        if(offset < 0) return@get call.respond(RequestError.Invalid("offset").toProblem())
+        if(offset < 0) return@get RequestError.Invalid("offset").toProblem().respond(call)
         val result = subjectService.getAllSubjects(limit, offset)
         call.respondEither(
             either = result,
@@ -81,7 +81,7 @@ fun Route.baseSubjectRoutes(subjectService: SubjectService) {
         post("/add") {
             val subjectRequest = call.receive<SubjectRequest>()
             subjectRequest.validate()?.let { error ->
-                return@post call.respond(error.toProblem())
+                return@post error.toProblem().respond(call)
             }
             val result = subjectService.createSubject(
                 name = subjectRequest.name
@@ -108,8 +108,8 @@ fun Route.specificSubjectRoutes(subjectService: SubjectService) {
     route("/{subjectId}") {
         get {
             val subjectId = call.parameters["subjectId"]
-            if(subjectId.isNullOrBlank()) return@get call.respond(RequestError.Missing("subjectId").toProblem())
-            if(subjectId.toIntOrNull() == null) return@get call.respond(RequestError.Invalid("subjectId").toProblem())
+            if(subjectId.isNullOrBlank()) return@get RequestError.Missing("subjectId").toProblem().respond(call)
+            if(subjectId.toIntOrNull() == null) return@get RequestError.Invalid("subjectId").toProblem().respond(call)
             val result = subjectService.getSubjectById(subjectId.toInt())
             call.respondEither(
                 either = result,
@@ -123,8 +123,8 @@ fun Route.specificSubjectRoutes(subjectService: SubjectService) {
         withRole(Role.ADMIN){
             delete("/delete") {
                 val subjectId = call.parameters["subjectId"]
-                if(subjectId.isNullOrBlank()) return@delete call.respond(RequestError.Missing("subjectId").toProblem())
-                if(subjectId.toIntOrNull() == null) return@delete call.respond(RequestError.Invalid("subjectId").toProblem())
+                if(subjectId.isNullOrBlank()) return@delete RequestError.Missing("subjectId").toProblem().respond(call)
+                if(subjectId.toIntOrNull() == null) return@delete RequestError.Invalid("subjectId").toProblem().respond(call)
                 val result = subjectService.deleteSubject(subjectId.toInt())
                 call.respondEither(
                     either = result,
@@ -149,10 +149,10 @@ fun Route.subjectClassesRoutes(classService: ClassService) {
             val limit = call.queryParameters["limit"] ?.toIntOrNull()?: 10
             if(limit < 1 || limit > 100) return@get call.respond(RequestError.Invalid("limit").toProblem())
             val offset = call.queryParameters["offset"] ?.toIntOrNull() ?: 0
-            if(offset < 0) return@get call.respond(RequestError.Invalid("offset").toProblem())
+            if(offset < 0) return@get RequestError.Invalid("offset").toProblem().respond(call)
             val subjectId = call.parameters["subjectId"]
-            if(subjectId.isNullOrBlank()) return@get call.respond(RequestError.Missing("subjectId").toProblem())
-            if(subjectId.toIntOrNull() == null) return@get call.respond(RequestError.Invalid("subjectId").toProblem())
+            if(subjectId.isNullOrBlank()) return@get RequestError.Missing("subjectId").toProblem().respond(call)
+            if(subjectId.toIntOrNull() == null) return@get RequestError.Invalid("subjectId").toProblem().respond(call)
             val result = classService.getAllClassesFromSubject(subjectId.toInt(), limit, offset)
             call.respondEither(
                 either = result,
@@ -166,8 +166,8 @@ fun Route.subjectClassesRoutes(classService: ClassService) {
         withRole(Role.ADMIN){
             post("/add") {
                 val subjectId = call.parameters["subjectId"]
-                if(subjectId.isNullOrBlank()) return@post call.respond(RequestError.Missing("subjectId").toProblem())
-                if(subjectId.toIntOrNull() == null) return@post call.respond(RequestError.Invalid("subjectId").toProblem())
+                if(subjectId.isNullOrBlank()) return@post RequestError.Missing("subjectId").toProblem().respond(call)
+                if(subjectId.toIntOrNull() == null) return@post RequestError.Invalid("subjectId").toProblem().respond(call)
                 val classRequest = call.receive<ClassRequest>()
                 val result = classService.createClass(
                     name = classRequest.name,
@@ -194,8 +194,8 @@ fun Route.classManagementRoutes(classService: ClassService) {
     route("/{classId}") {
         get {
             val classId = call.parameters["classId"]
-            if(classId.isNullOrBlank()) return@get call.respond(RequestError.Missing("classId").toProblem())
-            if(classId.toIntOrNull() == null) return@get call.respond(RequestError.Invalid("classId").toProblem())
+            if(classId.isNullOrBlank()) return@get RequestError.Missing("classId").toProblem().respond(call)
+            if(classId.toIntOrNull() == null) return@get RequestError.Invalid("classId").toProblem().respond(call)
             val result = classService.getClassById(classId.toInt())
             call.respondEither(
                 either = result,
@@ -219,8 +219,8 @@ fun Route.classUserRoutes(usersClassService: UserClassService) {
             val role = call.getUserRoleFromPrincipal() ?: return@post call.respond(HttpStatusCode.Unauthorized)
             val userId = call.getUserIdFromPrincipal() ?: return@post call.respond(HttpStatusCode.Unauthorized)
             val classId = call.parameters["classId"]
-            if(classId.isNullOrBlank()) return@post call.respond(RequestError.Missing("classId").toProblem())
-            if(classId.toIntOrNull() == null) return@post call.respond(RequestError.Invalid("classId").toProblem())
+            if(classId.isNullOrBlank()) return@post RequestError.Missing("classId").toProblem().respond(call)
+            if(classId.toIntOrNull() == null) return@post RequestError.Invalid("classId").toProblem().respond(call)
             val result = usersClassService.addUserToClass(userId, classId.toInt(), Role.valueOf(role.uppercase()))
             call.respondEither(
                 either = result,
@@ -235,8 +235,8 @@ fun Route.classUserRoutes(usersClassService: UserClassService) {
             val role = call.getUserRoleFromPrincipal() ?: return@delete call.respond(HttpStatusCode.Unauthorized)
             val userId = call.getUserIdFromPrincipal() ?: return@delete call.respond(HttpStatusCode.Unauthorized)
             val classId = call.parameters["classId"]
-            if(classId.isNullOrBlank()) return@delete call.respond(RequestError.Missing("classId").toProblem())
-            if(classId.toIntOrNull() == null) return@delete call.respond(RequestError.Invalid("classId").toProblem())
+            if(classId.isNullOrBlank()) return@delete RequestError.Missing("classId").toProblem().respond(call)
+            if(classId.toIntOrNull() == null) return@delete RequestError.Invalid("classId").toProblem().respond(call)
             val result = usersClassService.removeUserFromClass(userId, classId.toInt(), Role.valueOf(role.uppercase()))
             call.respondEither(
                 either = result,
@@ -257,12 +257,12 @@ fun Route.classLecturesRoutes(lectureService: LectureService) {
     route("/lectures") {
         get {
             val limit = call.queryParameters["limit"] ?.toIntOrNull()?: 10
-            if(limit < 1 || limit > 100) return@get call.respond(RequestError.Invalid("limit").toProblem())
+            if(limit < 1 || limit > 100) return@get RequestError.Invalid("limit").toProblem().respond(call)
             val offset = call.queryParameters["offset"] ?.toIntOrNull() ?: 0
-            if(offset < 0) return@get call.respond(RequestError.Invalid("offset").toProblem())
+            if(offset < 0) return@get RequestError.Invalid("offset").toProblem().respond(call)
             val id = call.parameters["classId"]
-            if(id.isNullOrBlank()) return@get call.respond(RequestError.Missing("classId").toProblem())
-            if(id.toIntOrNull() == null) return@get call.respond(RequestError.Invalid("classId").toProblem())
+            if(id.isNullOrBlank()) return@get RequestError.Missing("classId").toProblem().respond(call)
+            if(id.toIntOrNull() == null) return@get RequestError.Invalid("classId").toProblem().respond(call)
             val result = lectureService.getLecturesByClass(id.toInt(), limit, offset)
             call.respondEither(
                 either = result,

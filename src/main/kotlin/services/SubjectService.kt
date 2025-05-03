@@ -13,6 +13,8 @@ typealias SubjectListResult = Either<SubjectError, List<Subject>>
 
 typealias SubjectResult = Either<SubjectError, Subject>
 
+typealias DeleteSubjectResult = Either<SubjectError, Boolean>
+
 class SubjectService(
     private val subjectRepository: SubjectRepositoryInterface,
     private val transactionInterface: TransactionInterface,
@@ -56,7 +58,7 @@ class SubjectService(
         }
     }
 
-    fun deleteSubject(id: Int): SubjectResult {
+    fun deleteSubject(id: Int): DeleteSubjectResult {
         return runCatching {
             transactionInterface.useTransaction {
                 val subject = subjectRepository.findSubjectById(id) ?: return@useTransaction failure(SubjectError.SubjectNotFound)
@@ -64,7 +66,7 @@ class SubjectService(
                 if (!deleted) {
                     return@useTransaction failure(SubjectError.SubjectNotFound)
                 }
-                return@useTransaction success(subject)
+                return@useTransaction success(true)
             }
         }
     }

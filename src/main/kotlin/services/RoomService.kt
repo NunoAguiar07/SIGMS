@@ -14,6 +14,8 @@ typealias RoomListResult = Either<RoomError, List<Room>>
 
 typealias RoomResult = Either<RoomError, Room>
 
+typealias DeleteRoomResult = Either<RoomError, Boolean>
+
 class RoomService (
     private val roomRepository: RoomRepositoryInterface,
     private val transactionInterface: TransactionInterface,
@@ -57,14 +59,14 @@ class RoomService (
             }
         }
     }
-    fun deleteRoom(id: Int): RoomResult {
+    fun deleteRoom(id: Int): DeleteRoomResult {
         return runCatching {
             transactionInterface.useTransaction {
                 val room = roomRepository.getRoomById(id) ?: return@useTransaction failure(RoomError.RoomNotFound)
                 if (roomRepository.deleteRoom(room.id)) {
-                    return@useTransaction success(room)
+                    return@useTransaction success(true)
                 }
-                return@useTransaction failure(RoomError.RoomNotFound)
+                return@useTransaction failure(RoomError.ConnectionDbError("Failed to delete room with id $id"))
             }
         }
     }

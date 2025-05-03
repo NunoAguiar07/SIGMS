@@ -4,12 +4,12 @@ GET {{baseUrl}}/subjects
 Authorization: Bearer {{token}}
 
 ###
-POST {{baseUrl}}/subjects
+POST {{baseUrl}}/subjects/add
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "name": "PG"
+  "name": "AC"
 }
 
 ###
@@ -21,14 +21,14 @@ GET {{baseUrl}}/subjects/1/classes
 Authorization: Bearer {{token}}
 
 ###
-POST {{baseUrl}}/subjects/1/classes
+POST {{baseUrl}}/subjects/2/classes/add
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "name": "LEIC51D"
+  "name": "LEIC53D"
 }
 
 ###
-GET {{baseUrl}}/subjects/1/classes/3/lectures
+GET {{baseUrl}}/subjects/1/classes/5/lectures
 Authorization: Bearer {{token}}

@@ -30,11 +30,8 @@ data class UserCredentialsRequest(
         }
 
         // Check role validity (only if role exists)
-        if (role.isNotBlank()) {
-            val validRoles = Role.entries.joinToString { it.name }
-            if (role.uppercase() !in validRoles) {
-                return RequestError.Invalid("role")
-            }
+        if (Role.fromValue(role.uppercase()) == null) {
+            return RequestError.Invalid("role")
         }
         return null
     }

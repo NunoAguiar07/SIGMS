@@ -1,6 +1,6 @@
 
 ###
-# checked
+# for student ()
 POST {{baseUrl}}/auth/register
 Content-Type: application/json
 
@@ -12,8 +12,32 @@ Content-Type: application/json
 }
 
 ###
+# for teacher ()
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "email": "antonioTeacher16@gmail.com",
+  "username": "Antonio_124",
+  "password": "Antonio_124",
+  "role": "teacher"
+}
+
+###
+# for technical service ()
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "email": "antonioTS15@gmail.com",
+  "username": "Antonio_124",
+  "password": "Antonio_124",
+  "role": "technical_services"
+}
+
+###
 # @name login
-# checked
+#
 POST {{baseUrl}}/auth/login
 Content-Type: application/json
 
@@ -24,18 +48,18 @@ Content-Type: application/json
 
 
 ###
-#checked
-PUT {{baseUrl}}/auth/verifyAccount?token=96ec6464-005d-4aea-91e5-72f3b89fa3e9
+#
+PUT {{baseUrl}}/auth/verify-account?token=6d2e73cd-d7f6-4b23-95e2-9e37f2649e11
 
 ###
-GET {{baseUrl}}/assessRole
+GET {{baseUrl}}/assess-roles
 Authorization: Bearer {{token}}
 
 ###
-GET {{baseUrl}}/assessRole/684a7f17-62f0-45a8-87b8-ce44c8f131fe
+GET {{baseUrl}}/assess-roles/ec3e412a-98b5-4bed-a4aa-a9d14060cb85
 Authorization: Bearer {{token}}
 
 ###
-PUT {{baseUrl}}/assessRole?token=684a7f17-62f0-45a8-87b8-ce44c8f131fe&status=approved
+PUT {{baseUrl}}/assess-roles/validate?token=ec3e412a-98b5-4bed-a4aa-a9d14060cb85&status=approved
 Authorization: Bearer {{token}}
 

@@ -11,7 +11,6 @@ import isel.leic.group25.api.model.response.AssessRoleResponse
 import isel.leic.group25.db.entities.types.Role
 import isel.leic.group25.db.entities.types.Status
 import isel.leic.group25.services.AuthService
-import java.util.*
 
 /**
  * Defines routes for assessing and managing role approval requests for Technical_Services and Teachers
@@ -40,8 +39,8 @@ fun Route.getAllPendingApprovalsRoute(authService: AuthService) {
     get {
         val limit = call.request.queryParameters["limit"]?.toIntOrNull() ?: 10
         val offset = call.request.queryParameters["offset"]?.toIntOrNull() ?: 0
-        if (offset < 0) return@get call.respond(RequestError.Invalid("offset").toProblem())
-        if (limit <= 0 || limit > 100) return@get call.respond(RequestError.Invalid("limit").toProblem())
+        if (offset < 0) return@get RequestError.Invalid("offset").toProblem().respond(call)
+        if (limit <= 0 || limit > 100) return@get RequestError.Invalid("limit").toProblem().respond(call)
         val result = authService.getAllPendingApprovals(limit, offset)
         call.respondEither(
             either = result,
@@ -66,12 +65,12 @@ fun Route.processRoleApprovalRoute(authService: AuthService) {
     route("/validate"){
         put {
             val token = call.queryParameters["token"]
-                ?: return@put call.respond(RequestError.Missing("token").toProblem())
+                ?: return@put RequestError.Missing("token").toProblem().respond(call)
             val status = call.queryParameters["status"]
-                ?: return@put call.respond(RequestError.Missing("status").toProblem())
+                ?: return@put RequestError.Missing("status").toProblem().respond(call)
             val adminId = call.getUserIdFromPrincipal() ?: return@put call.respond(HttpStatusCode.Unauthorized)
-            val toStatus = Status.fromValue(status.uppercase(Locale.getDefault()))
-                ?: return@put call.respond(RequestError.Invalid("status").toProblem())
+            val toStatus = Status.fromValue(status.uppercase())
+                ?: return@put RequestError.Invalid("status").toProblem().respond(call)
             val result = authService.assessRoleRequest(
                 token = token,
                 adminUserId = adminId,
@@ -97,7 +96,7 @@ fun Route.processRoleApprovalRoute(authService: AuthService) {
 fun Route.getApprovalByTokenRoute(authService: AuthService) {
     get("/{token}") {
         val token = call.parameters["token"]
-            ?: return@get call.respond(RequestError.Missing("token").toProblem())
+            ?: return@get RequestError.Missing("token").toProblem().respond(call)
         val result = authService.getApprovalByToken(token)
         call.respondEither(
             either = result,

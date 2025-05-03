@@ -62,8 +62,8 @@ fun Route.baseRoomRoutes(roomService: RoomService) {
     get {
         val limit = call.queryParameters["limit"]?.toIntOrNull() ?: 10
         val offset = call.queryParameters["offset"]?.toIntOrNull() ?: 0
-        if(offset < 0) return@get call.respond(RequestError.Invalid("offset").toProblem())
-        if(limit < 1 || limit > 100) return@get call.respond(RequestError.Invalid("limit").toProblem())
+        if(offset < 0) return@get RequestError.Invalid("offset").toProblem().respond(call)
+        if(limit < 1 || limit > 100) return@get RequestError.Invalid("limit").toProblem().respond(call)
         val result = roomService.getAllRooms(limit, offset)
         call.respondEither(
             either = result,
@@ -75,10 +75,10 @@ fun Route.baseRoomRoutes(roomService: RoomService) {
         post("/add") {
             val roomRequest = call.receive<RoomRequest>()
             roomRequest.validate()?.let{ error ->
-                return@post call.respond(error.toProblem())
+                return@post error.toProblem().respond(call)
             }
-            val type = RoomType.fromValue(roomRequest.type)
-                ?: return@post call.respond(RequestError.Invalid("type").toProblem())
+            val type = RoomType.fromValue(roomRequest.type.uppercase())
+                ?: return@post RequestError.Invalid("type").toProblem().respond(call)
             val result = roomService.createRoom(
                 name = roomRequest.name,
                 capacity = roomRequest.capacity,
@@ -103,11 +103,11 @@ fun Route.teacherOfficeRoutes(teacherRoomService: TeacherRoomService) {
     route("/offices/{roomId}/teachers") {
         put("/add") {
             val roomId = call.parameters["roomId"]
-            if(roomId.isNullOrBlank()) return@put call.respond(RequestError.Missing("roomId").toProblem())
-            if(roomId.toIntOrNull() == null) return@put call.respond(RequestError.Invalid("roomId").toProblem())
+            if(roomId.isNullOrBlank()) return@put RequestError.Missing("roomId").toProblem().respond(call)
+            if(roomId.toIntOrNull() == null) return@put RequestError.Invalid("roomId").toProblem().respond(call)
             val request = call.receive<TeacherOfficeRequest>()
             request.validate()?.let{ error ->
-                return@put call.respond(error.toProblem())
+                return@put error.toProblem().respond(call)
             }
             val result = teacherRoomService.addTeacherToOffice(
                 teacherId = request.teacherId,
@@ -122,8 +122,8 @@ fun Route.teacherOfficeRoutes(teacherRoomService: TeacherRoomService) {
 
         delete("/remove") {
             val roomId = call.parameters["roomId"]
-            if(roomId.isNullOrBlank()) return@delete call.respond(RequestError.Missing("roomId").toProblem())
-            if(roomId.toIntOrNull() == null) return@delete call.respond(RequestError.Invalid("roomId").toProblem())
+            if(roomId.isNullOrBlank()) return@delete RequestError.Missing("roomId").toProblem().respond(call)
+            if(roomId.toIntOrNull() == null) return@delete RequestError.Invalid("roomId").toProblem().respond(call)
             val request = call.receive<TeacherOfficeRequest>()
             val result = teacherRoomService.removeTeacherFromRoom(
                 teacherId = request.teacherId,
@@ -148,8 +148,12 @@ fun Route.specificRoomRoutes(roomService: RoomService) {
     route("/{roomId}") {
         get {
             val roomId = call.parameters["roomId"]
-            if(roomId.isNullOrBlank()) return@get call.respond(RequestError.Missing("roomId").toProblem())
-            if(roomId.toIntOrNull() == null) return@get call.respond(RequestError.Invalid("roomId").toProblem())
+            if(roomId.isNullOrBlank()) {
+                return@get RequestError.Missing("roomId").toProblem().respond(call)
+            }
+            if(roomId.toIntOrNull() == null) {
+                return@get RequestError.Invalid("roomId").toProblem().respond(call)
+            }
             val result = roomService.getRoomById(roomId.toInt())
             call.respondEither(
                 either = result,
@@ -160,8 +164,8 @@ fun Route.specificRoomRoutes(roomService: RoomService) {
         withRole(Role.ADMIN){
             delete("/delete") {
                 val roomId = call.parameters["roomId"]
-                if(roomId.isNullOrBlank()) return@delete call.respond(RequestError.Missing("roomId").toProblem())
-                if(roomId.toIntOrNull() == null) return@delete call.respond(RequestError.Invalid("roomId").toProblem())
+                if(roomId.isNullOrBlank()) return@delete RequestError.Missing("roomId").toProblem().respond(call)
+                if(roomId.toIntOrNull() == null) return@delete RequestError.Invalid("roomId").toProblem().respond(call)
                 val result = roomService.deleteRoom(roomId.toInt())
                 call.respondEither(
                     either = result,
@@ -172,11 +176,11 @@ fun Route.specificRoomRoutes(roomService: RoomService) {
 
             put("update") {
                 val roomId = call.parameters["roomId"]
-                if(roomId.isNullOrBlank()) return@put call.respond(RequestError.Missing("roomId").toProblem())
-                if(roomId.toIntOrNull() == null) return@put call.respond(RequestError.Invalid("roomId").toProblem())
+                if(roomId.isNullOrBlank()) return@put RequestError.Missing("roomId").toProblem().respond(call)
+                if(roomId.toIntOrNull() == null) return@put RequestError.Invalid("roomId").toProblem().respond(call)
                 val roomRequest = call.receive<RoomRequest>()
                 roomRequest.validate()?.let{ error ->
-                    return@put call.respond(error.toProblem())
+                    return@put error.toProblem().respond(call)
                 }
                 val result = roomService.updateRoom(
                     id = roomId.toInt(),
@@ -202,11 +206,11 @@ fun Route.roomLecturesRoutes(lectureService: LectureService) {
         get {
             val limit = call.queryParameters["limit"]?.toIntOrNull() ?: 10
             val offset = call.queryParameters["offset"]?.toIntOrNull() ?: 0
-            if(offset < 0) return@get call.respond(RequestError.Invalid("offset").toProblem())
-            if(limit < 1 || limit > 100) return@get call.respond(RequestError.Invalid("limit").toProblem())
+            if(offset < 0) return@get RequestError.Invalid("offset").toProblem().respond(call)
+            if(limit < 1 || limit > 100) return@get RequestError.Invalid("limit").toProblem().respond(call)
             val roomId = call.parameters["roomId"]
-            if(roomId.isNullOrBlank()) return@get call.respond(RequestError.Missing("roomId").toProblem())
-            if(roomId.toIntOrNull() == null) return@get call.respond(RequestError.Invalid("roomId").toProblem())
+            if(roomId.isNullOrBlank()) return@get RequestError.Missing("roomId").toProblem().respond(call)
+            if(roomId.toIntOrNull() == null) return@get RequestError.Invalid("roomId").toProblem().respond(call)
             val result = lectureService.getLecturesByRoom(roomId.toInt(), limit, offset)
             call.respondEither(
                 either = result,
@@ -228,11 +232,11 @@ fun Route.roomIssuesRoutes(issuesReportService: IssuesReportService) {
         get {
             val limit = call.queryParameters["limit"]?.toIntOrNull() ?: 10
             val offset = call.queryParameters["offset"]?.toIntOrNull() ?: 0
-            if(offset < 0) return@get call.respond(RequestError.Invalid("offset").toProblem())
-            if(limit < 1 || limit > 100) return@get call.respond(RequestError.Invalid("limit").toProblem())
+            if(offset < 0) return@get RequestError.Invalid("offset").toProblem().respond(call)
+            if(limit < 1 || limit > 100) return@get RequestError.Invalid("limit").toProblem().respond(call)
             val roomId = call.parameters["roomId"]
-            if(roomId.isNullOrBlank()) return@get call.respond(RequestError.Missing("roomId").toProblem())
-            if(roomId.toIntOrNull() == null) return@get call.respond(RequestError.Invalid("roomId").toProblem())
+            if(roomId.isNullOrBlank()) return@get RequestError.Missing("roomId").toProblem().respond(call)
+            if(roomId.toIntOrNull() == null) return@get RequestError.Invalid("roomId").toProblem().respond(call)
             val result = issuesReportService.getIssuesReportByRoomId(roomId.toInt(), limit, offset)
             call.respondEither(
                 either = result,
@@ -244,11 +248,11 @@ fun Route.roomIssuesRoutes(issuesReportService: IssuesReportService) {
         post("/add") {
             val userId = call.getUserIdFromPrincipal() ?: return@post call.respond(HttpStatusCode.Unauthorized)
             val roomId = call.parameters["roomId"]
-            if(roomId.isNullOrBlank()) return@post call.respond(RequestError.Missing("roomId").toProblem())
-            if(roomId.toIntOrNull() == null) return@post call.respond(RequestError.Invalid("roomId").toProblem())
+            if(roomId.isNullOrBlank()) return@post RequestError.Missing("roomId").toProblem().respond(call)
+            if(roomId.toIntOrNull() == null) return@post RequestError.Invalid("roomId").toProblem().respond(call)
             val issueRequest = call.receive<IssueReportRequest>()
             issueRequest.validate()?.let{ error ->
-                return@post call.respond(error.toProblem())
+                return@post error.toProblem().respond(call)
             }
             val result = issuesReportService.createIssueReport(
                 userId = userId,
@@ -281,8 +285,8 @@ fun Route.roomIssuesRoutes(issuesReportService: IssuesReportService) {
 fun Route.issueCrudRoutes(issuesReportService: IssuesReportService) {
     get {
         val issueId = call.parameters["issueId"]
-        if(issueId.isNullOrBlank()) return@get call.respond(RequestError.Missing("issueId").toProblem())
-        if(issueId.toIntOrNull() == null) return@get call.respond(RequestError.Invalid("issueId").toProblem())
+        if(issueId.isNullOrBlank()) return@get RequestError.Missing("issueId").toProblem().respond(call)
+        if(issueId.toIntOrNull() == null) return@get RequestError.Invalid("issueId").toProblem().respond(call)
         val result = issuesReportService.getIssueReportById(issueId.toInt())
         call.respondEither(
             either = result,
@@ -294,8 +298,8 @@ fun Route.issueCrudRoutes(issuesReportService: IssuesReportService) {
     withRole(Role.TECHNICAL_SERVICE) {
         delete("/delete") {
             val issueId = call.parameters["issueId"]
-            if(issueId.isNullOrBlank()) return@delete call.respond(RequestError.Missing("issueId").toProblem())
-            if(issueId.toIntOrNull() == null) return@delete call.respond(RequestError.Invalid("issueId").toProblem())
+            if(issueId.isNullOrBlank()) return@delete RequestError.Missing("issueId").toProblem().respond(call)
+            if(issueId.toIntOrNull() == null) return@delete RequestError.Invalid("issueId").toProblem().respond(call)
             val result = issuesReportService.deleteIssueReport(issueId.toInt())
             call.respondEither(
                 either = result,
@@ -305,11 +309,11 @@ fun Route.issueCrudRoutes(issuesReportService: IssuesReportService) {
         }
         put("/update") {
             val issueId = call.parameters["issueId"]
-            if(issueId.isNullOrBlank()) return@put call.respond(RequestError.Missing("issueId").toProblem())
-            if(issueId.toIntOrNull() == null) return@put call.respond(RequestError.Invalid("issueId").toProblem())
+            if(issueId.isNullOrBlank()) return@put RequestError.Missing("issueId").toProblem().respond(call)
+            if(issueId.toIntOrNull() == null) return@put RequestError.Invalid("issueId").toProblem().respond(call)
             val issueRequest = call.receive<IssueReportRequest>()
             issueRequest.validate()?.let{ error ->
-                return@put call.respond(error.toProblem())
+                return@put error.toProblem().respond(call)
             }
             val result = issuesReportService.updateIssueReport(
                 id = issueId.toInt(),

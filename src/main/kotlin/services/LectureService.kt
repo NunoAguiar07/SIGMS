@@ -18,6 +18,8 @@ typealias LectureListResult = Either<LectureError, List<Lecture>>
 
 typealias LectureResult = Either<LectureError, Lecture>
 
+typealias DeleteLectureResult = Either<LectureError, Boolean>
+
 class LectureService(
     private val lectureRepository: LectureRepository,
     private val transactionInterface: TransactionInterface,
@@ -90,6 +92,7 @@ class LectureService(
     fun getLecturesByClass(classId: Int, limit: Int, offset:Int): LectureListResult {
         return runCatching {
             transactionInterface.useTransaction {
+                classRepository.findClassById(classId) ?: return@useTransaction failure(LectureError.InvalidLectureClass)
                 val lectures = lectureRepository.getLecturesByClass(classId, limit, offset)
                 return@useTransaction success(lectures)
             }
@@ -111,7 +114,7 @@ class LectureService(
         weekDay: WeekDay,
         startTime: String,
         endTime: String
-    ): LectureResult {
+    ): DeleteLectureResult {
         return runCatching {
             transactionInterface.useTransaction {
                 val schoolClass = classRepository.findClassById(schoolClassId) ?: return@useTransaction failure(LectureError.InvalidLectureClass)
@@ -122,7 +125,7 @@ class LectureService(
                     lectureRepository.getLecture(schoolClass, room, type, weekDay, parsedStartTime, parsedEndTime )
                         ?: return@useTransaction failure(LectureError.LectureNotFound)
                 if (lectureRepository.deleteLecture(lecture)) {
-                    return@useTransaction success(lecture)
+                    return@useTransaction success(true)
                 }
                 return@useTransaction failure(LectureError.LectureNotFound)
             }
@@ -174,7 +177,6 @@ class LectureService(
                     }
                 }
                 val updatedLecture = lectureRepository.updateLecture(lecture, newSchoolClass, newClassroom, newType, newWeekDay, newParsedStartTime, newParsedEndTime)
-
                 val students = classRepository.findStudentsByClassId(schoolClassId)
                 if(students.isNotEmpty()){
                     emailService.sendStudentsChangeInLecture(students.map { it.user.email }, updatedLecture)

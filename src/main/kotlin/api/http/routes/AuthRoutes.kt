@@ -6,7 +6,6 @@ import api.model.response.LoginResponse
 import api.model.response.RegisterResponse
 import io.ktor.http.*
 import io.ktor.server.request.*
-import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import isel.leic.group25.api.exceptions.RequestError
 import isel.leic.group25.api.exceptions.respondEither
@@ -39,7 +38,7 @@ fun Route.registerRoute(authService: AuthService) {
     post("/register") {
         val credentials = call.receive<UserCredentialsRequest>()
         credentials.validate()?.let { error ->
-            return@post call.respond(error.toProblem())
+            return@post error.toProblem().respond(call)
         }
         val result = authService.register(
             email = credentials.email,
@@ -74,7 +73,7 @@ fun Route.loginRoute(authService: AuthService) {
     post("/login") {
         val credentials = call.receive<LoginCredentialsRequest>()
         credentials.validate()?.let { error ->
-            return@post call.respond(error.toProblem())
+            return@post error.toProblem().respond(call)
         }
         val result = authService.login(
             email = credentials.email,
@@ -99,7 +98,7 @@ fun Route.loginRoute(authService: AuthService) {
 fun Route.accountVerificationRoute(authService: AuthService) {
     put {
         val token = call.request.queryParameters["token"]
-            ?: return@put call.respond(RequestError.Missing("token").toProblem())
+            ?: return@put RequestError.Missing("token").toProblem().respond(call)
         val result = authService.verifyStudentAccount(token)
         call.respondEither(
             either = result,

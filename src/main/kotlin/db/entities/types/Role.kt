@@ -4,11 +4,9 @@ enum class Role {
     STUDENT,
     TEACHER,
     ADMIN,
-    TECHNICAL_SERVICE
-}
+    TECHNICAL_SERVICE;
 
-fun String.toRoleOrNull(): Role? {
-    return Role.entries.firstOrNull {
-        it.name.equals(this.trim(), ignoreCase = true)
+    companion object {
+        fun fromValue(value: String): Role? = Role.entries.find { it.name == value }
     }
 }
