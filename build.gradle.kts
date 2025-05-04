@@ -23,6 +23,7 @@ dependencies {
     implementation("io.ktor:ktor-server-auth:$ktor_version")
     implementation("io.ktor:ktor-server-auth-jwt:$ktor_version")
     implementation("io.ktor:ktor-server-core-jvm")
+    implementation("io.ktor:ktor-server-cors:$ktor_version")
     implementation("io.ktor:ktor-server-jetty-jakarta")
     implementation("io.ktor:ktor-server-websockets:$ktor_version")
     implementation("ch.qos.logback:logback-classic:$logback_version")

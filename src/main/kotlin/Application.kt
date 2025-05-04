@@ -7,6 +7,7 @@ import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*
+import io.ktor.server.plugins.cors.routing.*
 import io.ktor.server.response.*
 import io.ktor.server.websocket.*
 import isel.leic.group25.api.http.configureRouting
@@ -30,6 +31,30 @@ fun main(args: Array<String>) {
 }
 
 fun Application.module() {
+    install(CORS) {
+        //allowSameOrigin
+        //allowHost("localhost:8081", schemes = listOf("http")) // Expo front end
+        allowMethod(HttpMethod.Options)
+        allowMethod(HttpMethod.Put)
+        allowMethod(HttpMethod.Patch)
+        allowMethod(HttpMethod.Delete)
+
+        anyHost()
+
+        // Allow headers
+        allowHeader(HttpHeaders.ContentType)
+        allowHeader(HttpHeaders.Authorization)
+        allowHeader(HttpHeaders.Origin)
+        allowHeader(HttpHeaders.AccessControlAllowOrigin)
+        allowHeader(HttpHeaders.AccessControlAllowMethods)
+        allowHeader(HttpHeaders.AccessControlAllowHeaders)
+
+
+        allowCredentials = true
+
+        // Max age for preflight requests
+        maxAgeInSeconds = 24 * 60 * 60
+    }
     install(ContentNegotiation) {
         json()
     }
@@ -102,5 +127,6 @@ fun Application.module() {
         maxFrameSize = Long.MAX_VALUE
         masking = false
     }
+
     configureRouting(userService, teacherRoomService, authService, classService, userClassService, subjectService, roomService, lectureService, issueReportService)
 }
