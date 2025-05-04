@@ -13,13 +13,7 @@ export const GetData = (setWelcome, setError) => {
     return async () => {
         try {
             console.log("Fetching data from API...")
-            const response = await fetch(apiUrl, {
-                method: 'GET',
-                headers: {
-                    'Origin': 'http://localhost:8081',  // Frontend origin for CORS
-                    'Content-Type': 'application/json',
-                }
-            });
+            const response = await fetch(apiUrl);
 
             // Log the response headers for debugging purposes
             console.log('Response Headers:', response.headers);

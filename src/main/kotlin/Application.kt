@@ -33,22 +33,15 @@ fun main(args: Array<String>) {
 fun Application.module() {
     install(CORS) {
         //allowSameOrigin
-        //allowHost("localhost:8081", schemes = listOf("http")) // Expo front end
+        allowHost("localhost:8081", schemes = listOf("http")) // Expo front end
         allowMethod(HttpMethod.Options)
         allowMethod(HttpMethod.Put)
         allowMethod(HttpMethod.Patch)
         allowMethod(HttpMethod.Delete)
 
-        anyHost()
-
         // Allow headers
         allowHeader(HttpHeaders.ContentType)
         allowHeader(HttpHeaders.Authorization)
-        allowHeader(HttpHeaders.Origin)
-        allowHeader(HttpHeaders.AccessControlAllowOrigin)
-        allowHeader(HttpHeaders.AccessControlAllowMethods)
-        allowHeader(HttpHeaders.AccessControlAllowHeaders)
-
 
         allowCredentials = true
 
