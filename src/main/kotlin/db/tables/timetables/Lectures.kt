@@ -14,6 +14,7 @@ import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
 object Lectures: Table<Lecture>("lecture") {
+    val id = int("id").primaryKey().bindTo { it.id }
     val classId = int("class_id").references(Classes){ it.schoolClass }
     val roomId = int("room_id").references(Classrooms){ it.classroom }
     val type = varchar("class_type").transform({ ClassType.valueOf(it.uppercase()) }, {it.name.lowercase()}).bindTo { it.type }

@@ -28,10 +28,15 @@ fun Route.lectureRoutes(lectureService: LectureService) {
         getAllLecturesRoute(lectureService)
         withRole(Role.ADMIN){
             createLectureRoute(lectureService)
-            deleteLectureRoute(lectureService)
         }
-        withRoles(setOf(Role.ADMIN, Role.TEACHER)){
-            updateLectureRoute(lectureService)
+        route("/{lectureId}") {
+            getLectureRoute(lectureService)
+            withRole(Role.ADMIN){
+                deleteLectureRoute(lectureService)
+            }
+            withRoles(setOf(Role.ADMIN, Role.TEACHER)){
+                updateLectureRoute(lectureService)
+            }
         }
     }
 }
@@ -54,6 +59,29 @@ fun Route.getAllLecturesRoute(lectureService: LectureService) {
             transformError = { error -> error.toProblem() },
             transformSuccess = { lectures ->
                 lectures.map { LectureResponse.from(it) }
+            }
+        )
+    }
+}
+
+/**
+ * Retrieves a lecture by ID.
+ *
+ * @receiver Route The Ktor route for this endpoint
+ * @param lectureService Service handling lecture retrieval logic
+ **/
+fun Route.getLectureRoute(lectureService: LectureService) {
+    get {
+        val lectureStringId = call.parameters["lectureId"]
+            ?: return@get RequestError.Missing("lectureId").toProblem().respond(call)
+        val lectureId = lectureStringId.toIntOrNull()
+            ?: return@get RequestError.Invalid("lectureId").toProblem().respond(call)
+        val result = lectureService.getLectureById(lectureId)
+        call.respondEither(
+            either = result,
+            transformError = { error -> error.toProblem() },
+            transformSuccess = { lecture ->
+                LectureResponse.from(lecture)
             }
         )
     }
@@ -106,27 +134,25 @@ fun Route.updateLectureRoute(lectureService: LectureService) {
         updateLectureRequest.validate()?.let { error ->
             return@put call.respond(error.toProblem())
         }
-        val weekday = WeekDay.fromValue(updateLectureRequest.weekDay)
-            ?: return@put RequestError.Invalid("weekday").toProblem().respond(call)
-        val type = ClassType.fromValue(updateLectureRequest.type)
-            ?: return@put RequestError.Invalid("type").toProblem().respond(call)
+        val lectureIdString = call.parameters["lectureId"]
+            ?: return@put RequestError.Missing("id").toProblem().respond(call)
+        val lectureId = lectureIdString.toIntOrNull()
+            ?: return@put RequestError.Invalid("id").toProblem().respond(call)
         val newWeekday = WeekDay.fromValue(updateLectureRequest.newWeekDay)
             ?: return@put RequestError.Invalid("newWeekday").toProblem().respond(call)
         val newType = ClassType.fromValue(updateLectureRequest.newType)
             ?: return@put RequestError.Invalid("newType").toProblem().respond(call)
+        val numberOfWeeks = updateLectureRequest.numberOfWeeks ?: 0
         val result = lectureService.updateLecture(
-            schoolClassId = updateLectureRequest.schoolClassId,
-            roomId = updateLectureRequest.roomId,
-            weekDay = weekday,
-            type = type,
-            startTime = updateLectureRequest.startTime,
-            endTime = updateLectureRequest.endTime,
+            lectureId = lectureId,
             newSchoolClassId = updateLectureRequest.newSchoolClassId,
             newRoomId = updateLectureRequest.newRoomId,
             newWeekDay = newWeekday,
             newType = newType,
             newStartTime = updateLectureRequest.newStartTime,
-            newEndTime = updateLectureRequest.newEndTime
+            newEndTime = updateLectureRequest.newEndTime,
+            numberOfWeeks = numberOfWeeks,
+
         )
         call.respondEither(
             either = result,
@@ -146,21 +172,12 @@ fun Route.updateLectureRoute(lectureService: LectureService) {
  */
 fun Route.deleteLectureRoute(lectureService: LectureService) {
     delete("/delete") {
-        val lectureRequest = call.receive<LectureRequest>()
-        lectureRequest.validate()?.let { error ->
-            return@delete error.toProblem().respond(call)
-        }
-        val weekday = WeekDay.fromValue(lectureRequest.weekDay)
-            ?: return@delete RequestError.Invalid("weekday").toProblem().respond(call)
-        val type = ClassType.fromValue(lectureRequest.type)
-            ?: return@delete RequestError.Invalid("type").toProblem().respond(call)
+        val lectureIdString = call.parameters["lectureId"]
+            ?: return@delete RequestError.Missing("id").toProblem().respond(call)
+        val lectureId = lectureIdString.toIntOrNull()
+            ?: return@delete RequestError.Invalid("id").toProblem().respond(call)
         val result = lectureService.deleteLecture(
-            schoolClassId = lectureRequest.schoolClassId,
-            roomId = lectureRequest.roomId,
-            weekDay = weekday,
-            type = type,
-            startTime = lectureRequest.startTime,
-            endTime = lectureRequest.endTime
+            lectureId = lectureId,
         )
         call.respondEither(
             either = result,

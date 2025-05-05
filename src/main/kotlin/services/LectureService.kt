@@ -5,13 +5,19 @@ import isel.leic.group25.db.entities.types.ClassType
 import isel.leic.group25.db.entities.types.WeekDay
 import isel.leic.group25.db.repositories.interfaces.IsolationLevel
 import isel.leic.group25.db.repositories.interfaces.TransactionInterface
-import isel.leic.group25.db.repositories.rooms.RoomRepository
-import isel.leic.group25.db.repositories.timetables.ClassRepository
-import isel.leic.group25.db.repositories.timetables.LectureRepository
+import isel.leic.group25.db.repositories.rooms.interfaces.RoomRepositoryInterface
+import isel.leic.group25.db.repositories.timetables.interfaces.ClassRepositoryInterface
+import isel.leic.group25.db.repositories.timetables.interfaces.LectureRepositoryInterface
 import isel.leic.group25.services.email.EmailService
 import isel.leic.group25.services.errors.LectureError
 import isel.leic.group25.utils.*
+import kotlinx.datetime.Clock
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import java.sql.SQLException
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 
 typealias LectureListResult = Either<LectureError, List<Lecture>>
@@ -21,10 +27,10 @@ typealias LectureResult = Either<LectureError, Lecture>
 typealias DeleteLectureResult = Either<LectureError, Boolean>
 
 class LectureService(
-    private val lectureRepository: LectureRepository,
+    private val lectureRepository: LectureRepositoryInterface,
     private val transactionInterface: TransactionInterface,
-    private val classRepository: ClassRepository,
-    private val roomRepository: RoomRepository,
+    private val classRepository: ClassRepositoryInterface,
+    private val roomRepository: RoomRepositoryInterface,
     private val emailService: EmailService
 ) {
 
@@ -61,21 +67,31 @@ class LectureService(
         return runCatching {
             transactionInterface.useTransaction {
                 if(
-                    lectureRepository.getAllLectures().any {
-                        it.startTime == parsedStartTime &&
-                                it.endTime == parsedEndTime &&
-                                it.classroom.room.id == roomId &&
-                                it.schoolClass.id == schoolClassId &&
-                                it.type == type &&
-                                it.weekDay == weekDay }
+                    lectureRepository.findConflictingLectures(
+                        roomId,
+                        weekDay,
+                        parsedStartTime,
+                        parsedEndTime,
+                        null
+                    )
                 ) {
-                    return@useTransaction failure(LectureError.LectureAlreadyExists)
+                    return@useTransaction failure(LectureError.LectureTimeConflict)
                 }
                 val room = roomRepository.getClassRoomById(roomId) ?: return@useTransaction failure(LectureError.InvalidLectureRoom)
                 val schoolClass = classRepository.findClassById(schoolClassId) ?: return@useTransaction failure(LectureError.InvalidLectureClass)
                 val newLecture = lectureRepository.createLecture(schoolClass, room,type , weekDay, parsedStartTime, parsedEndTime)
                 return@useTransaction success(newLecture)
 
+            }
+        }
+    }
+
+    fun getLectureById(lectureId: Int): LectureResult {
+        return runCatching {
+            transactionInterface.useTransaction {
+                val lecture = lectureRepository.getLectureById(lectureId)
+                       ?: return@useTransaction failure(LectureError.LectureNotFound)
+                return@useTransaction success(lecture)
             }
         }
     }
@@ -107,24 +123,15 @@ class LectureService(
             }
         }
     }
+
     fun deleteLecture(
-        schoolClassId: Int,
-        roomId: Int,
-        type: ClassType,
-        weekDay: WeekDay,
-        startTime: String,
-        endTime: String
+        lectureId: Int
     ): DeleteLectureResult {
         return runCatching {
             transactionInterface.useTransaction {
-                val schoolClass = classRepository.findClassById(schoolClassId) ?: return@useTransaction failure(LectureError.InvalidLectureClass)
-                val room = roomRepository.getClassRoomById(roomId) ?: return@useTransaction failure(LectureError.InvalidLectureRoom)
-                val parsedStartTime = startTime.hoursAndMinutesToDuration()
-                val parsedEndTime = endTime.hoursAndMinutesToDuration()
-                val lecture =
-                    lectureRepository.getLecture(schoolClass, room, type, weekDay, parsedStartTime, parsedEndTime )
+                val lecture = lectureRepository.getLectureById(lectureId)
                         ?: return@useTransaction failure(LectureError.LectureNotFound)
-                if (lectureRepository.deleteLecture(lecture)) {
+                if (lectureRepository.deleteLecture(lecture.id)) {
                     return@useTransaction success(true)
                 }
                 return@useTransaction failure(LectureError.LectureNotFound)
@@ -132,18 +139,14 @@ class LectureService(
         }
     }
     fun updateLecture(
-        schoolClassId: Int,
-        roomId: Int,
-        type: ClassType,
-        weekDay: WeekDay,
-        startTime: String,
-        endTime: String,
+        lectureId: Int,
         newSchoolClassId: Int,
         newRoomId: Int,
         newType: ClassType,
         newWeekDay: WeekDay,
         newStartTime: String,
-        newEndTime: String
+        newEndTime: String,
+        numberOfWeeks: Int
     ): LectureResult {
         val newParsedStartTime = newStartTime.hoursAndMinutesToDuration()
         val newParsedEndTime = newEndTime.hoursAndMinutesToDuration()
@@ -152,32 +155,38 @@ class LectureService(
         }
         return runCatching {
             transactionInterface.useTransaction(IsolationLevel.SERIALIZABLE) {
-                val schoolClass = classRepository.findClassById(schoolClassId) ?: return@useTransaction failure(LectureError.InvalidLectureClass)
-                val classroom = roomRepository.getClassRoomById(roomId) ?: return@useTransaction failure(LectureError.InvalidLectureRoom)
-                val parsedStartTime = startTime.hoursAndMinutesToDuration()
-                val parsedEndTime = endTime.hoursAndMinutesToDuration()
-                val lecture =
-                    lectureRepository.getLecture(schoolClass, classroom, type, weekDay, parsedStartTime, parsedEndTime )
+                val lecture = lectureRepository.getLectureById(lectureId)
                         ?: return@useTransaction failure(LectureError.LectureNotFound)
-                val newClassroom = roomRepository.getClassRoomById(newRoomId) ?: return@useTransaction failure(LectureError.InvalidLectureRoom)
-                val newSchoolClass = classRepository.findClassById(newSchoolClassId) ?: return@useTransaction failure(LectureError.InvalidLectureClass)
-                if (newClassroom.room.id != classroom.room.id || newWeekDay != weekDay ||
-                    newParsedStartTime != parsedStartTime || newParsedEndTime != parsedEndTime) {
-
-                    val conflictingLectures = lectureRepository.findConflictingLectures(
-                        newRoomId = newClassroom.room.id,
-                        newWeekDay = newWeekDay,
-                        newStartTime = newParsedStartTime,
-                        newEndTime = newParsedEndTime,
-                        currentLecture = lecture
-                    )
-
-                    if (conflictingLectures) {
-                        return@useTransaction failure(LectureError.LectureTimeConflict)
-                    }
+                val now = Clock.System.now()
+                val today = now.toLocalDateTime(TimeZone.currentSystemDefault())
+                val currentDayOfWeek = today.dayOfWeek.value
+                val currentTimeDuration = today.hour.hours + today.minute.minutes + today.second.seconds
+                val adjustedNumberOfWeeks = when {
+                    lecture.weekDay.value < currentDayOfWeek -> numberOfWeeks + 1
+                    lecture.weekDay.value == currentDayOfWeek &&
+                            lecture.endTime < currentTimeDuration
+                                -> numberOfWeeks + 1
+                    else -> numberOfWeeks
                 }
-                val updatedLecture = lectureRepository.updateLecture(lecture, newSchoolClass, newClassroom, newType, newWeekDay, newParsedStartTime, newParsedEndTime)
-                val students = classRepository.findStudentsByClassId(schoolClassId)
+                val newClassroom = roomRepository.getClassRoomById(newRoomId)
+                    ?: return@useTransaction failure(LectureError.InvalidLectureRoom)
+                classRepository.findClassById(newSchoolClassId)
+                    ?: return@useTransaction failure(LectureError.InvalidLectureClass)
+                val conflictingLectures = lectureRepository.findConflictingLectures(
+                    newRoomId = newRoomId,
+                    newWeekDay = newWeekDay,
+                    newStartTime = newParsedStartTime,
+                    newEndTime = newParsedEndTime,
+                    currentLecture = lecture
+                )
+                if (conflictingLectures) {
+                    return@useTransaction failure(LectureError.LectureTimeConflict)
+                }
+                val updatedLecture = lectureRepository.updateLecture(
+                    lecture, newClassroom, newType, newWeekDay,
+                    newParsedStartTime, newParsedEndTime, adjustedNumberOfWeeks
+                )
+                val students = classRepository.findStudentsByClassId(lecture.schoolClass.id)
                 if(students.isNotEmpty()){
                     emailService.sendStudentsChangeInLecture(students.map { it.user.email }, updatedLecture)
                 }

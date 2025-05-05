@@ -10,6 +10,7 @@ import kotlin.time.Duration
 @Serializable
 sealed interface Lecture: Entity<Lecture> {
     companion object: Entity.Factory<Lecture>()
+    val id: Int
     var schoolClass: Class
     var classroom: Classroom
     var type: ClassType

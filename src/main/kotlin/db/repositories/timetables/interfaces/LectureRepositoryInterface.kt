@@ -11,7 +11,8 @@ import kotlin.time.Duration
 interface LectureRepositoryInterface {
 
     fun getAllLectures(): List<Lecture>
-    fun getAllLectures(limit: Int, offSet: Int): List<Lecture>
+    fun getAllLectures(limit: Int, offset: Int): List<Lecture>
+    fun getLectureById(id: Int): Lecture?
     fun getLecture(
         schoolClass: Class,
         classroom: Classroom,
@@ -31,16 +32,17 @@ interface LectureRepositoryInterface {
     fun getLecturesByRoom(roomId: Int, limit: Int, offSet: Int): List<Lecture>
     fun getLecturesByClass(classId: Int, limit: Int, offSet: Int): List<Lecture>
     fun getLecturesByType(type: ClassType): List<Lecture>
-    fun deleteLecture(lecture: Lecture): Boolean //
+    fun deleteLecture(id: Int): Boolean //
+    fun deleteLectureChange(id: Int): Boolean //
 
     fun updateLecture(
         lecture: Lecture,
-        newSchoolClass: Class,
         newClassroom: Classroom,
         newType: ClassType,
         newWeekDay: WeekDay,
         newStartTime: Duration,
-        newEndTime: Duration
+        newEndTime: Duration,
+        numberOfWeeks: Int
     ): Lecture //
 
     fun findConflictingLectures(
@@ -48,6 +50,6 @@ interface LectureRepositoryInterface {
         newWeekDay: WeekDay,
         newStartTime: Duration,
         newEndTime: Duration,
-        currentLecture: Lecture
+        currentLecture: Lecture?
     ) : Boolean
 }
