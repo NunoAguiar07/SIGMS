@@ -12,11 +12,7 @@ export const apiUrl = 'http://localhost:8080/api'
 export const GetData = (setWelcome, setError) => {
     return async () => {
         try {
-            console.log("Fetching data from API...")
             const response = await fetch(apiUrl);
-
-            // Log the response headers for debugging purposes
-            console.log('Response Headers:', response.headers);
             const data = await response.json()
             if (!response.ok) {
                 throw { status: response.status, message: ErrorUriParser(data.type)}
@@ -27,6 +23,3 @@ export const GetData = (setWelcome, setError) => {
         }
     }
 }
-/*
-curl http://localhost:8080/api -H "Origin:  http://localhost:8081" -H "Access-Control-Request-Method: POST" -H "Access-Control-Request-Headers: X-Requested-With" -X OPTIONS
- */

@@ -20,7 +20,7 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": false
     },
     "scheme" : "frontendFinal",
     "web": {
@@ -28,7 +28,19 @@
       "bundler": "metro"
     },
     "plugins": [
-      "expo-router"
+      "expo-router",
+        [
+            "expo-asset",
+            {
+            "assets" : [
+                "./assets/icon.png",
+                "./assets/splash-icon.png",
+                "./assets/adaptive-icon.png",
+                "./assets/favicon.png",
+                "./assets/Logo.webp"
+            ]
+            }
+        ]
     ]
   }
 }
