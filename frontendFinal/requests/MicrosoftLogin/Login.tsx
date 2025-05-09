@@ -89,7 +89,7 @@ const authenticateWithBackend = async (accessToken: string) => {
 
         if (response.ok) {
             // Store your backend JWT token
-            await SecureStore.setItemAsync('authToken', data.token);
+            await AsyncStorage.setItem('authToken', data.token);
             // Navigate to app
         } else {
             console.error('Backend authentication failed:', data.message);
@@ -113,7 +113,7 @@ const handleRefreshToken = async () => {
             discovery
         );
 
-        await SecureStore.setItemAsync('refreshToken', tokenResponse.refreshToken || '');
+        await AsyncStorage.setItem('refreshToken', tokenResponse.refreshToken || '');
         authenticateWithBackend(tokenResponse.accessToken);
     } catch (error) {
         console.error('Token refresh failed:', error);
