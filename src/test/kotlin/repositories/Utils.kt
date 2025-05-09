@@ -32,6 +32,7 @@ class DatabaseTestSetup {
                 DELETE FROM CLASSROOM;
                 DELETE FROM OFFICE_ROOM;
                 DELETE FROM LECTURE;
+                DELETE FROM LECTURE_CHANGE;
                 DELETE FROM ISSUE_REPORT;
             """)
             )
@@ -132,13 +133,25 @@ CREATE TABLE IF NOT EXISTS ATTEND (
 );
 
 CREATE TABLE IF NOT EXISTS LECTURE (
+    id SERIAL PRIMARY KEY,
     class_id INT NOT NULL REFERENCES CLASS(id) ON DELETE CASCADE,
     room_id INT NOT NULL REFERENCES CLASSROOM(id) ON DELETE CASCADE,
     class_type VARCHAR(20) CHECK (class_type IN ('theoretical', 'practical', 'theoretical_practical')),
     week_day int CHECK(week_day > 0 and week_day < 8),
     start_time time NOT NULL,
     end_time time NOT NULL,
-    CHECK (end_time > start_time)
+    CHECK (end_time > start_time),
+    CONSTRAINT unique_class_room_time UNIQUE (class_id, room_id, week_day, start_time)
+);
+
+CREATE TABLE IF NOT EXISTS LECTURE_CHANGE (
+    lecture_id INT NOT NULL REFERENCES LECTURE(id) ON DELETE CASCADE,
+    new_room_id INT NOT NULL REFERENCES CLASSROOM(id) ON DELETE CASCADE,
+    new_week_day INT CHECK(new_week_day > 0 AND new_week_day < 8),
+    new_start_time TIME NOT NULL,
+    new_end_time TIME NOT NULL,
+    remaining_weeks INT NOT NULL CHECK(remaining_weeks > 0),
+    CHECK (new_end_time > new_start_time)
 );
 
 CREATE TABLE IF NOT EXISTS ISSUE_REPORT (

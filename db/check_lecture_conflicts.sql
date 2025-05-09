@@ -1,37 +1,59 @@
 CREATE OR REPLACE FUNCTION check_lecture_conflict()
     RETURNS TRIGGER AS $$
 BEGIN
-    -- Check if there's any overlapping lecture in the same room on the same day
     IF EXISTS (
-        SELECT 1 FROM LECTURE
-        WHERE room_id = NEW.room_id
-          AND week_day = NEW.week_day
+        SELECT 1 FROM LECTURE l
+        WHERE l.room_id = NEW.room_id
+          AND l.week_day = NEW.week_day
           AND (
             -- New lecture starts during an existing lecture
-            (NEW.start_time >= start_time AND NEW.start_time < end_time) OR
+            (NEW.start_time >= l.start_time AND NEW.start_time < l.end_time) OR
                 -- New lecture ends during an existing lecture
-            (NEW.end_time > start_time AND NEW.end_time <= end_time) OR
+            (NEW.end_time > l.start_time AND NEW.end_time <= l.end_time) OR
                 -- New lecture completely contains an existing lecture
-            (NEW.start_time <= start_time AND NEW.end_time >= end_time)
+            (NEW.start_time <= l.start_time AND NEW.end_time >= l.end_time)
             )
           -- Exclude the current lecture when updating
-          AND NOT (TG_OP = 'UPDATE' AND class_id = OLD.class_id AND room_id = OLD.room_id
-            AND class_type = OLD.class_type AND week_day = OLD.week_day
-            AND start_time = OLD.start_time AND end_time = OLD.end_time)
+          AND NOT (TG_OP = 'UPDATE' AND l.id = OLD.id)
+          -- Exclude lectures that have active changes in LECTURE_CHANGE
+          AND NOT EXISTS (
+            SELECT 1 FROM LECTURE_CHANGE lc
+            WHERE lc.lecture_id = l.id
+              AND lc.remaining_weeks > 0
+        )
     ) THEN
         RAISE EXCEPTION 'Lecture conflict: Another lecture already exists in this room at the specified time';
+    END IF;
+
+    -- Check for conflicts in the LECTURE_CHANGE table
+    IF EXISTS (
+        SELECT 1 FROM LECTURE_CHANGE lc
+        WHERE lc.new_room_id = NEW.room_id
+          AND lc.new_week_day = NEW.week_day
+          AND (
+            -- New lecture starts during a changed lecture
+            (NEW.start_time >= lc.new_start_time AND NEW.start_time < lc.new_end_time) OR
+                -- New lecture ends during a changed lecture
+            (NEW.end_time > lc.new_start_time AND NEW.end_time <= lc.new_end_time) OR
+                -- New lecture completely contains a changed lecture
+            (NEW.start_time <= lc.new_start_time AND NEW.end_time >= lc.new_end_time)
+            )
+          -- Exclude changes for the current lecture when updating
+          AND NOT (TG_OP = 'UPDATE' AND lc.lecture_id = OLD.id)
+    ) THEN
+        RAISE EXCEPTION 'Lecture conflict: A scheduled change already exists for this room at the specified time';
     END IF;
 
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER prevent_lecture_conflict_insert
-    BEFORE INSERT ON LECTURE
+CREATE TRIGGER prevent_lecture_conflict
+    BEFORE INSERT OR UPDATE ON LECTURE
     FOR EACH ROW
 EXECUTE FUNCTION check_lecture_conflict();
 
-CREATE TRIGGER prevent_lecture_conflict_update
-    BEFORE UPDATE ON LECTURE
+CREATE TRIGGER prevent_lecture_change_conflict
+    BEFORE INSERT OR UPDATE ON LECTURE_CHANGE
     FOR EACH ROW
 EXECUTE FUNCTION check_lecture_conflict();
