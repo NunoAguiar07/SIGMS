@@ -3,6 +3,8 @@ import { backgroundStyle, mainStyle } from "../css_styling/Properties";
 import '../css_styling/PropertiesWelcome.css'
 import Button from "../Utils/Button";
 import {Image} from "expo-image";
+import {Redirect} from "expo-router";
+import MicrosoftAuthButton from "../requests/MicrosoftLogin/Login";
 // @ts-ignore
 export const WelcomeScreen = ({ welcome }) => {
     return (
@@ -10,7 +12,7 @@ export const WelcomeScreen = ({ welcome }) => {
         <div className="background-board">
             {/* Logo */}
             <div className="logo-welcomePage">
-            <Image source={require("../assets/Logo.webp")} style={{width:903, height:516}}></Image>
+                <Image source={require("../assets/Logo.webp")} style={{width: 903, height: 516}}></Image>
             </div>
             {/* Slogan */}
             <div className="shape text a-tua-sala-24b9efeac4eb">
@@ -26,26 +28,27 @@ export const WelcomeScreen = ({ welcome }) => {
                     </p>
                 </div>
             </div>
-            <div>
-           <Button text="Login" onClick={() => {}} className={"rectangle-24baecca1439"}></Button>
+            <div className="rectangle-login">
+                <MicrosoftAuthButton/>
             </div>
+            <Button text="Register" onClick={() => {
+            }} className={"rectangle-register"}></Button>
 
 
-
-
-            {/* About / FAQ / Privacy */}
-            <div className="shape text about-FAQ-Privacy">
-                <div className="text-node-html">
-                    <p style={{
-                        color: '#b8b2ab',
-                        fontSize: '40px',
-                        fontFamily: '"Roboto Condensed"',
-                        fontWeight: 400,
-                        whiteSpace: 'pre'
-                    }}>
-                        About FAQ Privacy
-                    </p>
-                </div>
+            <div style={{
+                position: 'absolute',
+                bottom: '0%',
+                left: 0,
+                right: 0,
+                display: 'flex',
+                gap: '20px'
+            }}>
+                <Button text="About" onClick={() => {
+                }} className="about-faq-privacy-button"/>
+                <Button text="FAQ" onClick={() => {
+                }} className="about-faq-privacy-button"/>
+                <Button text="Privacy" onClick={() => {
+                }} className="about-faq-privacy-button"/>
             </div>
         </div>
     );
