@@ -1,6 +1,7 @@
 package mocks.repositories.timetables
 
 import isel.leic.group25.db.entities.timetables.Subject
+import isel.leic.group25.db.entities.timetables.University
 import isel.leic.group25.db.repositories.timetables.interfaces.SubjectRepositoryInterface
 
 class MockSubjectRepository : SubjectRepositoryInterface {
@@ -11,6 +12,10 @@ class MockSubjectRepository : SubjectRepositoryInterface {
         return subjects.drop(offset).take(limit)
     }
 
+    override fun getAllSubjectsByUniversityId(universityId: Int, limit: Int, offset: Int): List<Subject> {
+        return subjects.filter { it.university.id == universityId }.drop(offset).take(limit)
+    }
+
     override fun findSubjectById(id: Int): Subject? {
         return subjects.firstOrNull { it.id == id }
     }
@@ -19,9 +24,10 @@ class MockSubjectRepository : SubjectRepositoryInterface {
         return subjects.firstOrNull { it.name == name }
     }
 
-    override fun createSubject(name: String): Subject {
+    override fun createSubject(name: String, university: University): Subject {
         val newSubject = Subject {
             this.name = name
+            this.university = university
         }
         subjects.add(newSubject)
         return newSubject

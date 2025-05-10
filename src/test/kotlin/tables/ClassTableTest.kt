@@ -2,8 +2,10 @@ package tables
 
 import isel.leic.group25.db.entities.timetables.Class
 import isel.leic.group25.db.entities.timetables.Subject
+import isel.leic.group25.db.entities.timetables.University
 import isel.leic.group25.db.tables.Tables.Companion.classes
 import isel.leic.group25.db.tables.Tables.Companion.subjects
+import isel.leic.group25.db.tables.Tables.Companion.universities
 import org.h2.jdbcx.JdbcDataSource
 import org.h2.tools.RunScript
 import org.ktorm.database.Database
@@ -27,6 +29,7 @@ class ClassTableTest {
     @AfterTest
     fun clearDB(){
         RunScript.execute(connection, StringReader("""
+            DELETE FROM UNIVERSITY;
             DELETE FROM SUBJECT;
             DELETE FROM CLASS;
             """)
@@ -42,9 +45,14 @@ class ClassTableTest {
         connection = dataSource.connection
         database = Database.connect(dataSource)
         RunScript.execute(connection, StringReader("""
+            CREATE TABLE IF NOT EXISTS UNIVERSITY (
+                id SERIAL PRIMARY KEY,
+                university_name VARCHAR(255) NOT NULL UNIQUE
+            );
             CREATE TABLE IF NOT EXISTS SUBJECT (
                  id SERIAL PRIMARY KEY,
-                 subject_name VARCHAR(255) NOT NULL
+                 subject_name VARCHAR(255) NOT NULL,
+                 university_id INT NOT NULL REFERENCES UNIVERSITY(id) ON DELETE CASCADE
             );
             
             CREATE TABLE IF NOT EXISTS CLASS (
@@ -58,8 +66,12 @@ class ClassTableTest {
 
     @Test
     fun `Should create a new class`(){
+        val newUniversity = University{
+            name = "ISEL"
+        }.also { database.universities.add(it) }
         val newSubject = Subject{
             name = "PS"
+            university = newUniversity
         }
         database.subjects.add(newSubject)
         val newClass = Class{
@@ -75,8 +87,12 @@ class ClassTableTest {
 
     @Test
     fun `Should update a class`(){
+        val newUniversity = University{
+            name = "ISEL"
+        }.also { database.universities.add(it) }
         val newSubject = Subject{
             name = "PS"
+            university = newUniversity
         }
         database.subjects.add(newSubject)
         val newClass = Class{
@@ -91,8 +107,12 @@ class ClassTableTest {
 
     @Test
     fun `Should delete a class`(){
+        val newUniversity = University{
+            name = "ISEL"
+        }.also { database.universities.add(it) }
         val newSubject = Subject{
             name = "PS"
+            university = newUniversity
         }
         database.subjects.add(newSubject)
         val newClass = Class{

@@ -1,6 +1,7 @@
 package isel.leic.group25.db.repositories.timetables
 
 import isel.leic.group25.db.entities.timetables.Subject
+import isel.leic.group25.db.entities.timetables.University
 import isel.leic.group25.db.repositories.timetables.interfaces.SubjectRepositoryInterface
 import isel.leic.group25.db.repositories.utils.withDatabase
 import isel.leic.group25.db.tables.Tables.Companion.subjects
@@ -13,6 +14,11 @@ class SubjectRepository(private val database: Database): SubjectRepositoryInterf
         return database.subjects.drop(offset).take(limit).toList()
     }
 
+    override fun getAllSubjectsByUniversityId(universityId: Int, limit: Int, offset: Int): List<Subject> {
+        return database.subjects.filter { it.university eq universityId }.drop(offset).take(limit).toList()
+    }
+
+
     override fun findSubjectById(id: Int): Subject? = withDatabase {
         return database.subjects.firstOrNull { it.id eq id }
     }
@@ -21,9 +27,10 @@ class SubjectRepository(private val database: Database): SubjectRepositoryInterf
         return database.subjects.firstOrNull { it.name eq name }
     }
 
-    override fun createSubject(name: String): Subject = withDatabase {
+    override fun createSubject(name: String, university: University): Subject = withDatabase {
         val newSubject = Subject {
             this.name = name
+            this.university = university
         }
         database.subjects.add(newSubject)
         return newSubject

@@ -1,11 +1,11 @@
 package services
 
-import isel.leic.group25.db.entities.timetables.Subject
-import isel.leic.group25.db.entities.types.Role
-import isel.leic.group25.db.entities.users.User
 import isel.leic.group25.db.entities.timetables.Class
+import isel.leic.group25.db.entities.timetables.Subject
 import isel.leic.group25.db.entities.types.ClassType
+import isel.leic.group25.db.entities.types.Role
 import isel.leic.group25.db.entities.types.WeekDay
+import isel.leic.group25.db.entities.users.User
 import isel.leic.group25.services.UserClassService
 import isel.leic.group25.services.errors.UserClassError
 import isel.leic.group25.utils.Failure
@@ -14,6 +14,7 @@ import isel.leic.group25.utils.hoursAndMinutesToDuration
 import mocks.repositories.rooms.MockRoomRepository
 import mocks.repositories.timetables.MockClassRepository
 import mocks.repositories.timetables.MockLectureRepository
+import mocks.repositories.timetables.MockUniversityRepository
 import mocks.repositories.users.MockStudentRepository
 import mocks.repositories.users.MockTeacherRepository
 import mocks.repositories.users.MockUserRepository
@@ -28,6 +29,7 @@ class UserClassServiceTest {
     private val classRepository = MockClassRepository()
     private val lectureRepository = MockLectureRepository()
     private val roomRepository = MockRoomRepository()
+    private val universityRepository = MockUniversityRepository()
     private val transactionInterface = MockTransaction()
 
     private val service = UserClassService(
@@ -41,11 +43,13 @@ class UserClassServiceTest {
 
     // Helper functions
     private fun createTestUser(role: Role): User {
+        val newUniversity = universityRepository.createUniversity("Test University")
         val user = userRepository.createWithRole(
             email = "${role.name.lowercase()}@test.com",
             username = "test${role.name.lowercase()}",
             password = "password123",
-            role = role
+            role = role,
+            university = newUniversity
         )
         when (role)  {
             Role.STUDENT -> studentRepository.addMockStudent(user)
@@ -157,7 +161,8 @@ class UserClassServiceTest {
     fun `getScheduleByUserId should return lectures for student`() {
         val studentUser = createTestUser(Role.STUDENT)
         val testClass = createTestClass()
-        val room = roomRepository.createRoom(20, "2.01")
+        val university = universityRepository.createUniversity("Test University")
+        val room = roomRepository.createRoom(20, "2.01", university)
         roomRepository.createClassRoom(room)
         val classroom = roomRepository.getClassRoomById(room.id)
         assertNotNull(classroom)

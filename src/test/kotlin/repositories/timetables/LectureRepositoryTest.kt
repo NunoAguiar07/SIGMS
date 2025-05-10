@@ -1,15 +1,16 @@
 package repositories.timetables
 
-import isel.leic.group25.db.entities.timetables.Class
-import isel.leic.group25.db.repositories.ktorm.KTransaction
-import isel.leic.group25.db.repositories.timetables.LectureRepository
-import isel.leic.group25.db.entities.timetables.Subject
 import isel.leic.group25.db.entities.rooms.Room
+import isel.leic.group25.db.entities.timetables.Class
+import isel.leic.group25.db.entities.timetables.Subject
 import isel.leic.group25.db.entities.types.ClassType
 import isel.leic.group25.db.entities.types.WeekDay
+import isel.leic.group25.db.repositories.ktorm.KTransaction
 import isel.leic.group25.db.repositories.rooms.RoomRepository
 import isel.leic.group25.db.repositories.timetables.ClassRepository
+import isel.leic.group25.db.repositories.timetables.LectureRepository
 import isel.leic.group25.db.repositories.timetables.SubjectRepository
+import isel.leic.group25.db.repositories.timetables.UniversityRepository
 import repositories.DatabaseTestSetup
 import kotlin.test.*
 import kotlin.time.Duration.Companion.hours
@@ -17,6 +18,7 @@ import kotlin.time.Duration.Companion.minutes
 
 class LectureRepositoryTest {
     private val kTransaction = KTransaction(DatabaseTestSetup.database)
+    private val universityRepository = UniversityRepository(DatabaseTestSetup.database)
     private val lectureRepository = LectureRepository(DatabaseTestSetup.database)
     private val classRepository = ClassRepository(DatabaseTestSetup.database)
     private val roomRepository = RoomRepository(DatabaseTestSetup.database)
@@ -30,10 +32,11 @@ class LectureRepositoryTest {
     @Test
     fun `Should get lecture by ID with active change`() {
         kTransaction.useTransaction {
-            val subject = subjectRepository.createSubject("Test Subject")
+            val university = universityRepository.createUniversity("Test University")
+            val subject = subjectRepository.createSubject("Test Subject", university)
             val clazz = classRepository.addClass("Test Class", subject)
-            val room = roomRepository.createRoom(20, "Test Room")
-            val newRoom = roomRepository.createRoom(30, "New Test Room")
+            val room = roomRepository.createRoom(20, "Test Room", university)
+            val newRoom = roomRepository.createRoom(30, "New Test Room", university)
             roomRepository.createClassRoom(room)
             roomRepository.createClassRoom(newRoom)
             val classroom = roomRepository.getClassRoomById(room.id)
@@ -66,9 +69,10 @@ class LectureRepositoryTest {
     @Test
     fun `Should get lecture by parameters`() {
         kTransaction.useTransaction {
-            val subject = subjectRepository.createSubject("Test Subject")
+            val university = universityRepository.createUniversity("Test University")
+            val subject = subjectRepository.createSubject("Test Subject", university)
             val clazz = classRepository.addClass("Test Class", subject)
-            val room = roomRepository.createRoom(20, "Test Room")
+            val room = roomRepository.createRoom(20, "Test Room", university)
             roomRepository.createClassRoom(room)
             val classroom = roomRepository.getClassRoomById(room.id)
             assertNotNull(classroom)
@@ -110,9 +114,10 @@ class LectureRepositoryTest {
                 capacity = 20
                 name = "testRoom"
             }
-            val newSubject = subjectRepository.createSubject(subject1.name)
+            val university = universityRepository.createUniversity("Test University")
+            val newSubject = subjectRepository.createSubject(subject1.name, university)
             val newClass = classRepository.addClass(clazz.name, newSubject)
-            val newRoom = roomRepository.createRoom(room.capacity,room.name)
+            val newRoom = roomRepository.createRoom(room.capacity, room.name, university)
             roomRepository.createClassRoom(newRoom)
             val newClassroom = roomRepository.getClassRoomById(newRoom.id)
             assertNotNull(newClassroom)
@@ -150,9 +155,10 @@ class LectureRepositoryTest {
                 capacity = 20
                 name = "testRoom2"
             }
-            val newSubject = subjectRepository.createSubject(subject1.name)
+            val university = universityRepository.createUniversity("Test University")
+            val newSubject = subjectRepository.createSubject(subject1.name, university)
             val newClass = classRepository.addClass(clazz.name, newSubject)
-            val newRoom = roomRepository.createRoom(room.capacity,room.name)
+            val newRoom = roomRepository.createRoom(room.capacity,room.name, university)
             roomRepository.createClassRoom(newRoom)
             val newClassroom = roomRepository.getClassRoomById(newRoom.id)
             assertNotNull(newClassroom)
@@ -191,9 +197,10 @@ class LectureRepositoryTest {
                 capacity = 20
                 name = "testRoom3"
             }
-            val newSubject = subjectRepository.createSubject(subject1.name)
+            val university = universityRepository.createUniversity("Test University")
+            val newSubject = subjectRepository.createSubject(subject1.name, university)
             val newClass = classRepository.addClass(clazz.name, newSubject)
-            val newRoom = roomRepository.createRoom(room.capacity,room.name)
+            val newRoom = roomRepository.createRoom(room.capacity,room.name, university)
             roomRepository.createClassRoom(newRoom)
             val newClassroom = roomRepository.getClassRoomById(newRoom.id)
             assertNotNull(newClassroom)
@@ -231,9 +238,10 @@ class LectureRepositoryTest {
                 capacity = 20
                 name = "testRoom4"
             }
-            val newSubject = subjectRepository.createSubject(subject1.name)
+            val university = universityRepository.createUniversity("Test University")
+            val newSubject = subjectRepository.createSubject(subject1.name, university)
             val newClass = classRepository.addClass(clazz.name, newSubject)
-            val newRoom = roomRepository.createRoom(room.capacity,room.name)
+            val newRoom = roomRepository.createRoom(room.capacity,room.name, university)
             roomRepository.createClassRoom(newRoom)
             val newClassroom = roomRepository.getClassRoomById(newRoom.id)
             assertNotNull(newClassroom)
@@ -259,9 +267,10 @@ class LectureRepositoryTest {
     @Test
     fun `Should delete lecture`() {
         kTransaction.useTransaction {
-            val subject = subjectRepository.createSubject("Test Subject")
+            val university = universityRepository.createUniversity("Test University")
+            val subject = subjectRepository.createSubject("Test Subject", university)
             val clazz = classRepository.addClass("Test Class", subject)
-            val room = roomRepository.createRoom(20, "Test Room")
+            val room = roomRepository.createRoom(20, "Test Room", university)
             roomRepository.createClassRoom(room)
             val classroom = roomRepository.getClassRoomById(room.id)
             assertNotNull(classroom)
@@ -284,10 +293,11 @@ class LectureRepositoryTest {
     fun `Should delete lecture change`() {
         kTransaction.useTransaction {
             // Setup test data
-            val subject = subjectRepository.createSubject("Test Subject")
+            val university = universityRepository.createUniversity("Test University")
+            val subject = subjectRepository.createSubject("Test Subject", university)
             val clazz = classRepository.addClass("Test Class", subject)
-            val room = roomRepository.createRoom(20, "Test Room")
-            val newRoom = roomRepository.createRoom(20, "Test Room 2")
+            val room = roomRepository.createRoom(20, "Test Room", university)
+            val newRoom = roomRepository.createRoom(20, "Test Room 2", university)
             roomRepository.createClassRoom(room)
             roomRepository.createClassRoom(newRoom)
             val classroom = roomRepository.getClassRoomById(room.id)
@@ -324,10 +334,11 @@ class LectureRepositoryTest {
     fun `Should update lecture permanently`() {
         kTransaction.useTransaction {
             // Setup test data
-            val subject = subjectRepository.createSubject("Test Subject")
+            val university = universityRepository.createUniversity("Test University")
+            val subject = subjectRepository.createSubject("Test Subject", university)
             val clazz = classRepository.addClass("Test Class", subject)
-            val room1 = roomRepository.createRoom(20, "Test Room 1")
-            val room2 = roomRepository.createRoom(30, "Test Room 2")
+            val room1 = roomRepository.createRoom(20, "Test Room 1", university)
+            val room2 = roomRepository.createRoom(30, "Test Room 2", university)
             roomRepository.createClassRoom(room1)
             roomRepository.createClassRoom(room2)
             val classroom1 = roomRepository.getClassRoomById(room1.id)

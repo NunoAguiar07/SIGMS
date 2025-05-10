@@ -4,6 +4,7 @@ import isel.leic.group25.db.entities.rooms.Classroom
 import isel.leic.group25.db.entities.rooms.OfficeRoom
 import isel.leic.group25.db.entities.rooms.Room
 import isel.leic.group25.db.entities.rooms.StudyRoom
+import isel.leic.group25.db.entities.timetables.University
 import isel.leic.group25.db.entities.users.Teacher
 import isel.leic.group25.db.repositories.rooms.interfaces.RoomRepositoryInterface
 
@@ -18,6 +19,16 @@ class MockRoomRepository : RoomRepositoryInterface {
     override fun getAllRooms(limit: Int, offset: Int): List<Room> =
         rooms.drop(offset).take(limit).toList()
 
+    override fun getAllRoomsByUniversityId(universityId: Int): List<Room> {
+        return rooms.filter { it.university.id == universityId }
+    }
+
+    override fun getAllRoomsByUniversityId(universityId: Int, limit: Int, offset: Int): List<Room> {
+        return rooms.filter { it.university.id == universityId }
+            .drop(offset)
+            .take(limit)
+    }
+
     override fun getRoomById(id: Int): Room? =
         rooms.firstOrNull { it.id == id }
 
@@ -27,11 +38,11 @@ class MockRoomRepository : RoomRepositoryInterface {
     override fun getClassRoomById(id: Int): Classroom? =
         classrooms.firstOrNull { it.room.id == id }
 
-
-    override fun createRoom(capacity: Int, name: String): Room {
+    override fun createRoom(capacity: Int, name: String, university: University): Room {
         val newRoom = Room {
             this.name = name
             this.capacity = capacity
+            this.university = university
         }
         rooms.add(newRoom)
         return newRoom

@@ -4,11 +4,14 @@ import api.model.request.LoginCredentialsRequest
 import api.model.request.UserCredentialsRequest
 import api.model.response.LoginResponse
 import api.model.response.RegisterResponse
+import io.ktor.client.*
 import io.ktor.http.*
 import io.ktor.server.request.*
 import io.ktor.server.routing.*
 import isel.leic.group25.api.exceptions.RequestError
 import isel.leic.group25.api.exceptions.respondEither
+import isel.leic.group25.api.oauth2.getMicrosoftOrganizationInfo
+import isel.leic.group25.api.oauth2.getMicrosoftUserInfo
 import isel.leic.group25.db.entities.types.Role
 import isel.leic.group25.services.AuthService
 
@@ -18,13 +21,42 @@ import isel.leic.group25.services.AuthService
  * @receiver Route The Ktor route to which these endpoints will be added
  * @param authService The authentication service handling business logic
  */
-fun Route.authRoutes(authService: AuthService) {
+fun Route.authRoutes(authService: AuthService, client: HttpClient) {
     route("/auth") {
         registerRoute(authService)
         loginRoute(authService)
+        microsoftLoginRoute(authService, client)
         route("/verify-account") {
             accountVerificationRoute(authService)
         }
+    }
+}
+
+fun Route.microsoftLoginRoute(authService: AuthService, client: HttpClient) {
+    post("/microsoft") {
+        val authHeader = call.request.headers["Authorization"]
+            ?: return@post RequestError.Missing("Authorization header").toProblem().respond(call)
+        if (!authHeader.startsWith("Bearer ")) {
+            return@post RequestError.Invalid("Authorization header format").toProblem().respond(call)
+        }
+        val accessToken = authHeader.substringAfter("Bearer ")
+        val userInfo = getMicrosoftUserInfo(accessToken = accessToken, client = client)
+        val organizationInfo = getMicrosoftOrganizationInfo(
+            accessToken = accessToken,
+            client = client
+        )
+        if(userInfo == null || organizationInfo == null) {
+            return@post RequestError.MicrosoftConnectionFailed.toProblem().respond(call)
+        }
+        val result = authService.authenticateWithMicrosoft(userInfo.displayName, userInfo.email, organizationInfo.name)
+
+        call.respondEither(
+            either = result,
+            transformError = { it.toProblem() },
+            transformSuccess = { token ->
+                LoginResponse(token = token)
+            }
+        )
     }
 }
 
@@ -44,7 +76,8 @@ fun Route.registerRoute(authService: AuthService) {
             email = credentials.email,
             username = credentials.username,
             password = credentials.password,
-            role = Role.valueOf(credentials.role.uppercase())
+            role = Role.valueOf(credentials.role.uppercase()),
+            universityId = credentials.universityId
         )
         call.respondEither(
             either = result,

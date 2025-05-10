@@ -6,6 +6,7 @@ sealed class AuthError {
     data object UserAlreadyExists : AuthError()
     data object UserChangesFailed : AuthError()
     data object UserNotFound : AuthError()
+    data object UniversityNotFound : AuthError()
     data object UserDeleteFailed : AuthError()
     data object RoleApprovedFailed : AuthError()
     data object AlreadyProcessed : AuthError()
@@ -29,6 +30,10 @@ sealed class AuthError {
             UserNotFound -> Problem.notFound(
                 title = "User not found",
                 detail = "The user with the given ID was not found."
+            )
+            UniversityNotFound -> Problem.notFound(
+                title = "University not found",
+                detail = "The university with the given ID was not found."
             )
             UserDeleteFailed -> Problem.internalServerError(
                 title = "User delete failed",

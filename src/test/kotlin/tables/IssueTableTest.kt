@@ -2,9 +2,11 @@ package tables
 
 import isel.leic.group25.db.entities.issues.IssueReport
 import isel.leic.group25.db.entities.rooms.Room
+import isel.leic.group25.db.entities.timetables.University
 import isel.leic.group25.db.entities.users.User
 import isel.leic.group25.db.tables.Tables.Companion.issueReports
 import isel.leic.group25.db.tables.Tables.Companion.rooms
+import isel.leic.group25.db.tables.Tables.Companion.universities
 import isel.leic.group25.db.tables.Tables.Companion.users
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertNull
@@ -28,6 +30,7 @@ class IssueTableTest {
     @AfterTest
     fun clearDB(){
         RunScript.execute(connection, StringReader("""
+            DELETE FROM UNIVERSITY;
             DELETE FROM ISSUE_REPORT;
             DELETE FROM ROOM;
             DELETE FROM USERS;
@@ -44,24 +47,32 @@ class IssueTableTest {
         connection = dataSource.connection
         database = Database.connect(dataSource)
         RunScript.execute(connection, StringReader("""
+            CREATE TABLE IF NOT EXISTS UNIVERSITY (
+                id SERIAL PRIMARY KEY,
+                university_name VARCHAR(255) NOT NULL UNIQUE
+            );
             CREATE TABLE IF NOT EXISTS USERS (
                 id SERIAL PRIMARY KEY,
                 email VARCHAR(255) UNIQUE NOT NULL,
                 username VARCHAR(255) NOT NULL,
                 password VARCHAR(255) NOT NULL,
-                profile_image VARCHAR(255)
+                profile_image VARCHAR(255),
+                university_id INT NOT NULL REFERENCES UNIVERSITY(id) ON DELETE CASCADE
             );
             
             CREATE TABLE IF NOT EXISTS TECHNICAL_SERVICES (
                 user_id INT UNIQUE NOT NULL REFERENCES USERS(id) ON DELETE CASCADE,
                 primary key (user_id)
             );
-            
+           
+
             CREATE TABLE IF NOT EXISTS ROOM (
                 id SERIAL PRIMARY KEY,
                 room_name VARCHAR(255) NOT NULL,
                 capacity INT NOT NULL,
-                CHECK(capacity > 0)
+                university_id INT NOT NULL REFERENCES UNIVERSITY(id) ON DELETE CASCADE,
+                CHECK(capacity > 0),
+                CONSTRAINT unique_room_per_university UNIQUE (room_name, university_id)
             );
             
             CREATE TABLE IF NOT EXISTS ISSUE_REPORT (
@@ -77,9 +88,13 @@ class IssueTableTest {
 
     @Test
     fun `Should create a new issue`(){
+        val newUniversity = University {
+            name = "ISEL"
+        }.also { database.universities.add(it) }
         val newRoom = Room {
             name = "G.0.02"
             capacity = 15
+            university = newUniversity
         }.also{ database.rooms.add(it) }
         // Arrange
         val testEmail = "teste69mail@email.com"
@@ -90,6 +105,7 @@ class IssueTableTest {
             username = testUsername
             password = User.hashPassword(testPassword)
             profileImage = byteArrayOf()
+            university = newUniversity
         }
         database.users.add(newUser)
         val newIssue = IssueReport {
@@ -113,9 +129,13 @@ class IssueTableTest {
 
     @Test
     fun `Should update an issue`(){
+        val newUniversity = University {
+            name = "ISEL"
+        }.also { database.universities.add(it) }
         val newRoom = Room {
             name = "G.0.02"
             capacity = 15
+            university = newUniversity
         }.also{ database.rooms.add(it) }
         // Arrange
         val testEmail = "teste69mail@email.com"
@@ -126,6 +146,7 @@ class IssueTableTest {
             username = testUsername
             password = User.hashPassword(testPassword)
             profileImage = byteArrayOf()
+            university = newUniversity
         }
         database.users.add(newUser)
         val newIssue = IssueReport {
@@ -155,9 +176,13 @@ class IssueTableTest {
 
     @Test
     fun `Should delete an issue`(){
+        val newUniversity = University {
+            name = "ISEL"
+        }.also { database.universities.add(it) }
         val newRoom = Room {
             name = "G.0.02"
             capacity = 15
+            university = newUniversity
         }.also{ database.rooms.add(it) }
         // Arrange
         val testEmail = "teste69mail@email.com"
@@ -168,6 +193,7 @@ class IssueTableTest {
             username = testUsername
             password = User.hashPassword(testPassword)
             profileImage = byteArrayOf()
+            university = newUniversity
         }
         database.users.add(newUser)
         val newIssue = IssueReport {

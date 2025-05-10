@@ -1,5 +1,6 @@
 package isel.leic.group25.services
 
+import UniversityRepositoryInterface
 import isel.leic.group25.db.entities.rooms.Room
 import isel.leic.group25.db.entities.types.RoomType
 import isel.leic.group25.db.repositories.interfaces.TransactionInterface
@@ -18,6 +19,7 @@ typealias DeleteRoomResult = Either<RoomError, Boolean>
 
 class RoomService (
     private val roomRepository: RoomRepositoryInterface,
+    private val universityRepository: UniversityRepositoryInterface,
     private val transactionInterface: TransactionInterface,
 ) {
     private inline fun <T> runCatching(block: () -> Either<RoomError, T>): Either<RoomError, T> {
@@ -37,6 +39,17 @@ class RoomService (
         }
     }
 
+    fun getAllRoomsByUniversityId(universityId: Int, limit: Int, offset: Int): RoomListResult {
+        return runCatching {
+            transactionInterface.useTransaction {
+                val university = universityRepository.getUniversityById(universityId)
+                ?: return@useTransaction failure(RoomError.UniversityNotFound)
+                val rooms = roomRepository.getAllRoomsByUniversityId(university.id, limit, offset)
+                return@useTransaction success(rooms)
+            }
+        }
+    }
+
     fun getRoomById(id: Int): RoomResult {
         return runCatching {
             transactionInterface.useTransaction {
@@ -46,10 +59,12 @@ class RoomService (
         }
     }
 
-    fun createRoom(capacity: Int, name: String, type: RoomType): RoomResult {
+    fun createRoom(capacity: Int, name: String, universityId: Int, type: RoomType): RoomResult {
         return runCatching {
             transactionInterface.useTransaction {
-                val room = roomRepository.createRoom(capacity, name)
+                val university = universityRepository.getUniversityById(universityId)
+                    ?: return@useTransaction failure(RoomError.UniversityNotFound)
+                val room = roomRepository.createRoom(capacity, name, university)
                 when (type) {
                     RoomType.CLASS -> roomRepository.createClassRoom(room)
                     RoomType.OFFICE -> roomRepository.createOfficeRoom(room)

@@ -5,18 +5,14 @@ import isel.leic.group25.db.tables.rooms.Classrooms
 import isel.leic.group25.db.tables.rooms.OfficeRooms
 import isel.leic.group25.db.tables.rooms.Rooms
 import isel.leic.group25.db.tables.rooms.StudyRooms
-import isel.leic.group25.db.tables.timetables.Classes
-import isel.leic.group25.db.tables.timetables.LectureChanges
-import isel.leic.group25.db.tables.timetables.Lectures
-import isel.leic.group25.db.tables.timetables.Subjects
+import isel.leic.group25.db.tables.timetables.*
 import isel.leic.group25.db.tables.users.*
-import isel.leic.group25.db.tables.users.Attends
-import isel.leic.group25.db.tables.users.Teaches
 import org.ktorm.database.Database
 import org.ktorm.entity.sequenceOf
 
 class Tables {
     companion object {
+        val Database.universities get() = this.sequenceOf(Universities)
         val Database.issueReports get() = this.sequenceOf(IssueReports)
         val Database.classrooms get() = this.sequenceOf(Classrooms)
         val Database.officeRooms get() = this.sequenceOf(OfficeRooms)

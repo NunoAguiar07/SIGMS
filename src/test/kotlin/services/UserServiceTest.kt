@@ -6,8 +6,9 @@ import isel.leic.group25.services.UserService
 import isel.leic.group25.services.errors.AuthError
 import isel.leic.group25.utils.Failure
 import isel.leic.group25.utils.Success
-import mocks.repositories.utils.MockTransaction
+import mocks.repositories.timetables.MockUniversityRepository
 import mocks.repositories.users.MockUserRepository
+import mocks.repositories.utils.MockTransaction
 import repositories.DatabaseTestSetup
 import kotlin.test.AfterTest
 import kotlin.test.Test
@@ -17,20 +18,23 @@ import kotlin.test.assertTrue
 class UserServiceTest {
     // Test database setup
     private val userRepository = MockUserRepository()
+    private val universityRepository = MockUniversityRepository()
     private val transactionInterface = MockTransaction()
 
-    private val userService = UserService(userRepository, transactionInterface)
+    private val userService = UserService(userRepository, universityRepository, transactionInterface)
 
     // Helper function to create a test user
     private fun createTestUser(role: Role = Role.STUDENT): User {
         return transactionInterface.useTransaction {
+            val newUniversity = universityRepository.createUniversity("Test University")
             val user = User {
                 email = "test@test.com"
                 username = "testuser"
                 password = User.hashPassword("test123!")
                 profileImage = byteArrayOf(1, 2, 3)
+                university = newUniversity
             }.let {
-                userRepository.createWithRole(it.email, it.username, it.password, role)
+                userRepository.createWithRole(it.email, it.username, it.password, role, it.university)
             }
             return@useTransaction user
         }

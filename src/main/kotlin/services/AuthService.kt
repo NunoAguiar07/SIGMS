@@ -1,10 +1,11 @@
 package isel.leic.group25.services
 
+import UniversityRepositoryInterface
 import isel.leic.group25.api.jwt.JwtConfig
 import isel.leic.group25.db.entities.types.Role
 import isel.leic.group25.db.entities.types.Status
-import isel.leic.group25.db.entities.users.User
 import isel.leic.group25.db.entities.users.RoleApproval
+import isel.leic.group25.db.entities.users.User
 import isel.leic.group25.db.repositories.interfaces.TransactionInterface
 import isel.leic.group25.db.repositories.users.interfaces.AdminRepositoryInterface
 import isel.leic.group25.db.repositories.users.interfaces.RoleApprovalRepositoryInterface
@@ -36,6 +37,7 @@ typealias VerificationResult = Either<AuthError, String>
 class AuthService(
     private val userRepository: UserRepositoryInterface,
     private val adminRepository: AdminRepositoryInterface,
+    private val universityRepository: UniversityRepositoryInterface,
     private val roleApprovalRepository: RoleApprovalRepositoryInterface,
     private val transactionInterface: TransactionInterface,
     private val jwtConfig: JwtConfig,
@@ -53,18 +55,39 @@ class AuthService(
         }
     }
 
-    fun register(email: String, username: String, password: String, role:Role): RegisterResult {
+    fun authenticateWithMicrosoft(username: String, email:String, universityName: String): LoginResult {
+        return runCatching {
+            transactionInterface.useTransaction {
+                val user = userRepository.findByEmail(email)
+                return@useTransaction if (user != null) {
+                    val token = jwtConfig.generateToken(user.id, Role.STUDENT.name)
+                    success(token)
+                } else {
+                    val university = universityRepository.getUniversityByName(universityName)
+                        ?: return@useTransaction failure(AuthError.UniversityNotFound)
+                    val newUser = userRepository.createWithoutRole(email, username, "", university)
+                    userRepository.associateWithRole(newUser, Role.STUDENT)
+                    val token = jwtConfig.generateToken(newUser.id, Role.STUDENT.name)
+                    success(token)
+                }
+            }
+        }
+    }
+
+    fun register(email: String, username: String, password: String, role:Role, universityId: Int): RegisterResult {
         val verificationToken = generateVerificationToken()
         return runCatching {
             transactionInterface.useTransaction {
                 if(userRepository.findByEmail(email) != null) {
                     return@useTransaction failure(AuthError.UserAlreadyExists)
                 }
-                val user = userRepository.createWithoutRole(email, username, password)
+                val university = universityRepository.getUniversityById(universityId)
+                    ?: return@useTransaction failure(AuthError.UniversityNotFound)
+                val user = userRepository.createWithoutRole(email, username, password, university)
                 if(!roleApprovalRepository.addPendingApproval(user, role, verificationToken, null)) {
                     return@useTransaction failure(AuthError.RoleApprovedFailed)
                 }
-                when(role) {
+                return@useTransaction when(role) {
                     Role.STUDENT -> {
                         val verificationLink = "${frontendUrl}verify-account?token=$verificationToken"
                         emailService.sendStudentVerificationEmail(
@@ -72,7 +95,7 @@ class AuthService(
                             username = user.username,
                             verificationLink = verificationLink
                         )
-                        return@useTransaction success(true)
+                         success(true)
                     }
                     Role.TEACHER, Role.TECHNICAL_SERVICE -> {
                         val adminEmails = adminRepository.getAllAdminEmails()
@@ -85,9 +108,9 @@ class AuthService(
                         if(adminEmails.isNotEmpty()){
                             emailService.sendAdminApprovalRequest(adminEmails, approvalLink, userDetails)
                         }
-                        return@useTransaction success(false)
+                        success(false)
                     }
-                    else -> return@useTransaction failure(AuthError.UnauthorizedRole)
+                    else -> failure(AuthError.UnauthorizedRole)
                 }
             }
         }

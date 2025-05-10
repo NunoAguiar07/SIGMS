@@ -17,6 +17,7 @@ class DatabaseTestSetup {
         @AfterTest
         fun clearDB(){
             RunScript.execute(connection, StringReader("""
+                DELETE FROM UNIVERSITY;
                 DELETE FROM USERS;
                 DELETE FROM STUDENT;
                 DELETE FROM TEACHER;
@@ -49,11 +50,18 @@ class DatabaseTestSetup {
             database = Database.connect(dataSource)
 
             RunScript.execute(connection, StringReader("""
-               CREATE TABLE IF NOT EXISTS ROOM (
+CREATE TABLE IF NOT EXISTS UNIVERSITY (
+    id SERIAL PRIMARY KEY,
+    university_name VARCHAR(255) NOT NULL UNIQUE
+);
+
+CREATE TABLE IF NOT EXISTS ROOM (
     id SERIAL PRIMARY KEY,
     room_name VARCHAR(255) NOT NULL,
     capacity INT NOT NULL,
-    CHECK(capacity > 0)
+    university_id INT NOT NULL REFERENCES UNIVERSITY(id) ON DELETE CASCADE,
+    CHECK(capacity > 0),
+    CONSTRAINT unique_room_per_university UNIQUE (room_name, university_id)
 );
 
 CREATE TABLE IF NOT EXISTS STUDY_ROOM (
@@ -73,7 +81,8 @@ CREATE TABLE IF NOT EXISTS USERS (
     email VARCHAR(255) UNIQUE NOT NULL,
     username VARCHAR(255) NOT NULL,
     password VARCHAR(255) NOT NULL,
-    profile_image VARCHAR(255)
+    profile_image VARCHAR(255),
+    university_id INT NOT NULL REFERENCES UNIVERSITY(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS STUDENT (
@@ -111,7 +120,8 @@ CREATE TABLE IF NOT EXISTS ROLE_APPROVALS (
 
 CREATE TABLE IF NOT EXISTS SUBJECT (
      id SERIAL PRIMARY KEY,
-     subject_name VARCHAR(255) NOT NULL
+     subject_name VARCHAR(255) NOT NULL,
+     university_id INT NOT NULL REFERENCES UNIVERSITY(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS CLASS (
@@ -161,6 +171,8 @@ CREATE TABLE IF NOT EXISTS ISSUE_REPORT (
     assigned_to INT DEFAULT NULL REFERENCES TECHNICAL_SERVICES(user_id) ON DELETE SET NULL,
     description TEXT NOT NULL
 );
+
+
                 
                 
             """)

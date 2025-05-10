@@ -5,15 +5,20 @@ import isel.leic.group25.db.entities.users.User
 import isel.leic.group25.db.repositories.issues.IssueReportRepository
 import isel.leic.group25.db.repositories.ktorm.KTransaction
 import isel.leic.group25.db.repositories.rooms.RoomRepository
+import isel.leic.group25.db.repositories.timetables.UniversityRepository
 import isel.leic.group25.db.repositories.users.UserRepository
 import repositories.DatabaseTestSetup
 import repositories.DatabaseTestSetup.Companion.database
-import kotlin.test.*
+import kotlin.test.AfterTest
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 
 class IssueReportRepositoryTest {
     private val kTransaction = KTransaction(database)
     private val issueReportRepository = IssueReportRepository(database)
     private val userRepository = UserRepository(database)
+    private val universityRepository = UniversityRepository(database)
     private val roomRepository = RoomRepository(database)
 
 
@@ -25,13 +30,15 @@ class IssueReportRepositoryTest {
     @Test
     fun `Should create a new issue report and find it by id`() {
         kTransaction.useTransaction {
+            val newUniversity = universityRepository.createUniversity("testUniversity")
             val newUser = User {
                 email = "testemail@test.com"
                 username = "tester"
                 password = User.hashPassword("test")
                 profileImage = byteArrayOf()
-            }.let { userRepository.createWithRole(it.email, it.username, it.password, Role.STUDENT) }
-            val room = roomRepository.createRoom(20, "testRoom")
+                university = newUniversity
+            }.let { userRepository.createWithRole(it.email, it.username, it.password, Role.STUDENT, it.university) }
+            val room = roomRepository.createRoom(20, "testRoom", newUniversity)
             val newIssueReport = issueReportRepository.createIssueReport(newUser ,room, "testDescription")
             val foundIssueReport = issueReportRepository.getIssueReportById(newIssueReport.id)
             assertNotNull(foundIssueReport, "Expected to find the issue report by ID")
@@ -42,13 +49,15 @@ class IssueReportRepositoryTest {
     @Test
     fun `Should create a new issue report and find it by description`() {
         kTransaction.useTransaction {
+            val newUniversity = universityRepository.createUniversity("testUniversity")
             val newUser = User {
                 email = "testemail@test.com"
                 username = "tester"
                 password = User.hashPassword("test")
                 profileImage = byteArrayOf()
-            }.let { userRepository.createWithRole(it.email, it.username, it.password, Role.STUDENT) }
-            val room = roomRepository.createRoom(20, "testRoom")
+                university = newUniversity
+            }.let { userRepository.createWithRole(it.email, it.username, it.password, Role.STUDENT, it.university) }
+            val room = roomRepository.createRoom(20, "testRoom", newUniversity)
             val newIssueReport = issueReportRepository.createIssueReport(newUser, room, "testDescription")
             val foundIssueReport = issueReportRepository.getAllIssueReports(10, 0).firstOrNull { it.description == newIssueReport.description }
             assertNotNull(foundIssueReport)
@@ -59,14 +68,16 @@ class IssueReportRepositoryTest {
     @Test
     fun `Should get all issue reports`() {
         kTransaction.useTransaction {
+            val newUniversity = universityRepository.createUniversity("testUniversity")
             val newUser = User {
                 email = "testemail@test.com"
                 username = "tester"
                 password = User.hashPassword("test")
                 profileImage = byteArrayOf()
-            }.let { userRepository.createWithRole(it.email, it.username, it.password, Role.STUDENT) }
-            val room1 = roomRepository.createRoom(20, "testRoom1")
-            val room2 = roomRepository.createRoom(30, "testRoom2")
+                university = newUniversity
+            }.let { userRepository.createWithRole(it.email, it.username, it.password, Role.STUDENT, it.university) }
+            val room1 = roomRepository.createRoom(20, "testRoom1", newUniversity)
+            val room2 = roomRepository.createRoom(30, "testRoom2", newUniversity)
             val newIssueReport1 = issueReportRepository.createIssueReport(newUser, room1, "testDescription1")
             val newIssueReport2 = issueReportRepository.createIssueReport(newUser, room2, "testDescription2")
             val issueReports = issueReportRepository.getAllIssueReports(10, 0)
@@ -85,13 +96,15 @@ class IssueReportRepositoryTest {
     @Test
     fun `Should delete an issue report`() {
         kTransaction.useTransaction {
+            val newUniversity = universityRepository.createUniversity("testUniversity")
             val newUser = User {
                 email = "testemail@test.com"
                 username = "tester"
                 password = User.hashPassword("test")
                 profileImage = byteArrayOf()
-            }.let { userRepository.createWithRole(it.email, it.username, it.password, Role.STUDENT) }
-            val room = roomRepository.createRoom(20, "testRoom")
+                university = newUniversity
+            }.let { userRepository.createWithRole(it.email, it.username, it.password, Role.STUDENT, it.university) }
+            val room = roomRepository.createRoom(20, "testRoom", newUniversity)
             val newIssueReport = issueReportRepository.createIssueReport(newUser, room, "testDescription")
             val deleteResult = issueReportRepository.deleteIssueReport(newIssueReport.id)
             assert(deleteResult)
@@ -102,13 +115,15 @@ class IssueReportRepositoryTest {
     @Test
     fun `Should update an issue report`() {
         kTransaction.useTransaction {
+            val newUniversity = universityRepository.createUniversity("testUniversity")
             val newUser = User {
                 email = "testemail@test.com"
                 username = "tester"
                 password = User.hashPassword("test")
                 profileImage = byteArrayOf()
-            }.let { userRepository.createWithRole(it.email, it.username, it.password, Role.STUDENT) }
-            val room = roomRepository.createRoom(20, "testRoom")
+                university = newUniversity
+            }.let { userRepository.createWithRole(it.email, it.username, it.password, Role.STUDENT, it.university) }
+            val room = roomRepository.createRoom(20, "testRoom", newUniversity)
             val newIssueReport = issueReportRepository.createIssueReport(newUser, room, "testDescription")
             val updatedIssueReport = issueReportRepository.updateIssueReport(newIssueReport,"updatedDescription")
             assert(updatedIssueReport.description == "updatedDescription")

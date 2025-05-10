@@ -10,6 +10,7 @@ import isel.leic.group25.utils.Failure
 import isel.leic.group25.utils.Success
 import mocks.repositories.issues.MockIssueReportRepository
 import mocks.repositories.rooms.MockRoomRepository
+import mocks.repositories.timetables.MockUniversityRepository
 import mocks.repositories.users.MockTechnicalServiceRepository
 import mocks.repositories.users.MockUserRepository
 import mocks.repositories.utils.MockTransaction
@@ -24,6 +25,7 @@ class IssueReportServiceTest {
     private val roomRepository = MockRoomRepository()
     private val userRepository = MockUserRepository()
     private val technicalServiceRepository = MockTechnicalServiceRepository()
+    private val universityRepository = MockUniversityRepository()
     private val transactionInterface = MockTransaction()
 
     private val issuesReportService = IssuesReportService(
@@ -38,7 +40,8 @@ class IssueReportServiceTest {
     private fun createTestRooms(count: Int = 1): List<Room> {
         return transactionInterface.useTransaction {
             (1..count).map { i ->
-                roomRepository.createRoom(10, "Test Room $i")
+                val university = universityRepository.createUniversity("Test University $i")
+                roomRepository.createRoom(10, "Test Room $i", university)
             }
         }
     }
@@ -54,13 +57,15 @@ class IssueReportServiceTest {
 
     private fun createTestUser(role: Role = Role.STUDENT): User {
         return transactionInterface.useTransaction {
+            val university = universityRepository.createUniversity("Test University")
             val user = User {
                 email = "test@test.com"
                 username = "testuser"
                 password = User.hashPassword("test123!")
                 profileImage = byteArrayOf(1, 2, 3)
+                this.university = university
             }.let {
-                userRepository.createWithRole(it.email, it.username, it.password, role)
+                userRepository.createWithRole(it.email, it.username, it.password, role, it.university)
             }
             return@useTransaction user
         }

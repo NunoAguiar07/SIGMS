@@ -8,6 +8,7 @@ import isel.leic.group25.utils.Failure
 import isel.leic.group25.utils.Success
 import mocks.repositories.timetables.MockClassRepository
 import mocks.repositories.timetables.MockSubjectRepository
+import mocks.repositories.timetables.MockUniversityRepository
 import mocks.repositories.utils.MockTransaction
 import repositories.DatabaseTestSetup
 import kotlin.test.*
@@ -17,6 +18,7 @@ class ClassServiceTest {
     private val classRepository = MockClassRepository()
     private val subjectRepository = MockSubjectRepository()
     private val transactionInterface = MockTransaction()
+    private val universityRepository = MockUniversityRepository()
 
     private val classService = ClassService(
         classRepository = classRepository,
@@ -28,7 +30,8 @@ class ClassServiceTest {
     private fun createTestSubjects(count: Int = 1): List<Subject> {
         return transactionInterface.useTransaction {
             (1..count).map { i ->
-                subjectRepository.createSubject("Test Subject $i")
+                val university = universityRepository.createUniversity("Test University $i")
+                subjectRepository.createSubject("Test Subject $i", university)
             }
         }
     }

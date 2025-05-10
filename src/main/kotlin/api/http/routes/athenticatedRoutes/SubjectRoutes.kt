@@ -79,12 +79,15 @@ fun Route.baseSubjectRoutes(subjectService: SubjectService) {
 
     withRole(Role.ADMIN){
         post("/add") {
+            val universityId = call.getUserIdFromPrincipal()
+                ?: return@post call.respond(HttpStatusCode.Unauthorized)
             val subjectRequest = call.receive<SubjectRequest>()
             subjectRequest.validate()?.let { error ->
                 return@post error.toProblem().respond(call)
             }
             val result = subjectService.createSubject(
-                name = subjectRequest.name
+                name = subjectRequest.name,
+                universityId = universityId,
             )
             call.respondEither(
                 either = result,

@@ -1,5 +1,6 @@
 package isel.leic.group25.services
 
+import UniversityRepositoryInterface
 import isel.leic.group25.db.entities.types.Role
 import isel.leic.group25.db.entities.users.User
 import isel.leic.group25.db.repositories.interfaces.TransactionInterface
@@ -16,7 +17,8 @@ typealias RoleResult = Either<AuthError, Role?>
 
 typealias DeleteUserResult = Either<AuthError, Boolean>
 
-class UserService(private val repository: UserRepositoryInterface,
+class UserService(private val userRepository: UserRepositoryInterface,
+                  private val universityRepository: UniversityRepositoryInterface,
                   private val transactionInterface: TransactionInterface) {
     private inline fun <T> runCatching(block: () -> Either<AuthError, T>): Either<AuthError, T> {
         return try {
@@ -28,7 +30,7 @@ class UserService(private val repository: UserRepositoryInterface,
 
     fun getUserById(id: Int): UserResult {
         return runCatching {
-            val user = repository.findById(id)
+            val user = userRepository.findById(id)
                 ?: return@runCatching failure(AuthError.UserNotFound)
             return@runCatching success(user)
         }
@@ -37,7 +39,7 @@ class UserService(private val repository: UserRepositoryInterface,
     fun updateUser(id: Int, username: String?, image: ByteArray?): UserResult {
         return runCatching {
             transactionInterface.useTransaction {
-                val user = repository.findById(id)
+                val user = userRepository.findById(id)
                     ?: return@useTransaction failure(AuthError.UserNotFound)
                 if (username != null) {
                     user.username = username
@@ -45,7 +47,24 @@ class UserService(private val repository: UserRepositoryInterface,
                 if (image != null) {
                     user.profileImage = image
                 }
-                val rowsChanged = repository.update(user)
+                val rowsChanged = userRepository.update(user)
+                if (rowsChanged == 0) {
+                    return@useTransaction failure(AuthError.UserChangesFailed)
+                }
+                return@useTransaction success(user)
+            }
+        }
+    }
+
+    fun associateUniversity(userId: Int, universityId: Int): UserResult {
+        return runCatching {
+            transactionInterface.useTransaction {
+                val user = userRepository.findById(userId)
+                    ?: return@useTransaction failure(AuthError.UserNotFound)
+                val university = universityRepository.getUniversityById(universityId)
+                    ?: return@useTransaction failure(AuthError.UniversityNotFound)
+                user.university = university
+                val rowsChanged = userRepository.update(user)
                 if (rowsChanged == 0) {
                     return@useTransaction failure(AuthError.UserChangesFailed)
                 }
@@ -57,13 +76,13 @@ class UserService(private val repository: UserRepositoryInterface,
     fun changePassword(userId: Int, oldPassword: String, newPassword: String) : UserResult {
         return runCatching {
             transactionInterface.useTransaction {
-                val user = repository.findById(userId)
+                val user = userRepository.findById(userId)
                     ?: return@useTransaction failure(AuthError.UserNotFound)
                 if(!User.verifyPassword(user.password, oldPassword)) {
                     return@useTransaction failure(AuthError.InvalidCredentials)
                 }
                 user.password = User.hashPassword(newPassword)
-                val rowsChanged = repository.update(user)
+                val rowsChanged = userRepository.update(user)
                 if (rowsChanged == 0) {
                     return@useTransaction failure(AuthError.UserChangesFailed)
                 }
@@ -75,7 +94,7 @@ class UserService(private val repository: UserRepositoryInterface,
     fun getRoleByUserId(userId: Int): RoleResult {
         return runCatching {
             transactionInterface.useTransaction {
-                val role = repository.getRoleById(userId)
+                val role = userRepository.getRoleById(userId)
                     ?: return@useTransaction failure(AuthError.UserNotFound)
                 return@useTransaction success(role)
             }
@@ -84,9 +103,9 @@ class UserService(private val repository: UserRepositoryInterface,
     fun deleteUser(id: Int): DeleteUserResult {
         return runCatching {
             transactionInterface.useTransaction {
-                repository.findById(id)
+                userRepository.findById(id)
                     ?: return@useTransaction failure(AuthError.UserNotFound)
-                val deleted = repository.delete(id)
+                val deleted = userRepository.delete(id)
                 if (!deleted) {
                     return@useTransaction failure(AuthError.UserDeleteFailed)
                 }

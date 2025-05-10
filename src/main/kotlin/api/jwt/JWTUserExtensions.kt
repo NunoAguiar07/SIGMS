@@ -11,3 +11,7 @@ fun ApplicationCall.getUserIdFromPrincipal(): Int? {
 fun ApplicationCall.getUserRoleFromPrincipal(): String? {
     return principal<JWTPrincipal>()?.payload?.getClaim("role")?.asString()
 }
+
+fun ApplicationCall.getUniversityIdFromPrincipal(): Int? {
+    return principal<JWTPrincipal>()?.payload?.getClaim("universityId")?.asInt()
+}

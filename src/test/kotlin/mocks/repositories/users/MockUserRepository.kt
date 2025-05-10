@@ -1,5 +1,6 @@
 package mocks.repositories.users
 
+import isel.leic.group25.db.entities.timetables.University
 import isel.leic.group25.db.entities.types.Role
 import isel.leic.group25.db.entities.users.*
 import isel.leic.group25.db.repositories.users.interfaces.UserRepositoryInterface
@@ -25,21 +26,24 @@ class MockUserRepository : UserRepositoryInterface {
         return newUser
     }
 
-    override fun createWithRole(email: String, username: String, password: String, role: Role): User {
+
+    override fun createWithRole(email: String, username: String, password: String, role: Role, university: University): User {
         val newUser = User {
             this.email = email
             this.username = username
             this.password = User.hashPassword(password)
+            this.university = university
         }
         users.add(newUser)
         return associateWithRole(newUser, role)
     }
 
-    override fun createWithoutRole(email: String, username: String, password: String): User {
+    override fun createWithoutRole(email: String, username: String, password: String, university: University): User {
         val newUser = User {
             this.email = email
             this.username = username
             this.password = User.hashPassword(password)
+            this.university = university
         }
         users.add(newUser)
         return newUser

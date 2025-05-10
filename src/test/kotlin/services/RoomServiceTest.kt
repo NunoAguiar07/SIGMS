@@ -7,6 +7,7 @@ import isel.leic.group25.services.errors.RoomError
 import isel.leic.group25.utils.Failure
 import isel.leic.group25.utils.Success
 import mocks.repositories.rooms.MockRoomRepository
+import mocks.repositories.timetables.MockUniversityRepository
 import mocks.repositories.utils.MockTransaction
 import repositories.DatabaseTestSetup
 import kotlin.test.AfterTest
@@ -16,14 +17,16 @@ import kotlin.test.assertTrue
 
 class RoomServiceTest {
     private val roomRepository = MockRoomRepository()
+    private val universityRepository = MockUniversityRepository()
     private val transactionInterface = MockTransaction()
 
-    private val roomService = RoomService(roomRepository, transactionInterface)
+    private val roomService = RoomService(roomRepository, universityRepository, transactionInterface)
 
     private fun createTestRooms(count: Int = 1): List<Room> {
         return transactionInterface.useTransaction {
             (1..count).map { i ->
-                roomRepository.createRoom(10, "Test Room $i")
+                val university = universityRepository.createUniversity("Test University $i")
+                roomRepository.createRoom(10, "Test Room $i", university)
             }
         }
     }
@@ -75,7 +78,8 @@ class RoomServiceTest {
 
     @Test
     fun `createRoom succeeds with valid parameters for class room`() {
-        val result = roomService.createRoom(10, "Class Room 1", RoomType.CLASS)
+        val university = universityRepository.createUniversity("Test University")
+        val result = roomService.createRoom(10, "Class Room 1", university.id, RoomType.CLASS)
         assertTrue(result is Success, "Expected Success")
         val successResult = result.value
         assertEquals("Class Room 1", successResult.name, "Expected room name to match")
@@ -84,7 +88,8 @@ class RoomServiceTest {
 
     @Test
     fun `createRoom succeeds with valid parameters for office room`() {
-        val result = roomService.createRoom(10, "Office Room 1", RoomType.OFFICE)
+        val university = universityRepository.createUniversity("Test University")
+        val result = roomService.createRoom(10, "Office Room 1", university.id, RoomType.OFFICE)
         assertTrue(result is Success, "Expected Success")
         val successResult = result.value
         assertEquals("Office Room 1", successResult.name, "Expected room name to match")
@@ -93,7 +98,8 @@ class RoomServiceTest {
 
     @Test
     fun `createRoom succeeds with valid parameters for study room`() {
-        val result = roomService.createRoom(10, "Study Room 1", RoomType.STUDY)
+        val university = universityRepository.createUniversity("Test University")
+        val result = roomService.createRoom(10, "Study Room 1", university.id, RoomType.STUDY)
         assertTrue(result is Success, "Expected Success")
         val successResult = result.value
         assertEquals("Study Room 1", successResult.name, "Expected room name to match")

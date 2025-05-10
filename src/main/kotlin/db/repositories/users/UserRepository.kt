@@ -1,5 +1,6 @@
 package isel.leic.group25.db.repositories.users
 
+import isel.leic.group25.db.entities.timetables.University
 import isel.leic.group25.db.entities.types.Role
 import isel.leic.group25.db.entities.users.*
 import isel.leic.group25.db.repositories.users.interfaces.UserRepositoryInterface
@@ -10,7 +11,7 @@ import isel.leic.group25.db.tables.Tables.Companion.teachers
 import isel.leic.group25.db.tables.Tables.Companion.technicalServices
 import isel.leic.group25.db.tables.Tables.Companion.users
 import org.ktorm.database.Database
-import org.ktorm.dsl.*
+import org.ktorm.dsl.eq
 import org.ktorm.entity.*
 
 class UserRepository(private val database: Database): UserRepositoryInterface {
@@ -40,23 +41,25 @@ class UserRepository(private val database: Database): UserRepositoryInterface {
         return newUser
     }
 
-    override fun createWithRole(email: String, username: String, password: String, role: Role): User = withDatabase {
+    override fun createWithRole(email: String, username: String, password: String, role: Role, university: University): User = withDatabase {
         val newUser = User {
             this.email = email
             this.username = username
             this.password = User.hashPassword(password)
             this.profileImage = ByteArray(0)
+            this.university = university
         }
         database.users.add(newUser)
         return associateWithRole(newUser, role)
     }
 
-    override fun createWithoutRole(email: String, username: String, password: String): User = withDatabase {
+    override fun createWithoutRole(email: String, username: String, password: String, university: University): User = withDatabase {
         val newUser = User {
             this.email = email
             this.username = username
             this.password = User.hashPassword(password)
             this.profileImage = ByteArray(0)
+            this.university = university
         }
         database.users.add(newUser)
         return newUser

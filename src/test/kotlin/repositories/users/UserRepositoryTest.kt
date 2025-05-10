@@ -3,6 +3,7 @@ package repositories.users
 import isel.leic.group25.db.entities.types.Role
 import isel.leic.group25.db.entities.users.User
 import isel.leic.group25.db.repositories.ktorm.KTransaction
+import isel.leic.group25.db.repositories.timetables.UniversityRepository
 import isel.leic.group25.db.repositories.users.UserRepository
 import repositories.DatabaseTestSetup
 import kotlin.test.*
@@ -15,6 +16,7 @@ class UserRepositoryTest {
     }
 
     private val userRepository = UserRepository(DatabaseTestSetup.database)
+    private val universityRepository = UniversityRepository(DatabaseTestSetup.database)
     private val kTransaction = KTransaction(DatabaseTestSetup.database)
 /*
     @Test
@@ -57,12 +59,14 @@ class UserRepositoryTest {
     @Test
     fun `Should find user my id`() {
         kTransaction.useTransaction {
+            val newUniversity = universityRepository.createUniversity("testUniversity")
             val newUser = User {
                 email = "testemail@test.com"
                 username = "tester"
                 password = User.hashPassword("test")
                 profileImage = byteArrayOf()
-            }.let { userRepository.createWithRole(it.email, it.username, it.password, Role.STUDENT) }
+                university = newUniversity
+            }.let { userRepository.createWithRole(it.email, it.username, it.password, Role.STUDENT, it.university) }
             val user = userRepository.findById(newUser.id)
             assertNotNull(user)
             assertEquals(newUser.id, user.id)
@@ -75,12 +79,14 @@ class UserRepositoryTest {
     @Test
     fun `Should find user my email`(){
         kTransaction.useTransaction {
+            val newUniversity = universityRepository.createUniversity("testUniversity")
             val newUser = User {
                 email = "testemail@test.com"
                 username = "tester"
                 password = User.hashPassword("test")
                 profileImage = byteArrayOf()
-            }.let { userRepository.createWithRole(it.email, it.username, it.password, Role.STUDENT) }
+                university = newUniversity
+            }.let { userRepository.createWithRole(it.email, it.username, it.password, Role.STUDENT, it.university) }
             val user = userRepository.findByEmail(newUser.email)
             assertNotNull(user)
             assertEquals(newUser.id, user.id)
@@ -93,12 +99,14 @@ class UserRepositoryTest {
     @Test
     fun `Should update the user username`(){
         kTransaction.useTransaction {
+            val newUniversity = universityRepository.createUniversity("testUniversity")
             val newUser = User {
                 email = "testemail@test.com"
                 username = "tester"
                 password = User.hashPassword("test")
                 profileImage = byteArrayOf()
-            }.let { userRepository.createWithRole(it.email, it.username, it.password, Role.STUDENT) }
+                university = newUniversity
+            }.let { userRepository.createWithRole(it.email, it.username, it.password, Role.STUDENT, it.university) }
             val newUsername = "newTester"
             newUser.username = newUsername
             userRepository.update(newUser)

@@ -5,6 +5,7 @@ import isel.leic.group25.api.exceptions.Problem
 sealed class RoomError {
     data object RoomAlreadyExists : RoomError()
     data object RoomNotFound : RoomError()
+    data object UniversityNotFound : RoomError()
     data object InvalidRoomId : RoomError()
     data object InvalidRoomCapacity : RoomError()
     data object InvalidRoomLimit : RoomError()
@@ -17,6 +18,10 @@ sealed class RoomError {
             RoomNotFound -> Problem.notFound(
                 title = "Room not found",
                 detail = "The room with the given ID was not found."
+            )
+            UniversityNotFound -> Problem.notFound(
+                title = "University not found",
+                detail = "The university with the given ID was not found."
             )
             RoomAlreadyExists -> Problem.conflict(
                 title = "Room already exists",

@@ -1,5 +1,6 @@
 package isel.leic.group25.services
 
+import UniversityRepositoryInterface
 import isel.leic.group25.db.entities.timetables.Subject
 import isel.leic.group25.db.repositories.interfaces.TransactionInterface
 import isel.leic.group25.db.repositories.timetables.interfaces.SubjectRepositoryInterface
@@ -17,6 +18,7 @@ typealias DeleteSubjectResult = Either<SubjectError, Boolean>
 
 class SubjectService(
     private val subjectRepository: SubjectRepositoryInterface,
+    private val universityRepository: UniversityRepositoryInterface,
     private val transactionInterface: TransactionInterface,
 ) {
     private inline fun <T> runCatching(block: () -> Either<SubjectError, T>): Either<SubjectError, T> {
@@ -36,6 +38,17 @@ class SubjectService(
         }
     }
 
+    fun getAllSubjectsByUniversity(universityId: Int, limit: Int, offset: Int): SubjectListResult {
+        return runCatching {
+            transactionInterface.useTransaction {
+                val university = universityRepository.getUniversityById(universityId)
+                    ?: return@useTransaction failure(SubjectError.UniversityNotFound)
+                val subjects = subjectRepository.getAllSubjectsByUniversityId(university.id, limit, offset)
+                return@useTransaction success(subjects)
+            }
+        }
+    }
+
     fun getSubjectById(id: Int): SubjectResult {
         return runCatching {
             transactionInterface.useTransaction {
@@ -45,14 +58,16 @@ class SubjectService(
         }
     }
 
-    fun createSubject(name: String): SubjectResult {
+    fun createSubject(name: String, universityId: Int): SubjectResult {
         return runCatching {
             transactionInterface.useTransaction {
+                val university = universityRepository.getUniversityById(universityId)
+                    ?: return@useTransaction failure(SubjectError.UniversityNotFound)
                 val existingSubject = subjectRepository.findSubjectByName(name)
                 if (existingSubject != null) {
                     return@useTransaction failure(SubjectError.SubjectAlreadyExists)
                 }
-                val newSubject = subjectRepository.createSubject(name)
+                val newSubject = subjectRepository.createSubject(name, university)
                 return@useTransaction success(newSubject)
             }
         }

@@ -10,6 +10,7 @@ import mocks.repositories.rooms.MockRoomRepository
 import mocks.repositories.timetables.MockClassRepository
 import mocks.repositories.timetables.MockLectureRepository
 import mocks.repositories.timetables.MockSubjectRepository
+import mocks.repositories.timetables.MockUniversityRepository
 import mocks.repositories.utils.MockTransaction
 import mocks.services.MockEmailService
 import kotlin.test.*
@@ -20,6 +21,7 @@ class LectureServiceTest {
     private val subjectRepository = MockSubjectRepository()
     private val classRepository = MockClassRepository()
     private val roomRepository = MockRoomRepository()
+    private val universityRepository = MockUniversityRepository()
     private val emailService = MockEmailService()
     private val transactionInterface = MockTransaction()
 
@@ -40,9 +42,10 @@ class LectureServiceTest {
     @Test
     fun `getAllLectures should return list of lectures`() {
         // Setup test data
-        val subject = subjectRepository.createSubject("PG")
+        val university = universityRepository.createUniversity("Test University")
+        val subject = subjectRepository.createSubject("PG", university)
         val schoolClass = classRepository.addClass("LEIC51D", subject)
-        val room = roomRepository.createRoom(30, "G.2.01")
+        val room = roomRepository.createRoom(30, "G.2.01", university)
         roomRepository.createClassRoom(room)
         val classroom = roomRepository.getClassRoomById(room.id)
         assertNotNull(classroom, "Classroom should be created")
@@ -65,9 +68,10 @@ class LectureServiceTest {
     @Test
     fun `getLectureById should return lecture when found`() {
         // Setup test data
-        val subject = subjectRepository.createSubject("Math")
+        val university = universityRepository.createUniversity("Test University")
+        val subject = subjectRepository.createSubject("Math", university)
         val schoolClass = classRepository.addClass("Algebra", subject)
-        val room = roomRepository.createRoom(30, "Room 101")
+        val room = roomRepository.createRoom(30, "Room 101", university)
         roomRepository.createClassRoom(room)
         val classroom = roomRepository.getClassRoomById(room.id)
         assertNotNull(classroom, "Classroom should be created")
@@ -97,9 +101,10 @@ class LectureServiceTest {
     @Test
     fun `createLecture should create new lecture with valid data`() {
         // Setup test data
-        val subject = subjectRepository.createSubject("Math")
+        val university = universityRepository.createUniversity("Test University")
+        val subject = subjectRepository.createSubject("Math", university)
         val schoolClass = classRepository.addClass("Algebra", subject)
-        val room = roomRepository.createRoom(30, "Room 101")
+        val room = roomRepository.createRoom(30, "Room 101", university)
         roomRepository.createClassRoom(room)
 
         // Test
@@ -135,9 +140,10 @@ class LectureServiceTest {
     @Test
     fun `createLecture should return LectureTimeConflict when conflicting lecture exists`() {
         // Setup test data
-        val subject = subjectRepository.createSubject("Math")
+        val university = universityRepository.createUniversity("Test University")
+        val subject = subjectRepository.createSubject("Math", university)
         val schoolClass = classRepository.addClass("Algebra", subject)
-        val room = roomRepository.createRoom(30, "Room 101")
+        val room = roomRepository.createRoom(30, "Room 101", university)
         roomRepository.createClassRoom(room)
 
         // Create first lecture
@@ -167,7 +173,8 @@ class LectureServiceTest {
     @Test
     fun `createLecture should return InvalidLectureRoom when room not found`() {
         // Setup test data
-        val subject = subjectRepository.createSubject("Math")
+        val university = universityRepository.createUniversity("Test University")
+        val subject = subjectRepository.createSubject("Math", university)
         val schoolClass = classRepository.addClass("Algebra", subject)
 
         val result = lectureService.createLecture(
@@ -186,7 +193,8 @@ class LectureServiceTest {
     @Test
     fun `createLecture should return InvalidLectureClass when class not found`() {
         // Setup test data
-        val room = roomRepository.createRoom(30, "Room 101")
+        val university = universityRepository.createUniversity("Test University")
+        val room = roomRepository.createRoom(30, "Room 101", university)
         roomRepository.createClassRoom(room)
 
         val result = lectureService.createLecture(
@@ -205,10 +213,11 @@ class LectureServiceTest {
     @Test
     fun `getLecturesByRoom should return lectures for given room`() {
         // Setup test data
-        val subject = subjectRepository.createSubject("Math")
+        val university = universityRepository.createUniversity("Test University")
+        val subject = subjectRepository.createSubject("Math", university)
         val schoolClass = classRepository.addClass("Algebra", subject)
-        val room1 = roomRepository.createRoom(30, "Room 101")
-        val room2 = roomRepository.createRoom(30, "Room 102")
+        val room1 = roomRepository.createRoom(30, "Room 101", university)
+        val room2 = roomRepository.createRoom(30, "Room 102", university)
         roomRepository.createClassRoom(room1)
         roomRepository.createClassRoom(room2)
         val classroom1 = roomRepository.getClassRoomById(room1.id)
@@ -243,10 +252,11 @@ class LectureServiceTest {
     @Test
     fun `getLecturesByClass should return lectures for given class`() {
         // Setup test data
-        val subject = subjectRepository.createSubject("Math")
+        val university = universityRepository.createUniversity("Test University")
+        val subject = subjectRepository.createSubject("Math", university)
         val schoolClass1 = classRepository.addClass("Algebra", subject)
         val schoolClass2 = classRepository.addClass("Geometry", subject)
-        val room = roomRepository.createRoom(30, "Room 101")
+        val room = roomRepository.createRoom(30, "Room 101", university)
         roomRepository.createClassRoom(room)
         val classroom = roomRepository.getClassRoomById(room.id)
         assertNotNull(classroom, "Classroom should be created")
@@ -285,9 +295,10 @@ class LectureServiceTest {
     @Test
     fun `getLecturesByType should return lectures of given type`() {
         // Setup test data
-        val subject = subjectRepository.createSubject("Math")
+        val university = universityRepository.createUniversity("Test University")
+        val subject = subjectRepository.createSubject("Math", university)
         val schoolClass = classRepository.addClass("Algebra", subject)
-        val room = roomRepository.createRoom(30, "Room 101")
+        val room = roomRepository.createRoom(30, "Room 101", university)
         roomRepository.createClassRoom(room)
         val classroom = roomRepository.getClassRoomById(room.id)
         assertNotNull(classroom)
@@ -320,9 +331,10 @@ class LectureServiceTest {
     @Test
     fun `deleteLecture should return true when lecture is deleted`() {
         // Setup test data
-        val subject = subjectRepository.createSubject("Math")
+        val university = universityRepository.createUniversity("Test University")
+        val subject = subjectRepository.createSubject("Math", university)
         val schoolClass = classRepository.addClass("Algebra", subject)
-        val room = roomRepository.createRoom(30, "Room 101")
+        val room = roomRepository.createRoom(30, "Room 101",    university)
         roomRepository.createClassRoom(room)
         val classroom = roomRepository.getClassRoomById(room.id)
         assertNotNull(classroom)
@@ -353,10 +365,11 @@ class LectureServiceTest {
     @Test
     fun `updateLecture should update lecture permanently when numberOfWeeks is 0`() {
         // Setup test data
-        val subject = subjectRepository.createSubject("Math")
+        val university = universityRepository.createUniversity("Test University")
+        val subject = subjectRepository.createSubject("Math", university)
         val schoolClass = classRepository.addClass("Algebra", subject)
-        val room1 = roomRepository.createRoom(30, "Room 101")
-        val room2 = roomRepository.createRoom(30, "Room 102")
+        val room1 = roomRepository.createRoom(30, "Room 101", university)
+        val room2 = roomRepository.createRoom(30, "Room 102", university)
         roomRepository.createClassRoom(room1)
         roomRepository.createClassRoom(room2)
         val classroom1 = roomRepository.getClassRoomById(room1.id)
@@ -396,10 +409,11 @@ class LectureServiceTest {
     @Test
     fun `updateLecture should create temporary change when numberOfWeeks greater than 0`() {
         // Setup test data
-        val subject = subjectRepository.createSubject("Math")
+        val university = universityRepository.createUniversity("Test University")
+        val subject = subjectRepository.createSubject("Math", university)
         val schoolClass = classRepository.addClass("Algebra", subject)
-        val room1 = roomRepository.createRoom(30, "Room 101")
-        val room2 = roomRepository.createRoom(30, "Room 102")
+        val room1 = roomRepository.createRoom(30, "Room 101", university)
+        val room2 = roomRepository.createRoom(30, "Room 102", university)
         roomRepository.createClassRoom(room1)
         roomRepository.createClassRoom(room2)
         val classroom1 = roomRepository.getClassRoomById(room1.id)
@@ -458,9 +472,10 @@ class LectureServiceTest {
     @Test
     fun `updateLecture should return InvalidLectureRoom when new room not found`() {
         // Setup test data
-        val subject = subjectRepository.createSubject("Math")
+        val university = universityRepository.createUniversity("Test University")
+        val subject = subjectRepository.createSubject("Math", university)
         val schoolClass = classRepository.addClass("Algebra", subject)
-        val room = roomRepository.createRoom(30, "Room 101")
+        val room = roomRepository.createRoom(30, "Room 101", university)
         roomRepository.createClassRoom(room)
         val classroom = roomRepository.getClassRoomById(room.id)
         assertNotNull(classroom)
@@ -492,9 +507,10 @@ class LectureServiceTest {
     @Test
     fun `updateLecture should return InvalidLectureClass when new class not found`() {
         // Setup test data
-        val subject = subjectRepository.createSubject("Math")
+        val university = universityRepository.createUniversity("Test University")
+        val subject = subjectRepository.createSubject("Math", university)
         val schoolClass = classRepository.addClass("Algebra", subject)
-        val room = roomRepository.createRoom(30, "Room 101")
+        val room = roomRepository.createRoom(30, "Room 101", university)
         roomRepository.createClassRoom(room)
         val classroom = roomRepository.getClassRoomById(room.id)
         assertNotNull(classroom)

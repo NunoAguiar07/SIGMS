@@ -6,6 +6,7 @@ import isel.leic.group25.services.errors.SubjectError
 import isel.leic.group25.utils.Failure
 import isel.leic.group25.utils.Success
 import mocks.repositories.timetables.MockSubjectRepository
+import mocks.repositories.timetables.MockUniversityRepository
 import mocks.repositories.utils.MockTransaction
 import repositories.DatabaseTestSetup
 import kotlin.test.AfterTest
@@ -16,15 +17,17 @@ import kotlin.test.assertTrue
 class SubjectServiceTest {
     // Test database setup
     private val subjectRepository = MockSubjectRepository()
+    private val universityRepository = MockUniversityRepository()
     private val transactionInterface = MockTransaction()
 
-    private val subjectService = SubjectService(subjectRepository, transactionInterface)
+    private val subjectService = SubjectService(subjectRepository, universityRepository, transactionInterface)
 
     // Helper function to create test subjects
     private fun createTestSubjects(count: Int = 1): List<Subject> {
         return transactionInterface.useTransaction {
             (1..count).map { i ->
-                subjectRepository.createSubject("Test Subject $i")
+                val university = universityRepository.createUniversity("Test University $i")
+                subjectRepository.createSubject("Test Subject $i", university)
             }
         }
     }
@@ -78,8 +81,8 @@ class SubjectServiceTest {
 
     @Test
     fun `createSubject should create a new subject`() {
-        val result = subjectService.createSubject("PG")
-
+        val university = universityRepository.createUniversity("Test University")
+        val result = subjectService.createSubject("PG", university.id)
         assertTrue(result is Success, "Expected Success")
         val successResult = result.value
         assertEquals("PG", successResult.name, "Subject name should match")
@@ -88,8 +91,8 @@ class SubjectServiceTest {
     @Test
     fun `createSubject should return SubjectAlreadyExists when name exists`() {
         createTestSubjects(1)
-        val result = subjectService.createSubject("Test Subject 1")
-
+        val university = universityRepository.createUniversity("Test University")
+        val result = subjectService.createSubject("Test Subject 1", university.id)
         assertTrue(result is Failure, "Expected Failure")
         assertEquals(SubjectError.SubjectAlreadyExists, result.value,"Expected SubjectAlreadyExists error")
     }

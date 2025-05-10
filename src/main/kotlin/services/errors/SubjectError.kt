@@ -5,6 +5,7 @@ import isel.leic.group25.api.exceptions.Problem
 sealed class SubjectError {
 
     data object SubjectNotFound : SubjectError()
+    data object UniversityNotFound : SubjectError()
     data object FailedToAddToDatabase : SubjectError()
     data object SubjectAlreadyExists : SubjectError()
     data object SubjectChangesFailed : SubjectError()
@@ -18,6 +19,10 @@ sealed class SubjectError {
             SubjectNotFound -> Problem.notFound(
                 title = "Subject not found",
                 detail = "The subject with the given ID was not found."
+            )
+            UniversityNotFound -> Problem.notFound(
+                title = "University not found",
+                detail = "The university with the given ID was not found."
             )
             SubjectAlreadyExists -> Problem.conflict(
                 title = "Subject already exists",

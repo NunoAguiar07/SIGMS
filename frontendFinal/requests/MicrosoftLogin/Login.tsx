@@ -1,6 +1,6 @@
 import * as AuthSession from 'expo-auth-session';
 import * as WebBrowser from 'expo-web-browser';
-import {Button, Platform} from 'react-native';
+import {Button} from 'react-native';
 import * as SecureStore from 'expo-secure-store';
 import {useEffect} from "react";
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -17,7 +17,7 @@ const MicrosoftAuthButton = () => {
 const [request, response, promptAsync] = AuthSession.useAuthRequest(
     {
         clientId: process.env.EXPO_PUBLIC_MICROSOFT_CLIENT_ID,
-        scopes: ['openid', 'profile', 'email', 'offline_access'],
+        scopes: ['openid', 'profile', 'email', 'offline_access', 'https://graph.microsoft.com/User.Read'],
         redirectUri: AuthSession.makeRedirectUri({
             scheme: 'frontendFinal',
             path: 'auth/microsoft/callback'
@@ -53,7 +53,7 @@ const exchangeCodeForTokens = async (code: string) => {
                     path: 'auth/microsoft/callback'
                 }),
                 extraParams: {
-                    code_verifier: request?.codeVerifier || '',
+                    code_verifier: request?.codeVerifier ?? '',
                     grant_type: 'authorization_code'
                 },
 
@@ -64,7 +64,7 @@ const exchangeCodeForTokens = async (code: string) => {
         // Store the refresh token securely
         console.log(tokenResponse)
 
-        await AsyncStorage.setItem('refreshToken', tokenResponse.refreshToken || '');
+        await AsyncStorage.setItem('refreshToken', tokenResponse.refreshToken ?? '');
 
 
         // Now send the access token to your backend
@@ -108,12 +108,12 @@ const handleRefreshToken = async () => {
             {
                 clientId: process.env.EXPO_PUBLIC_MICROSOFT_CLIENT_ID,
                 refreshToken,
-                scopes: ['openid', 'profile', 'email'],
+                scopes: ['openid', 'profile', 'email', 'https://graph.microsoft.com/User.Read'],
             },
             discovery
         );
 
-        await AsyncStorage.setItem('refreshToken', tokenResponse.refreshToken || '');
+        await AsyncStorage.setItem('refreshToken', tokenResponse.refreshToken ?? '');
         authenticateWithBackend(tokenResponse.accessToken);
     } catch (error) {
         console.error('Token refresh failed:', error);

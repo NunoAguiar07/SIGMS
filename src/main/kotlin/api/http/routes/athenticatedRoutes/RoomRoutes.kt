@@ -7,6 +7,7 @@ import io.ktor.server.routing.*
 import isel.leic.group25.api.exceptions.RequestError
 import isel.leic.group25.api.exceptions.respondEither
 import isel.leic.group25.api.http.utils.withRole
+import isel.leic.group25.api.jwt.getUniversityIdFromPrincipal
 import isel.leic.group25.api.jwt.getUserIdFromPrincipal
 import isel.leic.group25.api.model.request.IssueReportRequest
 import isel.leic.group25.api.model.request.RoomRequest
@@ -73,6 +74,8 @@ fun Route.baseRoomRoutes(roomService: RoomService) {
     }
     withRole(Role.ADMIN){
         post("/add") {
+            val universityId = call.getUniversityIdFromPrincipal()
+                ?: return@post call.respond(HttpStatusCode.Unauthorized)
             val roomRequest = call.receive<RoomRequest>()
             roomRequest.validate()?.let{ error ->
                 return@post error.toProblem().respond(call)
@@ -82,7 +85,8 @@ fun Route.baseRoomRoutes(roomService: RoomService) {
             val result = roomService.createRoom(
                 name = roomRequest.name,
                 capacity = roomRequest.capacity,
-                type = type
+                type = type,
+                universityId = universityId
             )
             call.respondEither(
                 either = result,

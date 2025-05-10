@@ -2,6 +2,7 @@ package isel.leic.group25.db.entities.users
 
 import de.mkammerer.argon2.Argon2
 import de.mkammerer.argon2.Argon2Factory
+import isel.leic.group25.db.entities.timetables.University
 import isel.leic.group25.db.tables.Tables.Companion.admins
 import isel.leic.group25.db.tables.Tables.Companion.students
 import isel.leic.group25.db.tables.Tables.Companion.teachers
@@ -19,6 +20,7 @@ sealed interface User: Entity<User> {
     var username: String
     var password: String
     var profileImage: ByteArray
+    var university: University
 
     companion object: Entity.Factory<User>() {
 

@@ -7,12 +7,14 @@ import isel.leic.group25.db.entities.users.User
 import isel.leic.group25.db.repositories.ktorm.KTransaction
 import isel.leic.group25.db.repositories.timetables.ClassRepository
 import isel.leic.group25.db.repositories.timetables.SubjectRepository
+import isel.leic.group25.db.repositories.timetables.UniversityRepository
 import isel.leic.group25.db.repositories.users.StudentRepository
 import isel.leic.group25.db.repositories.users.UserRepository
 import kotlin.test.*
 
 class ClassRepositoryTest {
     private val kTransaction = KTransaction(DatabaseTestSetup.database)
+    private val universityRepository = UniversityRepository(DatabaseTestSetup.database)
     private val userRepository = UserRepository(DatabaseTestSetup.database)
     private val studentRepository = StudentRepository(DatabaseTestSetup.database)
     private val teacherRepository = StudentRepository(DatabaseTestSetup.database)
@@ -27,11 +29,13 @@ class ClassRepositoryTest {
     @Test
     fun `Should create a new class and find it by id`() {
         kTransaction.useTransaction {
+            val newUniversity = universityRepository.createUniversity("Test University")
             val newSubject = Subject {
                 name = "Test Subject"
-            }.let { subjectRepository.createSubject(it.name) }
+                university = newUniversity
+            }.let { subjectRepository.createSubject(it.name, it.university) }
             val name = "Test Class"
-            val clazz = classRepository.addClass(name, newSubject!!)
+            val clazz = classRepository.addClass(name, newSubject)
             val foundClass = classRepository.findClassById(clazz.id)
             assertNotNull(foundClass)
             assertEquals(clazz.id, foundClass.id)
@@ -42,11 +46,13 @@ class ClassRepositoryTest {
     @Test
     fun `Should create a new class and find it by name`() {
         kTransaction.useTransaction {
+            val newUniversity = universityRepository.createUniversity("Test University")
             val newSubject = Subject {
                 name = "Test Subject1"
-            }.let { subjectRepository.createSubject(it.name) }
+                university = newUniversity
+            }.let { subjectRepository.createSubject(it.name, it.university) }
             val name = "Test Class1"
-            val clazz = classRepository.addClass(name, newSubject!!)
+            val clazz = classRepository.addClass(name, newSubject)
             val foundClass = classRepository.findClassByName(clazz.name)
             assertNotNull(foundClass)
             assertEquals(clazz.id, foundClass.id)
@@ -56,11 +62,13 @@ class ClassRepositoryTest {
     @Test
     fun `Should create a new class and find it by subject`() {
         kTransaction.useTransaction {
+            val newUniversity = universityRepository.createUniversity("Test University")
             val newSubject = Subject {
                 name = "Test Subject2"
-            }.let { subjectRepository.createSubject(it.name) }
+                university = newUniversity
+            }.let { subjectRepository.createSubject(it.name, it.university) }
             val name = "Test Class2"
-            val clazz = classRepository.addClass(name, newSubject!!)
+            val clazz = classRepository.addClass(name, newSubject)
             val foundClasses = classRepository.findClassesBySubject(newSubject, 10, 0)
             assertNotNull(foundClasses)
             assertTrue(foundClasses.isNotEmpty())
@@ -71,11 +79,13 @@ class ClassRepositoryTest {
     @Test
     fun `Should update a class`() {
         kTransaction.useTransaction {
+            val newUniversity = universityRepository.createUniversity("Test University")
             val newSubject = Subject {
                 name = "Test Subject3"
-            }.let { subjectRepository.createSubject(it.name) }
+                university = newUniversity
+            }.let { subjectRepository.createSubject(it.name, it.university) }
             val name1 = "Test Class3"
-            val clazz = classRepository.addClass(name1, newSubject!!)
+            val clazz = classRepository.addClass(name1, newSubject)
             clazz.name = "Updated Class"
             clazz.subject = newSubject
             val result = classRepository.updateClass(clazz)
@@ -89,11 +99,13 @@ class ClassRepositoryTest {
     @Test
     fun `Should delete a class by id`() {
         kTransaction.useTransaction {
+            val newUniversity = universityRepository.createUniversity("Test University")
             val newSubject = Subject {
                 name = "Test Subject4"
-            }.let { subjectRepository.createSubject(it.name) }
+                university = newUniversity
+            }.let { subjectRepository.createSubject(it.name, it.university) }
             val name = "Test Class4"
-            val clazz = classRepository.addClass(name, newSubject!!)
+            val clazz = classRepository.addClass(name, newSubject)
             val result = classRepository.deleteClassById(clazz.id)
             assertTrue(result)
             val foundClass = classRepository.findClassById(clazz.id)
@@ -104,11 +116,13 @@ class ClassRepositoryTest {
     @Test
     fun `Should delete a class`() {
         kTransaction.useTransaction {
+            val newUniversity = universityRepository.createUniversity("Test University")
             val newSubject = Subject {
                 name = "Test Subject5"
-            }.let { subjectRepository.createSubject(it.name) }
+                university = newUniversity
+            }.let { subjectRepository.createSubject(it.name, it.university) }
             val name = "Test Class5"
-            val clazz = classRepository.addClass(name, newSubject!!)
+            val clazz = classRepository.addClass(name, newSubject)
             val result = classRepository.deleteClass(clazz)
             assertTrue(result)
             val foundClass = classRepository.findClassById(clazz.id)
@@ -120,17 +134,20 @@ class ClassRepositoryTest {
         val className = Class {
             name = "Test Class6"
         }
+        val newUniversity = universityRepository.createUniversity("Test University")
         val subject = Subject {
             name = "Test Subject6"
+            university = newUniversity
         }
-        val newSubject = subjectRepository.createSubject(subject.name)
-        val clazz = classRepository.addClass(className.name, newSubject!!)
+        val newSubject = subjectRepository.createSubject(subject.name, subject.university)
+        val clazz = classRepository.addClass(className.name, newSubject)
         val newUser = User {
             email = "testemail@test.com"
             username = "tester"
             password = User.hashPassword("test")
             profileImage = byteArrayOf()
-        }.let { userRepository.createWithRole(it.email, it.username, it.password, Role.STUDENT) }
+            university = newUniversity
+        }.let { userRepository.createWithRole(it.email, it.username, it.password, Role.STUDENT, it.university) }
         val student = studentRepository.findStudentById(newUser.id)
         assertNotNull(student)
         val result = classRepository.addStudentToClass(student, clazz)
@@ -146,17 +163,20 @@ class ClassRepositoryTest {
         val className = Class {
             name = "Test Class7"
         }
+        val newUniversity = universityRepository.createUniversity("Test University")
         val subject = Subject {
             name = "Test Subject7"
+            university = newUniversity
         }
-        val newSubject = subjectRepository.createSubject(subject.name)
-        val clazz = classRepository.addClass(className.name, newSubject!!)
+        val newSubject = subjectRepository.createSubject(subject.name, subject.university)
+        val clazz = classRepository.addClass(className.name, newSubject)
         val newUser = User {
             email = "teste123mail@test.com"
             username = "tester123"
             password = User.hashPassword("test")
             profileImage = byteArrayOf()
-        }.let { userRepository.createWithRole(it.email, it.username, it.password, Role.STUDENT) }
+            university = newUniversity
+        }.let { userRepository.createWithRole(it.email, it.username, it.password, Role.STUDENT, it.university) }
         val student = studentRepository.findStudentById(newUser.id)
         assertNotNull(student)
         classRepository.addStudentToClass(student, clazz)
@@ -172,17 +192,19 @@ class ClassRepositoryTest {
         val className = Class {
             name = "Test Class8"
         }
+        val newUniversity = universityRepository.createUniversity("Test University")
         val subject = Subject {
             name = "Test Subject8"
         }
-        val newSubject = subjectRepository.createSubject(subject.name)
-        val clazz = classRepository.addClass(className.name, newSubject!!)
+        val newSubject = subjectRepository.createSubject(subject.name, newUniversity)
+        val clazz = classRepository.addClass(className.name, newSubject)
         val newUser = User {
             email = "teste1234mail@test.com"
             username = "tester1234"
             password = User.hashPassword("test")
             profileImage = byteArrayOf()
-        }.let { userRepository.createWithRole(it.email, it.username, it.password, Role.STUDENT) }
+            university = newUniversity
+        }.let { userRepository.createWithRole(it.email, it.username, it.password, Role.STUDENT, it.university) }
         val student = studentRepository.findStudentById(newUser.id)
         assertNotNull(student)
         classRepository.addStudentToClass(student, clazz)

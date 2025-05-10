@@ -1,22 +1,24 @@
 package tables
 
+import isel.leic.group25.db.entities.timetables.University
 import isel.leic.group25.db.entities.users.*
-import org.h2.jdbcx.JdbcDataSource
-import org.h2.tools.RunScript
-import org.ktorm.database.Database
-import java.sql.Connection
-import javax.sql.DataSource
 import isel.leic.group25.db.tables.Tables.Companion.admins
 import isel.leic.group25.db.tables.Tables.Companion.students
 import isel.leic.group25.db.tables.Tables.Companion.teachers
 import isel.leic.group25.db.tables.Tables.Companion.technicalServices
+import isel.leic.group25.db.tables.Tables.Companion.universities
 import isel.leic.group25.db.tables.Tables.Companion.users
+import org.h2.jdbcx.JdbcDataSource
+import org.h2.tools.RunScript
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertNull
+import org.ktorm.database.Database
 import org.ktorm.dsl.eq
 import org.ktorm.entity.*
-import kotlin.test.*
 import java.io.StringReader
+import java.sql.Connection
+import javax.sql.DataSource
+import kotlin.test.*
 
 class UserTableTests {
     private val connection: Connection
@@ -25,6 +27,7 @@ class UserTableTests {
     @AfterTest
     fun clearDB(){
         RunScript.execute(connection, StringReader("""
+            DELETE FROM UNIVERSITY;
             DELETE FROM USERS;
             """)
         )
@@ -39,12 +42,17 @@ class UserTableTests {
         connection = dataSource.connection
         database = Database.connect(dataSource)
         RunScript.execute(connection, StringReader("""
+            CREATE TABLE IF NOT EXISTS UNIVERSITY (
+                id SERIAL PRIMARY KEY,
+                university_name VARCHAR(255) NOT NULL UNIQUE
+            );
             CREATE TABLE IF NOT EXISTS USERS (
                 id SERIAL PRIMARY KEY,
                 email VARCHAR(255) UNIQUE NOT NULL,
                 username VARCHAR(255) NOT NULL,
                 password VARCHAR(255) NOT NULL,
-                profile_image VARCHAR(255)
+                profile_image VARCHAR(255),
+                university_id INT NOT NULL REFERENCES UNIVERSITY(id) ON DELETE CASCADE
             );
             
             CREATE TABLE IF NOT EXISTS STUDENT (
@@ -73,11 +81,15 @@ class UserTableTests {
 
     @Test
     fun `Should create a add a new user and retrieve it from the database`(){
+        val newUniversity = University{
+            name = "ISEL"
+        }.also { database.universities.add(it) }
         val newUser = User{
             email = "testemail@email.com"
             username = "jhondoe123"
             password = User.hashPassword("supersecretpassword123")
             profileImage = byteArrayOf()
+            university = newUniversity
         }
 
         database.users.add(newUser)
@@ -95,11 +107,15 @@ class UserTableTests {
         val testPassword = "supersecretpassword123"
 
         // Create new user with hashed password
+        val newUniversity = University{
+            name = "ISEL"
+        }.also { database.universities.add(it) }
         val newUser = User {
             email = testEmail
             username = testUsername
             password = User.hashPassword(testPassword)
             profileImage = byteArrayOf()
+            university = newUniversity
         }
 
 
@@ -132,11 +148,15 @@ class UserTableTests {
 
     @Test
     fun `Should retrieve a user modify it and save it to the database`(){
+        val newUniversity = University{
+            name = "ISEL"
+        }.also { database.universities.add(it) }
         val user = User{
             email = "testemail@email.com"
             username = "jhondoe456"
             password = User.hashPassword("supersecretpassword123")
             profileImage = byteArrayOf()
+            university = newUniversity
         }
         database.users.add(user)
         user.email = "newtestemail@email.com"
@@ -148,11 +168,15 @@ class UserTableTests {
 
     @Test
     fun `Should delete a user from the database`(){
+        val newUniversity = University{
+            name = "ISEL"
+        }.also { database.universities.add(it) }
         val user = User{
             email = "testemail@email.com"
             username = "jhondoe789"
             password = User.hashPassword("supersecretpassword123")
             profileImage = byteArrayOf()
+            university = newUniversity
         }
         database.users.add(user)
         user.delete()
@@ -161,11 +185,15 @@ class UserTableTests {
 
     @Test
     fun `Should create an admin user`(){
+        val newUniversity = University{
+            name = "ISEL"
+        }.also { database.universities.add(it) }
         val userInfo = User{
             email = "testemail@email.com"
             username = "jhondoe789"
             password = User.hashPassword("supersecretpassword123")
             profileImage = byteArrayOf()
+            university = newUniversity
         }
         database.users.add(userInfo)
         val admin = Admin{
@@ -178,11 +206,15 @@ class UserTableTests {
 
     @Test
     fun `Should create a teacher user`(){
+        val newUniversity = University{
+            name = "ISEL"
+        }.also { database.universities.add(it) }
         val userInfo = User{
             email = "testemail@email.com"
             username = "jhondoe101112"
             password = User.hashPassword("supersecretpassword123")
             profileImage = byteArrayOf()
+            university = newUniversity
         }
         database.users.add(userInfo)
         val teacher = Teacher{
@@ -195,11 +227,15 @@ class UserTableTests {
 
     @Test
     fun `Should create a student user`(){
+        val newUniversity = University{
+            name = "ISEL"
+        }.also { database.universities.add(it) }
         val userInfo = User{
             email = "testemail@email.com"
             username = "jhondoe131415"
             password = User.hashPassword("supersecretpassword123")
             profileImage = byteArrayOf()
+            university = newUniversity
         }
         database.users.add(userInfo)
         val student = Student{
@@ -212,11 +248,15 @@ class UserTableTests {
 
     @Test
     fun `Should create a technical services user`(){
+        val newUniversity = University{
+            name = "ISEL"
+        }.also { database.universities.add(it) }
         val userInfo = User{
             email = "testemail@email.com"
             username = "jhondoe161718"
             password = User.hashPassword("supersecretpassword123")
             profileImage = byteArrayOf()
+            university = newUniversity
         }
         database.users.add(userInfo)
         val technicalService = TechnicalService{

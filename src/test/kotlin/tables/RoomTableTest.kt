@@ -1,10 +1,15 @@
 package tables
 
-import isel.leic.group25.db.entities.rooms.*
+import isel.leic.group25.db.entities.rooms.Classroom
+import isel.leic.group25.db.entities.rooms.OfficeRoom
+import isel.leic.group25.db.entities.rooms.Room
+import isel.leic.group25.db.entities.rooms.StudyRoom
+import isel.leic.group25.db.entities.timetables.University
 import isel.leic.group25.db.tables.Tables.Companion.classrooms
 import isel.leic.group25.db.tables.Tables.Companion.officeRooms
 import isel.leic.group25.db.tables.Tables.Companion.rooms
 import isel.leic.group25.db.tables.Tables.Companion.studyRooms
+import isel.leic.group25.db.tables.Tables.Companion.universities
 import org.h2.jdbcx.JdbcDataSource
 import org.h2.tools.RunScript
 import org.junit.jupiter.api.assertDoesNotThrow
@@ -15,7 +20,6 @@ import org.ktorm.entity.add
 import org.ktorm.entity.first
 import org.ktorm.entity.firstOrNull
 import java.io.StringReader
-import java.lang.Exception
 import java.sql.Connection
 import javax.sql.DataSource
 import kotlin.test.AfterTest
@@ -30,6 +34,7 @@ class RoomTableTest {
     @AfterTest
     fun clearDB(){
         RunScript.execute(connection, StringReader("""
+            DELETE FROM UNIVERSITY;
             DELETE FROM ROOM;
             """)
         )
@@ -44,11 +49,18 @@ class RoomTableTest {
         connection = dataSource.connection
         database = Database.connect(dataSource)
         RunScript.execute(connection, StringReader("""
+            CREATE TABLE IF NOT EXISTS UNIVERSITY (
+                id SERIAL PRIMARY KEY,
+                university_name VARCHAR(255) NOT NULL UNIQUE
+            );
+            
             CREATE TABLE IF NOT EXISTS ROOM (
                 id SERIAL PRIMARY KEY,
                 room_name VARCHAR(255) NOT NULL,
                 capacity INT NOT NULL,
-                CHECK(capacity > 0)
+                university_id INT NOT NULL REFERENCES UNIVERSITY(id) ON DELETE CASCADE,
+                CHECK(capacity > 0),
+                CONSTRAINT unique_room_per_university UNIQUE (room_name, university_id)
             );
 
             CREATE TABLE IF NOT EXISTS STUDY_ROOM (
@@ -68,9 +80,13 @@ class RoomTableTest {
 
     @Test
     fun `Should create a new room`(){
+        val newUniversity = University{
+            name = "ISEL"
+        }.also { database.universities.add(it) }
         val newRoom = Room{
             name = "G.2.02"
             capacity = 30
+            university = newUniversity
         }
         database.rooms.add(newRoom)
         val room = database.rooms.first { it.id eq newRoom.id }
@@ -80,9 +96,13 @@ class RoomTableTest {
 
     @Test
     fun `Should update a room`(){
+        val newUniversity = University{
+            name = "ISEL"
+        }.also { database.universities.add(it) }
         val newRoom = Room{
             name = "G.2.02"
             capacity = 30
+            university = newUniversity
         }
         database.rooms.add(newRoom)
         newRoom.capacity = 35
@@ -94,9 +114,13 @@ class RoomTableTest {
 
     @Test
     fun `Should delete a room`(){
+        val newUniversity = University{
+            name = "ISEL"
+        }.also { database.universities.add(it) }
         val newRoom = Room{
             name = "G.2.02"
             capacity = 30
+            university = newUniversity
         }
         database.rooms.add(newRoom)
         val room = database.rooms.first { it.id eq newRoom.id }
@@ -109,9 +133,13 @@ class RoomTableTest {
 
     @Test
     fun `Should not allow a room with less than 1 capacity`(){
+        val newUniversity = University{
+            name = "ISEL"
+        }.also { database.universities.add(it) }
         val newRoom = Room{
             name = "G.2.02"
             capacity = -1
+            university = newUniversity
         }
         assertThrows<Exception> { database.rooms.add(newRoom) }
         newRoom.capacity = 0
@@ -122,9 +150,13 @@ class RoomTableTest {
 
     @Test
     fun `Should create a new study room`(){
+        val newUniversity = University{
+            name = "ISEL"
+        }.also { database.universities.add(it) }
         val newRoom = Room{
             name = "G.2.02"
             capacity = 30
+            university = newUniversity
         }
         val newStudyRoom = StudyRoom{
             room = newRoom
@@ -138,9 +170,13 @@ class RoomTableTest {
 
     @Test
     fun `Should create a new classroom`(){
+        val newUniversity = University{
+            name = "ISEL"
+        }.also { database.universities.add(it) }
         val newRoom = Room{
             name = "G.2.02"
             capacity = 30
+            university = newUniversity
         }
         val newClassroom = Classroom{
             room = newRoom
@@ -154,9 +190,13 @@ class RoomTableTest {
 
     @Test
     fun `Should create a new office room`(){
+        val newUniversity = University{
+            name = "ISEL"
+        }.also { database.universities.add(it) }
         val newRoom = Room{
             name = "G.2.02"
             capacity = 30
+            university = newUniversity
         }
         val newOfficeRoom = OfficeRoom{
             room = newRoom

@@ -1,10 +1,11 @@
 package tables
 
-import isel.leic.group25.db.entities.rooms.Room
 import isel.leic.group25.db.entities.rooms.Classroom
+import isel.leic.group25.db.entities.rooms.Room
 import isel.leic.group25.db.entities.timetables.Class
 import isel.leic.group25.db.entities.timetables.Lecture
 import isel.leic.group25.db.entities.timetables.Subject
+import isel.leic.group25.db.entities.timetables.University
 import isel.leic.group25.db.entities.types.ClassType
 import isel.leic.group25.db.entities.types.WeekDay
 import isel.leic.group25.db.tables.Tables.Companion.classes
@@ -12,6 +13,7 @@ import isel.leic.group25.db.tables.Tables.Companion.classrooms
 import isel.leic.group25.db.tables.Tables.Companion.lectures
 import isel.leic.group25.db.tables.Tables.Companion.rooms
 import isel.leic.group25.db.tables.Tables.Companion.subjects
+import isel.leic.group25.db.tables.Tables.Companion.universities
 import isel.leic.group25.db.tables.timetables.Lectures
 import isel.leic.group25.utils.toHoursAndMinutes
 import junit.framework.TestCase.assertEquals
@@ -40,6 +42,7 @@ class LectureTableTest {
     @AfterTest
     fun clearDB(){
         RunScript.execute(connection, StringReader("""
+            DELETE FROM UNIVERSITY;
             DELETE FROM ROOM;
             DELETE FROM SUBJECT;
             DELETE FROM CLASS;
@@ -56,22 +59,29 @@ class LectureTableTest {
         connection = dataSource.connection
         database = Database.connect(dataSource)
         RunScript.execute(connection, StringReader("""
-            CREATE TABLE IF NOT EXISTS SUBJECT (
-                 id SERIAL PRIMARY KEY,
-                 subject_name VARCHAR(255) NOT NULL
-            );
-            
-            CREATE TABLE IF NOT EXISTS CLASS (
+            CREATE TABLE IF NOT EXISTS UNIVERSITY (
                 id SERIAL PRIMARY KEY,
-                subject_id INT NOT NULL REFERENCES SUBJECT(id) ON DELETE CASCADE,
-                class_name VARCHAR(255) NOT NULL
+                university_name VARCHAR(255) NOT NULL UNIQUE
             );
             
             CREATE TABLE IF NOT EXISTS ROOM (
                 id SERIAL PRIMARY KEY,
                 room_name VARCHAR(255) NOT NULL,
                 capacity INT NOT NULL,
-                CHECK(capacity > 0)
+                university_id INT NOT NULL REFERENCES UNIVERSITY(id) ON DELETE CASCADE,
+                CHECK(capacity > 0),
+                CONSTRAINT unique_room_per_university UNIQUE (room_name, university_id)
+            );
+
+            CREATE TABLE IF NOT EXISTS CLASS (
+                id SERIAL PRIMARY KEY,
+                subject_id INT NOT NULL REFERENCES SUBJECT(id) ON DELETE CASCADE,
+                class_name VARCHAR(255) NOT NULL
+            );
+            CREATE TABLE IF NOT EXISTS SUBJECT (
+                 id SERIAL PRIMARY KEY,
+                 subject_name VARCHAR(255) NOT NULL,
+                 university_id INT NOT NULL REFERENCES UNIVERSITY(id) ON DELETE CASCADE
             );
             
             CREATE TABLE IF NOT EXISTS STUDY_ROOM (
@@ -102,8 +112,12 @@ class LectureTableTest {
 
     @Test
     fun `Should create a new lecture`() {
+        val newUniversity = University{
+            name = "ISEL"
+        }.also { database.universities.add(it) }
         val newSubject = Subject{
             name = "PS"
+            university = newUniversity
         }.also { database.subjects.add(it) }
         val newClass = Class{
             subject = newSubject
@@ -112,6 +126,7 @@ class LectureTableTest {
         val newRoom = Room{
             name = "G.2.02"
             capacity = 15
+            university = newUniversity
         }.also{
             database.rooms.add(it)
         }
@@ -139,8 +154,12 @@ class LectureTableTest {
 
     @Test
     fun `Should update a lecture`() {
+        val newUniversity = University{
+            name = "ISEL"
+        }.also { database.universities.add(it) }
         val newSubject = Subject{
             name = "PS"
+            university = newUniversity
         }.also { database.subjects.add(it) }
         val newClass = Class{
             subject = newSubject
@@ -149,6 +168,7 @@ class LectureTableTest {
         val newRoom = Room{
             name = "G.2.02"
             capacity = 15
+            university = newUniversity
         }.also{
             database.rooms.add(it)
         }
@@ -190,8 +210,12 @@ class LectureTableTest {
 
     @Test
     fun `Should delete a lecture`() {
+        val newUniversity = University{
+            name = "ISEL"
+        }.also { database.universities.add(it) }
         val newSubject = Subject{
             name = "PS"
+            university = newUniversity
         }.also { database.subjects.add(it) }
         val newClass = Class{
             subject = newSubject
@@ -200,6 +224,7 @@ class LectureTableTest {
         val newRoom = Room{
             name = "G.2.02"
             capacity = 15
+            university = newUniversity
         }.also {
             database.rooms.add(it)
         }

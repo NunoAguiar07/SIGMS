@@ -4,9 +4,8 @@ import kotlinx.serialization.Serializable
 import org.ktorm.entity.Entity
 
 @Serializable
-sealed interface Subject: Entity<Subject> {
-    companion object: Entity.Factory<Subject>()
+sealed interface University: Entity<University> {
+    companion object: Entity.Factory<University>()
     val id: Int
     var name: String
-    var university: University
 }

@@ -10,7 +10,8 @@ data class UserCredentialsRequest(
     val email: String,
     val username: String,
     val password: String,
-    val role: String
+    val role: String,
+    val universityId: Int
 ) {
     fun validate(): RequestError? {
         // Check for missing fields
