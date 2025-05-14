@@ -71,7 +71,7 @@ class TeacherRepositoryTest {
     }
 
     @Test
-    fun `Should verify user is not teacher`(){
+    fun `Should verify user is not teacher`() {
         kTransaction.useTransaction {
             val newUniversity = universityRepository.createUniversity("testUniversity")
             val newUser = User {

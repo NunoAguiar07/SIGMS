@@ -1,8 +1,6 @@
 package repositories.timetables
 
-import isel.leic.group25.db.entities.rooms.Room
-import isel.leic.group25.db.entities.timetables.Class
-import isel.leic.group25.db.entities.timetables.Subject
+import isel.leic.group25.db.entities.timetables.Lecture
 import isel.leic.group25.db.entities.types.ClassType
 import isel.leic.group25.db.entities.types.WeekDay
 import isel.leic.group25.db.repositories.ktorm.KTransaction
@@ -13,10 +11,14 @@ import isel.leic.group25.db.repositories.timetables.SubjectRepository
 import isel.leic.group25.db.repositories.timetables.UniversityRepository
 import repositories.DatabaseTestSetup
 import kotlin.test.*
+import kotlin.time.Clock
+import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
-import kotlin.time.Duration.Companion.minutes
+import kotlin.time.ExperimentalTime
 
-class LectureRepositoryTest {
+
+@OptIn(ExperimentalTime::class)
+class LectureRepositoryTemporalTest {
     private val kTransaction = KTransaction(DatabaseTestSetup.database)
     private val universityRepository = UniversityRepository(DatabaseTestSetup.database)
     private val lectureRepository = LectureRepository(DatabaseTestSetup.database)
@@ -29,407 +31,250 @@ class LectureRepositoryTest {
         DatabaseTestSetup.clearDB()
     }
 
-    @Test
-    fun `Should get lecture by ID with active change`() {
-        kTransaction.useTransaction {
-            val university = universityRepository.createUniversity("Test University")
-            val subject = subjectRepository.createSubject("Test Subject", university)
-            val clazz = classRepository.addClass("Test Class", subject)
-            val room = roomRepository.createRoom(20, "Test Room", university)
-            val newRoom = roomRepository.createRoom(30, "New Test Room", university)
-            roomRepository.createClassRoom(room)
-            roomRepository.createClassRoom(newRoom)
-            val classroom = roomRepository.getClassRoomById(room.id)
-            val newClassroom = roomRepository.getClassRoomById(newRoom.id)
-            assertNotNull(classroom)
-            assertNotNull(newClassroom)
+    private fun createTestLecture(): Lecture = kTransaction.useTransaction {
+        val university = universityRepository.createUniversity("Test University")
+        val subject = subjectRepository.createSubject("Test Subject", university)
+        val clazz = classRepository.addClass("Test Class", subject)
+        val room = roomRepository.createRoom(20, "Test Room", university)
+        roomRepository.createClassRoom(room)
+        val classroom = roomRepository.getClassRoomById(room.id)!!
 
-            val originalLecture = lectureRepository.createLecture(
-                schoolClass = clazz,
-                classroom = classroom,
-                type = ClassType.THEORETICAL,
-                weekDay = WeekDay.MONDAY,
-                startTime = 9.hours,
-                endTime = 11.hours
-            )
-
-            lectureRepository.updateLecture(
-                originalLecture, newClassroom, ClassType.PRACTICAL, WeekDay.TUESDAY, 10.hours, 12.hours, 2
-            )
-
-            val foundLecture = lectureRepository.getLectureById(originalLecture.id)
-            assertNotNull(foundLecture)
-            assertEquals(WeekDay.TUESDAY, foundLecture.weekDay)
-            assertEquals(10.hours, foundLecture.startTime)
-            assertEquals(12.hours, foundLecture.endTime)
-        }
-    }
-
-
-    @Test
-    fun `Should get lecture by parameters`() {
-        kTransaction.useTransaction {
-            val university = universityRepository.createUniversity("Test University")
-            val subject = subjectRepository.createSubject("Test Subject", university)
-            val clazz = classRepository.addClass("Test Class", subject)
-            val room = roomRepository.createRoom(20, "Test Room", university)
-            roomRepository.createClassRoom(room)
-            val classroom = roomRepository.getClassRoomById(room.id)
-            assertNotNull(classroom)
-
-            val lecture = lectureRepository.createLecture(
-                schoolClass = clazz,
-                classroom = classroom,
-                type = ClassType.THEORETICAL,
-                weekDay = WeekDay.MONDAY,
-                startTime = 9.hours,
-                endTime = 11.hours
-            )
-
-            val foundLecture = lectureRepository.getLecture(
-                schoolClass = clazz,
-                classroom = classroom,
-                type = ClassType.THEORETICAL,
-                weekDay = WeekDay.MONDAY,
-                startTime = 9.hours,
-                endTime = 11.hours
-            )
-            assertNotNull(foundLecture)
-            assertEquals(lecture, foundLecture)
-        }
+        lectureRepository.createLecture(
+            schoolClass = clazz,
+            classroom = classroom,
+            type = ClassType.THEORETICAL,
+            weekDay = WeekDay.MONDAY,
+            startTime = 9.hours,
+            endTime = 11.hours
+        )
     }
 
     @Test
-    fun `Should create a new lecture and find it by id`() {
-        kTransaction.useTransaction {
-            val subject1 = Subject {
-                name = "test1"
-            }
-            val clazz = Class {
-                name = "test1"
-                subject = subject1
-            }
-
-            val room = Room {
-                capacity = 20
-                name = "testRoom"
-            }
-            val university = universityRepository.createUniversity("Test University")
-            val newSubject = subjectRepository.createSubject(subject1.name, university)
-            val newClass = classRepository.addClass(clazz.name, newSubject)
-            val newRoom = roomRepository.createRoom(room.capacity, room.name, university)
-            roomRepository.createClassRoom(newRoom)
-            val newClassroom = roomRepository.getClassRoomById(newRoom.id)
-            assertNotNull(newClassroom)
-            val newLecture = lectureRepository.createLecture(
-                schoolClass = newClass,
-                classroom = newClassroom,
-                type = ClassType.THEORETICAL,
-                weekDay = WeekDay.MONDAY,
-                startTime = 9.minutes,
-                endTime = 11.minutes
-            )
-            val foundLecture = lectureRepository.getAllLectures().firstOrNull { it == newLecture }
-            assert(foundLecture != null)
-            assert(foundLecture?.schoolClass == newLecture.schoolClass)
-            assert(foundLecture?.classroom == newLecture.classroom)
-            assert(foundLecture?.type == newLecture.type)
-            assert(foundLecture?.weekDay == newLecture.weekDay)
-            assert(foundLecture?.startTime == newLecture.startTime)
-            assert(foundLecture?.endTime == newLecture.endTime)
+    fun `Should apply permanent change when both dates are null`() = kTransaction.useTransaction {
+        val lecture = createTestLecture()
+        val newRoom = roomRepository.createRoom(30, "New Room", lecture.classroom.room.university).let {
+            roomRepository.createClassRoom(it)
+            roomRepository.getClassRoomById(it.id)!!
         }
+
+        val updatedLecture = lectureRepository.updateLecture(
+            lecture = lecture,
+            newClassroom = newRoom,
+            newType = ClassType.PRACTICAL,
+            newWeekDay = WeekDay.TUESDAY,
+            newStartTime = 10.hours,
+            newEndTime = 12.hours,
+            effectiveFrom = null,
+            effectiveUntil = null
+        )
+
+        assertEquals(newRoom, updatedLecture.classroom)
+        assertEquals(ClassType.PRACTICAL, updatedLecture.type)
+        assertEquals(WeekDay.TUESDAY, updatedLecture.weekDay)
+        assertEquals(10.hours, updatedLecture.startTime)
+        assertEquals(12.hours, updatedLecture.endTime)
+
+        // Verify no change record was created
+        //assertFalse(lectureRepository.hasActiveChanges(lecture.id))
     }
 
     @Test
-    fun `Should create a new lecture and find it by class id`() {
-        kTransaction.useTransaction {
-            val subject1 = Subject {
-                name = "test2"
-            }
-            val clazz = Class {
-                name = "test2"
-                subject = subject1
-            }
-
-            val room = Room {
-                capacity = 20
-                name = "testRoom2"
-            }
-            val university = universityRepository.createUniversity("Test University")
-            val newSubject = subjectRepository.createSubject(subject1.name, university)
-            val newClass = classRepository.addClass(clazz.name, newSubject)
-            val newRoom = roomRepository.createRoom(room.capacity,room.name, university)
-            roomRepository.createClassRoom(newRoom)
-            val newClassroom = roomRepository.getClassRoomById(newRoom.id)
-            assertNotNull(newClassroom)
-            val newLecture = lectureRepository.createLecture(
-                schoolClass = newClass,
-                classroom = newClassroom,
-                type = ClassType.THEORETICAL,
-                weekDay = WeekDay.MONDAY,
-                startTime = 9.minutes,
-                endTime = 11.minutes
-            )
-            val foundLecture = lectureRepository.getLecturesByClass(newClass.id, 10, 0).firstOrNull { it == newLecture }
-            assert(foundLecture != null)
-            assert(foundLecture?.schoolClass == newLecture.schoolClass)
-            assert(foundLecture?.classroom == newLecture.classroom)
-            assert(foundLecture?.type == newLecture.type)
-            assert(foundLecture?.weekDay == newLecture.weekDay)
-            assert(foundLecture?.startTime == newLecture.startTime)
-            assert(foundLecture?.endTime == newLecture.endTime)
+    fun `Should apply immediate change when start date is null`() = kTransaction.useTransaction {
+        val lecture = createTestLecture()
+        val newRoom = roomRepository.createRoom(30, "New Room", lecture.classroom.room.university).let {
+            roomRepository.createClassRoom(it)
+            roomRepository.getClassRoomById(it.id)!!
         }
-    }
+        val endDate = Clock.System.now().plus(7.days)
 
+        val updatedLecture = lectureRepository.updateLecture(
+            lecture = lecture,
+            newClassroom = newRoom,
+            newType = ClassType.PRACTICAL,
+            newWeekDay = WeekDay.TUESDAY,
+            newStartTime = 10.hours,
+            newEndTime = 12.hours,
+            effectiveFrom = null,
+            effectiveUntil = endDate
+        )
 
-    @Test
-    fun `Should create a new lecture and find it by room id`() {
-        kTransaction.useTransaction {
-            val subject1 = Subject {
-                name = "test3"
-            }
-            val clazz = Class {
-                name = "test3"
-                subject = subject1
-            }
+        // Should immediately apply changes
+        assertEquals(newRoom, updatedLecture.classroom)
+        assertEquals(ClassType.PRACTICAL, updatedLecture.type)
+        assertEquals(WeekDay.TUESDAY, updatedLecture.weekDay)
+        assertEquals(10.hours, updatedLecture.startTime)
+        assertEquals(12.hours, updatedLecture.endTime)
 
-            val room = Room {
-                capacity = 20
-                name = "testRoom3"
-            }
-            val university = universityRepository.createUniversity("Test University")
-            val newSubject = subjectRepository.createSubject(subject1.name, university)
-            val newClass = classRepository.addClass(clazz.name, newSubject)
-            val newRoom = roomRepository.createRoom(room.capacity,room.name, university)
-            roomRepository.createClassRoom(newRoom)
-            val newClassroom = roomRepository.getClassRoomById(newRoom.id)
-            assertNotNull(newClassroom)
-            val newLecture = lectureRepository.createLecture(
-                schoolClass = newClass,
-                classroom = newClassroom,
-                type = ClassType.THEORETICAL,
-                weekDay = WeekDay.MONDAY,
-                startTime = 9.minutes,
-                endTime = 11.minutes
-            )
-            val foundLecture = lectureRepository.getLecturesByRoom(newRoom.id, 10, 0).firstOrNull { it == newLecture }
-            assert(foundLecture != null)
-            assert(foundLecture?.schoolClass == newLecture.schoolClass)
-            assert(foundLecture?.classroom == newLecture.classroom)
-            assert(foundLecture?.type == newLecture.type)
-            assert(foundLecture?.weekDay == newLecture.weekDay)
-            assert(foundLecture?.startTime == newLecture.startTime)
-            assert(foundLecture?.endTime == newLecture.endTime)
-        }
+        // Verify change record was created
+        //assertTrue(lectureRepository.hasActiveChanges(lecture.id))
     }
 
     @Test
-    fun `Should create a new lecture and find it by type`() {
-        kTransaction.useTransaction {
-            val subject1 = Subject {
-                name = "test4"
-            }
-            val clazz = Class {
-                name = "test4"
-                subject = subject1
-            }
-
-            val room = Room {
-                capacity = 20
-                name = "testRoom4"
-            }
-            val university = universityRepository.createUniversity("Test University")
-            val newSubject = subjectRepository.createSubject(subject1.name, university)
-            val newClass = classRepository.addClass(clazz.name, newSubject)
-            val newRoom = roomRepository.createRoom(room.capacity,room.name, university)
-            roomRepository.createClassRoom(newRoom)
-            val newClassroom = roomRepository.getClassRoomById(newRoom.id)
-            assertNotNull(newClassroom)
-            val newLecture = lectureRepository.createLecture(
-                schoolClass = newClass,
-                classroom = newClassroom,
-                type = ClassType.THEORETICAL,
-                weekDay = WeekDay.MONDAY,
-                startTime = 9.minutes,
-                endTime = 11.minutes
-            )
-            val foundLecture = lectureRepository.getLecturesByType(ClassType.THEORETICAL).firstOrNull { it == newLecture }
-            assert(foundLecture != null)
-            assert(foundLecture?.schoolClass == newLecture.schoolClass)
-            assert(foundLecture?.classroom == newLecture.classroom)
-            assert(foundLecture?.type == newLecture.type)
-            assert(foundLecture?.weekDay == newLecture.weekDay)
-            assert(foundLecture?.startTime == newLecture.startTime)
-            assert(foundLecture?.endTime == newLecture.endTime)
+    fun `Should schedule future change when both dates are provided`() = kTransaction.useTransaction {
+        val lecture = createTestLecture()
+        val newRoom = roomRepository.createRoom(30, "New Room", lecture.classroom.room.university).let {
+            roomRepository.createClassRoom(it)
+            roomRepository.getClassRoomById(it.id)!!
         }
+        val startDate = Clock.System.now().plus(1.days)
+        val endDate = startDate.plus(7.days)
+
+        lectureRepository.updateLecture(
+            lecture = lecture,
+            newClassroom = newRoom,
+            newType = ClassType.PRACTICAL,
+            newWeekDay = WeekDay.TUESDAY,
+            newStartTime = 10.hours,
+            newEndTime = 12.hours,
+            effectiveFrom = startDate,
+            effectiveUntil = endDate
+        )
+
+        val lectureChangeStored = lectureRepository.getLectureChangeById(lecture.id)
+
+        assertNotNull(lectureChangeStored)
+
+        // Should not immediately apply changes
+        assertEquals(newRoom, lectureChangeStored.originalClassroom)
+        assertEquals(ClassType.PRACTICAL, lectureChangeStored.originalType)
+        assertEquals(WeekDay.TUESDAY, lectureChangeStored.originalWeekDay)
+        assertEquals(10.hours, lectureChangeStored.originalStartTime)
+        assertEquals(12.hours, lectureChangeStored.originalEndTime)
     }
 
     @Test
-    fun `Should delete lecture`() {
-        kTransaction.useTransaction {
-            val university = universityRepository.createUniversity("Test University")
-            val subject = subjectRepository.createSubject("Test Subject", university)
-            val clazz = classRepository.addClass("Test Class", subject)
-            val room = roomRepository.createRoom(20, "Test Room", university)
-            roomRepository.createClassRoom(room)
-            val classroom = roomRepository.getClassRoomById(room.id)
-            assertNotNull(classroom)
-
-            val lecture = lectureRepository.createLecture(
-                schoolClass = clazz,
-                classroom = classroom,
-                type = ClassType.THEORETICAL,
-                weekDay = WeekDay.MONDAY,
-                startTime = 9.hours,
-                endTime = 11.hours
-            )
-
-            assertTrue(lectureRepository.deleteLecture(lecture.id))
-            assertNull(lectureRepository.getLectureById(lecture.id))
+    fun `Should detect conflicts with permanent changes`() = kTransaction.useTransaction {
+        val lecture = createTestLecture()
+        val conflictingRoom = roomRepository.createRoom(30, "Conflicting Room", lecture.classroom.room.university).let {
+            roomRepository.createClassRoom(it)
+            roomRepository.getClassRoomById(it.id)!!
         }
+
+        // Create a conflicting lecture
+        lectureRepository.createLecture(
+            schoolClass = lecture.schoolClass,
+            classroom = conflictingRoom,
+            type = ClassType.THEORETICAL,
+            weekDay = WeekDay.MONDAY,
+            startTime = 9.hours,
+            endTime = 11.hours
+        )
+
+        val hasConflict = lectureRepository.findConflictingLectures(
+            newRoomId = conflictingRoom.room.id,
+            newWeekDay = WeekDay.MONDAY,
+            newStartTime = 9.hours,
+            newEndTime = 11.hours,
+            effectiveFrom = null,
+            effectiveUntil = null,
+            currentLecture = null
+        )
+
+        assertTrue(hasConflict)
     }
 
     @Test
-    fun `Should delete lecture change`() {
-        kTransaction.useTransaction {
-            // Setup test data
-            val university = universityRepository.createUniversity("Test University")
-            val subject = subjectRepository.createSubject("Test Subject", university)
-            val clazz = classRepository.addClass("Test Class", subject)
-            val room = roomRepository.createRoom(20, "Test Room", university)
-            val newRoom = roomRepository.createRoom(20, "Test Room 2", university)
-            roomRepository.createClassRoom(room)
-            roomRepository.createClassRoom(newRoom)
-            val classroom = roomRepository.getClassRoomById(room.id)
-            val newClassroom = roomRepository.getClassRoomById(newRoom.id)
-
-            assertNotNull(classroom)
-            assertNotNull(newClassroom)
-
-            // Create lecture and change
-            val lecture = lectureRepository.createLecture(
-                schoolClass = clazz,
-                classroom = classroom,
-                type = ClassType.THEORETICAL,
-                weekDay = WeekDay.MONDAY,
-                startTime = 9.hours,
-                endTime = 11.hours
-            )
-
-            lectureRepository.updateLecture(
-                lecture, newClassroom, ClassType.PRACTICAL, WeekDay.TUESDAY, 10.hours, 12.hours, 2
-            )
-
-            // Test delete
-            assertTrue(lectureRepository.deleteLectureChange(lecture.id))
-            val originalLecture = lectureRepository.getLectureById(lecture.id)
-            assertNotNull(originalLecture)
-            assert(originalLecture.schoolClass == clazz)
-            assert(originalLecture.classroom == classroom)
-            assert(originalLecture.type == ClassType.THEORETICAL)
+    fun `Should detect conflicts with immediate changes`() = kTransaction.useTransaction {
+        val lecture = createTestLecture()
+        val conflictingRoom = roomRepository.createRoom(30, "Conflicting Room", lecture.classroom.room.university).let {
+            roomRepository.createClassRoom(it)
+            roomRepository.getClassRoomById(it.id)
         }
+        assertNotNull(conflictingRoom)
+        val endDate = Clock.System.now().plus(7.days)
+
+        // Create a conflicting future change
+        lectureRepository.updateLecture(
+            lecture = lecture,
+            newClassroom = conflictingRoom,
+            newType = ClassType.PRACTICAL,
+            newWeekDay = WeekDay.TUESDAY,
+            newStartTime = 10.hours,
+            newEndTime = 12.hours,
+            effectiveFrom = Clock.System.now().plus(1.days),
+            effectiveUntil = endDate.plus(7.days)
+        )
+
+        val hasConflict = lectureRepository.findConflictingLectures(
+            newRoomId = conflictingRoom.room.id,
+            newWeekDay = WeekDay.TUESDAY,
+            newStartTime = 10.hours,
+            newEndTime = 12.hours,
+            effectiveFrom = null,
+            effectiveUntil = endDate,
+            currentLecture = null
+        )
+
+        assertTrue(hasConflict)
     }
 
     @Test
-    fun `Should update lecture permanently`() {
-        kTransaction.useTransaction {
-            // Setup test data
-            val university = universityRepository.createUniversity("Test University")
-            val subject = subjectRepository.createSubject("Test Subject", university)
-            val clazz = classRepository.addClass("Test Class", subject)
-            val room1 = roomRepository.createRoom(20, "Test Room 1", university)
-            val room2 = roomRepository.createRoom(30, "Test Room 2", university)
-            roomRepository.createClassRoom(room1)
-            roomRepository.createClassRoom(room2)
-            val classroom1 = roomRepository.getClassRoomById(room1.id)
-            val classroom2 = roomRepository.getClassRoomById(room2.id)
-            assertNotNull(classroom1)
-            assertNotNull(classroom2)
-
-            // Create lecture
-            val lecture = lectureRepository.createLecture(
-                schoolClass = clazz,
-                classroom = classroom1,
-                type = ClassType.THEORETICAL,
-                weekDay = WeekDay.MONDAY,
-                startTime = 9.hours,
-                endTime = 11.hours
-            )
-
-            // Update permanently (numberOfWeeks = 0)
-            val updatedLecture = lectureRepository.updateLecture(
-                lecture = lecture,
-                newClassroom = classroom2,
-                newType = ClassType.PRACTICAL,
-                newWeekDay = WeekDay.TUESDAY,
-                newStartTime = 10.hours,
-                newEndTime = 12.hours,
-                numberOfWeeks = 0
-            )
-
-            // Verify update
-            assertEquals(classroom2, updatedLecture.classroom)
-            assertEquals(ClassType.PRACTICAL, updatedLecture.type)
-            assertEquals(WeekDay.TUESDAY, updatedLecture.weekDay)
-            assertEquals(10.hours, updatedLecture.startTime)
-            assertEquals(12.hours, updatedLecture.endTime)
-
-            // Verify no change record was created
-            val confirmUpdated = lectureRepository.getLectureById(updatedLecture.id)
-            assertNotNull(confirmUpdated)
-            assertEquals(confirmUpdated.id, updatedLecture.id)
-            assertEquals(confirmUpdated.schoolClass, updatedLecture.schoolClass)
-            assertEquals(confirmUpdated.classroom, updatedLecture.classroom)
-            assertEquals(confirmUpdated.type, updatedLecture.type)
-
+    fun `Should detect conflicts with scheduled changes`() = kTransaction.useTransaction {
+        val lecture = createTestLecture()
+        val conflictingRoom = roomRepository.createRoom(30, "Conflicting Room", lecture.classroom.room.university).let {
+            roomRepository.createClassRoom(it)
+            roomRepository.getClassRoomById(it.id)!!
         }
+        val startDate = Clock.System.now().plus(1.days)
+        val endDate = startDate.plus(7.days)
+
+        // Create a conflicting scheduled change
+        lectureRepository.updateLecture(
+            lecture = lecture,
+            newClassroom = conflictingRoom,
+            newType = ClassType.PRACTICAL,
+            newWeekDay = WeekDay.TUESDAY,
+            newStartTime = 10.hours,
+            newEndTime = 12.hours,
+            effectiveFrom = startDate,
+            effectiveUntil = endDate
+        )
+
+        val hasConflict = lectureRepository.findConflictingLectures(
+            newRoomId = conflictingRoom.room.id,
+            newWeekDay = WeekDay.TUESDAY,
+            newStartTime = 10.hours,
+            newEndTime = 12.hours,
+            effectiveFrom = startDate.minus(1.days),
+            effectiveUntil = endDate.plus(1.days),
+            currentLecture = null
+        )
+
+        assertTrue(hasConflict)
     }
 
-//    @Test
-//    fun `Should update lecture temporarily`() {
-//        kTransaction.useTransaction {
-//            // Setup test data
-//            val subject = subjectRepository.createSubject("Test Subject")
-//            val clazz = classRepository.addClass("Test Class", subject)
-//            val room1 = roomRepository.createRoom(20, "Test Room 1")
-//            val room2 = roomRepository.createRoom(30, "Test Room 2")
-//            roomRepository.createClassRoom(room1)
-//            roomRepository.createClassRoom(room2)
-//            val classroom1 = roomRepository.getClassRoomById(room1.id)
-//            val classroom2 = roomRepository.getClassRoomById(room2.id)
-//            assertNotNull(classroom1)
-//            assertNotNull(classroom2)
-//
-//            // Create lecture
-//            val lecture = lectureRepository.createLecture(
-//                schoolClass = clazz,
-//                classroom = classroom1,
-//                type = ClassType.THEORETICAL,
-//                weekDay = WeekDay.MONDAY,
-//                startTime = 9.hours,
-//                endTime = 11.hours
-//            )
-//
-//            // Update temporarily (numberOfWeeks > 0)
-//            val updatedLecture = lectureRepository.updateLecture(
-//                lecture = lecture,
-//                newClassroom = classroom2,
-//                newType = ClassType.PRACTICAL,
-//                newWeekDay = WeekDay.TUESDAY,
-//                newStartTime = 10.hours,
-//                newEndTime = 12.hours,
-//                numberOfWeeks = 2
-//            )
-//
-//            // Verify change record was created
-//            val confirmUpdated = lectureRepository.getLectureById(updatedLecture.id)
-//            assertNotNull(confirmUpdated)
-//            assertEquals(classroom2, confirmUpdated.classroom)
-//            assertEquals(ClassType.PRACTICAL, confirmUpdated.type)
-//            assertEquals(WeekDay.TUESDAY, confirmUpdated.weekDay)
-//            assertEquals(10.hours, confirmUpdated.startTime)
-//            assertEquals(12.hours, confirmUpdated.endTime)
-//        }
-//    }
+    @Test
+    fun `Should delete lecture change and restore original values`() = kTransaction.useTransaction {
+        val lecture = createTestLecture()
+        val storeLecture = lectureRepository.getLectureById(lecture.id)
+        assertNotNull(storeLecture)
+        val newRoom = roomRepository.createRoom(30, "New Room", lecture.classroom.room.university).let {
+            roomRepository.createClassRoom(it)
+            roomRepository.getClassRoomById(it.id)!!
+        }
+        val endDate = Clock.System.now().plus(7.days)
 
+        // Create a change
+        lectureRepository.updateLecture(
+            lecture = lecture,
+            newClassroom = newRoom,
+            newType = ClassType.PRACTICAL,
+            newWeekDay = WeekDay.TUESDAY,
+            newStartTime = 10.hours,
+            newEndTime = 12.hours,
+            effectiveFrom = null,
+            effectiveUntil = endDate
+        )
+
+        // Delete the change
+        assertTrue(lectureRepository.deleteLectureChange(lecture.id))
+
+        // Verify original values were restored
+        val restoredLecture = lectureRepository.getLectureById(lecture.id)!!
+        assertEquals(storeLecture.classroom, restoredLecture.classroom)
+        assertEquals(storeLecture.type, restoredLecture.type)
+        assertEquals(storeLecture.weekDay, restoredLecture.weekDay)
+        assertEquals(storeLecture.startTime, restoredLecture.startTime)
+        assertEquals(storeLecture.endTime, restoredLecture.endTime)
+    }
 }

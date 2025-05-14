@@ -48,7 +48,7 @@ fun Route.microsoftLoginRoute(authService: AuthService, client: HttpClient) {
         if(userInfo == null || organizationInfo == null) {
             return@post RequestError.MicrosoftConnectionFailed.toProblem().respond(call)
         }
-        val result = authService.authenticateWithMicrosoft(userInfo.displayName, userInfo.email, organizationInfo.name)
+        val result = authService.authenticateWithMicrosoft(userInfo.displayName, userInfo.mail, organizationInfo.displayName)
 
         call.respondEither(
             either = result,

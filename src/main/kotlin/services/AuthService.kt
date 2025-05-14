@@ -220,7 +220,6 @@ class AuthService(
                     return@useTransaction failure(AuthError.RoleApprovedFailed)
                 }
                 userRepository.associateWithRole(user, Role.STUDENT)
-
                 val jwtToken = jwtConfig.generateToken(user.id, Role.STUDENT.name)
                 return@useTransaction success(jwtToken)
             }

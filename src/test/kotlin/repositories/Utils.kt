@@ -147,21 +147,24 @@ CREATE TABLE IF NOT EXISTS LECTURE (
     class_id INT NOT NULL REFERENCES CLASS(id) ON DELETE CASCADE,
     room_id INT NOT NULL REFERENCES CLASSROOM(id) ON DELETE CASCADE,
     class_type VARCHAR(20) CHECK (class_type IN ('theoretical', 'practical', 'theoretical_practical')),
-    week_day int CHECK(week_day > 0 and week_day < 8),
-    start_time time NOT NULL,
-    end_time time NOT NULL,
+    week_day INT CHECK(week_day > 0 AND week_day < 8),
+    start_time TIME NOT NULL,
+    end_time TIME NOT NULL,
     CHECK (end_time > start_time),
     CONSTRAINT unique_class_room_time UNIQUE (class_id, room_id, week_day, start_time)
-);
+    );
 
 CREATE TABLE IF NOT EXISTS LECTURE_CHANGE (
-    lecture_id INT NOT NULL REFERENCES LECTURE(id) ON DELETE CASCADE,
-    new_room_id INT NOT NULL REFERENCES CLASSROOM(id) ON DELETE CASCADE,
-    new_week_day INT CHECK(new_week_day > 0 AND new_week_day < 8),
-    new_start_time TIME NOT NULL,
-    new_end_time TIME NOT NULL,
-    remaining_weeks INT NOT NULL CHECK(remaining_weeks > 0),
-    CHECK (new_end_time > new_start_time)
+    lecture_id INT PRIMARY KEY REFERENCES LECTURE(id) ON DELETE CASCADE,
+    original_room_id INT NOT NULL REFERENCES CLASSROOM(id) ON DELETE CASCADE,
+    original_week_day INT CHECK(original_week_day > 0 AND original_week_day < 8),
+    original_start_time TIME NOT NULL,
+    original_end_time TIME NOT NULL,
+    original_class_type VARCHAR(20) CHECK (original_class_type IN ('theoretical', 'practical', 'theoretical_practical')),
+    effective_from TIMESTAMP,
+    effective_until TIMESTAMP,
+    CHECK (effective_until > effective_from),
+    CHECK (original_end_time > original_start_time)
 );
 
 CREATE TABLE IF NOT EXISTS ISSUE_REPORT (

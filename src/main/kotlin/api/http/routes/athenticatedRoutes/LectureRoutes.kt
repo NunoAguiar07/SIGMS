@@ -15,6 +15,7 @@ import isel.leic.group25.db.entities.types.ClassType
 import isel.leic.group25.db.entities.types.Role
 import isel.leic.group25.db.entities.types.WeekDay
 import isel.leic.group25.services.LectureService
+import kotlin.time.ExperimentalTime
 
 /**
  * Defines lecture management routes including creation, retrieval, updating and deletion.
@@ -128,6 +129,7 @@ fun Route.createLectureRoute(lectureService: LectureService) {
  * @receiver Route The Ktor route for this endpoint
  * @param lectureService Service handling lecture update logic
  */
+@OptIn(ExperimentalTime::class)
 fun Route.updateLectureRoute(lectureService: LectureService) {
     put("/update") {
         val updateLectureRequest = call.receive<UpdateLectureRequest>()
@@ -142,17 +144,16 @@ fun Route.updateLectureRoute(lectureService: LectureService) {
             ?: return@put RequestError.Invalid("newWeekday").toProblem().respond(call)
         val newType = ClassType.fromValue(updateLectureRequest.newType)
             ?: return@put RequestError.Invalid("newType").toProblem().respond(call)
-        val numberOfWeeks = updateLectureRequest.numberOfWeeks ?: 0
+        val (effectiveFrom, effectiveUntil) = updateLectureRequest.parseChangeDates()
         val result = lectureService.updateLecture(
             lectureId = lectureId,
-            newSchoolClassId = updateLectureRequest.newSchoolClassId,
             newRoomId = updateLectureRequest.newRoomId,
             newWeekDay = newWeekday,
             newType = newType,
             newStartTime = updateLectureRequest.newStartTime,
             newEndTime = updateLectureRequest.newEndTime,
-            numberOfWeeks = numberOfWeeks,
-
+            effectiveFrom = effectiveFrom,
+            effectiveUntil = effectiveUntil
         )
         call.respondEither(
             either = result,
