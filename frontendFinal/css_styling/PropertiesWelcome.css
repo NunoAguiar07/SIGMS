@@ -232,15 +232,13 @@ body {
     font-weight: 400;
 }
 
-/* Rectangle */
-.rectangle-24baefd473e7 {
-    position: absolute;
-    left: 984px;
-    top: 798px;
-    width: 325px;
-    height: 68px;
-    background: #651c24FF;
+.microsoft-auth-button{
+    position: relative;
+    display: flex;
+    justify-content: center;
+    top: 70%;
     border-radius: 30px 30px 30px 30px;
+
 }
 
 /* Rectangle */
