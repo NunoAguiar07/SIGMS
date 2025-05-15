@@ -1,33 +1,42 @@
 package mocks.repositories.timetables
 
 import isel.leic.group25.db.entities.rooms.Classroom
-import isel.leic.group25.db.entities.timetables.Lecture
 import isel.leic.group25.db.entities.timetables.Class
+import isel.leic.group25.db.entities.timetables.Lecture
 import isel.leic.group25.db.entities.timetables.LectureChange
 import isel.leic.group25.db.entities.types.ClassType
 import isel.leic.group25.db.entities.types.WeekDay
 import isel.leic.group25.db.repositories.timetables.interfaces.LectureRepositoryInterface
 import kotlin.time.Duration
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 class MockLectureRepository : LectureRepositoryInterface {
     private val lectures = mutableListOf<Lecture>()
     private val lectureChanges = mutableListOf<LectureChange>()
 
     override fun getLectureById(id: Int): Lecture? {
-        val lecture = lectures.firstOrNull { it.id == id } ?: return null
-        return applyActiveChanges(lecture)
+        return lectures.firstOrNull { it.id == id }?.let { applyActiveChanges(it) }
+    }
+
+    override fun getLectureChangeById(id: Int): LectureChange? {
+        return lectureChanges.firstOrNull { it.lecture.id == id }
     }
 
     override fun getAllLectures(): List<Lecture> {
-        return lectures.map { lecture ->
-            applyActiveChanges(lecture)
-        }
+        return lectures.map { applyActiveChanges(it) }
     }
 
     override fun getAllLectures(limit: Int, offset: Int): List<Lecture> {
-        return lectures.drop(offset).take(limit).map { lecture ->
-            applyActiveChanges(lecture)
-        }
+        return lectures.drop(offset).take(limit).map { applyActiveChanges(it) }
+    }
+
+    override fun getAllLectureChanges(): List<LectureChange> {
+        return lectureChanges
+    }
+
+    override fun getAllLectureChanges(limit: Int, offset: Int): List<LectureChange> {
+        return lectureChanges.drop(offset).take(limit)
     }
 
     override fun getLecture(
@@ -38,26 +47,14 @@ class MockLectureRepository : LectureRepositoryInterface {
         startTime: Duration,
         endTime: Duration
     ): Lecture? {
-        val lecture = lectures.firstOrNull {
+        return lectures.firstOrNull {
             it.schoolClass.id == schoolClass.id &&
                     it.classroom.room.id == classroom.room.id &&
                     it.type == type &&
                     it.weekDay == weekDay &&
                     it.startTime == startTime &&
                     it.endTime == endTime
-        } ?: return null
-
-        val activeChange = lectureChanges.firstOrNull { it.lecture.id == lecture.id && it.remainingWeeks > 0 }
-        return if (activeChange != null) {
-            lecture.apply {
-                this.weekDay = activeChange.newWeekDay
-                this.startTime = activeChange.newStartTime
-                this.endTime = activeChange.newEndTime
-                this.classroom = activeChange.newClassroom
-            }
-        } else {
-            lecture
-        }
+        }?.let { applyActiveChanges(it) }
     }
 
     override fun createLecture(
@@ -102,10 +99,22 @@ class MockLectureRepository : LectureRepositoryInterface {
         return lectures.removeIf { it.id == id }
     }
 
+    @OptIn(ExperimentalTime::class)
     override fun deleteLectureChange(id: Int): Boolean {
-        return lectureChanges.removeIf { it.lecture.id == id }
+        val change = lectureChanges.firstOrNull { it.lecture.id == id } ?: return false
+        // Restore original values
+        val lecture = lectures.first { it.id == id }
+        lecture.apply {
+            classroom = change.originalClassroom
+            weekDay = change.originalWeekDay
+            startTime = change.originalStartTime
+            endTime = change.originalEndTime
+            type = change.originalType
+        }
+        return lectureChanges.remove(change)
     }
 
+    @OptIn(ExperimentalTime::class)
     override fun updateLecture(
         lecture: Lecture,
         newClassroom: Classroom,
@@ -113,91 +122,125 @@ class MockLectureRepository : LectureRepositoryInterface {
         newWeekDay: WeekDay,
         newStartTime: Duration,
         newEndTime: Duration,
-        numberOfWeeks: Int
+        effectiveFrom: Instant?,
+        effectiveUntil: Instant?
     ): Lecture {
-        lecture.classroom = newClassroom
-        lecture.type = newType
-        lecture.weekDay = newWeekDay
-        lecture.startTime = newStartTime
-        lecture.endTime = newEndTime
-
-        if (numberOfWeeks == 0) {
-            // Update directly
-            lectures.replaceAll { if (it.id == lecture.id) lecture else it }
-        } else {
-            val existingChange = lectureChanges.firstOrNull { it.lecture.id == lecture.id }
-            if (existingChange == null) {
+        return when {
+            // Permanent change
+            effectiveFrom == null && effectiveUntil == null -> {
+                lecture.apply {
+                    classroom = newClassroom
+                    type = newType
+                    weekDay = newWeekDay
+                    startTime = newStartTime
+                    endTime = newEndTime
+                }
+                lectures.replaceAll { if (it.id == lecture.id) lecture else it }
+                lecture
+            }
+            // Immediate change
+            effectiveFrom == null -> {
+                // Store current values as original
                 lectureChanges.add(LectureChange {
-                    this.newClassroom = newClassroom
-                    this.newWeekDay = newWeekDay
-                    this.newStartTime = newStartTime
-                    this.newEndTime = newEndTime
-                    this.remainingWeeks = numberOfWeeks
+                    this.lecture = lecture
+                    this.originalClassroom = lecture.classroom
+                    this.originalWeekDay = lecture.weekDay
+                    this.originalStartTime = lecture.startTime
+                    this.originalEndTime = lecture.endTime
+                    this.originalType = lecture.type
+                    this.effectiveFrom = null
+                    this.effectiveUntil = effectiveUntil
                 })
-            } else {
-                existingChange.newClassroom = newClassroom
-                existingChange.newWeekDay = newWeekDay
-                existingChange.newStartTime = newStartTime
-                existingChange.newEndTime = newEndTime
-                existingChange.remainingWeeks = numberOfWeeks
+                // Apply new values
+                lecture.apply {
+                    classroom = newClassroom
+                    type = newType
+                    weekDay = newWeekDay
+                    startTime = newStartTime
+                    endTime = newEndTime
+                }
+                lecture
+            }
+            // Future change
+            else -> {
+                lectureChanges.add(LectureChange {
+                    this.lecture = lecture
+                    this.originalClassroom = lecture.classroom
+                    this.originalWeekDay = lecture.weekDay
+                    this.originalStartTime = lecture.startTime
+                    this.originalEndTime = lecture.endTime
+                    this.originalType = lecture.type
+                    this.effectiveFrom = effectiveFrom
+                    this.effectiveUntil = effectiveUntil
+                })
+                lecture
             }
         }
-        return lecture
     }
 
+    @OptIn(ExperimentalTime::class)
     override fun findConflictingLectures(
         newRoomId: Int,
         newWeekDay: WeekDay,
         newStartTime: Duration,
         newEndTime: Duration,
+        effectiveFrom: Instant?,
+        effectiveUntil: Instant?,
         currentLecture: Lecture?
     ): Boolean {
-        // Check conflicts in regular lectures
+        // Check conflicts with existing lectures (current state)
         val lectureConflict = lectures.any { lecture ->
             lecture.classroom.room.id == newRoomId &&
                     lecture.weekDay == newWeekDay &&
                     (currentLecture == null || lecture.id != currentLecture.id) &&
-                    !lectureChanges.any { it.lecture.id == lecture.id && it.remainingWeeks > 0 } &&
-                    (timeOverlap(
-                        newStartTime, newEndTime,
-                        lecture.startTime, lecture.endTime
-                    ))
+                    timeOverlap(newStartTime, newEndTime, lecture.startTime, lecture.endTime)
         }
 
-        // Check conflicts in lecture changes
+        // Check conflicts with scheduled changes
         val changeConflict = lectureChanges.any { change ->
-            change.remainingWeeks > 0 &&
-                    change.newClassroom.room.id == newRoomId &&
-                    change.newWeekDay == newWeekDay &&
+            change.originalClassroom.room.id == newRoomId &&
+                    change.originalWeekDay == newWeekDay &&
                     (currentLecture == null || change.lecture.id != currentLecture.id) &&
-                    (timeOverlap(
-                        newStartTime, newEndTime,
-                        change.newStartTime, change.newEndTime
-                    ))
+                    timeOverlap(newStartTime, newEndTime, change.originalStartTime, change.originalEndTime) &&
+                    when {
+                        // Permanent change conflicts with all changes
+                        effectiveFrom == null && effectiveUntil == null -> true
+                        // Immediate change conflicts with future changes
+                        effectiveFrom == null ->
+                            change.effectiveUntil == null || change.effectiveUntil!! > effectiveUntil!!
+                        // Scheduled change conflicts with overlapping changes
+                        else ->
+                            (change.effectiveFrom == null || effectiveUntil == null || change.effectiveFrom!! < effectiveUntil) &&
+                                    (change.effectiveUntil == null || change.effectiveUntil!! > effectiveFrom)
+                    }
         }
 
         return lectureConflict || changeConflict
     }
 
-    private fun timeOverlap(
-        start1: Duration, end1: Duration,
-        start2: Duration, end2: Duration
-    ): Boolean {
-        return (start1 >= start2 && start1 < end2) || // Starts during
-                (end1 > start2 && end1 <= end2) ||    // Ends during
-                (start1 <= start2 && end1 >= end2)     // Completely contains
+    private fun timeOverlap(start1: Duration, end1: Duration, start2: Duration, end2: Duration): Boolean {
+        return (start1 >= start2 && start1 < end2) ||
+                (end1 > start2 && end1 <= end2) ||
+                (start1 <= start2 && end1 >= end2)
     }
 
+    @OptIn(ExperimentalTime::class)
     private fun applyActiveChanges(lecture: Lecture): Lecture {
-        val activeChange = lectureChanges.firstOrNull { it.lecture.id == lecture.id && it.remainingWeeks > 0 }
+        val activeChange = lectureChanges.firstOrNull { change ->
+            change.lecture.id == lecture.id
+        }
+
         return if (activeChange != null) {
-            lecture.apply{
-                weekDay = activeChange.newWeekDay
-                startTime = activeChange.newStartTime
-                endTime = activeChange.newEndTime
-                classroom = activeChange.newClassroom
+            lecture.apply {
+                weekDay = activeChange.originalWeekDay
+                startTime = activeChange.originalStartTime
+                endTime = activeChange.originalEndTime
+                classroom = activeChange.originalClassroom
+                type = activeChange.originalType
             }
-        } else lecture
+        } else {
+            lecture
+        }
     }
 
     fun clear() {

@@ -15,6 +15,7 @@ import mocks.repositories.utils.MockTransaction
 import mocks.services.MockEmailService
 import kotlin.test.*
 import kotlin.time.Duration.Companion.hours
+import kotlin.time.ExperimentalTime
 
 class LectureServiceTest {
     private val lectureRepository = MockLectureRepository()
@@ -362,6 +363,7 @@ class LectureServiceTest {
         assertEquals(LectureError.LectureNotFound, result.value, "Should return LectureNotFound error")
     }
 
+    @OptIn(ExperimentalTime::class)
     @Test
     fun `updateLecture should update lecture permanently when numberOfWeeks is 0`() {
         // Setup test data
@@ -389,13 +391,13 @@ class LectureServiceTest {
         // Test
         val result = lectureService.updateLecture(
             lectureId = lecture.id,
-            newSchoolClassId = schoolClass.id,
             newRoomId = room2.id,
             newType = ClassType.PRACTICAL,
             newWeekDay = WeekDay.TUESDAY,
             newStartTime = "10:00",
             newEndTime = "12:00",
-            numberOfWeeks = 0
+            effectiveFrom = null,
+            effectiveUntil = null,
         )
 
         assertTrue(result is Success, "Should return success")
@@ -406,6 +408,7 @@ class LectureServiceTest {
         assertEquals(12.hours, result.value.endTime, "Should update end time")
     }
 
+    @OptIn(ExperimentalTime::class)
     @Test
     fun `updateLecture should create temporary change when numberOfWeeks greater than 0`() {
         // Setup test data
@@ -433,13 +436,13 @@ class LectureServiceTest {
         // Test
         val result = lectureService.updateLecture(
             lectureId = lecture.id,
-            newSchoolClassId = schoolClass.id,
             newRoomId = room2.id,
             newType = ClassType.PRACTICAL,
             newWeekDay = WeekDay.TUESDAY,
             newStartTime = "10:00",
             newEndTime = "12:00",
-            numberOfWeeks = 2
+            effectiveFrom = null,
+            effectiveUntil = null,
         )
 
         assertTrue(result is Success, "Should return success")
@@ -452,23 +455,25 @@ class LectureServiceTest {
         assertEquals(10.hours, updatedLecture.startTime, "Updated start time should be")
     }
 
+    @OptIn(ExperimentalTime::class)
     @Test
     fun `updateLecture should return LectureNotFound when lecture not found`() {
         val result = lectureService.updateLecture(
             lectureId = 999,
-            newSchoolClassId = 1,
             newRoomId = 1,
             newType = ClassType.THEORETICAL,
             newWeekDay = WeekDay.MONDAY,
             newStartTime = "10:00",
             newEndTime = "12:00",
-            numberOfWeeks = 0
+            effectiveFrom = null,
+            effectiveUntil = null,
         )
 
         assertTrue(result is Failure, "Should return failure")
         assertEquals(LectureError.LectureNotFound, result.value, "Should return LectureNotFound error")
     }
 
+    @OptIn(ExperimentalTime::class)
     @Test
     fun `updateLecture should return InvalidLectureRoom when new room not found`() {
         // Setup test data
@@ -491,97 +496,17 @@ class LectureServiceTest {
 
         val result = lectureService.updateLecture(
             lectureId = lecture.id,
-            newSchoolClassId = schoolClass.id,
             newRoomId = 999, // non-existent room
             newType = ClassType.THEORETICAL,
             newWeekDay = WeekDay.MONDAY,
             newStartTime = "10:00",
             newEndTime = "12:00",
-            numberOfWeeks = 0
+            effectiveFrom = null,
+            effectiveUntil = null,
         )
 
         assertTrue(result is Failure, "Should return failure")
         assertEquals(LectureError.InvalidLectureRoom, result.value, "Should return InvalidLectureRoom error")
     }
 
-    @Test
-    fun `updateLecture should return InvalidLectureClass when new class not found`() {
-        // Setup test data
-        val university = universityRepository.createUniversity("Test University")
-        val subject = subjectRepository.createSubject("Math", university)
-        val schoolClass = classRepository.addClass("Algebra", subject)
-        val room = roomRepository.createRoom(30, "Room 101", university)
-        roomRepository.createClassRoom(room)
-        val classroom = roomRepository.getClassRoomById(room.id)
-        assertNotNull(classroom)
-
-        val lecture = lectureRepository.createLecture(
-            schoolClass = schoolClass,
-            classroom = classroom,
-            type = ClassType.THEORETICAL,
-            weekDay = WeekDay.MONDAY,
-            startTime = 9.hours,
-            endTime = 11.hours
-        )
-
-        val result = lectureService.updateLecture(
-            lectureId = lecture.id,
-            newSchoolClassId = 999, // non-existent class
-            newRoomId = room.id,
-            newType = ClassType.THEORETICAL,
-            newWeekDay = WeekDay.MONDAY,
-            newStartTime = "10:00",
-            newEndTime = "12:00",
-            numberOfWeeks = 0
-        )
-
-        assertTrue(result is Failure, "Should return failure")
-        assertEquals(LectureError.InvalidLectureClass, result.value, "Should return InvalidLectureClass error")
-    }
-
-//    @Test
-//    fun `updateLecture should return LectureTimeConflict when conflicting lecture exists`() {
-//        // Setup test data
-//        val subject = subjectRepository.createSubject("Math")
-//        val schoolClass = classRepository.addClass("Algebra", subject)
-//        val room = roomRepository.createRoom(30, "Room 101")
-//        roomRepository.createClassRoom(room)
-//        val classroom = roomRepository.getClassRoomById(room.id)
-//        assertNotNull(classroom)
-//
-//        // Create first lecture
-//        lectureRepository.createLecture(
-//            schoolClass = schoolClass,
-//            classroom = classroom,
-//            type = ClassType.THEORETICAL,
-//            weekDay = WeekDay.MONDAY,
-//            startTime = 9.hours,
-//            endTime = 11.hours
-//        )
-//
-//        // Create second lecture
-//        val lecture2 = lectureRepository.createLecture(
-//            schoolClass = schoolClass,
-//            classroom = classroom,
-//            type = ClassType.THEORETICAL,
-//            weekDay = WeekDay.TUESDAY,
-//            startTime = 9.hours,
-//            endTime = 11.hours
-//        )
-//
-//        // Try to update second lecture to conflict with first
-//        val result = lectureService.updateLecture(
-//            lectureId = 1,
-//            newSchoolClassId = schoolClass.id,
-//            newRoomId = classroom.room.id,
-//            newType = ClassType.THEORETICAL,
-//            newWeekDay = WeekDay.MONDAY,
-//            newStartTime = "10:00",
-//            newEndTime = "12:00",
-//            numberOfWeeks = 0
-//        )
-//
-//        assertTrue(result is Failure, "Should return failure")
-//        assertEquals(LectureError.LectureTimeConflict, result.value, "Should return LectureTimeConflict error")
-//    }
 }

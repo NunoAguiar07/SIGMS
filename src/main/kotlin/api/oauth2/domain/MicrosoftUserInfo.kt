@@ -4,6 +4,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class MicrosoftUserInfo(
-    val email: String,
+    val mail: String,
     val displayName: String,
 )

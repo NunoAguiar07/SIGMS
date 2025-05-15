@@ -8,7 +8,6 @@ import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*
 import io.ktor.server.jetty.jakarta.*
-import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.plugins.cors.routing.*
 import io.ktor.server.response.*
 import io.ktor.server.websocket.*
@@ -25,11 +24,18 @@ import isel.leic.group25.db.repositories.users.*
 import isel.leic.group25.services.*
 import isel.leic.group25.services.email.SmtpEmailService
 import isel.leic.group25.services.email.model.EmailConfig
+import kotlinx.serialization.json.Json
 import org.ktorm.database.Database
 import org.ktorm.support.postgresql.PostgreSqlDialect
 import kotlin.time.Duration.Companion.seconds
 
-val applicationHttpClient = HttpClient(OkHttp)
+val applicationHttpClient = HttpClient(OkHttp) {
+    install(io.ktor.client.plugins.contentnegotiation.ContentNegotiation) {
+        json(Json {
+            ignoreUnknownKeys = true
+        })
+    }
+}
 
 fun main(args: Array<String>) {
     EngineMain.main(args)
@@ -53,8 +59,12 @@ fun Application.module() {
         // Max age for preflight requests
         maxAgeInSeconds = 24 * 60 * 60
     }
-    install(ContentNegotiation) {
-        json()
+    install(io.ktor.server.plugins.contentnegotiation.ContentNegotiation) {
+        json(
+            Json {
+                ignoreUnknownKeys = true
+        }
+        )
     }
 
     val db = Database.connect(
@@ -129,7 +139,6 @@ fun Application.module() {
         kTransaction,
         roomRepository
     )
-
     install(Authentication) {
         oauth("auth-microsoft") {
             client = applicationHttpClient
@@ -159,6 +168,7 @@ fun Application.module() {
                 val userId = credential.payload.getClaim("userId").asInt()
                 val role = credential.payload.getClaim("role").asString()
                 val universityId = credential.payload.getClaim("universityId").asInt()
+
                 if (userId != null && role != null && universityId != null) {
                     JWTPrincipal(credential.payload)
                 } else {
