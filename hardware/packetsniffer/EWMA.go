@@ -1,4 +1,4 @@
-package main
+package packetsniffer
 
 type EWMA struct {
 	weight float64

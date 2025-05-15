@@ -18,8 +18,8 @@ object DeviceRoute: WebsocketRoute {
             try {
                 for (frame in incoming) {
                     if (frame is Frame.Text) {
-                        val event = Json.decodeFromString<Event>(frame.readText())
-                        handleEvent(event, this)
+                        val event = Event.eventJson.decodeFromString<Event>(frame.readText())
+                        handleEvent(event.data, this)
                     }
                 }
             } catch (e: UnexpectedEventException){
@@ -35,7 +35,7 @@ object DeviceRoute: WebsocketRoute {
         }
     }
 
-    private fun handleEvent(event: Event, connection: DefaultWebSocketServerSession){
+    private fun handleEvent(event: EventData, connection: DefaultWebSocketServerSession){
         when(event){
             is Hello -> {
                 deviceList.add(Device(event.id))
