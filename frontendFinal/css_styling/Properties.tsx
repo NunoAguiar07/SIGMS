@@ -59,6 +59,7 @@ export const headerStyle: React.CSSProperties = {
     backgroundColor: 'rgba(0, 0, 0, 0.7)',
     borderBottom: '0px solid #fff',
     boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+
 }
 
 /**

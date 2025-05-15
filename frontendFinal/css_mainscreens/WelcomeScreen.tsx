@@ -1,15 +1,22 @@
-import React from "react";
-import { backgroundStyle, mainStyle } from "../css_styling/Properties";
+import React, {useState} from "react";
 import '../css_styling/PropertiesWelcome.css'
 import Button from "../Utils/Button";
 import {Image} from "expo-image";
-import {Redirect} from "expo-router";
-import MicrosoftAuthButton from "../requests/MicrosoftLogin/Login";
+import MicrosoftAuthButton from "../requests/Microsoft/Login";
+import About from "./about";
+import Privacy from "./privacy";
+import FAQ from "./faq";
 // @ts-ignore
 export const WelcomeScreen = ({ welcome }) => {
+    const [showAbout, setShowAbout] = useState(false);
+    const [showFAQ, setShowFAQ] = useState(false);
+    const [showPrivacy, setShowPrivacy] = useState(false);
     return (
 
         <div className="background-board">
+            {showAbout && <About onClose={() => setShowAbout(false)} />}
+            {showFAQ && <FAQ onClose={() => setShowFAQ(false)} />}
+            {showPrivacy && <Privacy onClose={() => setShowPrivacy(false)} />}
             {/* Logo */}
             <div className="logo-welcomePage">
                 <Image source={require("../assets/Logo.webp")} style={{width: 903, height: 516}}></Image>
@@ -23,16 +30,17 @@ export const WelcomeScreen = ({ welcome }) => {
                         fontFamily: '"Roboto Condensed"',
                         fontWeight: 400,
                         whiteSpace: 'pre-wrap'
-                    }}>
-                        A tua sala de aula, mais simples. {welcome.title}
+                    }}><p>
+                        {welcome.title}
+                    </p>
+                        A tua sala de aula, mais simples.
                     </p>
                 </div>
             </div>
-            <div className="rectangle-login">
+            <div className="microsoft-auth-button">
                 <MicrosoftAuthButton/>
             </div>
-            <Button text="Register" onClick={() => {
-            }} className={"rectangle-register"}></Button>
+
 
 
             <div style={{
@@ -43,12 +51,9 @@ export const WelcomeScreen = ({ welcome }) => {
                 display: 'flex',
                 gap: '20px'
             }}>
-                <Button text="About" onClick={() => {
-                }} className="about-faq-privacy-button"/>
-                <Button text="FAQ" onClick={() => {
-                }} className="about-faq-privacy-button"/>
-                <Button text="Privacy" onClick={() => {
-                }} className="about-faq-privacy-button"/>
+                <Button text="About" onClick={() => setShowAbout(true)} className="about-faq-privacy-button"/>
+                <Button text="FAQ" onClick={() => setShowFAQ(true)} className="about-faq-privacy-button"/>
+                <Button text="Privacy" onClick={() => setShowPrivacy(true)} className="about-faq-privacy-button"/>
             </div>
         </div>
     );

@@ -1,10 +1,10 @@
 import {useEffect, useState} from "react";
 import {WelcomeInterface} from "../../interfaces/WelcomeInterface";
 import {ErrorInterface} from "../../interfaces/ErrorInterface";
-import {LoadingApresentation} from "../../css_mainscreens/Loading";
 import {WelcomeScreen} from "../../css_mainscreens/WelcomeScreen";
 import {GetData} from "../../requests/WelcomeRequest";
 import ErrorHandler from "./error";
+import LoadingPresentation from "../../css_mainscreens/Loading";
 
 const welcome = () => {
         const [welcome, setHome] = useState<WelcomeInterface | null>(null)
@@ -20,7 +20,7 @@ const welcome = () => {
         if (error) return <ErrorHandler errorStatus={error.status} errorMessage={error.message} />
 
         //If the home is still loading we will represent the loading screen.
-        if (!welcome) return <LoadingApresentation />
+        if (!welcome) return <LoadingPresentation />
 
         //Return of the home screen.
         return <WelcomeScreen welcome={welcome}/>

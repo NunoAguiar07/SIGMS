@@ -1,16 +1,19 @@
-import {backgroundStyle, headerStyle} from "../css_styling/Properties";
-
+import React from "react";
+import "../css_styling/loading.css";
+import {Image} from "expo-image";
 
 /**
- * Const "LoadingApresentation" representing the loading screen when we are loading something.
+ * Const "Loadingpresentation" representing the loading screen when we are loading something.
  * @return the new page for the loading screen.
  */
-export const LoadingApresentation = () => {
+const LoadingPresentation = () => {
     return (
-        <div style={backgroundStyle}>
-            <header style={headerStyle}>
-                <h1>Loading...</h1>
-            </header>
+        <div className="loading-container">
+            <div className="loading-logo">
+                <Image source={require("../assets/Logo.webp")} style={{width: 903, height: 516}}></Image>
+            </div>
+            <p className="loading-subtext">A carregar, por favor aguarde...</p>
         </div>
-    )
-}
+    );
+};
+export default LoadingPresentation;

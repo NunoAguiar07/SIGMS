@@ -39,11 +39,8 @@ useEffect(() => {
 
 const exchangeCodeForTokens = async (code: string) => {
     try {
-
         console.log(code)
         console.log(request)
-
-
         const tokenResponse = await AuthSession.exchangeCodeAsync(
             {
                 clientId: process.env.EXPO_PUBLIC_MICROSOFT_CLIENT_ID,
@@ -77,6 +74,7 @@ const exchangeCodeForTokens = async (code: string) => {
 
 const authenticateWithBackend = async (accessToken: string) => {
     try {
+        console.log('Access Token:', accessToken);
         const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/auth/microsoft`, {
             method: 'POST',
             headers: {
