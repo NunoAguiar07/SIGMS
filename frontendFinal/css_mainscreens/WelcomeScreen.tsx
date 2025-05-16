@@ -19,17 +19,18 @@ export const WelcomeScreen = ({ welcome }) => {
             {showPrivacy && <Privacy onClose={() => setShowPrivacy(false)} />}
             {/* Logo */}
             <div className="logo-welcomePage">
-                <Image source={require("../assets/Logo.webp")} style={{width: 903, height: 516}}></Image>
+                <Image source={require("../assets/Logo.webp")} style={{width: 903, height: 516 }}></Image>
             </div>
             {/* Slogan */}
             <div className="shape text a-tua-sala-24b9efeac4eb">
-                <div className="text-node-html">
+                <div className="text-node">
                     <p style={{
                         color: '#671b22',
                         fontSize: '55px',
                         fontFamily: '"Roboto Condensed"',
                         fontWeight: 400,
-                        whiteSpace: 'pre-wrap'
+                        whiteSpace: 'pre-wrap',
+                        textAlign: 'center',
                     }}><p>
                         {welcome.title}
                     </p>

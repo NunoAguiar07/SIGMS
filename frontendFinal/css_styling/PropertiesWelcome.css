@@ -85,8 +85,11 @@ body {
 
 
 .background-board {
-    position: relative;
+    position: absolute;
     width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     height: 100%;
     background: #f8f0e6FF;
     border-radius: 0px 0px 0px 0px;
@@ -233,10 +236,10 @@ body {
 }
 
 .microsoft-auth-button{
-    position: relative;
+    position: absolute;
     display: flex;
     justify-content: center;
-    top: 70%;
+    top: 80%;
     border-radius: 30px 30px 30px 30px;
 
 }
@@ -274,9 +277,7 @@ body {
 
 /* A tua sala de aula, mais simples. */
 .a-tua-sala-24b9efeac4eb {
-    position: relative;
-    left: 30%;
-    top: 55%;
+    position: absolute;
     width: 811px;
     height: 83px;
 }
@@ -319,9 +320,7 @@ body {
 /* Logo */
 .logo-welcomePage {
     position: absolute;
-    left: 481px;
-    top: 10%;
+    top: 2%;
     width: 903px;
     height: 516px;
-    border-radius: 0px 0px 0px 0px;
 }
