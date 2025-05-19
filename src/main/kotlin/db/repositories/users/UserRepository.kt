@@ -41,24 +41,26 @@ class UserRepository(private val database: Database): UserRepositoryInterface {
         return newUser
     }
 
-    override fun createWithRole(email: String, username: String, password: String, role: Role, university: University): User = withDatabase {
+    override fun createWithRole(email: String, username: String, password: String, role: Role, university: University, authProvider: String): User = withDatabase {
         val newUser = User {
             this.email = email
             this.username = username
             this.password = User.hashPassword(password)
             this.profileImage = ByteArray(0)
+            this.authProvider = authProvider
             this.university = university
         }
         database.users.add(newUser)
         return associateWithRole(newUser, role)
     }
 
-    override fun createWithoutRole(email: String, username: String, password: String, university: University): User = withDatabase {
+    override fun createWithoutRole(email: String, username: String, password: String, university: University, authProvider: String): User = withDatabase {
         val newUser = User {
             this.email = email
             this.username = username
             this.password = User.hashPassword(password)
             this.profileImage = ByteArray(0)
+            this.authProvider = authProvider
             this.university = university
         }
         database.users.add(newUser)

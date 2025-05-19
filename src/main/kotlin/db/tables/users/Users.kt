@@ -15,5 +15,6 @@ object Users: Table<User>("users") {
     var image = varchar("profile_image")
         .transform({Base64.getDecoder().decode(it)},{Base64.getEncoder().encodeToString(it)})
         .bindTo { it.profileImage }
+    var authProvider = varchar("auth_provider").bindTo { it.authProvider }
     val university = int("university_id").references(Universities) { it.university }
 }

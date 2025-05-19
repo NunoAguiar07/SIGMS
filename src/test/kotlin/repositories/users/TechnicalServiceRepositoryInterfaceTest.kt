@@ -30,8 +30,9 @@ class TechnicalServiceRepositoryInterfaceTest {
                 username = "tester"
                 password = User.hashPassword("test")
                 profileImage = byteArrayOf()
+                authProvider = "local"
                 university = newUniversity
-            }.let { userRepository.createWithRole(it.email, it.username, it.password, Role.TECHNICAL_SERVICE, it.university) }
+            }.let { userRepository.createWithRole(it.email, it.username, it.password, Role.TECHNICAL_SERVICE, it.university, it.authProvider) }
             val technicalService = technicalServiceRepository.findTechnicalServiceById(newUser.id)
             assertNotNull(technicalService)
             assertEquals(newUser.id, technicalService.user.id)
@@ -47,8 +48,9 @@ class TechnicalServiceRepositoryInterfaceTest {
                 username = "tester"
                 password = User.hashPassword("test")
                 profileImage = byteArrayOf()
+                authProvider = "local"
                 university = newUniversity
-            }.let { userRepository.createWithRole(it.email, it.username, it.password, Role.TECHNICAL_SERVICE, it.university) }
+            }.let { userRepository.createWithRole(it.email, it.username, it.password, Role.TECHNICAL_SERVICE, it.university, it.authProvider) }
             val technicalService = technicalServiceRepository.findTechnicalServiceByEmail(newUser.email)
             assertNotNull(technicalService)
             assertEquals(newUser.id, technicalService.user.id)
@@ -64,8 +66,9 @@ class TechnicalServiceRepositoryInterfaceTest {
                 username = "tester"
                 password = User.hashPassword("test")
                 profileImage = byteArrayOf()
+                authProvider = "local"
                 university = newUniversity
-            }.let { userRepository.createWithRole(it.email, it.username, it.password, Role.TECHNICAL_SERVICE, it.university) }
+            }.let { userRepository.createWithRole(it.email, it.username, it.password, Role.TECHNICAL_SERVICE, it.university, it.authProvider) }
             assertTrue(technicalServiceRepository.isTechnicalService(newUser))
         }
     }
@@ -79,8 +82,9 @@ class TechnicalServiceRepositoryInterfaceTest {
                 username = "tester"
                 password = User.hashPassword("test")
                 profileImage = byteArrayOf()
+                authProvider = "local"
                 university = newUniversity
-            }.let { userRepository.createWithRole(it.email, it.username, it.password, Role.ADMIN, it.university) }
+            }.let { userRepository.createWithRole(it.email, it.username, it.password, Role.ADMIN, it.university, it.authProvider) }
             assertFalse(technicalServiceRepository.isTechnicalService(newUser))
         }
     }

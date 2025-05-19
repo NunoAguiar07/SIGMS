@@ -52,6 +52,7 @@ class UserTableTests {
                 username VARCHAR(255) NOT NULL,
                 password VARCHAR(255) NOT NULL,
                 profile_image VARCHAR(255),
+                auth_provider VARCHAR(50) NOT NULL CHECK (auth_provider IN ('local', 'microsoft')),
                 university_id INT NOT NULL REFERENCES UNIVERSITY(id) ON DELETE CASCADE
             );
             
@@ -89,6 +90,7 @@ class UserTableTests {
             username = "jhondoe123"
             password = User.hashPassword("supersecretpassword123")
             profileImage = byteArrayOf()
+            authProvider = "local"
             university = newUniversity
         }
 
@@ -115,6 +117,7 @@ class UserTableTests {
             username = testUsername
             password = User.hashPassword(testPassword)
             profileImage = byteArrayOf()
+            authProvider = "local"
             university = newUniversity
         }
 
@@ -156,6 +159,7 @@ class UserTableTests {
             username = "jhondoe456"
             password = User.hashPassword("supersecretpassword123")
             profileImage = byteArrayOf()
+            authProvider = "local"
             university = newUniversity
         }
         database.users.add(user)
@@ -176,6 +180,7 @@ class UserTableTests {
             username = "jhondoe789"
             password = User.hashPassword("supersecretpassword123")
             profileImage = byteArrayOf()
+            authProvider = "local"
             university = newUniversity
         }
         database.users.add(user)
@@ -193,6 +198,7 @@ class UserTableTests {
             username = "jhondoe789"
             password = User.hashPassword("supersecretpassword123")
             profileImage = byteArrayOf()
+            authProvider = "local"
             university = newUniversity
         }
         database.users.add(userInfo)
@@ -214,6 +220,7 @@ class UserTableTests {
             username = "jhondoe101112"
             password = User.hashPassword("supersecretpassword123")
             profileImage = byteArrayOf()
+            authProvider = "local"
             university = newUniversity
         }
         database.users.add(userInfo)
@@ -235,6 +242,7 @@ class UserTableTests {
             username = "jhondoe131415"
             password = User.hashPassword("supersecretpassword123")
             profileImage = byteArrayOf()
+            authProvider = "local"
             university = newUniversity
         }
         database.users.add(userInfo)
@@ -256,6 +264,7 @@ class UserTableTests {
             username = "jhondoe161718"
             password = User.hashPassword("supersecretpassword123")
             profileImage = byteArrayOf()
+            authProvider = "local"
             university = newUniversity
         }
         database.users.add(userInfo)

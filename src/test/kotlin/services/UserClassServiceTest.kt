@@ -49,6 +49,7 @@ class UserClassServiceTest {
             username = "test${role.name.lowercase()}",
             password = "password123",
             role = role,
+            authProvider = "local",
             university = newUniversity
         )
         when (role)  {

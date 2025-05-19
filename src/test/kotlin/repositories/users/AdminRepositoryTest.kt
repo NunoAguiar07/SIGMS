@@ -30,8 +30,9 @@ class AdminRepositoryTest {
                 username = "tester"
                 password = User.hashPassword("test")
                 profileImage = byteArrayOf()
+                authProvider = "local"
                 university = newUniversity
-            }.let { userRepository.createWithRole(it.email, it.username, it.password, Role.ADMIN, it.university) }
+            }.let { userRepository.createWithRole(it.email, it.username, it.password, Role.ADMIN, it.university, it.authProvider) }
             val admin = adminRepository.findAdminById(newUser.id)
             assertNotNull(admin)
             assertEquals(newUser.id, admin.user.id)
@@ -47,8 +48,9 @@ class AdminRepositoryTest {
                 username = "tester"
                 password = User.hashPassword("test")
                 profileImage = byteArrayOf()
+                authProvider = "local"
                 university = newUniversity
-            }.let { userRepository.createWithRole(it.email, it.username, it.password, Role.ADMIN, it.university) }
+            }.let { userRepository.createWithRole(it.email, it.username, it.password, Role.ADMIN, it.university, it.authProvider) }
             val admin = adminRepository.findAdminByEmail(newUser.email)
             assertNotNull(admin)
             assertEquals(newUser.id, admin.user.id)
@@ -64,8 +66,9 @@ class AdminRepositoryTest {
                 username = "tester"
                 password = User.hashPassword("test")
                 profileImage = byteArrayOf()
+                authProvider = "local"
                 university = newUniversity
-            }.let { userRepository.createWithRole(it.email, it.username, it.password, Role.ADMIN, it.university) }
+            }.let { userRepository.createWithRole(it.email, it.username, it.password, Role.ADMIN, it.university, it.authProvider) }
             assertTrue(adminRepository.isAdmin(newUser))
         }
     }
@@ -79,8 +82,9 @@ class AdminRepositoryTest {
                 username = "tester"
                 password = User.hashPassword("test")
                 profileImage = byteArrayOf()
+                authProvider = "local"
                 university = newUniversity
-            }.let { userRepository.createWithRole(it.email, it.username, it.password, Role.STUDENT, it.university) }
+            }.let { userRepository.createWithRole(it.email, it.username, it.password, Role.STUDENT, it.university, it.authProvider) }
             assertFalse(adminRepository.isAdmin(newUser))
         }
     }

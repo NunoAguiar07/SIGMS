@@ -32,9 +32,10 @@ class UserServiceTest {
                 username = "testuser"
                 password = User.hashPassword("test123!")
                 profileImage = byteArrayOf(1, 2, 3)
+                authProvider = "local"
                 university = newUniversity
             }.let {
-                userRepository.createWithRole(it.email, it.username, it.password, role, it.university)
+                userRepository.createWithRole(it.email, it.username, it.password, role, it.university, it.authProvider)
             }
             return@useTransaction user
         }

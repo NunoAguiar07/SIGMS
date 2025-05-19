@@ -36,8 +36,9 @@ class IssueReportRepositoryTest {
                 username = "tester"
                 password = User.hashPassword("test")
                 profileImage = byteArrayOf()
+                authProvider = "local"
                 university = newUniversity
-            }.let { userRepository.createWithRole(it.email, it.username, it.password, Role.STUDENT, it.university) }
+            }.let { userRepository.createWithRole(it.email, it.username, it.password, Role.STUDENT, it.university, it.authProvider) }
             val room = roomRepository.createRoom(20, "testRoom", newUniversity)
             val newIssueReport = issueReportRepository.createIssueReport(newUser ,room, "testDescription")
             val foundIssueReport = issueReportRepository.getIssueReportById(newIssueReport.id)
@@ -55,8 +56,9 @@ class IssueReportRepositoryTest {
                 username = "tester"
                 password = User.hashPassword("test")
                 profileImage = byteArrayOf()
+                authProvider = "local"
                 university = newUniversity
-            }.let { userRepository.createWithRole(it.email, it.username, it.password, Role.STUDENT, it.university) }
+            }.let { userRepository.createWithRole(it.email, it.username, it.password, Role.STUDENT, it.university, it.authProvider) }
             val room = roomRepository.createRoom(20, "testRoom", newUniversity)
             val newIssueReport = issueReportRepository.createIssueReport(newUser, room, "testDescription")
             val foundIssueReport = issueReportRepository.getAllIssueReports(10, 0).firstOrNull { it.description == newIssueReport.description }
@@ -74,8 +76,9 @@ class IssueReportRepositoryTest {
                 username = "tester"
                 password = User.hashPassword("test")
                 profileImage = byteArrayOf()
+                authProvider = "local"
                 university = newUniversity
-            }.let { userRepository.createWithRole(it.email, it.username, it.password, Role.STUDENT, it.university) }
+            }.let { userRepository.createWithRole(it.email, it.username, it.password, Role.STUDENT, it.university, it.authProvider) }
             val room1 = roomRepository.createRoom(20, "testRoom1", newUniversity)
             val room2 = roomRepository.createRoom(30, "testRoom2", newUniversity)
             val newIssueReport1 = issueReportRepository.createIssueReport(newUser, room1, "testDescription1")
@@ -102,8 +105,9 @@ class IssueReportRepositoryTest {
                 username = "tester"
                 password = User.hashPassword("test")
                 profileImage = byteArrayOf()
+                authProvider = "local"
                 university = newUniversity
-            }.let { userRepository.createWithRole(it.email, it.username, it.password, Role.STUDENT, it.university) }
+            }.let { userRepository.createWithRole(it.email, it.username, it.password, Role.STUDENT, it.university, it.authProvider) }
             val room = roomRepository.createRoom(20, "testRoom", newUniversity)
             val newIssueReport = issueReportRepository.createIssueReport(newUser, room, "testDescription")
             val deleteResult = issueReportRepository.deleteIssueReport(newIssueReport.id)
@@ -121,8 +125,9 @@ class IssueReportRepositoryTest {
                 username = "tester"
                 password = User.hashPassword("test")
                 profileImage = byteArrayOf()
+                authProvider = "local"
                 university = newUniversity
-            }.let { userRepository.createWithRole(it.email, it.username, it.password, Role.STUDENT, it.university) }
+            }.let { userRepository.createWithRole(it.email, it.username, it.password, Role.STUDENT, it.university, it.authProvider) }
             val room = roomRepository.createRoom(20, "testRoom", newUniversity)
             val newIssueReport = issueReportRepository.createIssueReport(newUser, room, "testDescription")
             val updatedIssueReport = issueReportRepository.updateIssueReport(newIssueReport,"updatedDescription")

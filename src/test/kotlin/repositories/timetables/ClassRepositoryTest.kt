@@ -146,8 +146,9 @@ class ClassRepositoryTest {
             username = "tester"
             password = User.hashPassword("test")
             profileImage = byteArrayOf()
+            authProvider = "local"
             university = newUniversity
-        }.let { userRepository.createWithRole(it.email, it.username, it.password, Role.STUDENT, it.university) }
+        }.let { userRepository.createWithRole(it.email, it.username, it.password, Role.STUDENT, it.university, it.authProvider) }
         val student = studentRepository.findStudentById(newUser.id)
         assertNotNull(student)
         val result = classRepository.addStudentToClass(student, clazz)
@@ -175,8 +176,9 @@ class ClassRepositoryTest {
             username = "tester123"
             password = User.hashPassword("test")
             profileImage = byteArrayOf()
+            authProvider = "local"
             university = newUniversity
-        }.let { userRepository.createWithRole(it.email, it.username, it.password, Role.STUDENT, it.university) }
+        }.let { userRepository.createWithRole(it.email, it.username, it.password, Role.STUDENT, it.university, it.authProvider) }
         val student = studentRepository.findStudentById(newUser.id)
         assertNotNull(student)
         classRepository.addStudentToClass(student, clazz)
@@ -203,8 +205,9 @@ class ClassRepositoryTest {
             username = "tester1234"
             password = User.hashPassword("test")
             profileImage = byteArrayOf()
+            authProvider = "local"
             university = newUniversity
-        }.let { userRepository.createWithRole(it.email, it.username, it.password, Role.STUDENT, it.university) }
+        }.let { userRepository.createWithRole(it.email, it.username, it.password, Role.STUDENT, it.university, it.authProvider) }
         val student = studentRepository.findStudentById(newUser.id)
         assertNotNull(student)
         classRepository.addStudentToClass(student, clazz)

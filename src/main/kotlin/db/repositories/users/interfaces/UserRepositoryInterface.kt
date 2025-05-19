@@ -11,9 +11,9 @@ interface UserRepositoryInterface {
 
     fun associateWithRole(newUser: User, role: Role): User
 
-    fun createWithRole(email: String, username: String, password: String, role: Role, university: University): User
+    fun createWithRole(email: String, username: String, password: String, role: Role, university: University, authProvider: String): User
 
-    fun createWithoutRole(email: String, username: String, password: String, university: University): User
+    fun createWithoutRole(email: String, username: String, password: String, university: University, authProvider: String): User
 
     fun update(user: User): Int
 

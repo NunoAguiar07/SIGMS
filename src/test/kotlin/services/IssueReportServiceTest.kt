@@ -62,10 +62,11 @@ class IssueReportServiceTest {
                 email = "test@test.com"
                 username = "testuser"
                 password = User.hashPassword("test123!")
+                authProvider = "local"
                 profileImage = byteArrayOf(1, 2, 3)
                 this.university = university
             }.let {
-                userRepository.createWithRole(it.email, it.username, it.password, role, it.university)
+                userRepository.createWithRole(it.email, it.username, it.password, role, it.university, it.authProvider)
             }
             return@useTransaction user
         }

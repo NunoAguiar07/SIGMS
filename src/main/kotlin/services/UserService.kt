@@ -78,6 +78,9 @@ class UserService(private val userRepository: UserRepositoryInterface,
             transactionInterface.useTransaction {
                 val user = userRepository.findById(userId)
                     ?: return@useTransaction failure(AuthError.UserNotFound)
+                if (user.authProvider != "local") {
+                    return@useTransaction failure(AuthError.LocalAccountRequired)
+                }
                 if(!User.verifyPassword(user.password, oldPassword)) {
                     return@useTransaction failure(AuthError.InvalidCredentials)
                 }

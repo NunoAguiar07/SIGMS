@@ -60,12 +60,15 @@ class AuthService(
             transactionInterface.useTransaction {
                 val user = userRepository.findByEmail(email)
                 return@useTransaction if (user != null) {
+                    if (user.authProvider == "local") {
+                        return@useTransaction failure(AuthError.MicrosoftAccountRequired)
+                    }
                     val token = jwtConfig.generateToken(user.id, Role.STUDENT.name)
                     success(token)
                 } else {
                     val university = universityRepository.getUniversityByName(universityName)
                         ?: return@useTransaction failure(AuthError.UniversityNotFound)
-                    val newUser = userRepository.createWithoutRole(email, username, "", university)
+                    val newUser = userRepository.createWithoutRole(email, username, "", university, "microsoft")
                     userRepository.associateWithRole(newUser, Role.STUDENT)
                     val token = jwtConfig.generateToken(newUser.id, Role.STUDENT.name)
                     success(token)
@@ -83,7 +86,7 @@ class AuthService(
                 }
                 val university = universityRepository.getUniversityById(universityId)
                     ?: return@useTransaction failure(AuthError.UniversityNotFound)
-                val user = userRepository.createWithoutRole(email, username, password, university)
+                val user = userRepository.createWithoutRole(email, username, password, university, "local")
                 if(!roleApprovalRepository.addPendingApproval(user, role, verificationToken, null)) {
                     return@useTransaction failure(AuthError.RoleApprovedFailed)
                 }
@@ -187,6 +190,9 @@ class AuthService(
             transactionInterface.useTransaction {
                 val user = userRepository.findByEmail(email)
                     ?: return@useTransaction failure(AuthError.UserNotFound)
+                if (user.authProvider == "microsoft") {
+                    return@useTransaction failure(AuthError.MicrosoftLoginRequired)
+                }
                 if(!User.verifyPassword(user.password, password)) {
                     return@useTransaction failure(AuthError.InvalidCredentials)
                 }

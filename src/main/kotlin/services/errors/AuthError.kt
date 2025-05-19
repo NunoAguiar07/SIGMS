@@ -14,6 +14,9 @@ sealed class AuthError {
     data object TokenValidationFailed : AuthError()
     data object UnauthorizedRole : AuthError()
     data object InvalidCredentials: AuthError()
+    data object MicrosoftAccountRequired : AuthError()
+    data object MicrosoftLoginRequired : AuthError()
+    data object LocalAccountRequired : AuthError()
     data class ConnectionDbError(val message: String?) : AuthError()
     data class EmailError(val message: String?) : AuthError()
 
@@ -62,6 +65,18 @@ sealed class AuthError {
             InvalidCredentials -> Problem.badRequest(
                 title = "Invalid credentials",
                 detail = "Invalid email or password."
+            )
+            MicrosoftAccountRequired -> Problem.badRequest(
+                title = "Microsoft account required",
+                detail = "This action requires a Microsoft account."
+            )
+            MicrosoftLoginRequired -> Problem.badRequest(
+                title = "Microsoft login required",
+                detail = "This action requires a Microsoft login."
+            )
+            LocalAccountRequired -> Problem.badRequest(
+                title = "Local account required",
+                detail = "This action requires a local account."
             )
             is ConnectionDbError -> Problem.internalServerError(
                 title = "Database Connection Error",

@@ -20,6 +20,7 @@ sealed interface User: Entity<User> {
     var username: String
     var password: String
     var profileImage: ByteArray
+    var authProvider: String
     var university: University
 
     companion object: Entity.Factory<User>() {

@@ -65,8 +65,9 @@ class UserRepositoryTest {
                 username = "tester"
                 password = User.hashPassword("test")
                 profileImage = byteArrayOf()
+                authProvider = "local"
                 university = newUniversity
-            }.let { userRepository.createWithRole(it.email, it.username, it.password, Role.STUDENT, it.university) }
+            }.let { userRepository.createWithRole(it.email, it.username, it.password, Role.STUDENT, it.university, it.authProvider) }
             val user = userRepository.findById(newUser.id)
             assertNotNull(user)
             assertEquals(newUser.id, user.id)
@@ -85,8 +86,9 @@ class UserRepositoryTest {
                 username = "tester"
                 password = User.hashPassword("test")
                 profileImage = byteArrayOf()
+                authProvider = "local"
                 university = newUniversity
-            }.let { userRepository.createWithRole(it.email, it.username, it.password, Role.STUDENT, it.university) }
+            }.let { userRepository.createWithRole(it.email, it.username, it.password, Role.STUDENT, it.university, it.authProvider) }
             val user = userRepository.findByEmail(newUser.email)
             assertNotNull(user)
             assertEquals(newUser.id, user.id)
@@ -105,8 +107,9 @@ class UserRepositoryTest {
                 username = "tester"
                 password = User.hashPassword("test")
                 profileImage = byteArrayOf()
+                authProvider = "local"
                 university = newUniversity
-            }.let { userRepository.createWithRole(it.email, it.username, it.password, Role.STUDENT, it.university) }
+            }.let { userRepository.createWithRole(it.email, it.username, it.password, Role.STUDENT, it.university, it.authProvider) }
             val newUsername = "newTester"
             newUser.username = newUsername
             userRepository.update(newUser)

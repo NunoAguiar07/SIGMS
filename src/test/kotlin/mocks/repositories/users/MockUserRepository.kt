@@ -27,22 +27,24 @@ class MockUserRepository : UserRepositoryInterface {
     }
 
 
-    override fun createWithRole(email: String, username: String, password: String, role: Role, university: University): User {
+    override fun createWithRole(email: String, username: String, password: String, role: Role, university: University, authProvider: String): User {
         val newUser = User {
             this.email = email
             this.username = username
             this.password = User.hashPassword(password)
+            this.authProvider = authProvider
             this.university = university
         }
         users.add(newUser)
         return associateWithRole(newUser, role)
     }
 
-    override fun createWithoutRole(email: String, username: String, password: String, university: University): User {
+    override fun createWithoutRole(email: String, username: String, password: String, university: University, authProvider: String): User {
         val newUser = User {
             this.email = email
             this.username = username
             this.password = User.hashPassword(password)
+            this.authProvider = authProvider
             this.university = university
         }
         users.add(newUser)
