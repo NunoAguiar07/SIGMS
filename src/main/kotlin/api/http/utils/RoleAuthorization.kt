@@ -14,8 +14,9 @@ val RoleAuthorization = createRouteScopedPlugin(
     on(AuthenticationChecked) { call ->
         val requiredRoles = pluginConfig.roles
         if (requiredRoles.isNotEmpty()) {
-            val userRole = call.getUserRoleFromPrincipal()
-            if (userRole == null || Role.fromValue(userRole.uppercase()) == null) {
+            val userRoleString = call.getUserRoleFromPrincipal()
+            val userRole = userRoleString?.let { Role.fromValue(it.uppercase()) }
+            if (userRole == null || userRole !in requiredRoles) {
                 call.respond(HttpStatusCode.Forbidden, "Access forbidden for role $userRole")
                 return@on
             }

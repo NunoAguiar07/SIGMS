@@ -63,14 +63,14 @@ class AuthService(
                     if (user.authProvider == "local") {
                         return@useTransaction failure(AuthError.MicrosoftAccountRequired)
                     }
-                    val token = jwtConfig.generateToken(user.id, Role.STUDENT.name)
+                    val token = jwtConfig.generateToken(user.id, Role.STUDENT.name, user.university.id)
                     success(token)
                 } else {
                     val university = universityRepository.getUniversityByName(universityName)
                         ?: return@useTransaction failure(AuthError.UniversityNotFound)
                     val newUser = userRepository.createWithoutRole(email, username, "", university, "microsoft")
                     userRepository.associateWithRole(newUser, Role.STUDENT)
-                    val token = jwtConfig.generateToken(newUser.id, Role.STUDENT.name)
+                    val token = jwtConfig.generateToken(newUser.id, Role.STUDENT.name, university.id)
                     success(token)
                 }
             }
@@ -198,7 +198,7 @@ class AuthService(
                 }
                 val role = userRepository.getRoleById(user.id)
                     ?: return@useTransaction failure(AuthError.UserNotFound)
-                val token = jwtConfig.generateToken(user.id, role.name)
+                val token = jwtConfig.generateToken(user.id, role.name, user.university.id)
                 return@useTransaction success(token)
             }
         }
@@ -226,7 +226,7 @@ class AuthService(
                     return@useTransaction failure(AuthError.RoleApprovedFailed)
                 }
                 userRepository.associateWithRole(user, Role.STUDENT)
-                val jwtToken = jwtConfig.generateToken(user.id, Role.STUDENT.name)
+                val jwtToken = jwtConfig.generateToken(user.id, Role.STUDENT.name, user.university.id)
                 return@useTransaction success(jwtToken)
             }
         }

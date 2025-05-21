@@ -8,6 +8,7 @@ Content-Type: application/json
   "email": "antonioStudent15@gmail.com",
   "username": "Antonio_124",
   "password": "Antonio_124",
+  "universityId": 1,
   "role": "student"
 }
 
@@ -20,6 +21,7 @@ Content-Type: application/json
   "email": "antonioTeacher16@gmail.com",
   "username": "Antonio_124",
   "password": "Antonio_124",
+  "universityId": 1,
   "role": "teacher"
 }
 
@@ -42,14 +44,14 @@ POST {{baseUrl}}/auth/login
 Content-Type: application/json
 
 {
-  "email": "admin1@example.com",
+  "email": "antonioStudent15@gmail.com",
   "password": "Antonio_124"
 }
 
 
 ###
 #
-PUT {{baseUrl}}/auth/verify-account?token=6d2e73cd-d7f6-4b23-95e2-9e37f2649e11
+PUT {{baseUrl}}/auth/verify-account?token=0e07a389-2f59-4dbf-9c46-65d456aa1ea6
 
 ###
 GET {{baseUrl}}/assess-roles
