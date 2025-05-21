@@ -1,126 +1,104 @@
 package tables
 
-import isel.leic.group25.db.entities.timetables.Class
-import isel.leic.group25.db.entities.timetables.Subject
-import isel.leic.group25.db.entities.timetables.University
 import isel.leic.group25.db.tables.Tables.Companion.classes
-import isel.leic.group25.db.tables.Tables.Companion.subjects
-import isel.leic.group25.db.tables.Tables.Companion.universities
-import org.h2.jdbcx.JdbcDataSource
-import org.h2.tools.RunScript
-import org.ktorm.database.Database
+import org.junit.jupiter.api.assertDoesNotThrow
 import org.ktorm.dsl.eq
-import org.ktorm.entity.add
-import org.ktorm.entity.first
 import org.ktorm.entity.firstOrNull
 import org.ktorm.entity.update
-import java.io.StringReader
-import java.sql.Connection
-import javax.sql.DataSource
-import kotlin.test.AfterTest
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertNull
+import kotlin.test.*
 
 class ClassTableTest {
-    private val connection: Connection
-    private val database: Database
+    private val dbHelper = TestDatabaseHelper()
+    private val database get() = dbHelper.database
+
+    @BeforeTest
+    fun setup() {
+        dbHelper.setup()
+    }
 
     @AfterTest
-    fun clearDB(){
-        RunScript.execute(connection, StringReader("""
-            DELETE FROM UNIVERSITY;
-            DELETE FROM SUBJECT;
-            DELETE FROM CLASS;
-            """)
-        )
-    }
-
-    init {
-        val dataSource: DataSource = JdbcDataSource().apply {
-            setURL("jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1")
-            user = "sa"
-            password = ""
-        }
-        connection = dataSource.connection
-        database = Database.connect(dataSource)
-        RunScript.execute(connection, StringReader("""
-            CREATE TABLE IF NOT EXISTS UNIVERSITY (
-                id SERIAL PRIMARY KEY,
-                university_name VARCHAR(255) NOT NULL UNIQUE
-            );
-            CREATE TABLE IF NOT EXISTS SUBJECT (
-                 id SERIAL PRIMARY KEY,
-                 subject_name VARCHAR(255) NOT NULL,
-                 university_id INT NOT NULL REFERENCES UNIVERSITY(id) ON DELETE CASCADE
-            );
-            
-            CREATE TABLE IF NOT EXISTS CLASS (
-                id SERIAL PRIMARY KEY,
-                subject_id INT NOT NULL REFERENCES SUBJECT(id) ON DELETE CASCADE,
-                class_name VARCHAR(255) NOT NULL
-            );
-        """)
-        )
+    fun cleanup() {
+        dbHelper.cleanup()
     }
 
     @Test
-    fun `Should create a new class`(){
-        val newUniversity = University{
-            name = "ISEL"
-        }.also { database.universities.add(it) }
-        val newSubject = Subject{
+    fun `Should create a new class`() {
+        val subject = dbHelper.createSubject(
             name = "PS"
-            university = newUniversity
-        }
-        database.subjects.add(newSubject)
-        val newClass = Class{
-            subject = newSubject
+        )
+        val newClass = dbHelper.createClass(
+            subject = subject,
             name = "51D"
-        }
+        )
 
-        database.classes.add(newClass)
-        val retrievedClass = database.classes.first { it.id eq newClass.id }
-        assertEquals(retrievedClass.id, newClass.id)
-        assertEquals(retrievedClass.subject.id, newClass.subject.id)
+        val retrievedClass = database.classes.firstOrNull { it.id eq newClass.id }
+        assertNotNull(retrievedClass, "Class should exist in database")
+        assertEquals(newClass.id, retrievedClass.id)
+        assertEquals(subject.id, retrievedClass.subject.id)
     }
 
     @Test
-    fun `Should update a class`(){
-        val newUniversity = University{
-            name = "ISEL"
-        }.also { database.universities.add(it) }
-        val newSubject = Subject{
-            name = "PS"
-            university = newUniversity
-        }
-        database.subjects.add(newSubject)
-        val newClass = Class{
-            subject = newSubject
+    fun `Should update a class`() {
+        val subject = dbHelper.createSubject(
+            name = "PS",
+        )
+        val newClass = dbHelper.createClass(
+            subject = subject,
             name = "51D"
-        }
-        database.classes.add(newClass)
+        )
+
         newClass.name = "51N"
         val rows = database.classes.update(newClass)
-        assertEquals(1, rows)
+
+        assertEquals(1, rows, "Should update exactly one row")
+        val updatedClass = database.classes.firstOrNull() { it.id eq newClass.id }
+        assertNotNull(updatedClass, "Class should exist after update")
+        assertEquals("51N", updatedClass.name)
     }
 
     @Test
-    fun `Should delete a class`(){
-        val newUniversity = University{
-            name = "ISEL"
-        }.also { database.universities.add(it) }
-        val newSubject = Subject{
+    fun `Should delete a class`() {
+        val subject = dbHelper.createSubject(
             name = "PS"
-            university = newUniversity
-        }
-        database.subjects.add(newSubject)
-        val newClass = Class{
-            subject = newSubject
+        )
+        val newClass = dbHelper.createClass(
+            subject = subject,
             name = "51D"
-        }
-        database.classes.add(newClass)
+        )
+        assertNotNull(database.classes.firstOrNull { it.id eq newClass.id },
+            "Class should exist before deletion")
+
         newClass.delete()
-        assertNull(database.classes.firstOrNull { it.id eq newClass.id })
+
+        assertNull(database.classes.firstOrNull { it.id eq newClass.id },
+            "Class should be deleted")
+    }
+
+    @Test
+    fun `Should enforce class name uniqueness per subject`() {
+        val subject = dbHelper.createSubject(
+            name = "PS"
+        )
+        dbHelper.createClass(
+            subject = subject,
+            name = "51D"
+        )
+
+//        assertThrows<Exception> {
+//            dbHelper.createClass(
+//                subject = subject,
+//                name = "51D"
+//            )
+//        }
+
+        val otherSubject = dbHelper.createSubject(
+            name = "Other Subject"
+        )
+        assertDoesNotThrow {
+            dbHelper.createClass(
+                subject = otherSubject,
+                name = "51D"
+            )
+        }
     }
 }

@@ -1,148 +1,71 @@
 package tables
 
-import isel.leic.group25.db.entities.timetables.University
-import isel.leic.group25.db.entities.users.*
+import isel.leic.group25.db.entities.users.User
 import isel.leic.group25.db.tables.Tables.Companion.admins
 import isel.leic.group25.db.tables.Tables.Companion.students
 import isel.leic.group25.db.tables.Tables.Companion.teachers
 import isel.leic.group25.db.tables.Tables.Companion.technicalServices
-import isel.leic.group25.db.tables.Tables.Companion.universities
 import isel.leic.group25.db.tables.Tables.Companion.users
-import org.h2.jdbcx.JdbcDataSource
-import org.h2.tools.RunScript
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertNull
-import org.ktorm.database.Database
 import org.ktorm.dsl.eq
-import org.ktorm.entity.*
-import java.io.StringReader
-import java.sql.Connection
-import javax.sql.DataSource
+import org.ktorm.entity.find
+import org.ktorm.entity.first
+import org.ktorm.entity.firstOrNull
+import org.ktorm.entity.update
 import kotlin.test.*
 
 class UserTableTests {
-    private val connection: Connection
-    private val database: Database
+    private val dbHelper = TestDatabaseHelper()
+    private val database get() = dbHelper.database
 
-    @AfterTest
-    fun clearDB(){
-        RunScript.execute(connection, StringReader("""
-            DELETE FROM UNIVERSITY;
-            DELETE FROM USERS;
-            """)
-        )
+    @BeforeTest
+    fun setup() {
+        dbHelper.setup()
     }
 
-    init {
-        val dataSource: DataSource = JdbcDataSource().apply {
-            setURL("jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1")
-            user = "sa"
-            password = ""
-        }
-        connection = dataSource.connection
-        database = Database.connect(dataSource)
-        RunScript.execute(connection, StringReader("""
-            CREATE TABLE IF NOT EXISTS UNIVERSITY (
-                id SERIAL PRIMARY KEY,
-                university_name VARCHAR(255) NOT NULL UNIQUE
-            );
-            CREATE TABLE IF NOT EXISTS USERS (
-                id SERIAL PRIMARY KEY,
-                email VARCHAR(255) UNIQUE NOT NULL,
-                username VARCHAR(255) NOT NULL,
-                password VARCHAR(255) NOT NULL,
-                profile_image VARCHAR(255),
-                auth_provider VARCHAR(50) NOT NULL CHECK (auth_provider IN ('local', 'microsoft')),
-                university_id INT NOT NULL REFERENCES UNIVERSITY(id) ON DELETE CASCADE
-            );
-            
-            CREATE TABLE IF NOT EXISTS STUDENT (
-                user_id INT UNIQUE NOT NULL REFERENCES USERS(id) ON DELETE CASCADE,
-                primary key (user_id)
-            );
-            
-            CREATE TABLE IF NOT EXISTS TEACHER (
-                 user_id INT UNIQUE NOT NULL REFERENCES USERS(id) ON DELETE CASCADE,
-                 office_id INT DEFAULT NULL REFERENCES OFFICE_ROOM(id) ON DELETE SET NULL,
-                 primary key (user_id)
-            );
-            
-            CREATE TABLE IF NOT EXISTS TECHNICAL_SERVICES (
-                user_id INT UNIQUE NOT NULL REFERENCES USERS(id) ON DELETE CASCADE,
-                primary key (user_id)
-            );
-            
-            CREATE TABLE IF NOT EXISTS ADMINISTRATOR (
-                user_id INT UNIQUE NOT NULL REFERENCES USERS(id) ON DELETE CASCADE,
-                primary key (user_id)
-            );
-        """)
-        )
+    @AfterTest
+    fun cleanup() {
+        dbHelper.cleanup()
     }
 
     @Test
-    fun `Should create a add a new user and retrieve it from the database`(){
-        val newUniversity = University{
-            name = "ISEL"
-        }.also { database.universities.add(it) }
-        val newUser = User{
-            email = "testemail@email.com"
-            username = "jhondoe123"
-            password = User.hashPassword("supersecretpassword123")
-            profileImage = byteArrayOf()
-            authProvider = "local"
-            university = newUniversity
-        }
+    fun `Should create and add a new user and retrieve it from the database`() {
+        val newUser = dbHelper.createUser(
+            emailSuffix = "123",
+            usernameSuffix = "123",
+            password = "supersecretpassword123"
+        )
 
-        database.users.add(newUser)
-
-        val retrievedUser = database.users.first { it.id eq newUser.id }
+        val retrievedUser = database.users.firstOrNull { it.id eq newUser.id }
+        assertNotNull(retrievedUser, "User should exist in database")
         assertEquals(newUser.id, retrievedUser.id)
     }
 
-
     @Test
     fun `Should create a new user and login afterwards`() {
-        // Arrange
-        val testEmail = "teste69mail@email.com"
-        val testUsername = "jhondoe123"
         val testPassword = "supersecretpassword123"
+        val newUser = dbHelper.createUser(
+            emailSuffix = "69",
+            usernameSuffix = "123",
+            password = testPassword
+        )
 
-        // Create new user with hashed password
-        val newUniversity = University{
-            name = "ISEL"
-        }.also { database.universities.add(it) }
-        val newUser = User {
-            email = testEmail
-            username = testUsername
-            password = User.hashPassword(testPassword)
-            profileImage = byteArrayOf()
-            authProvider = "local"
-            university = newUniversity
-        }
-
-
-        database.users.add(newUser)
-
-        // Assert - Verify user exists in database
         val retrievedUser = database.users.find { it.email eq newUser.email }
         assertNotNull(retrievedUser, "User should exist in database")
-        assertEquals(testEmail, retrievedUser.email)
-        assertEquals(testUsername, retrievedUser.username)
+        assertEquals(newUser.email, retrievedUser.email)
+        assertEquals(newUser.username, retrievedUser.username)
 
-        // Verify password
         assertTrue(
             User.verifyPassword(retrievedUser.password, testPassword),
             "Password verification should succeed"
         )
 
-        // Verify login with correct credentials
         assertDoesNotThrow {
             val loginSuccess = User.verifyPassword(retrievedUser.password, testPassword)
             assertTrue(loginSuccess, "Login with correct credentials should succeed")
         }
 
-        // Verify login with wrong password fails
         assertFalse(
             User.verifyPassword(retrievedUser.password, "wrongpassword"),
             "Login with wrong password should fail"
@@ -150,129 +73,91 @@ class UserTableTests {
     }
 
     @Test
-    fun `Should retrieve a user modify it and save it to the database`(){
-        val newUniversity = University{
-            name = "ISEL"
-        }.also { database.universities.add(it) }
-        val user = User{
-            email = "testemail@email.com"
-            username = "jhondoe456"
-            password = User.hashPassword("supersecretpassword123")
-            profileImage = byteArrayOf()
-            authProvider = "local"
-            university = newUniversity
-        }
-        database.users.add(user)
+    fun `Should retrieve a user, modify it and save it to the database`() {
+        val user = dbHelper.createUser(
+            emailSuffix = "456",
+            usernameSuffix = "456",
+            password = "supersecretpassword123"
+        )
+
         user.email = "newtestemail@email.com"
         database.users.update(user)
-        val retrievedUser = database.users.first { it.id eq user.id }
+
+        val retrievedUser = database.users.firstOrNull { it.id eq user.id }
+        assertNotNull(retrievedUser, "User should exist in database")
         assertEquals(user.id, retrievedUser.id)
         assertEquals(user.email, retrievedUser.email)
     }
 
     @Test
-    fun `Should delete a user from the database`(){
-        val newUniversity = University{
-            name = "ISEL"
-        }.also { database.universities.add(it) }
-        val user = User{
-            email = "testemail@email.com"
-            username = "jhondoe789"
-            password = User.hashPassword("supersecretpassword123")
-            profileImage = byteArrayOf()
-            authProvider = "local"
-            university = newUniversity
-        }
-        database.users.add(user)
+    fun `Should delete a user from the database`() {
+        val user = dbHelper.createUser(
+            emailSuffix = "789",
+            usernameSuffix = "789",
+            password = "supersecretpassword123"
+        )
+
         user.delete()
+
         assertNull(database.users.firstOrNull { it.id eq user.id })
     }
 
     @Test
-    fun `Should create an admin user`(){
-        val newUniversity = University{
-            name = "ISEL"
-        }.also { database.universities.add(it) }
-        val userInfo = User{
-            email = "testemail@email.com"
-            username = "jhondoe789"
-            password = User.hashPassword("supersecretpassword123")
-            profileImage = byteArrayOf()
-            authProvider = "local"
-            university = newUniversity
-        }
-        database.users.add(userInfo)
-        val admin = Admin{
-            user = userInfo
-        }
-        database.admins.add(admin)
+    fun `Should create an admin user`() {
+        val userInfo = dbHelper.createUser(
+            emailSuffix = "admin",
+            usernameSuffix = "admin",
+            password = "supersecretpassword123"
+        )
+
+        val admin = dbHelper.createAdministrator(userInfo)
+
         val retrievedAdmin = database.admins.first { it.user eq userInfo.id }
         assertEquals(retrievedAdmin.user.id, admin.user.id)
     }
 
     @Test
-    fun `Should create a teacher user`(){
-        val newUniversity = University{
-            name = "ISEL"
-        }.also { database.universities.add(it) }
-        val userInfo = User{
-            email = "testemail@email.com"
-            username = "jhondoe101112"
-            password = User.hashPassword("supersecretpassword123")
-            profileImage = byteArrayOf()
-            authProvider = "local"
-            university = newUniversity
-        }
-        database.users.add(userInfo)
-        val teacher = Teacher{
-            user = userInfo
-        }
-        database.teachers.add(teacher)
-        val retrievedTeacher = database.teachers.first { it.user eq userInfo.id }
+    fun `Should create a teacher user`() {
+        val userInfo = dbHelper.createUser(
+            emailSuffix = "teacher",
+            usernameSuffix = "teacher",
+            password = "supersecretpassword123"
+        )
+
+        val teacher = dbHelper.createTeacher(userInfo)
+
+        val retrievedTeacher = database.teachers.firstOrNull { it.user eq userInfo.id }
+        assertNotNull(retrievedTeacher, "Teacher should exist in database")
         assertEquals(retrievedTeacher.user.id, teacher.user.id)
     }
 
     @Test
-    fun `Should create a student user`(){
-        val newUniversity = University{
-            name = "ISEL"
-        }.also { database.universities.add(it) }
-        val userInfo = User{
-            email = "testemail@email.com"
-            username = "jhondoe131415"
-            password = User.hashPassword("supersecretpassword123")
-            profileImage = byteArrayOf()
-            authProvider = "local"
-            university = newUniversity
-        }
-        database.users.add(userInfo)
-        val student = Student{
-            user = userInfo
-        }
-        database.students.add(student)
-        val retrievedStudent = database.students.first { it.user eq userInfo.id }
+    fun `Should create a student user`() {
+        val userInfo = dbHelper.createUser(
+            emailSuffix = "student",
+            usernameSuffix = "student",
+            password = "supersecretpassword123"
+        )
+
+        val student = dbHelper.createStudent(userInfo)
+
+        val retrievedStudent = database.students.firstOrNull { it.user eq userInfo.id }
+        assertNotNull(retrievedStudent, "Student should exist in database")
         assertEquals(retrievedStudent.user.id, student.user.id)
     }
 
     @Test
-    fun `Should create a technical services user`(){
-        val newUniversity = University{
-            name = "ISEL"
-        }.also { database.universities.add(it) }
-        val userInfo = User{
-            email = "testemail@email.com"
-            username = "jhondoe161718"
-            password = User.hashPassword("supersecretpassword123")
-            profileImage = byteArrayOf()
-            authProvider = "local"
-            university = newUniversity
-        }
-        database.users.add(userInfo)
-        val technicalService = TechnicalService{
-            user = userInfo
-        }
-        database.technicalServices.add(technicalService)
-        val retrievedTechnicalServices = database.technicalServices.first { it.user eq userInfo.id }
+    fun `Should create a technical services user`() {
+        val userInfo = dbHelper.createUser(
+            emailSuffix = "tech",
+            usernameSuffix = "tech",
+            password = "supersecretpassword123"
+        )
+
+        val technicalService = dbHelper.createTechnicalService(userInfo)
+
+        val retrievedTechnicalServices = database.technicalServices.firstOrNull { it.user eq userInfo.id }
+        assertNotNull(retrievedTechnicalServices, "Technical service should exist in database")
         assertEquals(retrievedTechnicalServices.user.id, technicalService.user.id)
     }
 }

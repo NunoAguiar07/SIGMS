@@ -1,210 +1,155 @@
 package tables
 
-import isel.leic.group25.db.entities.rooms.Classroom
-import isel.leic.group25.db.entities.rooms.OfficeRoom
-import isel.leic.group25.db.entities.rooms.Room
-import isel.leic.group25.db.entities.rooms.StudyRoom
-import isel.leic.group25.db.entities.timetables.University
 import isel.leic.group25.db.tables.Tables.Companion.classrooms
 import isel.leic.group25.db.tables.Tables.Companion.officeRooms
 import isel.leic.group25.db.tables.Tables.Companion.rooms
 import isel.leic.group25.db.tables.Tables.Companion.studyRooms
-import isel.leic.group25.db.tables.Tables.Companion.universities
-import org.h2.jdbcx.JdbcDataSource
-import org.h2.tools.RunScript
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows
-import org.ktorm.database.Database
 import org.ktorm.dsl.eq
-import org.ktorm.entity.add
-import org.ktorm.entity.first
 import org.ktorm.entity.firstOrNull
-import java.io.StringReader
-import java.sql.Connection
-import javax.sql.DataSource
-import kotlin.test.AfterTest
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertNull
+import kotlin.test.*
 
 class RoomTableTest {
-    private val connection: Connection
-    private val database: Database
+    private val dbHelper = TestDatabaseHelper()
+    private val database get() = dbHelper.database
 
-    @AfterTest
-    fun clearDB(){
-        RunScript.execute(connection, StringReader("""
-            DELETE FROM UNIVERSITY;
-            DELETE FROM ROOM;
-            """)
-        )
+    @BeforeTest
+    fun setup() {
+        dbHelper.setup()
     }
 
-    init {
-        val dataSource: DataSource = JdbcDataSource().apply {
-            setURL("jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1")
-            user = "sa"
-            password = ""
-        }
-        connection = dataSource.connection
-        database = Database.connect(dataSource)
-        RunScript.execute(connection, StringReader("""
-            CREATE TABLE IF NOT EXISTS UNIVERSITY (
-                id SERIAL PRIMARY KEY,
-                university_name VARCHAR(255) NOT NULL UNIQUE
-            );
-            
-            CREATE TABLE IF NOT EXISTS ROOM (
-                id SERIAL PRIMARY KEY,
-                room_name VARCHAR(255) NOT NULL,
-                capacity INT NOT NULL,
-                university_id INT NOT NULL REFERENCES UNIVERSITY(id) ON DELETE CASCADE,
-                CHECK(capacity > 0),
-                CONSTRAINT unique_room_per_university UNIQUE (room_name, university_id)
-            );
-
-            CREATE TABLE IF NOT EXISTS STUDY_ROOM (
-                id SERIAL PRIMARY KEY REFERENCES ROOM(id) ON DELETE CASCADE
-            );
-
-            CREATE TABLE IF NOT EXISTS CLASSROOM (
-                id SERIAL PRIMARY KEY REFERENCES ROOM(id) ON DELETE CASCADE
-            );
-
-            CREATE TABLE IF NOT EXISTS OFFICE_ROOM (
-                id SERIAL PRIMARY KEY REFERENCES ROOM(id) ON DELETE CASCADE
-            );
-        """)
-        )
+    @AfterTest
+    fun cleanup() {
+        dbHelper.cleanup()
     }
 
     @Test
-    fun `Should create a new room`(){
-        val newUniversity = University{
-            name = "ISEL"
-        }.also { database.universities.add(it) }
-        val newRoom = Room{
-            name = "G.2.02"
+    fun `Should create a new room`() {
+        val newRoom = dbHelper.createRoom(
+            name = "G.2.02",
             capacity = 30
-            university = newUniversity
-        }
-        database.rooms.add(newRoom)
-        val room = database.rooms.first { it.id eq newRoom.id }
+        )
+
+        val room = database.rooms.firstOrNull { it.id eq newRoom.id }
+        assertNotNull(room, "Room should not exist in database before adding")
         assertEquals(room.id, newRoom.id)
         assertEquals(room.capacity, newRoom.capacity)
     }
 
     @Test
-    fun `Should update a room`(){
-        val newUniversity = University{
-            name = "ISEL"
-        }.also { database.universities.add(it) }
-        val newRoom = Room{
-            name = "G.2.02"
+    fun `Should update a room`() {
+        val newRoom = dbHelper.createRoom(
+            name = "G.2.02",
             capacity = 30
-            university = newUniversity
-        }
-        database.rooms.add(newRoom)
+        )
+
         newRoom.capacity = 35
         newRoom.flushChanges()
-        val room = database.rooms.first { it.id eq newRoom.id }
+
+        val room = database.rooms.firstOrNull { it.id eq newRoom.id }
+        assertNotNull(room, "Room should exist in database after updating")
         assertEquals(newRoom.id, room.id)
-        assertEquals(newRoom.capacity, room.capacity)
+        assertEquals(35, room.capacity)
     }
 
     @Test
-    fun `Should delete a room`(){
-        val newUniversity = University{
-            name = "ISEL"
-        }.also { database.universities.add(it) }
-        val newRoom = Room{
-            name = "G.2.02"
+    fun `Should delete a room`() {
+        val newRoom = dbHelper.createRoom(
+            name = "G.2.02",
             capacity = 30
-            university = newUniversity
-        }
-        database.rooms.add(newRoom)
-        val room = database.rooms.first { it.id eq newRoom.id }
-        assertEquals(newRoom.id, room.id)
-        assertEquals(newRoom.capacity, room.capacity)
+        )
+        val initialRoom = database.rooms.firstOrNull { it.id eq newRoom.id }
+        assertNotNull(initialRoom, "Room should exist in database before deleting")
+
         newRoom.delete()
-        val nullRoom = database.rooms.firstOrNull { it.id eq room.id }
-        assertNull(nullRoom)
+
+        assertNull(database.rooms.firstOrNull { it.id eq initialRoom.id })
     }
 
     @Test
-    fun `Should not allow a room with less than 1 capacity`(){
-        val newUniversity = University{
-            name = "ISEL"
-        }.also { database.universities.add(it) }
-        val newRoom = Room{
-            name = "G.2.02"
-            capacity = -1
-            university = newUniversity
+    fun `Should not allow a room with less than 1 capacity`() {
+        assertDoesNotThrow {
+            dbHelper.createRoom(
+                name = "ValidRoom",
+                capacity = 10
+            )
         }
-        assertThrows<Exception> { database.rooms.add(newRoom) }
-        newRoom.capacity = 0
-        assertThrows<Exception> { database.rooms.add(newRoom) }
-        newRoom.capacity = 1
-        assertDoesNotThrow { database.rooms.add(newRoom) }
+        assertThrows<Exception> {
+            dbHelper.createRoom(
+            name = "Invalid2",
+            capacity = 0
+            )
+        }
+        assertThrows<Exception> {
+            dbHelper.createRoom(
+            name = "Invalid1",
+            capacity = -5
+            )
+        }
     }
 
     @Test
-    fun `Should create a new study room`(){
-        val newUniversity = University{
-            name = "ISEL"
-        }.also { database.universities.add(it) }
-        val newRoom = Room{
-            name = "G.2.02"
-            capacity = 30
-            university = newUniversity
-        }
-        val newStudyRoom = StudyRoom{
-            room = newRoom
-        }
-        database.rooms.add(newRoom)
-        database.studyRooms.add(newStudyRoom)
-        val studyRoom = database.studyRooms.first { it.id eq newRoom.id }
-        assertEquals(newStudyRoom.room.id, studyRoom.room.id)
-        assertEquals(newStudyRoom.room.capacity, studyRoom.room.capacity)
+    fun `Should create a new study room`() {
+        val newRoom = dbHelper.createRoom(
+            name = "StudyRoom1",
+            capacity = 20,
+            type = "STUDY_ROOM"
+        )
+
+        val studyRoom = database.studyRooms.firstOrNull { it.id eq newRoom.id }
+        assertNotNull(studyRoom, "Study room should exist in database")
+        assertEquals(newRoom.id, studyRoom.room.id)
+        assertEquals(20, studyRoom.room.capacity)
     }
 
     @Test
-    fun `Should create a new classroom`(){
-        val newUniversity = University{
-            name = "ISEL"
-        }.also { database.universities.add(it) }
-        val newRoom = Room{
-            name = "G.2.02"
-            capacity = 30
-            university = newUniversity
-        }
-        val newClassroom = Classroom{
-            room = newRoom
-        }
-        database.rooms.add(newRoom)
-        database.classrooms.add(newClassroom)
-        val classroom = database.classrooms.first { it.id eq newRoom.id }
-        assertEquals(newClassroom.room.id, classroom.room.id)
-        assertEquals(newClassroom.room.capacity, classroom.room.capacity)
+    fun `Should create a new classroom`() {
+        val newRoom = dbHelper.createRoom(
+            name = "Classroom1",
+            capacity = 30,
+            type = "CLASSROOM"
+        )
+
+        val classroom = database.classrooms.firstOrNull { it.id eq newRoom.id }
+        assertNotNull(classroom, "Classroom should exist in database")
+        assertEquals(newRoom.id, classroom.room.id)
+        assertEquals(30, classroom.room.capacity)
     }
 
     @Test
-    fun `Should create a new office room`(){
-        val newUniversity = University{
-            name = "ISEL"
-        }.also { database.universities.add(it) }
-        val newRoom = Room{
-            name = "G.2.02"
-            capacity = 30
-            university = newUniversity
+    fun `Should create a new office room`() {
+        val newRoom = dbHelper.createRoom(
+            name = "Office1",
+            capacity = 5,
+            type = "OFFICE_ROOM"
+        )
+
+        val officeRoom = database.officeRooms.firstOrNull { it.id eq newRoom.id }
+        assertNotNull(officeRoom, "Office room should exist in database")
+        assertEquals(newRoom.id, officeRoom.room.id)
+        assertEquals(5, officeRoom.room.capacity)
+    }
+
+    @Test
+    fun `Should enforce unique room names per university`() {
+        dbHelper.createRoom(
+            name = "UniqueRoom",
+            capacity = 10
+        )
+
+        assertThrows<Exception> {
+            dbHelper.createRoom(
+                name = "UniqueRoom",
+                capacity = 15
+            )
         }
-        val newOfficeRoom = OfficeRoom{
-            room = newRoom
-        }
-        database.rooms.add(newRoom)
-        database.officeRooms.add(newOfficeRoom)
-        val officeRoom = database.officeRooms.first { it.id eq newRoom.id }
-        assertEquals(newOfficeRoom.room.id, officeRoom.room.id)
-        assertEquals(newOfficeRoom.room.capacity, officeRoom.room.capacity)
+
+        val otherUniversity = dbHelper.createUniversity("Other University")
+        assertDoesNotThrow { dbHelper.createRoom(
+            name = "UniqueRoom",
+            capacity = 20,
+            university = otherUniversity
+        ) }
     }
 }
