@@ -25,6 +25,7 @@ class MockClassRepository : ClassRepositoryInterface {
             this.name = name
             this.subject = subject
         }
+        newClass.set("id", classes.size + 1)
         classes.add(newClass)
         return newClass
     }

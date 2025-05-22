@@ -4,7 +4,7 @@ import isel.leic.group25.db.entities.timetables.Class
 import isel.leic.group25.db.entities.timetables.Subject
 import isel.leic.group25.db.entities.types.Role
 import isel.leic.group25.db.entities.users.User
-import isel.leic.group25.db.repositories.ktorm.KTransaction
+import isel.leic.group25.db.repositories.ktorm.KtormCommand
 import isel.leic.group25.db.repositories.timetables.ClassRepository
 import isel.leic.group25.db.repositories.timetables.SubjectRepository
 import isel.leic.group25.db.repositories.timetables.UniversityRepository
@@ -13,7 +13,7 @@ import isel.leic.group25.db.repositories.users.UserRepository
 import kotlin.test.*
 
 class ClassRepositoryTest {
-    private val kTransaction = KTransaction(DatabaseTestSetup.database)
+    private val kTormCommand = KtormCommand(DatabaseTestSetup.database)
     private val universityRepository = UniversityRepository(DatabaseTestSetup.database)
     private val userRepository = UserRepository(DatabaseTestSetup.database)
     private val studentRepository = StudentRepository(DatabaseTestSetup.database)
@@ -28,7 +28,7 @@ class ClassRepositoryTest {
 
     @Test
     fun `Should create a new class and find it by id`() {
-        kTransaction.useTransaction {
+        kTormCommand.useTransaction {
             val newUniversity = universityRepository.createUniversity("Test University")
             val newSubject = Subject {
                 name = "Test Subject"
@@ -45,7 +45,7 @@ class ClassRepositoryTest {
 
     @Test
     fun `Should create a new class and find it by name`() {
-        kTransaction.useTransaction {
+        kTormCommand.useTransaction {
             val newUniversity = universityRepository.createUniversity("Test University")
             val newSubject = Subject {
                 name = "Test Subject1"
@@ -61,7 +61,7 @@ class ClassRepositoryTest {
 
     @Test
     fun `Should create a new class and find it by subject`() {
-        kTransaction.useTransaction {
+        kTormCommand.useTransaction {
             val newUniversity = universityRepository.createUniversity("Test University")
             val newSubject = Subject {
                 name = "Test Subject2"
@@ -78,7 +78,7 @@ class ClassRepositoryTest {
 
     @Test
     fun `Should update a class`() {
-        kTransaction.useTransaction {
+        kTormCommand.useTransaction {
             val newUniversity = universityRepository.createUniversity("Test University")
             val newSubject = Subject {
                 name = "Test Subject3"
@@ -98,7 +98,7 @@ class ClassRepositoryTest {
 
     @Test
     fun `Should delete a class by id`() {
-        kTransaction.useTransaction {
+        kTormCommand.useTransaction {
             val newUniversity = universityRepository.createUniversity("Test University")
             val newSubject = Subject {
                 name = "Test Subject4"
@@ -115,7 +115,7 @@ class ClassRepositoryTest {
 
     @Test
     fun `Should delete a class`() {
-        kTransaction.useTransaction {
+        kTormCommand.useTransaction {
             val newUniversity = universityRepository.createUniversity("Test University")
             val newSubject = Subject {
                 name = "Test Subject5"

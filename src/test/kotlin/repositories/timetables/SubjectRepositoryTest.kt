@@ -1,6 +1,6 @@
 package repositories.timetables
 
-import isel.leic.group25.db.repositories.ktorm.KTransaction
+import isel.leic.group25.db.repositories.ktorm.KtormCommand
 import isel.leic.group25.db.repositories.timetables.SubjectRepository
 import isel.leic.group25.db.repositories.timetables.UniversityRepository
 import repositories.DatabaseTestSetup
@@ -10,7 +10,7 @@ import kotlin.test.Test
 // check comments before changing tests
 
 class SubjectRepositoryTest {
-    private val kTransaction = KTransaction(DatabaseTestSetup.database)
+    private val kTormCommand = KtormCommand(DatabaseTestSetup.database)
     private val subjectRepository = SubjectRepository(DatabaseTestSetup.database)
     private val universityRepository = UniversityRepository(DatabaseTestSetup.database)
 
@@ -21,7 +21,7 @@ class SubjectRepositoryTest {
 
     @Test
     fun `Should create a new subject and find it by id`() {
-        kTransaction.useTransaction {
+        kTormCommand.useTransaction {
             val newUniversity = universityRepository.createUniversity("testUniversity")
             val newSubject = subjectRepository.createSubject("testSubject", newUniversity)
             val foundSubject = subjectRepository.findSubjectById(newSubject.id)
@@ -32,7 +32,7 @@ class SubjectRepositoryTest {
 
     @Test
     fun `Should create a new subject and find it by name`() {
-        kTransaction.useTransaction {
+        kTormCommand.useTransaction {
             val newUniversity = universityRepository.createUniversity("testUniversity")
             val newSubject = subjectRepository.createSubject("testSubject", newUniversity)
             val foundSubject = subjectRepository.findSubjectByName(newSubject.name)
@@ -43,7 +43,7 @@ class SubjectRepositoryTest {
 
     @Test
     fun `Should get all subjects`() {
-        kTransaction.useTransaction {
+        kTormCommand.useTransaction {
             val newUniversity = universityRepository.createUniversity("testUniversity")
             val newSubject1 = subjectRepository.createSubject("testSubject1", newUniversity)
             val newSubject2 = subjectRepository.createSubject("testSubject2", newUniversity)

@@ -6,59 +6,57 @@ import isel.leic.group25.services.LectureService
 import isel.leic.group25.services.errors.LectureError
 import isel.leic.group25.utils.Failure
 import isel.leic.group25.utils.Success
-import mocks.repositories.rooms.MockRoomRepository
-import mocks.repositories.timetables.MockClassRepository
-import mocks.repositories.timetables.MockLectureRepository
-import mocks.repositories.timetables.MockSubjectRepository
-import mocks.repositories.timetables.MockUniversityRepository
-import mocks.repositories.utils.MockTransaction
+import mocks.repositories.MockRepositories
 import mocks.services.MockEmailService
+import org.ktorm.database.Database
 import kotlin.test.*
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.ExperimentalTime
 
 class LectureServiceTest {
-    private val lectureRepository = MockLectureRepository()
-    private val subjectRepository = MockSubjectRepository()
-    private val classRepository = MockClassRepository()
-    private val roomRepository = MockRoomRepository()
-    private val universityRepository = MockUniversityRepository()
+    val mockDB = Database.connect(
+        url = "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1",
+        user = "root",
+        password = ""
+    )
+    private val mockRepositories = MockRepositories(mockDB)
     private val emailService = MockEmailService()
-    private val transactionInterface = MockTransaction()
 
     private val lectureService = LectureService(
-        lectureRepository = lectureRepository,
-        transactionInterface = transactionInterface,
-        classRepository = classRepository,
-        roomRepository = roomRepository,
-        emailService = emailService
+        mockRepositories,
+        mockRepositories.ktormCommand,
+        emailService
     )
-
-    @AfterTest
-    fun clearDatabase() {
-        lectureRepository.clear()
-        roomRepository.clear()
-    }
 
     @Test
     fun `getAllLectures should return list of lectures`() {
         // Setup test data
-        val university = universityRepository.createUniversity("Test University")
-        val subject = subjectRepository.createSubject("PG", university)
-        val schoolClass = classRepository.addClass("LEIC51D", subject)
-        val room = roomRepository.createRoom(30, "G.2.01", university)
-        roomRepository.createClassRoom(room)
-        val classroom = roomRepository.getClassRoomById(room.id)
+        val university = mockRepositories.from({universityRepository}){
+            createUniversity("Test University")
+        }
+        val subject = mockRepositories.from({subjectRepository}){
+            createSubject("PG", university)
+        }
+        val schoolClass = mockRepositories.from({classRepository}){
+            addClass("LEIC51D", subject)
+        }
+        val room = mockRepositories.from({roomRepository}){
+            createRoom(30, "G.2.01", university)
+        }
+        mockRepositories.from({roomRepository}){createClassRoom(room)}
+        val classroom = mockRepositories.from({roomRepository}){getClassRoomById(room.id)}
         assertNotNull(classroom, "Classroom should be created")
 
-        lectureRepository.createLecture(
-            schoolClass = schoolClass,
-            classroom = classroom,
-            type = ClassType.THEORETICAL,
-            weekDay = WeekDay.MONDAY,
-            startTime = 9.hours,
-            endTime = 11.hours
-        )
+        mockRepositories.from({lectureRepository}){
+            createLecture(
+                schoolClass = schoolClass,
+                classroom = classroom,
+                type = ClassType.THEORETICAL,
+                weekDay = WeekDay.MONDAY,
+                startTime = 9.hours,
+                endTime = 11.hours
+            )
+        }
 
         // Test
         val result = lectureService.getAllLectures(10, 0)
@@ -69,22 +67,32 @@ class LectureServiceTest {
     @Test
     fun `getLectureById should return lecture when found`() {
         // Setup test data
-        val university = universityRepository.createUniversity("Test University")
-        val subject = subjectRepository.createSubject("Math", university)
-        val schoolClass = classRepository.addClass("Algebra", subject)
-        val room = roomRepository.createRoom(30, "Room 101", university)
-        roomRepository.createClassRoom(room)
-        val classroom = roomRepository.getClassRoomById(room.id)
+        val university = mockRepositories.from({universityRepository}){
+            createUniversity("Test University")
+        }
+        val subject = mockRepositories.from({subjectRepository}){
+            createSubject("Math", university)
+        }
+        val schoolClass = mockRepositories.from({classRepository}){
+            addClass("Algebra", subject)
+        }
+        val room =mockRepositories.from({roomRepository}){
+            createRoom(30, "Room 101", university)
+        }
+        mockRepositories.from({roomRepository}){createClassRoom(room)}
+        val classroom = mockRepositories.from({roomRepository}){getClassRoomById(room.id)}
         assertNotNull(classroom, "Classroom should be created")
 
-        val lecture = lectureRepository.createLecture(
-            schoolClass = schoolClass,
-            classroom = classroom,
-            type = ClassType.THEORETICAL,
-            weekDay = WeekDay.MONDAY,
-            startTime = 9.hours,
-            endTime = 11.hours
-        )
+        val lecture = mockRepositories.from({lectureRepository}){
+            createLecture(
+                schoolClass = schoolClass,
+                classroom = classroom,
+                type = ClassType.THEORETICAL,
+                weekDay = WeekDay.MONDAY,
+                startTime = 9.hours,
+                endTime = 11.hours
+            )
+        }
 
         // Test
         val result = lectureService.getLectureById(lecture.id)
@@ -102,13 +110,22 @@ class LectureServiceTest {
     @Test
     fun `createLecture should create new lecture with valid data`() {
         // Setup test data
-        val university = universityRepository.createUniversity("Test University")
-        val subject = subjectRepository.createSubject("Math", university)
-        val schoolClass = classRepository.addClass("Algebra", subject)
-        val room = roomRepository.createRoom(30, "Room 101", university)
-        roomRepository.createClassRoom(room)
+        val university = mockRepositories.from({universityRepository}){
+            createUniversity("Test University")
+        }
+        val subject = mockRepositories.from({subjectRepository}){
+            createSubject("Math", university)
+        }
+        val schoolClass = mockRepositories.from({classRepository}){
+            addClass("Algebra", subject)
+        }
+        val room =mockRepositories.from({roomRepository}){
+            createRoom(30, "Room 101", university)
+        }
+        mockRepositories.from({roomRepository}){createClassRoom(room)}
+        val classroom = mockRepositories.from({roomRepository}){getClassRoomById(room.id)}
+        assertNotNull(classroom, "Classroom should be created")
 
-        // Test
         val result = lectureService.createLecture(
             schoolClassId = schoolClass.id,
             roomId = room.id,
@@ -141,21 +158,32 @@ class LectureServiceTest {
     @Test
     fun `createLecture should return LectureTimeConflict when conflicting lecture exists`() {
         // Setup test data
-        val university = universityRepository.createUniversity("Test University")
-        val subject = subjectRepository.createSubject("Math", university)
-        val schoolClass = classRepository.addClass("Algebra", subject)
-        val room = roomRepository.createRoom(30, "Room 101", university)
-        roomRepository.createClassRoom(room)
+        val university = mockRepositories.from({universityRepository}){
+            createUniversity("Test University")
+        }
+        val subject = mockRepositories.from({subjectRepository}){
+            createSubject("Math", university)
+        }
+        val schoolClass = mockRepositories.from({classRepository}){
+            addClass("Algebra", subject)
+        }
+        val room =mockRepositories.from({roomRepository}){
+            createRoom(30, "Room 101", university)
+        }
+        mockRepositories.from({roomRepository}){createClassRoom(room)}
+        val classroom = mockRepositories.from({roomRepository}){getClassRoomById(room.id)}
+        assertNotNull(classroom, "Classroom should be created")
 
-        // Create first lecture
-        lectureService.createLecture(
-            schoolClassId = schoolClass.id,
-            roomId = room.id,
-            weekDay = WeekDay.MONDAY,
-            type = ClassType.THEORETICAL,
-            startTime = "09:00",
-            endTime = "11:00"
-        )
+        mockRepositories.from({lectureRepository}){
+            createLecture(
+                schoolClass = schoolClass,
+                classroom = classroom,
+                type = ClassType.THEORETICAL,
+                weekDay = WeekDay.MONDAY,
+                startTime = 9.hours,
+                endTime = 11.hours
+            )
+        }
 
         // Try to create conflicting lecture
         val result = lectureService.createLecture(
@@ -174,9 +202,15 @@ class LectureServiceTest {
     @Test
     fun `createLecture should return InvalidLectureRoom when room not found`() {
         // Setup test data
-        val university = universityRepository.createUniversity("Test University")
-        val subject = subjectRepository.createSubject("Math", university)
-        val schoolClass = classRepository.addClass("Algebra", subject)
+        val university = mockRepositories.from({universityRepository}){
+            createUniversity("Test University")
+        }
+        val subject = mockRepositories.from({subjectRepository}){
+            createSubject("Math", university)
+        }
+        val schoolClass = mockRepositories.from({classRepository}){
+            addClass("Algebra", subject)
+        }
 
         val result = lectureService.createLecture(
             schoolClassId = schoolClass.id,
@@ -194,9 +228,13 @@ class LectureServiceTest {
     @Test
     fun `createLecture should return InvalidLectureClass when class not found`() {
         // Setup test data
-        val university = universityRepository.createUniversity("Test University")
-        val room = roomRepository.createRoom(30, "Room 101", university)
-        roomRepository.createClassRoom(room)
+        val university = mockRepositories.from({universityRepository}){
+            createUniversity("Test University")
+        }
+        val room = mockRepositories.from({roomRepository}){
+            createRoom(30, "Room 101", university)
+        }
+        mockRepositories.from({roomRepository}){createClassRoom(room)}
 
         val result = lectureService.createLecture(
             schoolClassId = 999, // non-existent class
@@ -214,76 +252,107 @@ class LectureServiceTest {
     @Test
     fun `getLecturesByRoom should return lectures for given room`() {
         // Setup test data
-        val university = universityRepository.createUniversity("Test University")
-        val subject = subjectRepository.createSubject("Math", university)
-        val schoolClass = classRepository.addClass("Algebra", subject)
-        val room1 = roomRepository.createRoom(30, "Room 101", university)
-        val room2 = roomRepository.createRoom(30, "Room 102", university)
-        roomRepository.createClassRoom(room1)
-        roomRepository.createClassRoom(room2)
-        val classroom1 = roomRepository.getClassRoomById(room1.id)
-        val classroom2 = roomRepository.getClassRoomById(room2.id)
+        val university = mockRepositories.from({universityRepository}){
+            createUniversity("Test University")
+        }
+        val subject = mockRepositories.from({subjectRepository}){
+            createSubject("Math", university)
+        }
+        val schoolClass = mockRepositories.from({classRepository}){
+            addClass("Algebra", subject)
+        }
+        val room1 =mockRepositories.from({roomRepository}){
+            createRoom(30, "Room 101", university)
+        }
+        mockRepositories.from({roomRepository}){createClassRoom(room1)}
+        val room2 = mockRepositories.from({roomRepository}){
+            createRoom(30, "Room 102", university)
+        }
+        mockRepositories.from({roomRepository}){createClassRoom(room2)}
+        val classroom1 = mockRepositories.from({roomRepository}){getClassRoomById(room1.id)}
+        val classroom2 = mockRepositories.from({roomRepository}){getClassRoomById(room2.id)}
         assertNotNull(classroom1, "Classroom should be created")
         assertNotNull(classroom2, "Classroom should be created")
 
         // Create lectures in different rooms
-        lectureRepository.createLecture(
-            schoolClass = schoolClass,
-            classroom = classroom1,
-            type = ClassType.THEORETICAL,
-            weekDay = WeekDay.MONDAY,
-            startTime = 9.hours,
-            endTime = 11.hours
-        )
-        lectureRepository.createLecture(
-            schoolClass = schoolClass,
-            classroom = classroom2,
-            type = ClassType.THEORETICAL,
-            weekDay = WeekDay.TUESDAY,
-            startTime = 9.hours,
-            endTime = 11.hours
-        )
-
+        mockRepositories.from({lectureRepository}){
+            createLecture(
+                schoolClass = schoolClass,
+                classroom = classroom1,
+                type = ClassType.THEORETICAL,
+                weekDay = WeekDay.MONDAY,
+                startTime = 9.hours,
+                endTime = 11.hours
+            )
+        }
+        mockRepositories.from({lectureRepository}){
+            createLecture(
+                schoolClass = schoolClass,
+                classroom = classroom2,
+                type = ClassType.THEORETICAL,
+                weekDay = WeekDay.TUESDAY,
+                startTime = 9.hours,
+                endTime = 11.hours
+            )
+        }
         // Test
         val result = lectureService.getLecturesByRoom(room1.id, 10, 0)
         assertTrue(result is Success, "Should return success")
-        assertEquals(2, result.value.size, "Should return one lecture")
+        assertEquals(1, result.value.size, "Should return one lecture")
     }
 
     @Test
     fun `getLecturesByClass should return lectures for given class`() {
         // Setup test data
-        val university = universityRepository.createUniversity("Test University")
-        val subject = subjectRepository.createSubject("Math", university)
-        val schoolClass1 = classRepository.addClass("Algebra", subject)
-        val schoolClass2 = classRepository.addClass("Geometry", subject)
-        val room = roomRepository.createRoom(30, "Room 101", university)
-        roomRepository.createClassRoom(room)
-        val classroom = roomRepository.getClassRoomById(room.id)
+        val university = mockRepositories.from({universityRepository}){
+            createUniversity("Test University")
+        }
+        val subject = mockRepositories.from({subjectRepository}){
+            createSubject("Math", university)
+        }
+        val schoolClass1 = mockRepositories.from({classRepository}){
+            addClass("Algebra", subject)
+        }
+        val schoolClass2 = mockRepositories.from({classRepository}){
+            addClass("Geometry", subject)
+        }
+        val room = mockRepositories.from({roomRepository}){
+            createRoom(30, "Room 101", university)
+        }
+        mockRepositories.from({roomRepository}){
+            createClassRoom(room)
+        }
+        val classroom = mockRepositories.from({roomRepository}){
+            getClassRoomById(room.id)
+        }
         assertNotNull(classroom, "Classroom should be created")
 
         // Create lectures for different classes
-        lectureRepository.createLecture(
-            schoolClass = schoolClass1,
-            classroom = classroom,
-            type = ClassType.THEORETICAL,
-            weekDay = WeekDay.MONDAY,
-            startTime = 9.hours,
-            endTime = 11.hours
-        )
-        lectureRepository.createLecture(
-            schoolClass = schoolClass2,
-            classroom = classroom,
-            type = ClassType.THEORETICAL,
-            weekDay = WeekDay.TUESDAY,
-            startTime = 9.hours,
-            endTime = 11.hours
-        )
+        mockRepositories.from({lectureRepository}){
+            createLecture(
+                schoolClass = schoolClass1,
+                classroom = classroom,
+                type = ClassType.THEORETICAL,
+                weekDay = WeekDay.MONDAY,
+                startTime = 9.hours,
+                endTime = 11.hours
+            )
+        }
+        mockRepositories.from({lectureRepository}){
+            createLecture(
+                schoolClass = schoolClass2,
+                classroom = classroom,
+                type = ClassType.THEORETICAL,
+                weekDay = WeekDay.TUESDAY,
+                startTime = 9.hours,
+                endTime = 11.hours
+            )
+        }
 
         // Test
         val result = lectureService.getLecturesByClass(schoolClass1.id, 10, 0)
         assertTrue(result is Success, "Should return success")
-        assertEquals(2, result.value.size, "Should return one lecture")
+        assertEquals(1, result.value.size, "Should return one lecture")
     }
 
     @Test
@@ -296,31 +365,43 @@ class LectureServiceTest {
     @Test
     fun `getLecturesByType should return lectures of given type`() {
         // Setup test data
-        val university = universityRepository.createUniversity("Test University")
-        val subject = subjectRepository.createSubject("Math", university)
-        val schoolClass = classRepository.addClass("Algebra", subject)
-        val room = roomRepository.createRoom(30, "Room 101", university)
-        roomRepository.createClassRoom(room)
-        val classroom = roomRepository.getClassRoomById(room.id)
-        assertNotNull(classroom)
+        val university = mockRepositories.from({universityRepository}){
+            createUniversity("Test University")
+        }
+        val subject = mockRepositories.from({subjectRepository}){
+            createSubject("Math", university)
+        }
+        val schoolClass = mockRepositories.from({classRepository}){
+            addClass("Algebra", subject)
+        }
+        val room =mockRepositories.from({roomRepository}){
+            createRoom(30, "Room 101", university)
+        }
+        mockRepositories.from({roomRepository}){createClassRoom(room)}
+        val classroom = mockRepositories.from({roomRepository}){getClassRoomById(room.id)}
+        assertNotNull(classroom, "Classroom should be created")
 
         // Create lectures of different types
-        lectureRepository.createLecture(
-            schoolClass = schoolClass,
-            classroom = classroom,
-            type = ClassType.THEORETICAL,
-            weekDay = WeekDay.MONDAY,
-            startTime = 9.hours,
-            endTime = 11.hours
-        )
-        lectureRepository.createLecture(
-            schoolClass = schoolClass,
-            classroom = classroom,
-            type = ClassType.PRACTICAL,
-            weekDay = WeekDay.TUESDAY,
-            startTime = 9.hours,
-            endTime = 11.hours
-        )
+        mockRepositories.from({lectureRepository}){
+            createLecture(
+                schoolClass = schoolClass,
+                classroom = classroom,
+                type = ClassType.THEORETICAL,
+                weekDay = WeekDay.MONDAY,
+                startTime = 9.hours,
+                endTime = 11.hours
+            )
+        }
+        mockRepositories.from({lectureRepository}){
+            createLecture(
+                schoolClass = schoolClass,
+                classroom = classroom,
+                type = ClassType.PRACTICAL,
+                weekDay = WeekDay.TUESDAY,
+                startTime = 9.hours,
+                endTime = 11.hours
+            )
+        }
 
         // Test
         val result = lectureService.getLecturesByType(ClassType.THEORETICAL)
@@ -332,28 +413,38 @@ class LectureServiceTest {
     @Test
     fun `deleteLecture should return true when lecture is deleted`() {
         // Setup test data
-        val university = universityRepository.createUniversity("Test University")
-        val subject = subjectRepository.createSubject("Math", university)
-        val schoolClass = classRepository.addClass("Algebra", subject)
-        val room = roomRepository.createRoom(30, "Room 101",    university)
-        roomRepository.createClassRoom(room)
-        val classroom = roomRepository.getClassRoomById(room.id)
-        assertNotNull(classroom)
+        val university = mockRepositories.from({universityRepository}){
+            createUniversity("Test University")
+        }
+        val subject = mockRepositories.from({subjectRepository}){
+            createSubject("Math", university)
+        }
+        val schoolClass = mockRepositories.from({classRepository}){
+            addClass("Algebra", subject)
+        }
+        val room =mockRepositories.from({roomRepository}){
+            createRoom(30, "Room 101", university)
+        }
+        mockRepositories.from({roomRepository}){createClassRoom(room)}
+        val classroom = mockRepositories.from({roomRepository}){getClassRoomById(room.id)}
+        assertNotNull(classroom, "Classroom should be created")
 
-        val lecture = lectureRepository.createLecture(
-            schoolClass = schoolClass,
-            classroom = classroom,
-            type = ClassType.THEORETICAL,
-            weekDay = WeekDay.MONDAY,
-            startTime = 9.hours,
-            endTime = 11.hours
-        )
+        val lecture = mockRepositories.from({lectureRepository}){
+            createLecture(
+                schoolClass = schoolClass,
+                classroom = classroom,
+                type = ClassType.THEORETICAL,
+                weekDay = WeekDay.MONDAY,
+                startTime = 9.hours,
+                endTime = 11.hours
+            )
+        }
 
         // Test
         val result = lectureService.deleteLecture(lecture.id)
         assertTrue(result is Success, "Should return success")
         assertTrue(result.value, "Should return true when lecture is deleted")
-        assertNull(lectureRepository.getLectureById(lecture.id), "Lecture should be deleted")
+        assertNull(mockRepositories.from({lectureRepository}){getLectureById(lecture.id)}, "Lecture should be deleted")
     }
 
     @Test
@@ -367,26 +458,38 @@ class LectureServiceTest {
     @Test
     fun `updateLecture should update lecture permanently when numberOfWeeks is 0`() {
         // Setup test data
-        val university = universityRepository.createUniversity("Test University")
-        val subject = subjectRepository.createSubject("Math", university)
-        val schoolClass = classRepository.addClass("Algebra", subject)
-        val room1 = roomRepository.createRoom(30, "Room 101", university)
-        val room2 = roomRepository.createRoom(30, "Room 102", university)
-        roomRepository.createClassRoom(room1)
-        roomRepository.createClassRoom(room2)
-        val classroom1 = roomRepository.getClassRoomById(room1.id)
-        assertNotNull(classroom1)
-        val classroom2 = roomRepository.getClassRoomById(room2.id)
-        assertNotNull(classroom2)
+        val university = mockRepositories.from({universityRepository}){
+            createUniversity("Test University")
+        }
+        val subject = mockRepositories.from({subjectRepository}){
+            createSubject("Math", university)
+        }
+        val schoolClass = mockRepositories.from({classRepository}){
+            addClass("Algebra", subject)
+        }
+        val room1 =mockRepositories.from({roomRepository}){
+            createRoom(30, "Room 101", university)
+        }
+        mockRepositories.from({roomRepository}){createClassRoom(room1)}
+        val room2 =mockRepositories.from({roomRepository}){
+            createRoom(30, "Room 102", university)
+        }
+        mockRepositories.from({roomRepository}){createClassRoom(room2)}
+        val classroom1 = mockRepositories.from({roomRepository}){getClassRoomById(room1.id)}
+        val classroom2 = mockRepositories.from({roomRepository}){getClassRoomById(room2.id)}
+        assertNotNull(classroom1, "Classroom should be created")
+        assertNotNull(classroom2, "Classroom should be created")
 
-        val lecture = lectureRepository.createLecture(
-            schoolClass = schoolClass,
-            classroom = classroom1,
-            type = ClassType.THEORETICAL,
-            weekDay = WeekDay.MONDAY,
-            startTime = 9.hours,
-            endTime = 11.hours
-        )
+        val lecture = mockRepositories.from({lectureRepository}){
+            createLecture(
+                schoolClass = schoolClass,
+                classroom = classroom1,
+                type = ClassType.THEORETICAL,
+                weekDay = WeekDay.MONDAY,
+                startTime = 9.hours,
+                endTime = 11.hours
+            )
+        }
 
         // Test
         val result = lectureService.updateLecture(
@@ -412,26 +515,39 @@ class LectureServiceTest {
     @Test
     fun `updateLecture should create temporary change when numberOfWeeks greater than 0`() {
         // Setup test data
-        val university = universityRepository.createUniversity("Test University")
-        val subject = subjectRepository.createSubject("Math", university)
-        val schoolClass = classRepository.addClass("Algebra", subject)
-        val room1 = roomRepository.createRoom(30, "Room 101", university)
-        val room2 = roomRepository.createRoom(30, "Room 102", university)
-        roomRepository.createClassRoom(room1)
-        roomRepository.createClassRoom(room2)
-        val classroom1 = roomRepository.getClassRoomById(room1.id)
-        assertNotNull(classroom1)
-        val classroom2 = roomRepository.getClassRoomById(room2.id)
-        assertNotNull(classroom2)
+        val university = mockRepositories.from({universityRepository}){
+            createUniversity("Test University")
+        }
+        val subject = mockRepositories.from({subjectRepository}){
+            createSubject("Math", university)
+        }
+        val schoolClass = mockRepositories.from({classRepository}){
+            addClass("Algebra", subject)
+        }
+        val room1 =mockRepositories.from({roomRepository}){
+            createRoom(30, "Room 101", university)
+        }
+        mockRepositories.from({roomRepository}){createClassRoom(room1)}
+        val room2 =mockRepositories.from({roomRepository}){
+            createRoom(30, "Room 102", university)
+        }
+        mockRepositories.from({roomRepository}){createClassRoom(room2)}
+        val classroom1 = mockRepositories.from({roomRepository}){getClassRoomById(room1.id)}
+        val classroom2 = mockRepositories.from({roomRepository}){getClassRoomById(room2.id)}
+        assertNotNull(classroom1, "Classroom should be created")
+        assertNotNull(classroom2, "Classroom should be created")
 
-        val lecture = lectureRepository.createLecture(
-            schoolClass = schoolClass,
-            classroom = classroom1,
-            type = ClassType.THEORETICAL,
-            weekDay = WeekDay.MONDAY,
-            startTime = 9.hours,
-            endTime = 11.hours
-        )
+
+        val lecture =  mockRepositories.from({lectureRepository}){
+            createLecture(
+                schoolClass = schoolClass,
+                classroom = classroom1,
+                type = ClassType.THEORETICAL,
+                weekDay = WeekDay.MONDAY,
+                startTime = 9.hours,
+                endTime = 11.hours
+            )
+        }
 
         // Test
         val result = lectureService.updateLecture(
@@ -447,7 +563,9 @@ class LectureServiceTest {
 
         assertTrue(result is Success, "Should return success")
         // Check that change was created
-        val updatedLecture = lectureRepository.getLectureById(lecture.id)
+        val updatedLecture = mockRepositories.from({lectureRepository}){
+            getLectureById(lecture.id)
+        }
         assertNotNull(updatedLecture, "Updated lecture should exist")
         assertEquals(room2.id, updatedLecture.classroom.room.id, "Updated room should be")
         assertEquals(ClassType.PRACTICAL, updatedLecture.type, "Updated type should be")
@@ -477,22 +595,32 @@ class LectureServiceTest {
     @Test
     fun `updateLecture should return InvalidLectureRoom when new room not found`() {
         // Setup test data
-        val university = universityRepository.createUniversity("Test University")
-        val subject = subjectRepository.createSubject("Math", university)
-        val schoolClass = classRepository.addClass("Algebra", subject)
-        val room = roomRepository.createRoom(30, "Room 101", university)
-        roomRepository.createClassRoom(room)
-        val classroom = roomRepository.getClassRoomById(room.id)
-        assertNotNull(classroom)
+        val university = mockRepositories.from({universityRepository}){
+            createUniversity("Test University")
+        }
+        val subject = mockRepositories.from({subjectRepository}){
+            createSubject("Math", university)
+        }
+        val schoolClass = mockRepositories.from({classRepository}){
+            addClass("Algebra", subject)
+        }
+        val room =mockRepositories.from({roomRepository}){
+            createRoom(30, "Room 101", university)
+        }
+        mockRepositories.from({roomRepository}){createClassRoom(room)}
+        val classroom = mockRepositories.from({roomRepository}){getClassRoomById(room.id)}
+        assertNotNull(classroom, "Classroom should be created")
 
-        val lecture = lectureRepository.createLecture(
-            schoolClass = schoolClass,
-            classroom = classroom,
-            type = ClassType.THEORETICAL,
-            weekDay = WeekDay.MONDAY,
-            startTime = 9.hours,
-            endTime = 11.hours
-        )
+        val lecture = mockRepositories.from({lectureRepository}){
+            createLecture(
+                schoolClass = schoolClass,
+                classroom = classroom,
+                type = ClassType.THEORETICAL,
+                weekDay = WeekDay.MONDAY,
+                startTime = 9.hours,
+                endTime = 11.hours
+            )
+        }
 
         val result = lectureService.updateLecture(
             lectureId = lecture.id,

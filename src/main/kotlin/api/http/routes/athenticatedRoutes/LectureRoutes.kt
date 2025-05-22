@@ -14,7 +14,7 @@ import isel.leic.group25.api.model.response.LectureResponse
 import isel.leic.group25.db.entities.types.ClassType
 import isel.leic.group25.db.entities.types.Role
 import isel.leic.group25.db.entities.types.WeekDay
-import isel.leic.group25.services.LectureService
+import isel.leic.group25.services.Services
 import kotlin.time.ExperimentalTime
 
 /**
@@ -22,21 +22,21 @@ import kotlin.time.ExperimentalTime
  * Routes have role-based access control with different operations available to different roles.
  *
  * @receiver Route The Ktor route to which these endpoints will be added
- * @param lectureService Service handling lecture business logic
+ * @param services The class containing all the services containing business logic
  */
-fun Route.lectureRoutes(lectureService: LectureService) {
+fun Route.lectureRoutes(services: Services) {
     route("/lectures") {
-        getAllLecturesRoute(lectureService)
+        getAllLecturesRoute(services)
         withRole(Role.ADMIN){
-            createLectureRoute(lectureService)
+            createLectureRoute(services)
         }
         route("/{lectureId}") {
-            getLectureRoute(lectureService)
+            getLectureRoute(services)
             withRole(Role.ADMIN){
-                deleteLectureRoute(lectureService)
+                deleteLectureRoute(services)
             }
             withRoles(setOf(Role.ADMIN, Role.TEACHER)){
-                updateLectureRoute(lectureService)
+                updateLectureRoute(services)
             }
         }
     }
@@ -46,15 +46,17 @@ fun Route.lectureRoutes(lectureService: LectureService) {
  * Retrieves all lectures with optional pagination parameters.
  *
  * @receiver Route The Ktor route for this endpoint
- * @param lectureService Service handling lecture retrieval logic
+ * @param services The class containing all the services containing business logic
  */
-fun Route.getAllLecturesRoute(lectureService: LectureService) {
+fun Route.getAllLecturesRoute(services: Services) {
     get {
         val limit = call.queryParameters["limit"]?.toIntOrNull() ?: 10
         val offset = call.queryParameters["offset"]?.toIntOrNull() ?: 0
         if(offset < 0) return@get RequestError.Invalid("offset").toProblem().respond(call)
         if(limit < 1 || limit > 100) return@get RequestError.Invalid("limit").toProblem().respond(call)
-        val result = lectureService.getAllLectures(limit, offset)
+        val result = services.from({lectureService}){
+            getAllLectures(limit, offset)
+        }
         call.respondEither(
             either = result,
             transformError = { error -> error.toProblem() },
@@ -69,15 +71,17 @@ fun Route.getAllLecturesRoute(lectureService: LectureService) {
  * Retrieves a lecture by ID.
  *
  * @receiver Route The Ktor route for this endpoint
- * @param lectureService Service handling lecture retrieval logic
+ * @param services The class containing all the services containing business logic
  **/
-fun Route.getLectureRoute(lectureService: LectureService) {
+fun Route.getLectureRoute(services: Services) {
     get {
         val lectureStringId = call.parameters["lectureId"]
             ?: return@get RequestError.Missing("lectureId").toProblem().respond(call)
         val lectureId = lectureStringId.toIntOrNull()
             ?: return@get RequestError.Invalid("lectureId").toProblem().respond(call)
-        val result = lectureService.getLectureById(lectureId)
+        val result = services.from({lectureService}){
+            getLectureById(lectureId)
+        }
         call.respondEither(
             either = result,
             transformError = { error -> error.toProblem() },
@@ -92,9 +96,9 @@ fun Route.getLectureRoute(lectureService: LectureService) {
  * Creates a new lecture. Requires ADMIN role.
  *
  * @receiver Route The Ktor route for this endpoint
- * @param lectureService Service handling lecture creation logic
+ * @param services The class containing all the services containing business logic
  */
-fun Route.createLectureRoute(lectureService: LectureService) {
+fun Route.createLectureRoute(services: Services) {
     post("/add") {
         val lectureRequest = call.receive<LectureRequest>()
         lectureRequest.validate()?.let { error ->
@@ -104,14 +108,16 @@ fun Route.createLectureRoute(lectureService: LectureService) {
             ?: return@post RequestError.Invalid("weekday").toProblem().respond(call)
         val type = ClassType.fromValue(lectureRequest.type.uppercase())
             ?: return@post RequestError.Invalid("type").toProblem().respond(call)
-        val result = lectureService.createLecture(
-            schoolClassId = lectureRequest.schoolClassId,
-            roomId = lectureRequest.roomId,
-            weekDay = weekday,
-            type = type,
-            startTime = lectureRequest.startTime,
-            endTime = lectureRequest.endTime
-        )
+        val result = services.from({lectureService}){
+            createLecture(
+                schoolClassId = lectureRequest.schoolClassId,
+                roomId = lectureRequest.roomId,
+                weekDay = weekday,
+                type = type,
+                startTime = lectureRequest.startTime,
+                endTime = lectureRequest.endTime
+            )
+        }
         call.respondEither(
             either = result,
             transformError = { error -> error.toProblem() },
@@ -127,10 +133,10 @@ fun Route.createLectureRoute(lectureService: LectureService) {
  * Updates an existing lecture. Available to ADMIN and TEACHER roles.
  *
  * @receiver Route The Ktor route for this endpoint
- * @param lectureService Service handling lecture update logic
+ * @param services The class containing all the services containing business logic
  */
 @OptIn(ExperimentalTime::class)
-fun Route.updateLectureRoute(lectureService: LectureService) {
+fun Route.updateLectureRoute(services: Services) {
     put("/update") {
         val updateLectureRequest = call.receive<UpdateLectureRequest>()
         updateLectureRequest.validate()?.let { error ->
@@ -145,16 +151,18 @@ fun Route.updateLectureRoute(lectureService: LectureService) {
         val newType = ClassType.fromValue(updateLectureRequest.newType)
             ?: return@put RequestError.Invalid("newType").toProblem().respond(call)
         val (effectiveFrom, effectiveUntil) = updateLectureRequest.parseChangeDates()
-        val result = lectureService.updateLecture(
-            lectureId = lectureId,
-            newRoomId = updateLectureRequest.newRoomId,
-            newWeekDay = newWeekday,
-            newType = newType,
-            newStartTime = updateLectureRequest.newStartTime,
-            newEndTime = updateLectureRequest.newEndTime,
-            effectiveFrom = effectiveFrom,
-            effectiveUntil = effectiveUntil
-        )
+        val result = services.from({lectureService}){
+            updateLecture(
+                lectureId = lectureId,
+                newRoomId = updateLectureRequest.newRoomId,
+                newWeekDay = newWeekday,
+                newType = newType,
+                newStartTime = updateLectureRequest.newStartTime,
+                newEndTime = updateLectureRequest.newEndTime,
+                effectiveFrom = effectiveFrom,
+                effectiveUntil = effectiveUntil
+            )
+        }
         call.respondEither(
             either = result,
             transformError = { error -> error.toProblem() },
@@ -169,17 +177,19 @@ fun Route.updateLectureRoute(lectureService: LectureService) {
  * Deletes a lecture. Requires ADMIN role.
  *
  * @receiver Route The Ktor route for this endpoint
- * @param lectureService Service handling lecture deletion logic
+ * @param services The class containing all the services containing business logic
  */
-fun Route.deleteLectureRoute(lectureService: LectureService) {
+fun Route.deleteLectureRoute(services: Services) {
     delete("/delete") {
         val lectureIdString = call.parameters["lectureId"]
             ?: return@delete RequestError.Missing("id").toProblem().respond(call)
         val lectureId = lectureIdString.toIntOrNull()
             ?: return@delete RequestError.Invalid("id").toProblem().respond(call)
-        val result = lectureService.deleteLecture(
-            lectureId = lectureId,
-        )
+        val result = services.from({lectureService}){
+            deleteLecture(
+                lectureId = lectureId,
+            )
+        }
         call.respondEither(
             either = result,
             transformError = { error -> error.toProblem() },

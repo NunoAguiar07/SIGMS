@@ -10,7 +10,7 @@ import isel.leic.group25.api.jwt.getUserIdFromPrincipal
 import isel.leic.group25.api.model.response.AssessRoleResponse
 import isel.leic.group25.db.entities.types.Role
 import isel.leic.group25.db.entities.types.Status
-import isel.leic.group25.services.AuthService
+import isel.leic.group25.services.Services
 
 /**
  * Defines routes for assessing and managing role approval requests for Technical_Services and Teachers
@@ -19,12 +19,12 @@ import isel.leic.group25.services.AuthService
  * @receiver Route The Ktor route to which these endpoints will be added
  * @param authService Service handling role approval logic
  */
-fun Route.assessRoleRoutes(authService: AuthService) {
+fun Route.assessRoleRoutes(services: Services) {
     route("/assess-roles") {
         withRole(Role.ADMIN){
-            getAllPendingApprovalsRoute(authService)
-            processRoleApprovalRoute(authService)
-            getApprovalByTokenRoute(authService)
+            getAllPendingApprovalsRoute(services)
+            processRoleApprovalRoute(services)
+            getApprovalByTokenRoute(services)
         }
     }
 }
@@ -35,13 +35,15 @@ fun Route.assessRoleRoutes(authService: AuthService) {
  * @receiver Route The Ktor route for this endpoint
  * @param authService Service handling approval retrieval logic
  */
-fun Route.getAllPendingApprovalsRoute(authService: AuthService) {
+fun Route.getAllPendingApprovalsRoute(services: Services) {
     get {
         val limit = call.request.queryParameters["limit"]?.toIntOrNull() ?: 10
         val offset = call.request.queryParameters["offset"]?.toIntOrNull() ?: 0
         if (offset < 0) return@get RequestError.Invalid("offset").toProblem().respond(call)
         if (limit <= 0 || limit > 100) return@get RequestError.Invalid("limit").toProblem().respond(call)
-        val result = authService.getAllPendingApprovals(limit, offset)
+        val result = services.from({authService}){
+            getAllPendingApprovals(limit, offset)
+        }
         call.respondEither(
             either = result,
             transformError = { error -> error.toProblem() },
@@ -61,7 +63,7 @@ fun Route.getAllPendingApprovalsRoute(authService: AuthService) {
  * @receiver Route The Ktor route for this endpoint
  * @param authService Service handling approval processing logic
  */
-fun Route.processRoleApprovalRoute(authService: AuthService) {
+fun Route.processRoleApprovalRoute(services: Services) {
     route("/validate"){
         put {
             val token = call.queryParameters["token"]
@@ -71,11 +73,13 @@ fun Route.processRoleApprovalRoute(authService: AuthService) {
             val adminId = call.getUserIdFromPrincipal() ?: return@put call.respond(HttpStatusCode.Unauthorized)
             val toStatus = Status.fromValue(status.uppercase())
                 ?: return@put RequestError.Invalid("status").toProblem().respond(call)
-            val result = authService.assessRoleRequest(
-                token = token,
-                adminUserId = adminId,
-                status = toStatus
-            )
+            val result = services.from({authService}){
+                assessRoleRequest(
+                    token = token,
+                    adminUserId = adminId,
+                    status = toStatus
+                )
+            }
             call.respondEither(
                 either = result,
                 transformError = { error -> error.toProblem() },
@@ -93,11 +97,13 @@ fun Route.processRoleApprovalRoute(authService: AuthService) {
  * @receiver Route The Ktor route for this endpoint
  * @param authService Service handling approval retrieval logic
  */
-fun Route.getApprovalByTokenRoute(authService: AuthService) {
+fun Route.getApprovalByTokenRoute(services: Services) {
     get("/{token}") {
         val token = call.parameters["token"]
             ?: return@get RequestError.Missing("token").toProblem().respond(call)
-        val result = authService.getApprovalByToken(token)
+        val result = services.from({authService}){
+            getApprovalByToken(token)
+        }
         call.respondEither(
             either = result,
             transformError = { error -> error.toProblem() },

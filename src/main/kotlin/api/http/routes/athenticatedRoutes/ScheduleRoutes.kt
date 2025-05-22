@@ -8,7 +8,7 @@ import isel.leic.group25.api.exceptions.respondEither
 import isel.leic.group25.api.jwt.getUserIdFromPrincipal
 import isel.leic.group25.api.jwt.getUserRoleFromPrincipal
 import isel.leic.group25.db.entities.types.Role
-import isel.leic.group25.services.UserClassService
+import isel.leic.group25.services.Services
 
 /**
  * Defines the schedule retrieval route for authenticated users.
@@ -18,16 +18,18 @@ import isel.leic.group25.services.UserClassService
  * associated with the user.
  *
  * @receiver Route The Ktor route to which this endpoint will be added
- * @param userClassService Service handling user-class relationships and schedule logic
+ * @param services The class containing all the services containing business logic
  */
 fun Route.scheduleRoutes(
-    userClassService: UserClassService
+    services: Services
 ) {
     route("/schedule") {
         get {
             val id = call.getUserIdFromPrincipal() ?: return@get call.respond(HttpStatusCode.Unauthorized)
             val role = call.getUserRoleFromPrincipal() ?: return@get call.respond(HttpStatusCode.Unauthorized)
-            val result = userClassService.getScheduleByUserId(id, Role.valueOf(role.uppercase()))
+            val result = services.from({userClassService}){
+                getScheduleByUserId(id, Role.valueOf(role.uppercase()))
+            }
             call.respondEither(
                 either = result,
                 transformError = { error -> error.toProblem() },

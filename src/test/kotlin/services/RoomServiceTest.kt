@@ -6,9 +6,11 @@ import isel.leic.group25.services.RoomService
 import isel.leic.group25.services.errors.RoomError
 import isel.leic.group25.utils.Failure
 import isel.leic.group25.utils.Success
+import mocks.repositories.MockRepositories
 import mocks.repositories.rooms.MockRoomRepository
 import mocks.repositories.timetables.MockUniversityRepository
 import mocks.repositories.utils.MockTransaction
+import org.ktorm.database.Database
 import repositories.DatabaseTestSetup
 import kotlin.test.AfterTest
 import kotlin.test.Test
@@ -16,24 +18,26 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class RoomServiceTest {
-    private val roomRepository = MockRoomRepository()
-    private val universityRepository = MockUniversityRepository()
-    private val transactionInterface = MockTransaction()
+    val mockDB = Database.connect(
+        url = "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1",
+        user = "root",
+        password = ""
+    )
+    private val mockRepositories = MockRepositories(mockDB)
 
-    private val roomService = RoomService(roomRepository, universityRepository, transactionInterface)
+    private val roomService = RoomService(mockRepositories, mockRepositories.ktormCommand)
 
     private fun createTestRooms(count: Int = 1): List<Room> {
-        return transactionInterface.useTransaction {
+        return mockRepositories.ktormCommand.useTransaction {
             (1..count).map { i ->
-                val university = universityRepository.createUniversity("Test University $i")
-                roomRepository.createRoom(10, "Test Room $i", university)
+                val university = mockRepositories.from({universityRepository}){
+                    createUniversity("Test University $i")
+                }
+                mockRepositories.from({roomRepository}){
+                    createRoom(10, "Test Room $i", university)
+                }
             }
         }
-    }
-
-    @AfterTest
-    fun clearDatabase() {
-        DatabaseTestSetup.clearDB()
     }
 
     @Test
@@ -78,7 +82,9 @@ class RoomServiceTest {
 
     @Test
     fun `createRoom succeeds with valid parameters for class room`() {
-        val university = universityRepository.createUniversity("Test University")
+        val university = mockRepositories.from({universityRepository}){
+            createUniversity("Test University")
+        }
         val result = roomService.createRoom(10, "Class Room 1", university.id, RoomType.CLASS)
         assertTrue(result is Success, "Expected Success")
         val successResult = result.value
@@ -88,7 +94,9 @@ class RoomServiceTest {
 
     @Test
     fun `createRoom succeeds with valid parameters for office room`() {
-        val university = universityRepository.createUniversity("Test University")
+        val university = mockRepositories.from({universityRepository}){
+            createUniversity("Test University")
+        }
         val result = roomService.createRoom(10, "Office Room 1", university.id, RoomType.OFFICE)
         assertTrue(result is Success, "Expected Success")
         val successResult = result.value
@@ -98,7 +106,9 @@ class RoomServiceTest {
 
     @Test
     fun `createRoom succeeds with valid parameters for study room`() {
-        val university = universityRepository.createUniversity("Test University")
+        val university = mockRepositories.from({universityRepository}){
+            createUniversity("Test University")
+        }
         val result = roomService.createRoom(10, "Study Room 1", university.id, RoomType.STUDY)
         assertTrue(result is Success, "Expected Success")
         val successResult = result.value

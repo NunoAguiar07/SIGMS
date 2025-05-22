@@ -1,6 +1,6 @@
 package isel.leic.group25.db.repositories.interfaces
 
-interface TransactionInterface {
+interface Transactionable {
     fun <T> useTransaction(transaction: () -> T): T
     fun <T> useTransaction(isolationLevel: IsolationLevel, transaction: () -> T): T
 }

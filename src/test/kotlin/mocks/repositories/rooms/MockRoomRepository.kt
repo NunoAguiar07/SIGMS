@@ -44,6 +44,7 @@ class MockRoomRepository : RoomRepositoryInterface {
             this.capacity = capacity
             this.university = university
         }
+        newRoom["id"] = rooms.size + 1
         rooms.add(newRoom)
         return newRoom
     }

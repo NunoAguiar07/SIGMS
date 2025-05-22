@@ -9,7 +9,7 @@ import io.ktor.server.routing.*
 import io.ktor.server.response.*
 import isel.leic.group25.api.exceptions.respondEither
 import isel.leic.group25.api.jwt.getUserIdFromPrincipal
-import isel.leic.group25.services.UserService
+import isel.leic.group25.services.Services
 
 /**
  * Defines user profile management routes including:
@@ -22,11 +22,11 @@ import isel.leic.group25.services.UserService
  * @receiver Route The Ktor route to which these endpoints will be added
  * @param userService Service handling user profile operations
  */
-fun Route.profileRoutes(userService: UserService) {
+fun Route.profileRoutes(services: Services) {
     route("/profile") {
-        getProfileRoute(userService)
-        updateProfileRoute(userService)
-        changePasswordRoute(userService)
+        getProfileRoute(services)
+        updateProfileRoute(services)
+        changePasswordRoute(services)
     }
 }
 
@@ -37,10 +37,12 @@ fun Route.profileRoutes(userService: UserService) {
  * @receiver Route The Ktor route for this endpoint
  * @param userService Service handling user data retrieval
  */
-fun Route.getProfileRoute(userService: UserService) {
+fun Route.getProfileRoute(services: Services) {
     get {
         val userId = call.getUserIdFromPrincipal() ?: return@get call.respond(HttpStatusCode.Unauthorized)
-        val result = userService.getUserById(userId)
+        val result = services.from({userService}){
+            getUserById(userId)
+        }
         call.respondEither(
             either = result,
             transformError = { error -> error.toProblem() },
@@ -58,15 +60,17 @@ fun Route.getProfileRoute(userService: UserService) {
  * @receiver Route The Ktor route for this endpoint
  * @param userService Service handling profile updates
  */
-fun Route.updateProfileRoute(userService: UserService) {
+fun Route.updateProfileRoute(services: Services) {
     put("/update") {
         val userId = call.getUserIdFromPrincipal() ?: return@put call.respond(HttpStatusCode.Unauthorized)
         val updateRequest = call.receive<UserUpdateRequest>()
-        val result = userService.updateUser(
-            id = userId,
-            username = updateRequest.username,
-            image = updateRequest.image
-        )
+        val result = services.from({userService}){
+            updateUser(
+                id = userId,
+                username = updateRequest.username,
+                image = updateRequest.image
+            )
+        }
         call.respondEither(
             either = result,
             transformError = { error -> error.toProblem() },
@@ -84,18 +88,20 @@ fun Route.updateProfileRoute(userService: UserService) {
  * @receiver Route The Ktor route for this endpoint
  * @param userService Service handling password changes
  */
-fun Route.changePasswordRoute(userService: UserService) {
+fun Route.changePasswordRoute(services: Services) {
     post("/password") {
         val userId = call.getUserIdFromPrincipal() ?: return@post call.respond(HttpStatusCode.Unauthorized)
         val passwordRequest = call.receive<ChangePasswordRequest>()
         passwordRequest.validate()?.let{ error ->
             return@post error.toProblem().respond(call)
         }
-        val result = userService.changePassword(
-            userId = userId,
-            oldPassword = passwordRequest.oldPassword,
-            newPassword = passwordRequest.newPassword
-        )
+        val result = services.from({userService}){
+            changePassword(
+                userId = userId,
+                oldPassword = passwordRequest.oldPassword,
+                newPassword = passwordRequest.newPassword
+            )
+        }
         call.respondEither(
             either = result,
             transformError = { it.toProblem() },

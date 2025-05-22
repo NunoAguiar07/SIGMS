@@ -1,6 +1,6 @@
 package repositories.rooms
 
-import isel.leic.group25.db.repositories.ktorm.KTransaction
+import isel.leic.group25.db.repositories.ktorm.KtormCommand
 import isel.leic.group25.db.repositories.rooms.RoomRepository
 import isel.leic.group25.db.repositories.timetables.UniversityRepository
 import repositories.DatabaseTestSetup
@@ -11,7 +11,7 @@ import kotlin.test.Test
 
 
 class RoomRepositoryTest {
-    private val kTransaction = KTransaction(database)
+    private val kTormCommand = KtormCommand(database)
     private val roomRepository = RoomRepository(database)
     private val universityRepository = UniversityRepository(database)
 
@@ -22,7 +22,7 @@ class RoomRepositoryTest {
 
     @Test
     fun `Should create a new room and find it by id`() {
-        kTransaction.useTransaction {
+        kTormCommand.useTransaction {
             val createUniversity = universityRepository.createUniversity("testUniversity")
             val newRoom = roomRepository.createRoom(20, "testRoom", createUniversity)
             val foundRoom = roomRepository.getRoomById(newRoom.id)
@@ -33,7 +33,7 @@ class RoomRepositoryTest {
 
     @Test
     fun `Should create a new room and find it by name`() {
-        kTransaction.useTransaction {
+        kTormCommand.useTransaction {
             val createUniversity = universityRepository.createUniversity("testUniversity")
             val newRoom = roomRepository.createRoom(20, "testRoom", createUniversity)
             val foundRoom = roomRepository.getAllRooms().firstOrNull { it.name == newRoom.name }
@@ -44,7 +44,7 @@ class RoomRepositoryTest {
 
     @Test
     fun `Should get all rooms`() {
-        kTransaction.useTransaction {
+        kTormCommand.useTransaction {
             val createUniversity = universityRepository.createUniversity("testUniversity")
             val newRoom1 = roomRepository.createRoom(20, "testRoom1", createUniversity)
             val newRoom2 = roomRepository.createRoom(30, "testRoom2", createUniversity)
@@ -57,7 +57,7 @@ class RoomRepositoryTest {
 
     @Test
     fun `Should create a new classroom and find it by id`() {
-        kTransaction.useTransaction {
+        kTormCommand.useTransaction {
             val createUniversity = universityRepository.createUniversity("testUniversity")
             val newRoom = roomRepository.createRoom(30, "testRoom5", createUniversity)
             roomRepository.createClassRoom(newRoom)
@@ -68,7 +68,7 @@ class RoomRepositoryTest {
     }
     @Test
     fun `Should create a new office room and find it by id`() {
-        kTransaction.useTransaction {
+        kTormCommand.useTransaction {
             val createUniversity = universityRepository.createUniversity("testUniversity")
             val newRoom = roomRepository.createRoom(40, "testRoom6", createUniversity)
             roomRepository.createOfficeRoom(newRoom)
@@ -79,7 +79,7 @@ class RoomRepositoryTest {
     }
     @Test
     fun `Should create a new study room and find it by id`() {
-        kTransaction.useTransaction {
+        kTormCommand.useTransaction {
             val createUniversity = universityRepository.createUniversity("testUniversity")
             val newRoom = roomRepository.createRoom(45, "testRoom7", createUniversity)
             roomRepository.createStudyRoom(newRoom)

@@ -3,7 +3,7 @@ package repositories.issues
 import isel.leic.group25.db.entities.types.Role
 import isel.leic.group25.db.entities.users.User
 import isel.leic.group25.db.repositories.issues.IssueReportRepository
-import isel.leic.group25.db.repositories.ktorm.KTransaction
+import isel.leic.group25.db.repositories.ktorm.KtormCommand
 import isel.leic.group25.db.repositories.rooms.RoomRepository
 import isel.leic.group25.db.repositories.timetables.UniversityRepository
 import isel.leic.group25.db.repositories.users.UserRepository
@@ -15,7 +15,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
 class IssueReportRepositoryTest {
-    private val kTransaction = KTransaction(database)
+    private val kTormCommand = KtormCommand(database)
     private val issueReportRepository = IssueReportRepository(database)
     private val userRepository = UserRepository(database)
     private val universityRepository = UniversityRepository(database)
@@ -29,7 +29,7 @@ class IssueReportRepositoryTest {
 
     @Test
     fun `Should create a new issue report and find it by id`() {
-        kTransaction.useTransaction {
+        kTormCommand.useTransaction {
             val newUniversity = universityRepository.createUniversity("testUniversity")
             val newUser = User {
                 email = "testemail@test.com"
@@ -49,7 +49,7 @@ class IssueReportRepositoryTest {
 
     @Test
     fun `Should create a new issue report and find it by description`() {
-        kTransaction.useTransaction {
+        kTormCommand.useTransaction {
             val newUniversity = universityRepository.createUniversity("testUniversity")
             val newUser = User {
                 email = "testemail@test.com"
@@ -69,7 +69,7 @@ class IssueReportRepositoryTest {
 
     @Test
     fun `Should get all issue reports`() {
-        kTransaction.useTransaction {
+        kTormCommand.useTransaction {
             val newUniversity = universityRepository.createUniversity("testUniversity")
             val newUser = User {
                 email = "testemail@test.com"
@@ -98,7 +98,7 @@ class IssueReportRepositoryTest {
     }
     @Test
     fun `Should delete an issue report`() {
-        kTransaction.useTransaction {
+        kTormCommand.useTransaction {
             val newUniversity = universityRepository.createUniversity("testUniversity")
             val newUser = User {
                 email = "testemail@test.com"
@@ -118,7 +118,7 @@ class IssueReportRepositoryTest {
     }
     @Test
     fun `Should update an issue report`() {
-        kTransaction.useTransaction {
+        kTormCommand.useTransaction {
             val newUniversity = universityRepository.createUniversity("testUniversity")
             val newUser = User {
                 email = "testemail@test.com"

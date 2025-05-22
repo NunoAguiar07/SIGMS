@@ -10,31 +10,15 @@ import isel.leic.group25.services.*
 import isel.leic.group25.websockets.hardware.route.DeviceRoute
 
 fun Application.configureRouting(
-    userService: UserService,
-    teacherRoomService: TeacherRoomService,
-    authService: AuthService,
-    classService: ClassService,
-    userClassService: UserClassService,
-    subjectService: SubjectService,
-    roomService: RoomService,
-    lectureService: LectureService,
-    issuesReportService: IssuesReportService,
+    services: Services,
     client:HttpClient
 ) {
     routing {
         route("/api") {
             welcomeRoutes()
-            authRoutes(authService, client)
+            authRoutes(services, client)
             authenticatedRoutes(
-                authService,
-                userService,
-                teacherRoomService,
-                classService,
-                userClassService,
-                subjectService,
-                roomService,
-                lectureService,
-                issuesReportService
+                services
             )
         }
         with(DeviceRoute){
