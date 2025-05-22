@@ -1,5 +1,5 @@
 import React from "react";
-import '../css_styling/PropertiesAbout.css';
+import '../../css_styling/PropertiesAbout.css';
 // @ts-ignore
 const Privacy = ({onClose}) => {
     return (

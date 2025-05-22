@@ -1,5 +1,5 @@
 import React from "react";
-import '../css_styling/PropertiesAbout.css';
+import '../../css_styling/PropertiesAbout.css';
 
 // @ts-ignore
 const FAQ = ({onClose}) => {
@@ -18,7 +18,6 @@ const FAQ = ({onClose}) => {
                 <h2>How do I create an account?</h2>
                 <p>You can create an account by clicking on the "SIGN IN WITH MICROSOFT" button on the homepage and following the instructions.</p>
             </div>
-            {/* Add more FAQ items as needed */}
         </div>
         </div>
     );

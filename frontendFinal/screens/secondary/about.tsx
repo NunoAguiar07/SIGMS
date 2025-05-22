@@ -1,6 +1,6 @@
 import React from "react";
 // @ts-ignore
-import '../css_styling/PropertiesAbout.css';
+import '../../css_styling/PropertiesAbout.css';
 
 // @ts-ignore
 const About = ({ onClose }) => {

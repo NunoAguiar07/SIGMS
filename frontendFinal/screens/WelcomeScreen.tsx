@@ -2,10 +2,10 @@ import React, {useState} from "react";
 import '../css_styling/PropertiesWelcome.css'
 import Button from "../Utils/Button";
 import {Image} from "expo-image";
-import MicrosoftAuthButton from "../requests/Microsoft/Login";
-import About from "./about";
-import Privacy from "./privacy";
-import FAQ from "./faq";
+import MicrosoftAuthButton from "../requests/auth/Microsoft/Login";
+import About from "./secondary/about";
+import Privacy from "./secondary/privacy";
+import FAQ from "./secondary/faq";
 // @ts-ignore
 export const WelcomeScreen = ({ welcome }) => {
     const [showAbout, setShowAbout] = useState(false);

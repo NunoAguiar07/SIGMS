@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom'
-import {ErrorScreen} from "../../css_mainscreens/ErrorScreen";
+import {ErrorScreen} from "../../screens/ErrorScreen";
 import {goBack} from "expo-router/build/global-state/routing";
 import welcome from "./welcome";
 

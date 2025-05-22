@@ -4,11 +4,17 @@ import {Button} from 'react-native';
 import * as SecureStore from 'expo-secure-store';
 import {useEffect} from "react";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from "axios";
+import {useRouter} from "expo-router";
+
+
 
 
 WebBrowser.maybeCompleteAuthSession();
 
 const MicrosoftAuthButton = () => {
+    const router = useRouter();
+
   const discovery = {
     authorizationEndpoint: `https://login.microsoftonline.com/common/oauth2/v2.0/authorize`,
     tokenEndpoint: `https://login.microsoftonline.com/common/oauth2/v2.0/token`,
@@ -58,9 +64,6 @@ const exchangeCodeForTokens = async (code: string) => {
             discovery
         );
 
-        // Store the refresh token securely
-        console.log(tokenResponse)
-
         await AsyncStorage.setItem('refreshToken', tokenResponse.refreshToken ?? '');
 
 
@@ -72,29 +75,42 @@ const exchangeCodeForTokens = async (code: string) => {
     }
 };
 
+
+
 const authenticateWithBackend = async (accessToken: string) => {
-    try {
-        console.log('Access Token:', accessToken);
-        const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/auth/microsoft`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${accessToken}`
+        try {
+            const response = await axios.post(
+                `${process.env.EXPO_PUBLIC_API_URL}/auth/microsoft`,
+                {},
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${accessToken}`
+                    }
+                }
+            );
+
+            if (response.data.token) {
+                // Store your backend JWT token
+                await AsyncStorage.setItem('authToken', response.data.token);
+                console.log('Backend authentication successful:', response.data.token);
+                router.replace('/profile');
+            } else {
+                console.error('Backend authentication failed: No token received');
             }
-        });
-
-        const data = await response.json();
-
-        if (response.ok) {
-            // Store your backend JWT token
-            await AsyncStorage.setItem('authToken', data.token);
-            // Navigate to app
-        } else {
-            console.error('Backend authentication failed:', data.message);
+        } catch (error) {
+            if (axios.isAxiosError(error)) {
+                if (error.response) {
+                    console.error('Backend authentication failed:', error.response.data.message);
+                } else if (error.request) {
+                    console.error('No response from server:', error.request);
+                } else {
+                    console.error('Request setup error:', error.message);
+                }
+            } else {
+                console.error('Unexpected error:', error);
+            }
         }
-    } catch (error) {
-        console.error('Error authenticating with backend:', error);
-    }
 };
 
 const handleRefreshToken = async () => {

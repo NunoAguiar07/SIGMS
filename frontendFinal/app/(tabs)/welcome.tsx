@@ -1,10 +1,10 @@
 import {useEffect, useState} from "react";
 import {WelcomeInterface} from "../../interfaces/WelcomeInterface";
 import {ErrorInterface} from "../../interfaces/ErrorInterface";
-import {WelcomeScreen} from "../../css_mainscreens/WelcomeScreen";
+import {WelcomeScreen} from "../../screens/WelcomeScreen";
 import {GetData} from "../../requests/WelcomeRequest";
 import ErrorHandler from "./error";
-import LoadingPresentation from "../../css_mainscreens/Loading";
+import LoadingPresentation from "../../screens/Loading";
 
 const welcome = () => {
         const [welcome, setHome] = useState<WelcomeInterface | null>(null)
