@@ -9,6 +9,7 @@ data class UserResponse(
     val name: String,
     val email: String,
     val image: ByteArray? = null,
+    val university: String,
 ) {
     companion object {
         fun fromUser(user: User): UserResponse {
@@ -16,7 +17,8 @@ data class UserResponse(
                 id = user.id,
                 name = user.username,
                 email = user.email,
-                image = user.profileImage
+                image = user.profileImage,
+                university = user.university.name,
             )
         }
     }
