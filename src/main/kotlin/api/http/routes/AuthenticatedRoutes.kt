@@ -20,35 +20,19 @@ import isel.leic.group25.services.*
  * - User schedules (for teachers and students)
  *
  * @receiver Route The Ktor route to which these endpoints will be added
- * @param authService Service handling role assessment logic
- * @param userService Service handling user profile operations
- * @param teacherRoomService Service handling teacher-room assignments
- * @param classService Service handling class operations
- * @param userClassService Service handling user-class relationships
- * @param subjectService Service handling subject operations
- * @param roomService Service handling room management
- * @param lectureService Service handling lecture scheduling
- * @param issuesReportService Service handling room issue reports
+ * @param services The class containing all the services containing business logic
  */
 fun Route.authenticatedRoutes(
-    authService: AuthService,
-    userService: UserService,
-    teacherRoomService: TeacherRoomService,
-    classService: ClassService,
-    userClassService: UserClassService,
-    subjectService: SubjectService,
-    roomService: RoomService,
-    lectureService: LectureService,
-    issuesReportService: IssuesReportService
+    services: Services
 ) {
     authenticate("auth-jwt") {
-        assessRoleRoutes(authService)
-        profileRoutes(userService)
-        subjectRoutes(subjectService, classService, userClassService, lectureService)
-        roomRoutes(roomService, lectureService, issuesReportService, teacherRoomService)
-        lectureRoutes(lectureService)
+        assessRoleRoutes(services)
+        profileRoutes(services)
+        subjectRoutes(services)
+        roomRoutes(services)
+        lectureRoutes(services)
         withRoles(setOf(Role.TEACHER, Role.STUDENT)){
-            scheduleRoutes(userClassService)
+            scheduleRoutes(services)
         }
     }
 }

@@ -2,7 +2,7 @@ package repositories.users
 
 import isel.leic.group25.db.entities.types.Role
 import isel.leic.group25.db.entities.users.User
-import isel.leic.group25.db.repositories.ktorm.KTransaction
+import isel.leic.group25.db.repositories.ktorm.KtormCommand
 import isel.leic.group25.db.repositories.timetables.UniversityRepository
 import isel.leic.group25.db.repositories.users.UserRepository
 import repositories.DatabaseTestSetup
@@ -17,7 +17,7 @@ class UserRepositoryTest {
 
     private val userRepository = UserRepository(DatabaseTestSetup.database)
     private val universityRepository = UniversityRepository(DatabaseTestSetup.database)
-    private val kTransaction = KTransaction(DatabaseTestSetup.database)
+    private val kTormCommand = KtormCommand(DatabaseTestSetup.database)
 /*
     @Test
     fun `Should create a new user for every role`(){
@@ -58,7 +58,7 @@ class UserRepositoryTest {
 */
     @Test
     fun `Should find user my id`() {
-        kTransaction.useTransaction {
+        kTormCommand.useTransaction {
             val newUniversity = universityRepository.createUniversity("testUniversity")
             val newUser = User {
                 email = "testemail@test.com"
@@ -79,7 +79,7 @@ class UserRepositoryTest {
 
     @Test
     fun `Should find user my email`(){
-        kTransaction.useTransaction {
+        kTormCommand.useTransaction {
             val newUniversity = universityRepository.createUniversity("testUniversity")
             val newUser = User {
                 email = "testemail@test.com"
@@ -100,7 +100,7 @@ class UserRepositoryTest {
 
     @Test
     fun `Should update the user username`(){
-        kTransaction.useTransaction {
+        kTormCommand.useTransaction {
             val newUniversity = universityRepository.createUniversity("testUniversity")
             val newUser = User {
                 email = "testemail@test.com"

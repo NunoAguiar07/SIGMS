@@ -3,7 +3,7 @@ package repositories.timetables
 import isel.leic.group25.db.entities.timetables.Lecture
 import isel.leic.group25.db.entities.types.ClassType
 import isel.leic.group25.db.entities.types.WeekDay
-import isel.leic.group25.db.repositories.ktorm.KTransaction
+import isel.leic.group25.db.repositories.ktorm.KtormCommand
 import isel.leic.group25.db.repositories.rooms.RoomRepository
 import isel.leic.group25.db.repositories.timetables.ClassRepository
 import isel.leic.group25.db.repositories.timetables.LectureRepository
@@ -19,7 +19,7 @@ import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalTime::class)
 class LectureRepositoryTemporalTest {
-    private val kTransaction = KTransaction(DatabaseTestSetup.database)
+    private val kTormCommand = KtormCommand(DatabaseTestSetup.database)
     private val universityRepository = UniversityRepository(DatabaseTestSetup.database)
     private val lectureRepository = LectureRepository(DatabaseTestSetup.database)
     private val classRepository = ClassRepository(DatabaseTestSetup.database)
@@ -31,7 +31,7 @@ class LectureRepositoryTemporalTest {
         DatabaseTestSetup.clearDB()
     }
 
-    private fun createTestLecture(): Lecture = kTransaction.useTransaction {
+    private fun createTestLecture(): Lecture = kTormCommand.useTransaction {
         val university = universityRepository.createUniversity("Test University")
         val subject = subjectRepository.createSubject("Test Subject", university)
         val clazz = classRepository.addClass("Test Class", subject)
@@ -50,7 +50,7 @@ class LectureRepositoryTemporalTest {
     }
 
     @Test
-    fun `Should apply permanent change when both dates are null`() = kTransaction.useTransaction {
+    fun `Should apply permanent change when both dates are null`() = kTormCommand.useTransaction {
         val lecture = createTestLecture()
         val newRoom = roomRepository.createRoom(30, "New Room", lecture.classroom.room.university).let {
             roomRepository.createClassRoom(it)
@@ -79,7 +79,7 @@ class LectureRepositoryTemporalTest {
     }
 
     @Test
-    fun `Should apply immediate change when start date is null`() = kTransaction.useTransaction {
+    fun `Should apply immediate change when start date is null`() = kTormCommand.useTransaction {
         val lecture = createTestLecture()
         val newRoom = roomRepository.createRoom(30, "New Room", lecture.classroom.room.university).let {
             roomRepository.createClassRoom(it)
@@ -110,7 +110,7 @@ class LectureRepositoryTemporalTest {
     }
 
     @Test
-    fun `Should schedule future change when both dates are provided`() = kTransaction.useTransaction {
+    fun `Should schedule future change when both dates are provided`() = kTormCommand.useTransaction {
         val lecture = createTestLecture()
         val newRoom = roomRepository.createRoom(30, "New Room", lecture.classroom.room.university).let {
             roomRepository.createClassRoom(it)
@@ -143,7 +143,7 @@ class LectureRepositoryTemporalTest {
     }
 
     @Test
-    fun `Should detect conflicts with permanent changes`() = kTransaction.useTransaction {
+    fun `Should detect conflicts with permanent changes`() = kTormCommand.useTransaction {
         val lecture = createTestLecture()
         val conflictingRoom = roomRepository.createRoom(30, "Conflicting Room", lecture.classroom.room.university).let {
             roomRepository.createClassRoom(it)
@@ -174,7 +174,7 @@ class LectureRepositoryTemporalTest {
     }
 
     @Test
-    fun `Should detect conflicts with immediate changes`() = kTransaction.useTransaction {
+    fun `Should detect conflicts with immediate changes`() = kTormCommand.useTransaction {
         val lecture = createTestLecture()
         val conflictingRoom = roomRepository.createRoom(30, "Conflicting Room", lecture.classroom.room.university).let {
             roomRepository.createClassRoom(it)
@@ -209,7 +209,7 @@ class LectureRepositoryTemporalTest {
     }
 
     @Test
-    fun `Should detect conflicts with scheduled changes`() = kTransaction.useTransaction {
+    fun `Should detect conflicts with scheduled changes`() = kTormCommand.useTransaction {
         val lecture = createTestLecture()
         val conflictingRoom = roomRepository.createRoom(30, "Conflicting Room", lecture.classroom.room.university).let {
             roomRepository.createClassRoom(it)
@@ -244,7 +244,7 @@ class LectureRepositoryTemporalTest {
     }
 
     @Test
-    fun `Should delete lecture change and restore original values`() = kTransaction.useTransaction {
+    fun `Should delete lecture change and restore original values`() = kTormCommand.useTransaction {
         val lecture = createTestLecture()
         val storeLecture = lectureRepository.getLectureById(lecture.id)
         assertNotNull(storeLecture)

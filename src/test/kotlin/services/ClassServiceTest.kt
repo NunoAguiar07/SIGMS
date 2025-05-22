@@ -6,49 +6,48 @@ import isel.leic.group25.services.ClassService
 import isel.leic.group25.services.errors.ClassError
 import isel.leic.group25.utils.Failure
 import isel.leic.group25.utils.Success
+import mocks.repositories.MockRepositories
 import mocks.repositories.timetables.MockClassRepository
 import mocks.repositories.timetables.MockSubjectRepository
 import mocks.repositories.timetables.MockUniversityRepository
 import mocks.repositories.utils.MockTransaction
+import org.ktorm.database.Database
 import repositories.DatabaseTestSetup
 import kotlin.test.*
 
 
 class ClassServiceTest {
-    private val classRepository = MockClassRepository()
-    private val subjectRepository = MockSubjectRepository()
-    private val transactionInterface = MockTransaction()
-    private val universityRepository = MockUniversityRepository()
-
+    val mockDB = Database.connect(
+        url = "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1",
+        user = "root",
+        password = ""
+    )
+    private val mockRepositories = MockRepositories(mockDB)
     private val classService = ClassService(
-        classRepository = classRepository,
-        subjectRepository = subjectRepository,
-        transactionInterface = transactionInterface
+        mockRepositories,
+        mockRepositories.ktormCommand
     )
 
     // Helper function to create test subjects
     private fun createTestSubjects(count: Int = 1): List<Subject> {
-        return transactionInterface.useTransaction {
+        return mockRepositories.ktormCommand.useTransaction {
             (1..count).map { i ->
-                val university = universityRepository.createUniversity("Test University $i")
-                subjectRepository.createSubject("Test Subject $i", university)
+                val university = mockRepositories.from({universityRepository}){createUniversity("Test University $i")}
+                mockRepositories.from({subjectRepository}){createSubject("Test Subject $i", university)}
             }
         }
     }
 
     private fun createTestClasses(count: Int = 1, subject: Subject): List<Class> {
-        return transactionInterface.useTransaction {
+        return mockRepositories.ktormCommand.useTransaction {
             (1..count).map { i ->
-                classRepository.addClass(
-                   name = "Test Class $i", subject = subject
-                )
+                mockRepositories.from({classRepository}){
+                    addClass(
+                        name = "Test Class $i", subject = subject
+                    )
+                }
             }
         }
-    }
-
-    @AfterTest
-    fun clearDatabase() {
-        DatabaseTestSetup.clearDB()
     }
 
     @Test

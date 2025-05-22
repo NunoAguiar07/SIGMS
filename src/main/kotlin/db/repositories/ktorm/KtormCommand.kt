@@ -1,11 +1,11 @@
 package isel.leic.group25.db.repositories.ktorm
 
 import isel.leic.group25.db.repositories.interfaces.IsolationLevel
-import isel.leic.group25.db.repositories.interfaces.TransactionInterface
+import isel.leic.group25.db.repositories.interfaces.Transactionable
 import org.ktorm.database.Database
 import org.ktorm.database.TransactionIsolation
 
-class KTransaction(private val database: Database): TransactionInterface {
+class KtormCommand(private val database: Database): Transactionable {
     override fun <T> useTransaction(transaction: () -> T): T {
         database.useTransaction{
             return transaction()

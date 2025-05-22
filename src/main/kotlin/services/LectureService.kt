@@ -3,11 +3,9 @@ package isel.leic.group25.services
 import isel.leic.group25.db.entities.timetables.Lecture
 import isel.leic.group25.db.entities.types.ClassType
 import isel.leic.group25.db.entities.types.WeekDay
+import isel.leic.group25.db.repositories.Repositories
 import isel.leic.group25.db.repositories.interfaces.IsolationLevel
-import isel.leic.group25.db.repositories.interfaces.TransactionInterface
-import isel.leic.group25.db.repositories.rooms.interfaces.RoomRepositoryInterface
-import isel.leic.group25.db.repositories.timetables.interfaces.ClassRepositoryInterface
-import isel.leic.group25.db.repositories.timetables.interfaces.LectureRepositoryInterface
+import isel.leic.group25.db.repositories.interfaces.Transactionable
 import isel.leic.group25.services.email.EmailService
 import isel.leic.group25.services.errors.LectureError
 import isel.leic.group25.utils.Either
@@ -26,10 +24,8 @@ typealias LectureResult = Either<LectureError, Lecture>
 typealias DeleteLectureResult = Either<LectureError, Boolean>
 
 class LectureService(
-    private val lectureRepository: LectureRepositoryInterface,
-    private val transactionInterface: TransactionInterface,
-    private val classRepository: ClassRepositoryInterface,
-    private val roomRepository: RoomRepositoryInterface,
+    private val repositories: Repositories,
+    private val transactionable: Transactionable,
     private val emailService: EmailService
 ) {
 
@@ -43,8 +39,10 @@ class LectureService(
 
     fun getAllLectures(limit: Int, offSet: Int): LectureListResult {
         return runCatching {
-            transactionInterface.useTransaction {
-                val lectures = lectureRepository.getAllLectures(limit, offSet)
+            transactionable.useTransaction {
+                val lectures = repositories.from({lectureRepository}){
+                    getAllLectures(limit, offSet)
+                }
                 return@useTransaction success(lectures)
             }
         }
@@ -65,9 +63,9 @@ class LectureService(
             return failure(LectureError.InvalidLectureDate)
         }
         return runCatching {
-            transactionInterface.useTransaction {
+            transactionable.useTransaction {
                 if(
-                    lectureRepository.findConflictingLectures(
+                    repositories.from({lectureRepository}){findConflictingLectures(
                         roomId,
                         weekDay,
                         parsedStartTime,
@@ -75,13 +73,17 @@ class LectureService(
                         null,
                         null,
                         null
-                    )
+                    )}
                 ) {
                     return@useTransaction failure(LectureError.LectureTimeConflict)
                 }
-                val room = roomRepository.getClassRoomById(roomId) ?: return@useTransaction failure(LectureError.InvalidLectureRoom)
-                val schoolClass = classRepository.findClassById(schoolClassId) ?: return@useTransaction failure(LectureError.InvalidLectureClass)
-                val newLecture = lectureRepository.createLecture(schoolClass, room,type , weekDay, parsedStartTime, parsedEndTime)
+                val room = repositories.from({roomRepository}){getClassRoomById(roomId)}
+                    ?: return@useTransaction failure(LectureError.InvalidLectureRoom)
+                val schoolClass = repositories.from({classRepository}){findClassById(schoolClassId)}
+                    ?: return@useTransaction failure(LectureError.InvalidLectureClass)
+                val newLecture = repositories.from({lectureRepository}){
+                    createLecture(schoolClass, room,type , weekDay, parsedStartTime, parsedEndTime)
+                }
                 return@useTransaction success(newLecture)
 
             }
@@ -90,8 +92,8 @@ class LectureService(
 
     fun getLectureById(lectureId: Int): LectureResult {
         return runCatching {
-            transactionInterface.useTransaction {
-                val lecture = lectureRepository.getLectureById(lectureId)
+            transactionable.useTransaction {
+                val lecture = repositories.from({lectureRepository}){getLectureById(lectureId)}
                        ?: return@useTransaction failure(LectureError.LectureNotFound)
                 return@useTransaction success(lecture)
             }
@@ -100,8 +102,10 @@ class LectureService(
 
     fun getLecturesByRoom(roomId: Int, limit: Int, offSet: Int): LectureListResult {
         return runCatching {
-            transactionInterface.useTransaction {
-                val lectures = lectureRepository.getLecturesByRoom(roomId, limit, offSet)
+            transactionable.useTransaction {
+                val lectures = repositories.from({lectureRepository}){
+                    getLecturesByRoom(roomId, limit, offSet)
+                }
                 return@useTransaction success(lectures)
             }
         }
@@ -109,9 +113,12 @@ class LectureService(
 
     fun getLecturesByClass(classId: Int, limit: Int, offset:Int): LectureListResult {
         return runCatching {
-            transactionInterface.useTransaction {
-                classRepository.findClassById(classId) ?: return@useTransaction failure(LectureError.InvalidLectureClass)
-                val lectures = lectureRepository.getLecturesByClass(classId, limit, offset)
+            transactionable.useTransaction {
+                repositories.from({classRepository}){findClassById(classId)}
+                    ?: return@useTransaction failure(LectureError.InvalidLectureClass)
+                val lectures = repositories.from({lectureRepository}){
+                    getLecturesByClass(classId, limit, offset)
+                }
                 return@useTransaction success(lectures)
             }
         }
@@ -119,8 +126,8 @@ class LectureService(
 
     fun getLecturesByType(type: ClassType): LectureListResult {
         return runCatching {
-            transactionInterface.useTransaction {
-                val lectures = lectureRepository.getLecturesByType(type)
+            transactionable.useTransaction {
+                val lectures = repositories.from({lectureRepository}){getLecturesByType(type)}
                 return@useTransaction success(lectures)
             }
         }
@@ -130,10 +137,10 @@ class LectureService(
         lectureId: Int
     ): DeleteLectureResult {
         return runCatching {
-            transactionInterface.useTransaction {
-                val lecture = lectureRepository.getLectureById(lectureId)
+            transactionable.useTransaction {
+                val lecture = repositories.from({lectureRepository}){getLectureById(lectureId)}
                         ?: return@useTransaction failure(LectureError.LectureNotFound)
-                if (lectureRepository.deleteLecture(lecture.id)) {
+                if (repositories.from({lectureRepository}){deleteLecture(lecture.id)}) {
                     return@useTransaction success(true)
                 }
                 return@useTransaction failure(LectureError.LectureNotFound)
@@ -152,41 +159,47 @@ class LectureService(
         effectiveUntil: Instant?,
     ): LectureResult {
         return runCatching {
-            transactionInterface.useTransaction(IsolationLevel.SERIALIZABLE) {
-                val lecture = lectureRepository.getLectureById(lectureId)
+            transactionable.useTransaction(IsolationLevel.SERIALIZABLE) {
+                val lecture = repositories.from({lectureRepository}){getLectureById(lectureId)}
                         ?: return@useTransaction failure(LectureError.LectureNotFound)
                 val newParsedStartTime = newStartTime?.hoursAndMinutesToDuration() ?: lecture.startTime
                 val newParsedEndTime = newEndTime?.hoursAndMinutesToDuration() ?: lecture.endTime
                 if (newParsedStartTime >= newParsedEndTime) {
                     return@useTransaction failure(LectureError.InvalidLectureDate)
                 }
-                val newClassroom = roomRepository.getClassRoomById(newRoomId ?: -1)
+                val newClassroom = repositories.from({roomRepository}){
+                    getClassRoomById(newRoomId ?: -1)
+                }
                     ?: return@useTransaction failure(LectureError.InvalidLectureRoom)
-                classRepository.findClassById(lecture.schoolClass.id)
+                repositories.from({classRepository}){findClassById(lecture.schoolClass.id)}
                     ?: return@useTransaction failure(LectureError.InvalidLectureClass)
-                val conflictingLectures = lectureRepository.findConflictingLectures(
-                    newRoomId = newRoomId ?: lecture.classroom.room.id,
-                    newWeekDay = newWeekDay ?: lecture.weekDay,
-                    newStartTime = newParsedStartTime,
-                    newEndTime = newParsedEndTime,
-                    effectiveFrom = effectiveFrom,
-                    effectiveUntil = effectiveUntil,
-                    currentLecture = lecture
-                )
+                val conflictingLectures = repositories.from({lectureRepository}){
+                    findConflictingLectures(
+                        newRoomId = newRoomId ?: lecture.classroom.room.id,
+                        newWeekDay = newWeekDay ?: lecture.weekDay,
+                        newStartTime = newParsedStartTime,
+                        newEndTime = newParsedEndTime,
+                        effectiveFrom = effectiveFrom,
+                        effectiveUntil = effectiveUntil,
+                        currentLecture = lecture
+                    )}
                 if (conflictingLectures) {
                     return@useTransaction failure(LectureError.LectureTimeConflict)
                 }
-                val updatedLecture = lectureRepository.updateLecture(
-                    lecture,
-                    newClassroom,
-                    newType ?: lecture.type,
-                    newWeekDay ?: lecture.weekDay,
-                    newParsedStartTime,
-                    newParsedEndTime,
-                    effectiveFrom,
-                    effectiveUntil
-                )
-                val students = classRepository.findStudentsByClassId(lecture.schoolClass.id)
+                val updatedLecture = repositories.from({lectureRepository}){
+                    updateLecture(
+                        lecture,
+                        newClassroom,
+                        newType ?: lecture.type,
+                        newWeekDay ?: lecture.weekDay,
+                        newParsedStartTime,
+                        newParsedEndTime,
+                        effectiveFrom,
+                        effectiveUntil
+                    )}
+                val students = repositories.from({classRepository}){
+                    findStudentsByClassId(lecture.schoolClass.id)
+                }
                 if(students.isNotEmpty()){
                     emailService.sendStudentsChangeInLecture(students.map { it.user.email }, updatedLecture)
                 }

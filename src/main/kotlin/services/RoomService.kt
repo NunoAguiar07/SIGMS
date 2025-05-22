@@ -1,10 +1,9 @@
 package isel.leic.group25.services
 
-import UniversityRepositoryInterface
 import isel.leic.group25.db.entities.rooms.Room
 import isel.leic.group25.db.entities.types.RoomType
-import isel.leic.group25.db.repositories.interfaces.TransactionInterface
-import isel.leic.group25.db.repositories.rooms.interfaces.RoomRepositoryInterface
+import isel.leic.group25.db.repositories.Repositories
+import isel.leic.group25.db.repositories.interfaces.Transactionable
 import isel.leic.group25.services.errors.RoomError
 import isel.leic.group25.utils.Either
 import isel.leic.group25.utils.failure
@@ -18,9 +17,8 @@ typealias RoomResult = Either<RoomError, Room>
 typealias DeleteRoomResult = Either<RoomError, Boolean>
 
 class RoomService (
-    private val roomRepository: RoomRepositoryInterface,
-    private val universityRepository: UniversityRepositoryInterface,
-    private val transactionInterface: TransactionInterface,
+    private val repositories: Repositories,
+    private val transactionable: Transactionable,
 ) {
     private inline fun <T> runCatching(block: () -> Either<RoomError, T>): Either<RoomError, T> {
         return try {
@@ -32,8 +30,8 @@ class RoomService (
 
     fun getAllRooms(limit: Int, offset: Int): RoomListResult {
         return runCatching {
-            transactionInterface.useTransaction {
-                val rooms = roomRepository.getAllRooms(limit, offset)
+            transactionable.useTransaction {
+                val rooms = repositories.from({roomRepository}){getAllRooms(limit, offset)}
                 return@useTransaction success(rooms)
             }
         }
@@ -41,10 +39,14 @@ class RoomService (
 
     fun getAllRoomsByUniversityId(universityId: Int, limit: Int, offset: Int): RoomListResult {
         return runCatching {
-            transactionInterface.useTransaction {
-                val university = universityRepository.getUniversityById(universityId)
+            transactionable.useTransaction {
+                val university = repositories.from({universityRepository}){
+                    getUniversityById(universityId)
+                }
                 ?: return@useTransaction failure(RoomError.UniversityNotFound)
-                val rooms = roomRepository.getAllRoomsByUniversityId(university.id, limit, offset)
+                val rooms = repositories.from({roomRepository}){
+                    getAllRoomsByUniversityId(university.id, limit, offset)
+                }
                 return@useTransaction success(rooms)
             }
         }
@@ -52,8 +54,10 @@ class RoomService (
 
     fun getRoomById(id: Int): RoomResult {
         return runCatching {
-            transactionInterface.useTransaction {
-                val room = roomRepository.getRoomById(id) ?: return@useTransaction failure(RoomError.RoomNotFound)
+            transactionable.useTransaction {
+                val room = repositories.from({roomRepository}){
+                    getRoomById(id)
+                } ?: return@useTransaction failure(RoomError.RoomNotFound)
                 return@useTransaction success(room)
             }
         }
@@ -61,14 +65,24 @@ class RoomService (
 
     fun createRoom(capacity: Int, name: String, universityId: Int, type: RoomType): RoomResult {
         return runCatching {
-            transactionInterface.useTransaction {
-                val university = universityRepository.getUniversityById(universityId)
+            transactionable.useTransaction {
+                val university = repositories.from({universityRepository}){
+                    getUniversityById(universityId)
+                }
                     ?: return@useTransaction failure(RoomError.UniversityNotFound)
-                val room = roomRepository.createRoom(capacity, name, university)
+                val room = repositories.from({roomRepository}){
+                    createRoom(capacity, name, university)
+                }
                 when (type) {
-                    RoomType.CLASS -> roomRepository.createClassRoom(room)
-                    RoomType.OFFICE -> roomRepository.createOfficeRoom(room)
-                    RoomType.STUDY -> roomRepository.createStudyRoom(room)
+                    RoomType.CLASS -> repositories.from({roomRepository}){
+                        createClassRoom(room)
+                    }
+                    RoomType.OFFICE -> repositories.from({roomRepository}){
+                        createOfficeRoom(room)
+                    }
+                    RoomType.STUDY -> repositories.from({roomRepository}){
+                        createStudyRoom(room)
+                    }
                 }
                 return@useTransaction success(room)
             }
@@ -76,9 +90,10 @@ class RoomService (
     }
     fun deleteRoom(id: Int): DeleteRoomResult {
         return runCatching {
-            transactionInterface.useTransaction {
-                val room = roomRepository.getRoomById(id) ?: return@useTransaction failure(RoomError.RoomNotFound)
-                if (roomRepository.deleteRoom(room.id)) {
+            transactionable.useTransaction {
+                val room = repositories.from({roomRepository}){getRoomById(id)}
+                    ?: return@useTransaction failure(RoomError.RoomNotFound)
+                if (repositories.from({roomRepository}){deleteRoom(room.id)}) {
                     return@useTransaction success(true)
                 }
                 return@useTransaction failure(RoomError.ConnectionDbError("Failed to delete room with id $id"))
@@ -88,9 +103,10 @@ class RoomService (
 
     fun updateRoom(id: Int, name: String, capacity: Int): RoomResult {
         return runCatching {
-            transactionInterface.useTransaction {
-                val room = roomRepository.getRoomById(id) ?: return@useTransaction failure(RoomError.RoomNotFound)
-                val updatedRoom = roomRepository.updateRoom(room, name, capacity)
+            transactionable.useTransaction {
+                val room = repositories.from({roomRepository}){getRoomById(id)}
+                    ?: return@useTransaction failure(RoomError.RoomNotFound)
+                val updatedRoom = repositories.from({roomRepository}){updateRoom(room, name, capacity)}
                 return@useTransaction success(updatedRoom)
             }
         }

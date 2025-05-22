@@ -5,9 +5,8 @@ import isel.leic.group25.utils.Either
 import isel.leic.group25.utils.failure
 import isel.leic.group25.utils.success
 import isel.leic.group25.db.entities.timetables.Class
-import isel.leic.group25.db.repositories.interfaces.TransactionInterface
-import isel.leic.group25.db.repositories.timetables.interfaces.ClassRepositoryInterface
-import isel.leic.group25.db.repositories.timetables.interfaces.SubjectRepositoryInterface
+import isel.leic.group25.db.repositories.Repositories
+import isel.leic.group25.db.repositories.interfaces.Transactionable
 import java.sql.SQLException
 
 typealias ClassListResult = Either<ClassError, List<Class>>
@@ -16,9 +15,8 @@ typealias ClassResult = Either<ClassError, Class>
 
 typealias DeleteClassResult = Either<ClassError, Boolean>
 
-class ClassService(private val classRepository: ClassRepositoryInterface,
-                   private val subjectRepository: SubjectRepositoryInterface,
-                   private val transactionInterface: TransactionInterface,
+class ClassService(private val repositories: Repositories,
+                   private val transactionable: Transactionable,
 ) {
     private inline fun <T> runCatching(block: () -> Either<ClassError, T>): Either<ClassError, T> {
         return try {
@@ -30,10 +28,12 @@ class ClassService(private val classRepository: ClassRepositoryInterface,
 
     fun getAllClassesFromSubject(subjectId: Int, limit:Int, offset:Int): ClassListResult {
         return runCatching {
-            transactionInterface.useTransaction {
-                val subject = subjectRepository.findSubjectById(subjectId)
+            transactionable.useTransaction {
+                val subject = repositories.from({subjectRepository}){findSubjectById(subjectId)}
                     ?: return@useTransaction failure(ClassError.SubjectNotFound)
-                val classes = classRepository.findClassesBySubject(subject, limit, offset)
+                val classes = repositories.from({classRepository}){
+                    findClassesBySubject(subject, limit, offset)
+                }
                 return@useTransaction success(classes)
             }
         }
@@ -41,8 +41,8 @@ class ClassService(private val classRepository: ClassRepositoryInterface,
 
     fun getClassById(id: Int): ClassResult {
         return runCatching {
-            transactionInterface.useTransaction {
-                val schoolClass = classRepository.findClassById(id)
+            transactionable.useTransaction {
+                val schoolClass = repositories.from({classRepository}){findClassById(id)}
                     ?: return@useTransaction failure(ClassError.ClassNotFound)
                 return@useTransaction success(schoolClass)
             }
@@ -51,14 +51,14 @@ class ClassService(private val classRepository: ClassRepositoryInterface,
 
     fun createClass(name: String, subjectId: Int): ClassResult {
         return runCatching {
-            transactionInterface.useTransaction {
-                val existingClass = classRepository.findClassByName(name)
+            transactionable.useTransaction {
+                val existingClass = repositories.from({classRepository}){findClassByName(name)}
                 if(existingClass != null) {
                     return@useTransaction failure(ClassError.ClassAlreadyExists)
                 }
-                val existingSubject = subjectRepository.findSubjectById(subjectId)
+                val existingSubject = repositories.from({subjectRepository}){findSubjectById(subjectId)}
                     ?: return@useTransaction failure(ClassError.SubjectNotFound)
-                val newClass = classRepository.addClass(name, existingSubject)
+                val newClass = repositories.from({classRepository}){addClass(name, existingSubject)}
                 return@useTransaction success(newClass)
             }
         }

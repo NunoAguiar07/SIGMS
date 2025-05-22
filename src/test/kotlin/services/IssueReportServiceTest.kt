@@ -8,6 +8,7 @@ import isel.leic.group25.services.IssuesReportService
 import isel.leic.group25.services.errors.IssueReportError
 import isel.leic.group25.utils.Failure
 import isel.leic.group25.utils.Success
+import mocks.repositories.MockRepositories
 import mocks.repositories.issues.MockIssueReportRepository
 import mocks.repositories.rooms.MockRoomRepository
 import mocks.repositories.timetables.MockUniversityRepository
@@ -15,49 +16,55 @@ import mocks.repositories.users.MockTechnicalServiceRepository
 import mocks.repositories.users.MockUserRepository
 import mocks.repositories.utils.MockTransaction
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.ktorm.database.Database
 import repositories.DatabaseTestSetup
 import kotlin.test.AfterTest
 import kotlin.test.Test
 import kotlin.test.assertTrue
 
 class IssueReportServiceTest {
-    private val issueReportRepository = MockIssueReportRepository()
-    private val roomRepository = MockRoomRepository()
-    private val userRepository = MockUserRepository()
-    private val technicalServiceRepository = MockTechnicalServiceRepository()
-    private val universityRepository = MockUniversityRepository()
-    private val transactionInterface = MockTransaction()
+    val mockDB = Database.connect(
+        url = "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1",
+        user = "root",
+        password = ""
+    )
+    private val mockRepositories = MockRepositories(mockDB)
 
     private val issuesReportService = IssuesReportService(
-        issueReportRepository = issueReportRepository,
-        userRepository = userRepository,
-        technicalServiceRepository = technicalServiceRepository,
-        transactionInterface = transactionInterface,
-        roomRepository = roomRepository
+        mockRepositories,
+        mockRepositories.ktormCommand
     )
 
     // Helper function to create test rooms
     private fun createTestRooms(count: Int = 1): List<Room> {
-        return transactionInterface.useTransaction {
+        return mockRepositories.ktormCommand.useTransaction {
             (1..count).map { i ->
-                val university = universityRepository.createUniversity("Test University $i")
-                roomRepository.createRoom(10, "Test Room $i", university)
+                val university = mockRepositories.from({universityRepository}){
+                    createUniversity("Test University $i")
+                }
+                mockRepositories.from({roomRepository}){
+                    createRoom(10, "Test Room $i", university)
+                }
             }
         }
     }
 
     // Helper function to create test issue reports
     private fun createTestIssueReports(count: Int = 1, room: Room, user: User): List<IssueReport> {
-        return transactionInterface.useTransaction {
+        return mockRepositories.ktormCommand.useTransaction {
             (1..count).map { i ->
-                issueReportRepository.createIssueReport(user, room, "Test Description $i")
+                mockRepositories.from({issueReportRepository}){
+                    createIssueReport(user, room, "Test Description $i")
+                }
             }
         }
     }
 
     private fun createTestUser(role: Role = Role.STUDENT): User {
-        return transactionInterface.useTransaction {
-            val university = universityRepository.createUniversity("Test University")
+        return mockRepositories.ktormCommand.useTransaction {
+            val university = mockRepositories.from({universityRepository}){
+                createUniversity("Test University")
+            }
             val user = User {
                 email = "test@test.com"
                 username = "testuser"
@@ -66,15 +73,12 @@ class IssueReportServiceTest {
                 profileImage = byteArrayOf(1, 2, 3)
                 this.university = university
             }.let {
-                userRepository.createWithRole(it.email, it.username, it.password, role, it.university, it.authProvider)
+                mockRepositories.from({userRepository}){
+                    createWithRole(it.email, it.username, it.password, role, it.university, it.authProvider)
+                }
             }
             return@useTransaction user
         }
-    }
-
-    @AfterTest
-    fun clearDatabase() {
-        DatabaseTestSetup.clearDB()
     }
 
     @Test

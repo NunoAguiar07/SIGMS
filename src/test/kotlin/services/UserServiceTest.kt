@@ -6,9 +6,11 @@ import isel.leic.group25.services.UserService
 import isel.leic.group25.services.errors.AuthError
 import isel.leic.group25.utils.Failure
 import isel.leic.group25.utils.Success
+import mocks.repositories.MockRepositories
 import mocks.repositories.timetables.MockUniversityRepository
 import mocks.repositories.users.MockUserRepository
 import mocks.repositories.utils.MockTransaction
+import org.ktorm.database.Database
 import repositories.DatabaseTestSetup
 import kotlin.test.AfterTest
 import kotlin.test.Test
@@ -17,16 +19,21 @@ import kotlin.test.assertTrue
 
 class UserServiceTest {
     // Test database setup
-    private val userRepository = MockUserRepository()
-    private val universityRepository = MockUniversityRepository()
-    private val transactionInterface = MockTransaction()
+    val mockDB = Database.connect(
+        url = "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1",
+        user = "root",
+        password = ""
+    )
+    private val mockRepositories = MockRepositories(mockDB)
 
-    private val userService = UserService(userRepository, universityRepository, transactionInterface)
+    private val userService = UserService(mockRepositories, mockRepositories.ktormCommand)
 
     // Helper function to create a test user
     private fun createTestUser(role: Role = Role.STUDENT): User {
-        return transactionInterface.useTransaction {
-            val newUniversity = universityRepository.createUniversity("Test University")
+        return mockRepositories.ktormCommand.useTransaction {
+            val newUniversity = mockRepositories.from({universityRepository}){
+                createUniversity("Test University")
+            }
             val user = User {
                 email = "test@test.com"
                 username = "testuser"
@@ -35,15 +42,12 @@ class UserServiceTest {
                 authProvider = "local"
                 university = newUniversity
             }.let {
-                userRepository.createWithRole(it.email, it.username, it.password, role, it.university, it.authProvider)
+                mockRepositories.from({userRepository}){
+                    createWithRole(it.email, it.username, it.password, role, it.university, it.authProvider)
+                }
             }
             return@useTransaction user
         }
-    }
-
-    @AfterTest
-    fun clearDatabase() {
-        DatabaseTestSetup.clearDB()
     }
 
     @Test

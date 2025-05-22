@@ -1,11 +1,8 @@
 package isel.leic.group25.services
 
 import isel.leic.group25.db.entities.issues.IssueReport
-import isel.leic.group25.db.repositories.interfaces.TransactionInterface
-import isel.leic.group25.db.repositories.issues.interfaces.IssueReportRepositoryInterface
-import isel.leic.group25.db.repositories.rooms.interfaces.RoomRepositoryInterface
-import isel.leic.group25.db.repositories.users.interfaces.TechnicalServiceRepositoryInterface
-import isel.leic.group25.db.repositories.users.interfaces.UserRepositoryInterface
+import isel.leic.group25.db.repositories.Repositories
+import isel.leic.group25.db.repositories.interfaces.Transactionable
 import isel.leic.group25.services.errors.IssueReportError
 import isel.leic.group25.utils.Either
 import isel.leic.group25.utils.failure
@@ -19,11 +16,8 @@ typealias IssueReportUpdateResult = Either<IssueReportError, IssueReport>
 
 typealias IssueReportDeletionResult = Either<IssueReportError, Boolean>
 
-class IssuesReportService(private val issueReportRepository: IssueReportRepositoryInterface,
-                          private val userRepository: UserRepositoryInterface,
-                          private val technicalServiceRepository: TechnicalServiceRepositoryInterface,
-                          private val transactionInterface: TransactionInterface,
-                          private val roomRepository: RoomRepositoryInterface
+class IssuesReportService(private val repositories: Repositories,
+                          private val transactionable: Transactionable
 ) {
     private inline fun <T> runCatching(block: () -> Either<IssueReportError, T>): Either<IssueReportError, T> {
         return try {
@@ -35,8 +29,10 @@ class IssuesReportService(private val issueReportRepository: IssueReportReposito
 
     fun getAllIssueReports(limit:Int, offset:Int): IssueReportListResult {
         return runCatching {
-            transactionInterface.useTransaction {
-                val issues = issueReportRepository.getAllIssueReports(limit, offset)
+            transactionable.useTransaction {
+                val issues = repositories.from({issueReportRepository}){
+                    getAllIssueReports(limit, offset)
+                }
                 return@useTransaction success(issues)
             }
         }
@@ -44,8 +40,8 @@ class IssuesReportService(private val issueReportRepository: IssueReportReposito
 
     fun getIssueReportById(id: Int): IssueReportResult {
         return runCatching {
-            transactionInterface.useTransaction {
-                val issue = issueReportRepository.getIssueReportById(id)
+            transactionable.useTransaction {
+                val issue = repositories.from({issueReportRepository}){getIssueReportById(id)}
                     ?: return@useTransaction failure(IssueReportError.IssueReportNotFound)
                 return@useTransaction success(issue)
             }
@@ -54,8 +50,10 @@ class IssuesReportService(private val issueReportRepository: IssueReportReposito
 
     fun getIssuesReportByRoomId(roomId: Int, limit:Int, offset:Int): IssueReportListResult {
         return runCatching {
-            transactionInterface.useTransaction {
-                val issues = issueReportRepository.getIssuesReportByRoomId(roomId, limit, offset)
+            transactionable.useTransaction {
+                val issues = repositories.from({issueReportRepository}){
+                    getIssuesReportByRoomId(roomId, limit, offset)
+                }
                 return@useTransaction success(issues)
             }
         }
@@ -63,11 +61,15 @@ class IssuesReportService(private val issueReportRepository: IssueReportReposito
 
     fun createIssueReport(userId: Int, roomId: Int, description: String):IssueReportResult {
         return runCatching {
-            transactionInterface.useTransaction {
-                val room = roomRepository.getRoomById(roomId)
+            transactionable.useTransaction {
+                val room = repositories.from({roomRepository}){getRoomById(roomId)}
                     ?: return@useTransaction failure(IssueReportError.InvalidRoomId)
-                val user = userRepository.findById(userId) ?: return@useTransaction failure(IssueReportError.UserNotFound)
-                val newIssue = issueReportRepository.createIssueReport(user, room, description)
+                val user = repositories.from({userRepository}){
+                    findById(userId)
+                }?: return@useTransaction failure(IssueReportError.UserNotFound)
+                val newIssue = repositories.from({issueReportRepository}){
+                    createIssueReport(user, room, description)
+                }
                 return@useTransaction success(newIssue)
             }
         }
@@ -75,12 +77,17 @@ class IssuesReportService(private val issueReportRepository: IssueReportReposito
 
     fun assignTechnicianToIssueReport(technicianId: Int, reportId: Int) : IssueReportResult{
         return runCatching {
-            transactionInterface.useTransaction {
-                val issueReport = issueReportRepository.getIssueReportById(reportId)
-                    ?: return@useTransaction failure(IssueReportError.InvalidIssueReportId)
-                val technician = technicalServiceRepository.findTechnicalServiceById(technicianId)
-                    ?: return@useTransaction failure(IssueReportError.UserNotFound)
-                val updatedIssueReport = issueReportRepository.assignIssueTo(issueReport, technician)
+            transactionable.useTransaction {
+                val issueReport = repositories.from({issueReportRepository}){
+                    getIssueReportById(reportId)
+                } ?: return@useTransaction failure(IssueReportError.InvalidIssueReportId)
+                val technician = repositories.from({technicalServiceRepository}){
+                    findTechnicalServiceById(technicianId)
+
+                } ?: return@useTransaction failure(IssueReportError.UserNotFound)
+                val updatedIssueReport = repositories.from({issueReportRepository}){
+                    assignIssueTo(issueReport, technician)
+                }
                 return@useTransaction success(updatedIssueReport)
             }
         }
@@ -88,10 +95,11 @@ class IssuesReportService(private val issueReportRepository: IssueReportReposito
 
     fun deleteIssueReport(id: Int): IssueReportDeletionResult {
         return runCatching {
-            transactionInterface.useTransaction {
-                issueReportRepository.getIssueReportById(id)
-                    ?: return@useTransaction failure(IssueReportError.InvalidIssueReportId)
-                val deletedIssue = issueReportRepository.deleteIssueReport(id)
+            transactionable.useTransaction {
+                repositories.from({issueReportRepository}){
+                    getIssueReportById(id)
+                } ?: return@useTransaction failure(IssueReportError.InvalidIssueReportId)
+                val deletedIssue = repositories.from({issueReportRepository}){deleteIssueReport(id)}
                 return@useTransaction success(deletedIssue)
             }
         }
@@ -99,10 +107,12 @@ class IssuesReportService(private val issueReportRepository: IssueReportReposito
 
     fun updateIssueReport(id: Int, description: String): IssueReportUpdateResult {
         return runCatching {
-            transactionInterface.useTransaction {
-                val report = issueReportRepository.getIssueReportById(id)
+            transactionable.useTransaction {
+                val report = repositories.from({issueReportRepository}){getIssueReportById(id)}
                     ?: return@useTransaction failure(IssueReportError.InvalidIssueReportId)
-                val updatedIssue = issueReportRepository.updateIssueReport(report, description)
+                val updatedIssue = repositories.from({issueReportRepository}){
+                    updateIssueReport(report, description)
+                }
                 return@useTransaction success(updatedIssue)
             }
         }
