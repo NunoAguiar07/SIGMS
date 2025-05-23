@@ -26,6 +26,7 @@ fun Route.authenticatedRoutes(
     services: Services
 ) {
     authenticate("auth-jwt") {
+        userInfoRoutes()
         assessRoleRoutes(services)
         profileRoutes(services)
         subjectRoutes(services)

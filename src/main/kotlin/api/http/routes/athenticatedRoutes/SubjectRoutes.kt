@@ -55,12 +55,34 @@ fun Route.subjectRoutes(
  */
 fun Route.baseSubjectRoutes(services: Services) {
     get {
+        val universityId = call.getUniversityIdFromPrincipal()
+            ?: return@get call.respond(HttpStatusCode.Unauthorized)
         val limit = call.queryParameters["limit"] ?.toIntOrNull()?: 10
         if(limit < 1 || limit > 100) return@get RequestError.Invalid("limit").toProblem().respond(call)
         val offset = call.queryParameters["offset"] ?.toIntOrNull() ?: 0
         if(offset < 0) return@get RequestError.Invalid("offset").toProblem().respond(call)
         val result = services.from({subjectService}){
-            getAllSubjects(limit, offset)
+            getAllSubjectsByUniversity(universityId, limit, offset)
+        }
+        call.respondEither(
+            either = result,
+            transformError = { error -> error.toProblem() },
+            transformSuccess = { subjects ->
+                subjects.map { SubjectResponse.fromSubject(it) }
+            }
+        )
+    }
+
+    get("/search"){
+        val universityId = call.getUniversityIdFromPrincipal()
+            ?: return@get call.respond(HttpStatusCode.Unauthorized)
+        val search = call.queryParameters["search"] ?: return@get RequestError.Missing("search").toProblem().respond(call)
+        val limit = call.queryParameters["limit"] ?.toIntOrNull()?: 10
+        if(limit < 1 || limit > 100) return@get RequestError.Invalid("limit").toProblem().respond(call)
+        val offset = call.queryParameters["offset"] ?.toIntOrNull() ?: 0
+        if(offset < 0) return@get RequestError.Invalid("offset").toProblem().respond(call)
+        val result = services.from({subjectService}){
+            getSubjectsByNameAndUniversityId(universityId, search, limit, offset)
         }
         call.respondEither(
             either = result,

@@ -2,6 +2,7 @@ package isel.leic.group25
 
 import io.ktor.client.*
 import io.ktor.client.engine.okhttp.*
+import io.ktor.client.plugins.cookies.*
 import io.ktor.http.*
 import io.ktor.http.auth.HttpAuthHeader
 import io.ktor.serialization.kotlinx.json.*
@@ -43,8 +44,10 @@ fun Application.module() {
         allowMethod(HttpMethod.Delete)
 
         // Allow headers
+        allowHeader(HttpHeaders.Cookie)
         allowHeader(HttpHeaders.ContentType)
         allowHeader(HttpHeaders.Authorization)
+        allowHeader("X-Device")
 
         allowCredentials = true
 

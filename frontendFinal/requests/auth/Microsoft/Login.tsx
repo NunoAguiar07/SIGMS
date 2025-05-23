@@ -6,12 +6,15 @@ import {useEffect} from "react";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from "axios";
 import {useRouter} from "expo-router";
+import {getDeviceType} from "../../../Utils/DeviceType";
+import api from "../../interceptors/DeviceInterceptor";
 
 
 WebBrowser.maybeCompleteAuthSession();
 
 const MicrosoftAuthButton = () => {
     const router = useRouter();
+    const deviceType = getDeviceType();
 
     const discovery = {
         authorizationEndpoint: `https://login.microsoftonline.com/common/oauth2/v2.0/authorize`,
@@ -43,8 +46,6 @@ const MicrosoftAuthButton = () => {
 
     const exchangeCodeForTokens = async (code: string) => {
         try {
-            console.log(code)
-            console.log(request)
             const tokenResponse = await AuthSession.exchangeCodeAsync(
                 {
                     clientId: process.env.EXPO_PUBLIC_MICROSOFT_CLIENT_ID,
@@ -63,11 +64,9 @@ const MicrosoftAuthButton = () => {
             );
 
             await AsyncStorage.setItem('refreshToken', tokenResponse.refreshToken ?? '');
-
-
             // Now send the access token to your backend
             console.log('Access Token:', tokenResponse.accessToken);
-            authenticateWithBackend(tokenResponse.accessToken);
+            await authenticateWithBackend(tokenResponse.accessToken);
         } catch (error) {
             console.error('Token exchange failed:', error);
         }
@@ -76,40 +75,63 @@ const MicrosoftAuthButton = () => {
 
 
     const authenticateWithBackend = async (accessToken: string) => {
-            try {
-                const response = await axios.post(
-                    `${process.env.EXPO_PUBLIC_API_URL}/auth/microsoft`,
-                    {},
-                    {
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${accessToken}`
-                        }
+        try {
+            const response = await axios.post(
+                `${process.env.EXPO_PUBLIC_API_URL}/auth/microsoft`,
+                {},
+                {
+                    withCredentials: true,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${accessToken}`,
+                        'X-Device': deviceType
                     }
-                );
-
-                if (response.data.token) {
-                    // Store your backend JWT token
-                    await AsyncStorage.setItem('authToken', response.data.token);
-                    console.log('Backend authentication successful:', response.data.token);
-                    router.replace('/userHome');
-                } else {
-                    console.error('Backend authentication failed: No token received');
                 }
-            } catch (error) {
-                if (axios.isAxiosError(error)) {
-                    if (error.response) {
-                        console.error('Backend authentication failed:', error.response.data.message);
-                    } else if (error.request) {
-                        console.error('No response from server:', error.request);
-                    } else {
-                        console.error('Request setup error:', error.message);
-                    }
-                } else {
-                    console.error('Unexpected error:', error);
-                }
+            );
+            if (deviceType !== 'WEB' && response.data.token) {
+                await SecureStore.setItemAsync('authToken', response.data.token);
             }
+            await getUserInfo()
+        } catch (error) {
+            if (axios.isAxiosError(error)) {
+                if (error.response) {
+                    console.error('Backend authentication failed:', error.response.data.message);
+                } else if (error.request) {
+                    console.error('No response from server:', error.request);
+                } else {
+                    console.error('Request setup error:', error.message);
+                }
+            } else {
+                console.error('Unexpected error:', error);
+            }
+        }
     };
+
+    const getUserInfo = async () => {
+        try {
+            const response = await api.get(`/userInfo`, { withCredentials: true });
+            const { userId, universityId, userRole } = response.data;
+            console.log(response.data)
+            await AsyncStorage.multiSet([
+                ['userId', userId],
+                ['universityId', universityId],
+                ['userRole', userRole]
+            ]);
+            router.replace('/userHome');
+        } catch (error) {
+            if (axios.isAxiosError(error)) {
+                if (error.response) {
+                    console.error('Backend authentication failed:', error.response.data.message);
+                } else if (error.request) {
+                    console.error('No response from server:', error.request);
+                } else {
+                    console.error('Request setup error:', error.message);
+                }
+            } else {
+                console.error('Unexpected error:', error);
+            }
+        }
+    }
 
     const handleRefreshToken = async () => {
         const refreshToken = await SecureStore.getItemAsync('refreshToken');
@@ -126,7 +148,7 @@ const MicrosoftAuthButton = () => {
             );
 
             await AsyncStorage.setItem('refreshToken', tokenResponse.refreshToken ?? '');
-            authenticateWithBackend(tokenResponse.accessToken);
+            await authenticateWithBackend(tokenResponse.accessToken);
         } catch (error) {
             console.error('Token refresh failed:', error);
         }

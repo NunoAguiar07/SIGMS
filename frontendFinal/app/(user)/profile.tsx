@@ -1,6 +1,6 @@
 import {useEffect, useState} from "react";
 import {ErrorInterface} from "../../interfaces/ErrorInterface";
-import {GetProfile} from "../../requests/ProfilePage";
+import {GetProfile} from "../../requests/authorized/ProfilePage";
 import ErrorHandler from "../(public)/error";
 import LoadingPresentation from "../../screens/Loading";
 import {ProfileScreen} from "../../screens/ProfileScreen";
