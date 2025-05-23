@@ -1,9 +1,20 @@
 import {Stack} from "expo-router";
 
-const StackLayout = () => {
+export default function RootLayout() {
     return (
-        <Stack>
-            <Stack.Screen name="(tabs)" options={{headerShown: false}}/>
+        <Stack
+            screenOptions={{
+                headerShown: false, // Hides the header for all screens in (user)
+            }}
+        >
+            {/* Public screens (no tabs) */}
+            <Stack.Screen name="(public)" />
+
+            {/* Authenticated user screens (minimal top navbar) */}
+            <Stack.Screen name="(user)"  />
+
+            {/* Optional: If you still need tabs somewhere */}
+            {/*<Stack.Screen name="(tabs)" options={{ headerShown: false }} />*/}
         </Stack>
-    )
+    );
 }

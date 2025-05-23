@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
-import {ErrorInterface} from "../../../interfaces/ErrorInterface";
-import {GetProfile} from "../../../requests/ProfilePage";
-import ErrorHandler from "../error";
-import LoadingPresentation from "../../../screens/Loading";
-import {ProfileScreen} from "../../../screens/ProfileScreen";
+import {useEffect, useState} from "react";
+import {ErrorInterface} from "../../interfaces/ErrorInterface";
+import {GetProfile} from "../../requests/ProfilePage";
+import ErrorHandler from "../(public)/error";
+import LoadingPresentation from "../../screens/Loading";
+import {ProfileScreen} from "../../screens/ProfileScreen";
 
 
 const Profile = () => {

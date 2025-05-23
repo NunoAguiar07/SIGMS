@@ -1,12 +1,10 @@
-
 // @ts-ignore
 import {styles} from "../css_styling/profile/RectangleProps";
 // @ts-ignore
-import defaultUserImage from "../assets/default-user-profile.png";
 import {Image} from "expo-image";
 import React, {useState} from "react";
 import * as ImagePicker from "expo-image-picker";
-import {Button, Text, TouchableOpacity, View} from "react-native";
+import {Text, TouchableOpacity, View} from "react-native";
 
 // @ts-ignore
 export const ProfileScreen = ({profile} ) => {

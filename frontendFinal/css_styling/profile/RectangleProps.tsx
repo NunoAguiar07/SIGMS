@@ -1,4 +1,4 @@
-import { StyleSheet } from 'react-native';
+import {StyleSheet} from 'react-native';
 
 export const styles = StyleSheet.create({
     container: {
@@ -50,5 +50,54 @@ export const styles = StyleSheet.create({
         backgroundColor: '#651920',
         color: 'white', // Only applies in text components
         borderRadius: 32,
+    },
+    welcomeContainer: {
+        flex: 1,
+        backgroundColor: '#f5f5f5',
+    },
+    navBar: {
+        flexDirection: 'row',
+        justifyContent: 'flex-start',
+        alignItems: 'center',
+        padding: 15,
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        zIndex: 10,
+    },
+    navButton: {
+        paddingHorizontal: 15,
+        paddingVertical: 8,
+        marginRight: 10,
+        borderRadius: 5,
+        backgroundColor: '#e9e9e9',
+    },
+    navButtonText: {
+        fontSize: 16,
+        color: '#333333',
+    },
+    welcomeContent: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 20,
+    },
+    centerMiddleText: {
+        color: '#671b22',
+        fontFamily: '"Roboto Condensed"',
+        fontWeight: 400,
+    },
+    iconContainer: {
+        backgroundColor: '#651c24',
+        width: 60,
+        height: 60,
+        borderRadius: 30,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 10,
+    },
+    navContainer: {
+        flex: 1
     },
 });
