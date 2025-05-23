@@ -48,7 +48,8 @@ private suspend fun loginResponse(call: ApplicationCall, result: LoginResult, de
                     value = token,
                     httpOnly = true,
                     maxAge = 60 * 60,
-                    expires = oneMonthFromNow
+                    expires = oneMonthFromNow,
+                    path = "/api"
                 )
                 call.response.cookies.append(cookie)
             } else {
