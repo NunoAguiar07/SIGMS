@@ -5,7 +5,6 @@ import io.ktor.server.application.*
 import io.ktor.server.response.*
 import isel.leic.group25.api.model.ProblemDetail
 import isel.leic.group25.utils.Either
-import kotlinx.coroutines.async
 import java.net.URI
 
 class Problem private constructor(
@@ -84,12 +83,12 @@ class Problem private constructor(
     }
 }
 
-fun <L, R> ApplicationCall.respondEither(
+suspend fun <L, R> ApplicationCall.respondEither(
     either: Either<L, R>,
     transformError: (L) -> Problem,
     transformSuccess: (R) -> Any,
     successStatus: HttpStatusCode = HttpStatusCode.OK
-) = async {
+) {
     when (either) {
         is Either.Right -> {
             val responseBody = when (val successValue = transformSuccess(either.value)) {
