@@ -36,7 +36,7 @@ fun Route.authRoutes(services: Services, client: HttpClient) {
     }
 }
 
-private fun loginResponse(call: ApplicationCall, result: LoginResult, device: String){
+private suspend fun loginResponse(call: ApplicationCall, result: LoginResult, device: String){
     call.respondEither(
         either = result,
         transformError = { it.toProblem() },
