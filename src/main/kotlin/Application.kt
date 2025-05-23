@@ -3,6 +3,7 @@ package isel.leic.group25
 import io.ktor.client.*
 import io.ktor.client.engine.okhttp.*
 import io.ktor.http.*
+import io.ktor.http.auth.HttpAuthHeader
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
@@ -101,6 +102,17 @@ fun Application.module() {
             verifier(
                 jwtConfig.buildVerifier()
             )
+            authHeader { call ->
+                val authHeader = call.request.parseAuthorizationHeader()
+                if (authHeader != null) {
+                    return@authHeader authHeader
+                }
+                val token = call.request.cookies["auth_token"]
+                if (token != null) {
+                    return@authHeader HttpAuthHeader.Single("Bearer", token)
+                }
+                return@authHeader null
+            }
             validate { credential ->
                 val userId = credential.payload.getClaim("userId").asInt()
                 val role = credential.payload.getClaim("role").asString()

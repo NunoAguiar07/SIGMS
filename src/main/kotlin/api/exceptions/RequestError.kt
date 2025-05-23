@@ -5,6 +5,9 @@ sealed class RequestError {
     data object InsecurePassword : RequestError()
     data object MicrosoftConnectionFailed : RequestError()
 
+    data class MissingHeader(val fields: List<String>): RequestError(){
+        constructor(vararg field: String): this(field.toList())
+    }
     data class Invalid(val fields: List<String>) : RequestError() {
         constructor(field: String) : this(listOf(field))
     }
@@ -30,6 +33,10 @@ sealed class RequestError {
             is Invalid -> Problem.badRequest(
                 title = "Invalid fields",
                 detail = "Invalid values for: ${fields.joinToString(", ")}"
+            )
+            is MissingHeader -> Problem.badRequest(
+                "Missing Request Header",
+                detail = "Required headers are missing: ${fields.joinToString(", ")}"
             )
         }
     }

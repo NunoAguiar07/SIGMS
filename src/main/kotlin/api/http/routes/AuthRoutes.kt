@@ -6,13 +6,17 @@ import api.model.response.LoginResponse
 import api.model.response.RegisterResponse
 import io.ktor.client.*
 import io.ktor.http.*
+import io.ktor.server.application.ApplicationCall
 import io.ktor.server.request.*
 import io.ktor.server.routing.*
+import io.ktor.util.date.GMTDate
+import io.ktor.util.date.plus
 import isel.leic.group25.api.exceptions.RequestError
 import isel.leic.group25.api.exceptions.respondEither
 import isel.leic.group25.api.oauth2.getMicrosoftOrganizationInfo
 import isel.leic.group25.api.oauth2.getMicrosoftUserInfo
 import isel.leic.group25.db.entities.types.Role
+import isel.leic.group25.services.LoginResult
 import isel.leic.group25.services.Services
 
 /**
@@ -32,6 +36,28 @@ fun Route.authRoutes(services: Services, client: HttpClient) {
     }
 }
 
+private fun loginResponse(call: ApplicationCall, result: LoginResult, device: String){
+    call.respondEither(
+        either = result,
+        transformError = { it.toProblem() },
+        transformSuccess = { token ->
+            if(device == "WEB") {
+                val oneMonthFromNow = GMTDate() + (30L * 24 * 60 * 60 * 1000)
+                val cookie = Cookie(
+                    name = "auth_token",
+                    value = token,
+                    httpOnly = true,
+                    maxAge = 60 * 60,
+                    expires = oneMonthFromNow
+                )
+                call.response.cookies.append(cookie)
+            } else {
+                LoginResponse(token)
+            }
+        }
+    )
+}
+
 fun Route.microsoftLoginRoute(services: Services, client: HttpClient) {
     post("/microsoft") {
         val authHeader = call.request.headers["Authorization"]
@@ -39,6 +65,8 @@ fun Route.microsoftLoginRoute(services: Services, client: HttpClient) {
         if (!authHeader.startsWith("Bearer ")) {
             return@post RequestError.Invalid("Authorization header format").toProblem().respond(call)
         }
+        val device = call.request.headers["X-Device"]
+            ?: return@post RequestError.MissingHeader("X-Device").toProblem().respond(call)
         val accessToken = authHeader.substringAfter("Bearer ")
         val userInfo = getMicrosoftUserInfo(accessToken = accessToken, client = client)
         val organizationInfo = getMicrosoftOrganizationInfo(
@@ -51,14 +79,8 @@ fun Route.microsoftLoginRoute(services: Services, client: HttpClient) {
         val result = services.from({authService}){
             authenticateWithMicrosoft(userInfo.displayName, userInfo.mail, organizationInfo.displayName)
         }
+        loginResponse(call, result, device)
 
-        call.respondEither(
-            either = result,
-            transformError = { it.toProblem() },
-            transformSuccess = { token ->
-                LoginResponse(token = token)
-            }
-        )
     }
 }
 
@@ -108,6 +130,8 @@ fun Route.registerRoute(services: Services) {
 fun Route.loginRoute(services: Services) {
     post("/login") {
         val credentials = call.receive<LoginCredentialsRequest>()
+        val device = call.request.headers["X-Device"]
+            ?: return@post RequestError.MissingHeader("X-Device").toProblem().respond(call)
         credentials.validate()?.let { error ->
             return@post error.toProblem().respond(call)
         }
@@ -117,13 +141,7 @@ fun Route.loginRoute(services: Services) {
                 password = credentials.password
             )
         }
-        call.respondEither(
-            either = result,
-            transformError = { it.toProblem() },
-            transformSuccess = { token ->
-                LoginResponse(token = token)
-            }
-        )
+        loginResponse(call, result, device)
     }
 }
 
