@@ -51,6 +51,16 @@ export const styles = StyleSheet.create({
         color: 'white', // Only applies in text components
         borderRadius: 32,
     },
+    joinClassButton: {
+        marginTop: 16,
+        paddingVertical: 8,
+        paddingHorizontal: 24,
+        backgroundColor: '#651920',
+        color: 'white', // Only applies in text components
+        borderRadius: 16,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
     welcomeContainer: {
         flex: 1,
         backgroundColor: '#f5f5f5',
@@ -100,4 +110,76 @@ export const styles = StyleSheet.create({
     navContainer: {
         flex: 1
     },
+    searchInput: {
+        height: 50,
+        borderWidth: 1,
+        borderColor: '#651c24',
+        borderRadius: 8,
+        paddingHorizontal: 12,
+        marginBottom: 16,
+        marginTop: '10%',
+    },
+    itemSearch: {
+        padding: 16,
+        borderBottomWidth: 1,
+        borderBottomColor: '#651c24',
+    },
+    itemText: {
+        fontSize: 16,
+    },
+    emptyText: {
+        textAlign: 'center',
+        marginTop: 20,
+        color: '#666',
+    },
+    searchContainer: {
+        flex: 1,
+        padding: 16,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#fef6ef',
+    },
+    classItem: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingVertical: 12,
+        borderBottomWidth: 1,
+        backgroundColor: '#fef6ef',
+        borderBottomColor: '#651c24',
+    },
+    sectionTitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginBottom: 15,
+    },
+    classesSection: {
+        marginTop: '10%',
+        borderTopWidth: 1,
+        borderTopColor: '#fef6ef',
+        paddingTop: 20,
+    },
+    joinButtonText: {
+        color: 'white',
+        fontSize: 14,  // Optional: smaller text if needed
+        fontWeight: '500',
+    },
+    leftColumn: {
+        flex: 1, // Takes 50% of width
+        padding: 16,
+        borderRightWidth: 1,
+        borderRightColor: '#651c24',
+        alignItems: 'center',
+    },
+    rightColumn: {
+        flex: 1, // Takes 50% of width
+        padding: 16,
+        alignItems: 'center',
+
+    },
+    joinClassContainer: {
+        flex: 1,
+        flexDirection: 'row', // Horizontal layout
+        backgroundColor: '#fef6ef',
+    }
 });

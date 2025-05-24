@@ -17,7 +17,7 @@ export const UserNavBar = () => {
                     <Ionicons name="calendar-outline" size={30} color="white" />
                 </TouchableOpacity>
             </Link>
-            <Link href="/joinClass" asChild>
+            <Link href="/joinSubject" asChild>
                 <TouchableOpacity style={styles.iconContainer}>
                     <Ionicons name="checkbox-outline" size={30} color="white" />
                 </TouchableOpacity>
