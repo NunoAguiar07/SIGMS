@@ -3,12 +3,7 @@ import {styles} from "../css_styling/profile/RectangleProps";
 
 
 // @ts-ignore
-export const JoinSubjectScreen = ({subjects,schoolClasses,selectedSubject,searchQuery,onSearchChange,onSubjectSelect}) => {
-    const handleJoinClass = (classId: number) => {
-        // Implement your join class logic here
-        console.log("Joining class:", classId);
-        // You would typically call an API here
-    };
+export const JoinSubjectScreen = ({subjects,schoolClasses,selectedSubject,searchQuery,onSearchChange,onSubjectSelect,onJoinClass}) => {
     return (
         <View style={styles.joinClassContainer}>
             {/* Left Column - Search and Subjects */}
@@ -54,7 +49,7 @@ export const JoinSubjectScreen = ({subjects,schoolClasses,selectedSubject,search
                                         <Text style={styles.itemText}>{item.name}</Text>
                                         <TouchableOpacity
                                             style={styles.joinClassButton}
-                                            onPress={() => handleJoinClass(item.id)}
+                                            onPress={() => onJoinClass(selectedSubject.id, item.id)}
                                         >
                                             <Text style={styles.joinButtonText}>Join Class</Text>
                                         </TouchableOpacity>

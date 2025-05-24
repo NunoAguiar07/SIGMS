@@ -97,7 +97,7 @@ CREATE TABLE IF NOT EXISTS LECTURE (
     id SERIAL PRIMARY KEY,
     class_id INT NOT NULL REFERENCES CLASS(id) ON DELETE CASCADE,
     room_id INT NOT NULL REFERENCES CLASSROOM(id) ON DELETE CASCADE,
-    class_type VARCHAR(20) CHECK (class_type IN ('theoretical', 'practical', 'theoretical_practical')),
+    class_type VARCHAR(30) CHECK (class_type IN ('theoretical', 'practical', 'theoretical_practical')),
     week_day INT CHECK(week_day > 0 AND week_day < 8),
     start_time TIME NOT NULL,
     end_time TIME NOT NULL,

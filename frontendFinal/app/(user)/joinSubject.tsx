@@ -7,6 +7,8 @@ import {SubjectsRequest} from "../../requests/authorized/SubjectsRequest";
 import {JoinSubjectScreen} from "../../screens/JoinSubjectScreen";
 import {useDebounce} from 'use-debounce';
 import {SchoolClassRequest} from "../../requests/authorized/SchoolClassRequest";
+import {JoinSchoolClassRequest} from "../../requests/authorized/JoinSchoolClassRequest";
+import {Alert} from "react-native";
 
 
 const joinSubject = () => {
@@ -40,6 +42,19 @@ const joinSubject = () => {
         loadClasses()
     };
 
+    const handleJoinClass = async (subjectId: number, classId: number) => {
+        console.log(subjectId, classId)
+        const join = JoinSchoolClassRequest(subjectId, classId, setError);
+        const success = await join();
+        if (success) {
+            Alert.alert('Success', 'You have joined the class successfully!');
+            setSelectedSubject(null);
+            setSchoolClasses([]);
+        } else {
+            Alert.alert('Error', 'Failed to join the class. Please try again.');
+        }
+    };
+
     // Handle errors
     if (error) return <ErrorHandler errorStatus={error.status} errorMessage={error.message} />;
     return <JoinSubjectScreen
@@ -49,6 +64,7 @@ const joinSubject = () => {
             searchQuery={searchQuery}
             onSearchChange={setSearchQuery}
             onSubjectSelect={handleSubjectSelect}
+            onJoinClass={handleJoinClass}
         />
 
 }
