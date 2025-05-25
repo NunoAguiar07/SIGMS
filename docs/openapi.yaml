@@ -35,7 +35,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/WelcomePageResponse"
-  /api/assess-role:
+  /api/assess-roles:
     get:
       tags:
         - AssessRole
@@ -54,7 +54,7 @@ paths:
           name: limit
           schema:
             type: integer
-            default: 20
+            default: 10
           required: false
           description: Item return list limit
       responses:
@@ -68,7 +68,7 @@ paths:
                   $ref: "#/components/schemas/AssessRole"
         400:
           description: Either limit or offset are not a valid integer
-  /api/assess-role/validate:
+  /api/assess-roles/validate:
     put:
       tags:
         - AssessRole
@@ -95,7 +95,7 @@ paths:
       responses:
         204:
           description: Successfully set new pending user approval request status
-  /api/assess-role/{token}:
+  /api/assess-roles/{token}:
     get:
       tags:
         - AssessRole
@@ -124,7 +124,7 @@ paths:
         - Lecture
       security:
         - bearerJWT: []
-      description: Return pending approvals
+      description: Return existing user lectures
       parameters:
         - in: query
           name: offset
@@ -165,8 +165,15 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/LectureResponse"
-  /api/lectures/update:
+  /api/lectures/{lectureId}/update:
     put:
+      parameters:
+        - in: path
+          name: lectureId
+          schema:
+            type: integer
+            example: 1
+          required: true
       tags:
         - Lecture
       security:
@@ -181,8 +188,15 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/LectureResponse"
-  /api/lectures/delete:
+  /api/lectures/{lectureId}/delete:
     delete:
+      parameters:
+        - in: path
+          name: lectureId
+          schema:
+            type: integer
+            example: 1
+          required: true
       tags:
         - Lecture
       security:
@@ -193,6 +207,27 @@ paths:
       responses:
         204:
           description: Successfully deleted the lecture
+  /api/lectures/{lectureId}:
+    get:
+      parameters:
+        - in: path
+          name: lectureId
+          schema:
+            type: integer
+            example: 1
+          required: true
+      tags:
+        - Lecture
+      security:
+        - bearerJWT: [ ]
+      description: Retrieve a Lecture
+      responses:
+        200:
+          description: Successfully deleted the lecture
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LectureResponse"
   /api/profile:
     get:
       security:
@@ -238,7 +273,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/User"
-  /rooms:
+  /api/rooms:
     get:
       parameters:
         - in: query
@@ -268,7 +303,7 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/RoomResponse"
-  /rooms/add:
+  /api/rooms/add:
     post:
       security:
         - bearerJWT: [ ]
@@ -284,7 +319,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/RoomResponse"
-  /rooms/{roomId}:
+  /api/rooms/{roomId}:
     get:
       security:
         - bearerJWT: [ ]
@@ -306,7 +341,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/RoomResponse"
-  /rooms/{roomId}/delete:
+  /api/rooms/{roomId}/delete:
     delete:
       security:
         - bearerJWT: [ ]
@@ -324,7 +359,7 @@ paths:
       responses:
         204:
           description: Successfully deleted room by Id
-  /rooms/{roomId}/update:
+  /api/rooms/{roomId}/update:
     put:
       security:
         - bearerJWT: [ ]
@@ -348,7 +383,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/RoomResponse"
-  /rooms/{roomId}/lectures:
+  /api/rooms/{roomId}/lectures:
     get:
       security:
         - bearerJWT: [ ]
@@ -386,7 +421,7 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/LectureResponse"
-  /rooms/{roomId}/issues:
+  /api/rooms/{roomId}/issues:
     get:
       security:
         - bearerJWT: [ ]
@@ -424,7 +459,7 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/IssueReportResponse"
-  /rooms/{roomId}/issues/add:
+  /api/rooms/{roomId}/issues/add:
     post:
       security:
         - bearerJWT: [ ]
@@ -448,7 +483,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/IssueReportResponse"
-  /rooms/{roomId}/issues/{issueId}:
+  /api/rooms/{roomId}/issues/{issueId}:
     get:
       security:
         - bearerJWT: [ ]
@@ -477,7 +512,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/IssueReportResponse"
-  /rooms/{roomId}/issues/{issueId}/delete:
+  /api/rooms/{roomId}/issues/{issueId}/delete:
     delete:
       security:
         - bearerJWT: [ ]
@@ -502,7 +537,7 @@ paths:
       responses:
         204:
           description: Successfully deleted issue by Id associated with room of Id
-  /rooms/{roomId}/issues/{issueId}/update:
+  /api/rooms/{roomId}/issues/{issueId}/update:
     put:
       security:
         - bearerJWT: [ ]
@@ -533,7 +568,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/IssueReportResponse"
-  /rooms/{roomId}/issues/{issueId}/assign:
+  /api/rooms/{roomId}/issues/{issueId}/assign:
     put:
       security:
         - bearerJWT: [ ]
@@ -562,7 +597,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/IssueReportResponse"
-  /offices/{roomId}/teachers/add:
+  /api/offices/{roomId}/teachers/add:
     put:
       security:
         - bearerJWT: [ ]
@@ -582,7 +617,7 @@ paths:
       responses:
         200:
           description: Successfully added a teacher to the office room by id
-  /offices/{roomId}/teachers/remove:
+  /api/offices/{roomId}/teachers/remove:
     delete:
       security:
         - bearerJWT: [ ]
@@ -663,7 +698,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/SubjectResponse"
-  /api/subject/{subjectId}:
+  /api/subjects/{subjectId}:
     get:
       security:
         - bearerJWT: [ ]
@@ -684,7 +719,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/SubjectResponse"
-  /api/subject/{subjectId}/delete:
+  /api/subjects/{subjectId}/delete:
     delete:
       security:
         - bearerJWT: [ ]
@@ -701,7 +736,7 @@ paths:
       responses:
         204:
           description: Successfully deleted subject by Id
-  /api/subject/{subjectId}/classes:
+  /api/subjects/{subjectId}/classes:
     get:
       security:
         - bearerJWT: [ ]
@@ -738,7 +773,7 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/ClassResponse"
-  /api/subject/{subjectId}/classes/add:
+  /api/subjects/{subjectId}/classes/add:
     post:
       security:
         - bearerJWT: [ ]
@@ -761,7 +796,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ClassResponse"
-  /api/subject/{subjectId}/classes/{classId}:
+  /api/subjects/{subjectId}/classes/{classId}:
     get:
       security:
         - bearerJWT: [ ]
@@ -788,7 +823,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ClassResponse"
-  /api/subject/{subjectId}/classes/{classId}/users/add:
+  /api/subjects/{subjectId}/classes/{classId}/users/add:
     post:
       security:
         - bearerJWT: [ ]
@@ -811,7 +846,7 @@ paths:
       responses:
         204:
           description: Successfully added authenticated user to class by id for subject by id
-  /api/subject/{subjectId}/classes/{classId}/users/remove:
+  /api/subjects/{subjectId}/classes/{classId}/users/remove:
     delete:
       security:
         - bearerJWT: [ ]
@@ -834,7 +869,7 @@ paths:
       responses:
         204:
           description: Successfully removed authenticated user to class by id for subject by id
-  /api/subject/{subjectId}/classes/{classId}/lectures:
+  /api/subjects/{subjectId}/classes/{classId}/lectures:
     get:
       security:
         - bearerJWT: [ ]
@@ -877,7 +912,7 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/LectureResponse"
-  /auth/register:
+  /api/auth/register:
     post:
       tags:
         - Auth
@@ -891,8 +926,13 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/RegisterResponse"
-  /auth/login:
+  /api/auth/login:
     post:
+      parameters:
+        - in: header
+          name: X-Device
+          schema:
+              $ref: "#/components/schemas/Device"
       tags:
         - Auth
       requestBody:
@@ -900,12 +940,12 @@ paths:
       description: Login an user
       responses:
         200:
-          description: Successfully logged in an user
+          description: Successfully logged in an user, returns token in http-only cookie in browser and in response body everywhere else
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/LoginResponse"
-  /auth/verify-account:
+  /api/auth/verify-account:
     put:
       tags:
         - Auth
@@ -914,11 +954,32 @@ paths:
           name: token
           schema:
             type: string
-            example: UUID token
+            format: uuid
+            example: "UUID token"
       description: Verify a new student user
       responses:
         204:
           description: Successfully verified and registered a new user
+  /api/auth/microsoft:
+    post:
+      parameters:
+        - in: header
+          name: Authorization
+          schema:
+            type: string
+            example: "Bearer OAuth2 Token"
+        - in: header
+          name: X-Device
+          schema:
+            $ref: "#/components/schemas/Device"
+      responses:
+        200:
+          description: Successfully logged in an user, returns token in http-only cookie in browser and in response body everywhere else
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginResponse"
+
 components:
   schemas:
     ChangePassword:
@@ -1259,6 +1320,12 @@ components:
         - TEACHER
         - ADMIN
         - TECHNICIAN
+    Device:
+      type: string
+      enum:
+        - IOS
+        - ANDROID
+        - WEB
   securitySchemes:
     bearerJWT:
       type: http

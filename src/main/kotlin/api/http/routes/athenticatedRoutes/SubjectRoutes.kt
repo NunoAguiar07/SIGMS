@@ -38,8 +38,11 @@ fun Route.subjectRoutes(
         specificSubjectRoutes(services)
         subjectClassesRoutes(services)
 
-        route("/{subjectId}/classes/{classId}") {
+        route("/{subjectId}/classes") {
             classManagementRoutes(services)
+
+        }
+        route("/{subjectId}/classes/{classId}") {
             withRoles(setOf(Role.TEACHER, Role.STUDENT)){
                 classUserRoutes(services)
             }
