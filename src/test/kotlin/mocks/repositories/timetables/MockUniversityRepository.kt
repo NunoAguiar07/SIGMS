@@ -18,6 +18,11 @@ class MockUniversityRepository : UniversityRepositoryInterface {
         return universities.firstOrNull { it.name == name }
     }
 
+    override fun getUniversitiesByName(limit: Int, offset: Int, subjectPartialName: String): List<University> {
+        return universities.filter { it.name.contains(subjectPartialName, ignoreCase = true) }
+            .drop(offset).take(limit)
+    }
+
     override fun createUniversity(name: String): University {
         val university = University {
             this.name = name

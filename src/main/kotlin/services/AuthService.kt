@@ -94,7 +94,7 @@ class AuthService(
                 }
                 return@useTransaction when(role) {
                     Role.STUDENT -> {
-                        val verificationLink = "${frontendUrl}api/auth/verify-account?token=$verificationToken"
+                        val verificationLink = "${frontendUrl}auth/verify-account?token=$verificationToken"
                         emailService.sendStudentVerificationEmail(
                             userEmail = user.email,
                             username = user.username,

@@ -6,7 +6,7 @@ export const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         padding: 64, // 4rem ≈ 64px
-        backgroundColor: '#fef6ef',
+        backgroundColor: '#f8f0e6FF',
     },
     card: {
         backgroundColor: '#bb9996',
@@ -17,6 +17,7 @@ export const styles = StyleSheet.create({
         borderColor: '#651920',
         position: 'relative',
         alignItems: 'center',
+        zIndex:3,
     },
     imageWrapper: {
         position: 'relative',
@@ -111,6 +112,7 @@ export const styles = StyleSheet.create({
         flex: 1
     },
     searchInput: {
+        width: '100%',
         height: 50,
         borderWidth: 1,
         borderColor: '#651c24',
@@ -181,5 +183,165 @@ export const styles = StyleSheet.create({
         flex: 1,
         flexDirection: 'row', // Horizontal layout
         backgroundColor: '#fef6ef',
-    }
+    },
+    background: {
+        flex: 1,
+        backgroundColor: '#fff',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    centerContainer: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        flex: 1,
+    },
+    logo: {
+        width: 600,
+        height: 300,
+        resizeMode: 'contain',
+        marginBottom: 20,
+    },
+    slogan: {
+        color: '#671b22',
+        fontSize: 42,
+        fontFamily: 'Roboto Condensed',
+        textAlign: 'center',
+        marginBottom: 20,
+    },
+    microsoftButtonContainer: {
+        marginTop: 10,
+        marginBottom: 30,
+    },
+    footerContainer: {
+        position: 'absolute',
+        bottom: 20,
+        left: 20,
+        flexDirection: 'row',
+        gap: 20,
+    },
+    footerText: {
+        color: 'rgba(184, 178, 171, 1)',
+        fontSize: 40,
+        fontFamily: 'Roboto Condensed',
+        fontWeight: '400',
+        textTransform: 'none',
+        textAlign: 'left',
+    },
+    loginRegisterButton: {
+        position: 'relative',
+        backgroundColor: '#671b22',
+        paddingVertical: 12,
+        paddingHorizontal: 24,
+        borderRadius: 10,
+        marginVertical: 6,
+        alignItems: 'center',
+        width: 200,
+        zIndex: 2,
+    },
+    loginRegisterButtonText: {
+        color: '#fff',
+        fontSize: 18,
+        fontFamily: 'Roboto Condensed',
+        fontWeight: '400',
+    },
+    microsoftButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingVertical: 12,
+        paddingHorizontal: 24,
+        borderRadius: 10,
+        borderWidth: 1,
+        borderColor: '#671b22',
+        backgroundColor: 'transparent',
+        marginVertical: 6,
+        width: 200,
+    },
+
+    microsoftButtonText: {
+        color: '#671b22',
+        fontSize: 18,
+        fontFamily: 'Roboto Condensed',
+        fontWeight: '400',
+        marginLeft: 10,
+    },
+    title: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        textAlign: 'center',
+        marginBottom: 20,
+    },
+    pickerContainer: {
+        marginTop: 20,
+        width: '100%',
+        marginBottom: 20,
+    },
+    picker: {
+        width: '100%',
+        height: 50,
+        color: '#000',
+        backgroundColor: '#f8f0e6',
+        borderRadius: 8,
+    },
+    inputRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        width: '100%',
+        marginBottom: 20,
+    },
+    inputRowItem: {
+        width: '30%', // Each input takes about 1/3 of the space
+        marginTop: '5%',
+    },
+    universitySearchContainer: {
+        width: '100%',
+        justifyContent:'center',
+        alignItems: 'center',
+        position: 'relative',
+        marginBottom: 20,
+    },
+    universityResultsContainer: {
+        position: 'absolute',
+        top: '60%', // Position below the search input
+        left: 0,
+        right: 0,
+        backgroundColor: '#fff',
+        maxHeight: 200,
+        borderWidth: 1,
+        borderColor: '#651c24',
+        borderRadius: 8,
+        zIndex: 4,
+        elevation: 3, // For Android shadow
+        shadowColor: '#000', // For iOS shadow
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 4,
+    },
+    buttonsContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        width: '100%',
+        marginTop: 20,
+    },
+    message: {
+        fontSize: 18,
+        textAlign: 'center',
+        marginBottom: 16,
+        color: '#f4ece5',
+    },
+    loginButton: {
+        backgroundColor: '#671b22',
+        paddingVertical: 12,
+        paddingHorizontal: 24,
+        borderRadius: 10,
+        marginTop: 20,
+        alignItems: 'center',
+        width: 200,
+    },
+    buttonText: {
+        color: '#fff',
+        fontSize: 18,
+        fontFamily: 'Roboto Condensed',
+        fontWeight: '400',
+    },
 });

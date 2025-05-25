@@ -62,6 +62,8 @@ class SmtpEmailService(private val config: EmailConfig) : EmailService {
             }
             email.send()
         } catch (e: Exception) {
+            println(e.message)
+            println(e.cause)
             throw e
         }
     }

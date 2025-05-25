@@ -1,6 +1,6 @@
 import * as AuthSession from 'expo-auth-session';
 import * as WebBrowser from 'expo-web-browser';
-import {Button} from 'react-native';
+import {Image, Text, TouchableOpacity} from 'react-native';
 import * as SecureStore from 'expo-secure-store';
 import {useEffect} from "react";
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -8,6 +8,7 @@ import axios from "axios";
 import {useRouter} from "expo-router";
 import {getDeviceType} from "../../../Utils/DeviceType";
 import api from "../../interceptors/DeviceInterceptor";
+import {styles} from "../../../css_styling/profile/RectangleProps";
 
 
 WebBrowser.maybeCompleteAuthSession();
@@ -155,11 +156,14 @@ const MicrosoftAuthButton = () => {
     };
 
     return (
-        <Button
-            disabled={!request}
-            title="Sign in with Microsoft"
+        <TouchableOpacity
+            style={styles.microsoftButton}
             onPress={() => promptAsync()}
-        />
+            disabled={!request}
+        >
+            <Image source={require('../../../assets/microsoft-logo.jpg')} style={{ width: 24, height: 24 }} resizeMode="contain"/>
+            <Text style={styles.microsoftButtonText}>Microsoft</Text>
+        </TouchableOpacity>
     );
 };
 
