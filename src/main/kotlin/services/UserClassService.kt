@@ -69,7 +69,7 @@ class UserClassService(
         }
     }
 
-    fun getScheduleByUserId(userId: Int, role: Role): UserLectureListResult {
+    fun getScheduleByUserId(userId: Int, role: Role, limit:Int, offset:Int): UserLectureListResult {
         return runCatching {
             transactionable.useTransaction {
                 val user = repositories.from({userRepository}){
@@ -77,7 +77,7 @@ class UserClassService(
                 } ?: return@useTransaction failure(UserClassError.UserNotFound)
                 return@useTransaction when (role) {
                     Role.STUDENT -> {
-                        studentSchedule(user)
+                        studentSchedule(user, limit, offset)
                     }
                     Role.TEACHER -> {
                         teacherSchedule(user)
@@ -157,16 +157,18 @@ class UserClassService(
         return success(true)
     }
 
-    private fun studentSchedule(user: User): Either<UserClassError, List<Lecture>> {
+    private fun studentSchedule(user: User, limit:Int, offset: Int): Either<UserClassError, List<Lecture>> {
         val classes = repositories.from({classRepository}){
             findClassesByStudentId(user.id)
         }
         if(classes.isEmpty()) {
             return success(emptyList())
         }
-        val lectures = repositories.from({lectureRepository}){
-            getLecturesByClass(classes[0].id, 50, 0)
-        }
+        val lectures = classes.flatMap { classEntity ->
+            repositories.from({ lectureRepository }) {
+                getLecturesByClass(classEntity.id, limit, offset)
+            }
+        }.sortedBy { it.weekDay }
         if(lectures.isEmpty()) {
             return success(emptyList())
         }

@@ -111,6 +111,15 @@ export const styles = StyleSheet.create({
     navContainer: {
         flex: 1
     },
+    searchSubjectInput: {
+        height: 50,
+        borderWidth: 1,
+        borderColor: '#651c24',
+        borderRadius: 8,
+        paddingHorizontal: 12,
+        marginBottom: 16,
+        marginTop: '10%',
+    },
     searchInput: {
         width: '100%',
         height: 50,

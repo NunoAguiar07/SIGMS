@@ -9,7 +9,7 @@ export const JoinSubjectScreen = ({subjects,schoolClasses,selectedSubject,search
             {/* Left Column - Search and Subjects */}
             <View style={styles.leftColumn}>
                 <TextInput
-                    style={styles.searchInput}
+                    style={styles.searchSubjectInput}
                     placeholder="Search subjects..."
                     value={searchQuery}
                     onChangeText={onSearchChange}

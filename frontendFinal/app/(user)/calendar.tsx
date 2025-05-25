@@ -1,22 +1,24 @@
-import {ScrollView, Text, View} from "react-native";
-import {styles} from "../../css_styling/calendar/Props";
 import CalendarScreen from "../../screens/calendarScreen";
-import {useEffect, useState} from "react";
+import React, {useState} from "react";
 import {ErrorInterface} from "../../interfaces/ErrorInterface";
 import ErrorHandler from "../(public)/error";
 import LoadingPresentation from "../../screens/Loading";
 import {getSchedule} from "../../requests/authorized/CalendarPage";
+import {useFocusEffect} from "expo-router";
 
 
-const calendar = () => {
+const Calendar = () => {
     const [schedule, setSchedule] = useState([]);
     const [error, setError] = useState<ErrorInterface | null>(null);
 
-    useEffect(() => {
-        // @ts-ignore
-        const fetchData = getSchedule(setSchedule, setError);
-        fetchData();
-    }, []);
+    useFocusEffect(
+        React.useCallback(() => {
+            // @ts-ignore
+            const fetchData = getSchedule(setSchedule, setError);
+            fetchData();
+
+        }, []) // Add dependencies if needed
+    );
 
     if (error) {
         return <ErrorHandler errorStatus={error.status} errorMessage={error.message} />;
@@ -29,4 +31,4 @@ const calendar = () => {
     return <CalendarScreen schedule={schedule} />;
 };
 
-export default calendar;
+export default Calendar;
