@@ -1,7 +1,7 @@
 package isel.leic.group25.db.repositories.timetables.interfaces
 
-import isel.leic.group25.db.entities.timetables.Subject
 import isel.leic.group25.db.entities.timetables.Class
+import isel.leic.group25.db.entities.timetables.Subject
 import isel.leic.group25.db.entities.users.Student
 import isel.leic.group25.db.entities.users.Teacher
 import isel.leic.group25.db.entities.users.User
@@ -33,6 +33,8 @@ interface ClassRepositoryInterface {
     fun removeTeacherFromClass(user: User, schoolClass: Class): Boolean
 
     fun checkStudentInClass(userId: Int, classId:Int): Boolean
+
+    fun checkStudentInSubject(userId: Int, subjectId: Int): Boolean
 
     fun checkTeacherInClass(userId: Int, classId: Int): Boolean
 

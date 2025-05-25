@@ -6,7 +6,9 @@ import isel.leic.group25.db.repositories.timetables.interfaces.SubjectRepository
 import isel.leic.group25.db.repositories.utils.withDatabase
 import isel.leic.group25.db.tables.Tables.Companion.subjects
 import org.ktorm.database.Database
+import org.ktorm.dsl.and
 import org.ktorm.dsl.eq
+import org.ktorm.dsl.like
 import org.ktorm.entity.*
 
 class SubjectRepository(private val database: Database): SubjectRepositoryInterface {
@@ -16,6 +18,13 @@ class SubjectRepository(private val database: Database): SubjectRepositoryInterf
 
     override fun getAllSubjectsByUniversityId(universityId: Int, limit: Int, offset: Int): List<Subject> {
         return database.subjects.filter { it.university eq universityId }.drop(offset).take(limit).toList()
+    }
+
+    override fun getSubjectsByNameAndUniversityId(universityId: Int, subjectPartialName: String, limit: Int, offset: Int): List<Subject> {
+        return database.subjects.filter {
+            (it.university eq universityId) and
+            (it.name like "%$subjectPartialName%")
+        }.drop(offset).take(limit).toList()
     }
 
 

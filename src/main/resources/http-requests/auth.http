@@ -42,6 +42,7 @@ Content-Type: application/json
 #
 POST {{baseUrl}}/auth/login
 Content-Type: application/json
+X-Device: WEB
 
 {
   "email": "antonioStudent15@gmail.com",

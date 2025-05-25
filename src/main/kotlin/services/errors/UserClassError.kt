@@ -10,6 +10,7 @@ sealed class UserClassError {
     data object FailedToUnlinkUserFromClass : UserClassError()
     data object UserNotInClass : UserClassError()
     data object UserAlreadyInClass : UserClassError()
+    data object UserAlreadyInSubject : UserClassError()
     data class ConnectionDbError(val message: String?) : UserClassError()
 
     fun toProblem() : Problem = when (this) {
@@ -40,6 +41,10 @@ sealed class UserClassError {
         UserAlreadyInClass -> Problem.badRequest(
             title = "User already in class",
             detail = "The user is already enrolled in the specified class."
+        )
+        UserAlreadyInSubject -> Problem.badRequest(
+            title = "User already in subject",
+            detail = "The user is already enrolled in the specified subject."
         )
         is ConnectionDbError -> Problem.internalServerError(
             title = "Database Connection Error",

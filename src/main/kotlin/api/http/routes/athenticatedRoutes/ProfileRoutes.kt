@@ -2,7 +2,7 @@ package isel.leic.group25.api.http.routes.athenticatedRoutes
 
 import api.model.request.ChangePasswordRequest
 import api.model.request.UserUpdateRequest
-import api.model.response.UserResponse
+import api.model.response.UserProfileResponse
 import io.ktor.http.*
 import io.ktor.server.request.*
 import io.ktor.server.routing.*
@@ -47,7 +47,7 @@ fun Route.getProfileRoute(services: Services) {
             either = result,
             transformError = { error -> error.toProblem() },
             transformSuccess = { user ->
-                UserResponse.fromUser(user)
+                UserProfileResponse.fromUser(user)
             }
         )
     }
@@ -75,7 +75,7 @@ fun Route.updateProfileRoute(services: Services) {
             either = result,
             transformError = { error -> error.toProblem() },
             transformSuccess = { user ->
-                UserResponse.fromUser(user)
+                UserProfileResponse.fromUser(user)
             }
         )
     }
@@ -106,7 +106,7 @@ fun Route.changePasswordRoute(services: Services) {
             either = result,
             transformError = { it.toProblem() },
             transformSuccess = { user ->
-                UserResponse.fromUser(user)
+                UserProfileResponse.fromUser(user)
             }
         )
     }

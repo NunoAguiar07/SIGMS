@@ -76,6 +76,10 @@ class MockClassRepository : ClassRepositoryInterface {
         return studentsClasses.any { it.student.user.id == userId && it.schoolClass.id == classId }
     }
 
+    override fun checkStudentInSubject(userId: Int, subjectId: Int): Boolean {
+        return studentsClasses.any { it.student.user.id == userId && it.schoolClass.subject.id == subjectId }
+    }
+
     override fun checkTeacherInClass(userId: Int, classId: Int): Boolean {
         return teachersClasses.any { it.teacher.user.id == userId && it.schoolClass.id == classId }
     }

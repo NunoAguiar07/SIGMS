@@ -1,12 +1,12 @@
 package isel.leic.group25.services
 
 import isel.leic.group25.db.entities.timetables.Class
-import isel.leic.group25.db.repositories.interfaces.Transactionable
-import isel.leic.group25.services.errors.UserClassError
 import isel.leic.group25.db.entities.timetables.Lecture
 import isel.leic.group25.db.entities.types.Role
 import isel.leic.group25.db.entities.users.User
 import isel.leic.group25.db.repositories.Repositories
+import isel.leic.group25.db.repositories.interfaces.Transactionable
+import isel.leic.group25.services.errors.UserClassError
 import isel.leic.group25.utils.Either
 import isel.leic.group25.utils.failure
 import isel.leic.group25.utils.success
@@ -69,7 +69,7 @@ class UserClassService(
         }
     }
 
-    fun getScheduleByUserId(userId: Int, role: Role): UserLectureListResult {
+    fun getScheduleByUserId(userId: Int, role: Role, limit:Int, offset:Int): UserLectureListResult {
         return runCatching {
             transactionable.useTransaction {
                 val user = repositories.from({userRepository}){
@@ -77,7 +77,7 @@ class UserClassService(
                 } ?: return@useTransaction failure(UserClassError.UserNotFound)
                 return@useTransaction when (role) {
                     Role.STUDENT -> {
-                        studentSchedule(user)
+                        studentSchedule(user, limit, offset)
                     }
                     Role.TEACHER -> {
                         teacherSchedule(user)
@@ -96,6 +96,11 @@ class UserClassService(
             }) {
             return failure(UserClassError.UserAlreadyInClass)
         }
+//        if (repositories.from({classRepository}){
+//                checkStudentInSubject(student.user.id, schoolClass.subject.id)
+//            }) {
+//            return failure(UserClassError.UserAlreadyInSubject)
+//        }
         val linked = repositories.from({classRepository}){
             addStudentToClass(student, schoolClass)
         }
@@ -122,7 +127,7 @@ class UserClassService(
         return success(true)
     }
 
-    fun withdrawStudent(user: User, schoolClass: Class) : Either<UserClassError, Boolean> {
+    private fun withdrawStudent(user: User, schoolClass: Class) : Either<UserClassError, Boolean> {
         if (!repositories.from({classRepository}){
                 checkStudentInClass(user.id, schoolClass.id)
             }) {
@@ -137,7 +142,7 @@ class UserClassService(
         return success(true)
     }
 
-    fun unassignTeacher(user: User, schoolClass: Class) : Either<UserClassError, Boolean>{
+    private fun unassignTeacher(user: User, schoolClass: Class) : Either<UserClassError, Boolean>{
         if (!repositories.from({classRepository}){
                 checkTeacherInClass(user.id, schoolClass.id)
             }) {
@@ -152,23 +157,25 @@ class UserClassService(
         return success(true)
     }
 
-    fun studentSchedule(user: User): Either<UserClassError, List<Lecture>> {
+    private fun studentSchedule(user: User, limit:Int, offset: Int): Either<UserClassError, List<Lecture>> {
         val classes = repositories.from({classRepository}){
             findClassesByStudentId(user.id)
         }
         if(classes.isEmpty()) {
             return success(emptyList())
         }
-        val lectures = repositories.from({lectureRepository}){
-            getLecturesByClass(classes[0].id, 50, 0)
-        }
+        val lectures = classes.flatMap { classEntity ->
+            repositories.from({ lectureRepository }) {
+                getLecturesByClass(classEntity.id, limit, offset)
+            }
+        }.sortedBy { it.weekDay }
         if(lectures.isEmpty()) {
             return success(emptyList())
         }
         return success(lectures)
     }
 
-    fun teacherSchedule(user: User): Either<UserClassError, List<Lecture>> {
+    private fun teacherSchedule(user: User): Either<UserClassError, List<Lecture>> {
         val classes = repositories.from({classRepository}){
             findClassesByTeacherId(user.id)
         }

@@ -49,6 +49,24 @@ class SubjectService(
         }
     }
 
+    fun getSubjectsByNameAndUniversityId(
+        universityId: Int,
+        subjectPartialName: String,
+        limit: Int,
+        offset: Int
+    ): SubjectListResult {
+        return runCatching {
+            transactionable.useTransaction {
+                val university = repositories.from({universityRepository}) {getUniversityById(universityId)}
+                    ?: return@useTransaction failure(SubjectError.UniversityNotFound)
+                val subjects = repositories.from({subjectRepository}) {
+                    getSubjectsByNameAndUniversityId(university.id, subjectPartialName, limit, offset)
+                }
+                return@useTransaction success(subjects)
+            }
+        }
+    }
+
     fun getSubjectById(id: Int): SubjectResult {
         return runCatching {
             transactionable.useTransaction {

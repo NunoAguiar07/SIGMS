@@ -1,6 +1,6 @@
-import { ErrorUriParser } from "../Utils/UriParser";
+import {ErrorUriParser} from "../../Utils/UriParser";
 import axios from "axios";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import api from "../interceptors/DeviceInterceptor";
 
 export const apiUrl = 'http://localhost:8080/api';
 
@@ -15,17 +15,11 @@ export const GetProfile = (
     setError: (error: any) => void,
 ) => {
     return async () => {
-        const accessToken = await AsyncStorage.getItem('authToken');
         try {
-            const response = await axios.get(`${apiUrl}/profile`, {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${accessToken}`
-                }
-            });
-            setProfile(response.data);
-            console.log(response.data)
+            const response = await api.get(`/profile`, { withCredentials: true });
+            setProfile(response.data)
         } catch (error) {
+            console.log(error)
             if (axios.isAxiosError(error)) {
                 if (error.response) {
                     const parsedError = {
@@ -57,12 +51,7 @@ export const UpdateProfile = (
 ) => {
     return async () => {
         try {
-            const response = await axios.put(`${apiUrl}/profile`, profileData, {
-                headers: {
-                    'Authorization': `Bearer ${authToken}`,
-                    'Content-Type': 'application/json'
-                }
-            });
+            const response = await api.put(`/profile`, profileData, { withCredentials: true });
             setProfile(response.data);
         } catch (error) {
             if (axios.isAxiosError(error)) {

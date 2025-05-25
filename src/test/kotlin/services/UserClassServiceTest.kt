@@ -211,7 +211,7 @@ class UserClassServiceTest {
         // Add student to class
         service.addUserToClass(studentUser.id, testClass.id, Role.STUDENT)
 
-        val result = service.getScheduleByUserId(studentUser.id, Role.STUDENT)
+        val result = service.getScheduleByUserId(studentUser.id, Role.STUDENT, 10, 0)
 
         assertTrue(result is Success)
         assertEquals(2, result.value.size)
@@ -230,7 +230,7 @@ class UserClassServiceTest {
     fun `getScheduleByUserId should return empty list for student with no classes`() {
         val studentUser = createTestUser(Role.STUDENT)
 
-        val result = service.getScheduleByUserId(studentUser.id, Role.STUDENT)
+        val result = service.getScheduleByUserId(studentUser.id, Role.STUDENT, 10, 0)
 
         assertTrue(result is Success)
         assertTrue(result.value.isEmpty())

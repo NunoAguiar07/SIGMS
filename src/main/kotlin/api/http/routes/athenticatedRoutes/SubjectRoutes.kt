@@ -58,12 +58,19 @@ fun Route.subjectRoutes(
  */
 fun Route.baseSubjectRoutes(services: Services) {
     get {
+        val universityId = call.getUniversityIdFromPrincipal()
+            ?: return@get call.respond(HttpStatusCode.Unauthorized)
+        val searchQuery = call.queryParameters["search"]
         val limit = call.queryParameters["limit"] ?.toIntOrNull()?: 10
         if(limit < 1 || limit > 100) return@get RequestError.Invalid("limit").toProblem().respond(call)
         val offset = call.queryParameters["offset"] ?.toIntOrNull() ?: 0
         if(offset < 0) return@get RequestError.Invalid("offset").toProblem().respond(call)
-        val result = services.from({subjectService}){
-            getAllSubjects(limit, offset)
+        val result = services.from({ subjectService }) {
+            if (searchQuery != null) {
+                getSubjectsByNameAndUniversityId(universityId, searchQuery, limit, offset)
+            } else {
+                getAllSubjectsByUniversity(universityId, limit, offset)
+            }
         }
         call.respondEither(
             either = result,

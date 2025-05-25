@@ -4,6 +4,7 @@ import api.model.response.ScheduleResponse
 import io.ktor.http.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import isel.leic.group25.api.exceptions.RequestError
 import isel.leic.group25.api.exceptions.respondEither
 import isel.leic.group25.api.jwt.getUserIdFromPrincipal
 import isel.leic.group25.api.jwt.getUserRoleFromPrincipal
@@ -27,8 +28,12 @@ fun Route.scheduleRoutes(
         get {
             val id = call.getUserIdFromPrincipal() ?: return@get call.respond(HttpStatusCode.Unauthorized)
             val role = call.getUserRoleFromPrincipal() ?: return@get call.respond(HttpStatusCode.Unauthorized)
+            val limit = call.queryParameters["limit"] ?.toIntOrNull()?: 10
+            if(limit < 1 || limit > 100) return@get RequestError.Invalid("limit").toProblem().respond(call)
+            val offset = call.queryParameters["offset"] ?.toIntOrNull() ?: 0
+            if(offset < 0) return@get RequestError.Invalid("offset").toProblem().respond(call)
             val result = services.from({userClassService}){
-                getScheduleByUserId(id, Role.valueOf(role.uppercase()))
+                getScheduleByUserId(id, Role.valueOf(role.uppercase()), limit, offset)
             }
             call.respondEither(
                 either = result,

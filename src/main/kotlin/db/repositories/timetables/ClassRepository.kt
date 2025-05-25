@@ -1,15 +1,16 @@
 package isel.leic.group25.db.repositories.timetables
 
-import isel.leic.group25.db.repositories.timetables.interfaces.ClassRepositoryInterface
-import org.ktorm.database.Database
 import isel.leic.group25.db.entities.timetables.Class
 import isel.leic.group25.db.entities.timetables.Subject
 import isel.leic.group25.db.entities.users.*
+import isel.leic.group25.db.repositories.timetables.interfaces.ClassRepositoryInterface
 import isel.leic.group25.db.repositories.utils.withDatabase
 import isel.leic.group25.db.tables.Tables.Companion.classes
 import isel.leic.group25.db.tables.Tables.Companion.studentsClasses
 import isel.leic.group25.db.tables.Tables.Companion.teachersClasses
-import org.ktorm.dsl.*
+import org.ktorm.database.Database
+import org.ktorm.dsl.and
+import org.ktorm.dsl.eq
 import org.ktorm.entity.*
 
 
@@ -74,6 +75,16 @@ class ClassRepository(private val database: Database): ClassRepositoryInterface 
 
     override fun checkStudentInClass(userId: Int, classId: Int): Boolean = withDatabase {
         return database.studentsClasses.any { (it.studentId eq userId) and (it.classId eq classId) }
+    }
+
+    override fun checkStudentInSubject(userId: Int, subjectId: Int): Boolean = withDatabase {
+        return database.studentsClasses.any { attend ->
+            (attend.studentId eq userId) and
+                    (database.classes.any { cls ->
+                        (cls.id eq attend.classId) and
+                                (cls.subject eq subjectId)
+                    })
+        }
     }
 
     override fun checkTeacherInClass(userId: Int, classId: Int): Boolean = withDatabase {

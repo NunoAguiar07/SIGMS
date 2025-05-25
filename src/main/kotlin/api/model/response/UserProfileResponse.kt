@@ -4,7 +4,7 @@ import isel.leic.group25.db.entities.users.User
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class UserResponse(
+data class UserProfileResponse(
     val id: Int,
     val name: String,
     val email: String,
@@ -12,8 +12,8 @@ data class UserResponse(
     val university: String,
 ) {
     companion object {
-        fun fromUser(user: User): UserResponse {
-            return UserResponse(
+        fun fromUser(user: User): UserProfileResponse {
+            return UserProfileResponse(
                 id = user.id,
                 name = user.username,
                 email = user.email,

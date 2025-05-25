@@ -1,6 +1,6 @@
 package isel.leic.group25.api.model.response
 
-import api.model.response.UserResponse
+import api.model.response.UserProfileResponse
 import isel.leic.group25.db.entities.types.Role
 import isel.leic.group25.db.entities.types.Status
 import isel.leic.group25.db.entities.users.RoleApproval
@@ -10,10 +10,10 @@ import kotlin.time.ExperimentalTime
 @Serializable
 data class AssessRoleResponse (
     val id : Int,
-    var user: UserResponse,
+    var user: UserProfileResponse,
     var requestedRole: Role,
     var verificationToken : String,
-    var verifiedBy : UserResponse?,
+    var verifiedBy : UserProfileResponse?,
     var createdAt : String,
     var expiresAt : String,
     var status : Status
@@ -23,13 +23,13 @@ data class AssessRoleResponse (
         fun from(roleApproval: RoleApproval): AssessRoleResponse {
             val verifiedByAmin = roleApproval.verifiedBy
             val verifiedBy = if (verifiedByAmin != null) {
-                UserResponse.fromUser(verifiedByAmin.user)
+                UserProfileResponse.fromUser(verifiedByAmin.user)
             } else {
                 null
             }
             return AssessRoleResponse(
                 id = roleApproval.id,
-                user = UserResponse.fromUser(roleApproval.user),
+                user = UserProfileResponse.fromUser(roleApproval.user),
                 requestedRole = roleApproval.requestedRole,
                 verificationToken = roleApproval.verificationToken,
                 verifiedBy = verifiedBy,

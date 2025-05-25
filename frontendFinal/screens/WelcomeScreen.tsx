@@ -1,61 +1,61 @@
 import React, {useState} from "react";
 import '../css_styling/PropertiesWelcome.css'
-import Button from "../Utils/Button";
 import {Image} from "expo-image";
 import MicrosoftAuthButton from "../requests/auth/Microsoft/Login";
 import About from "./secondary/about";
 import Privacy from "./secondary/privacy";
 import FAQ from "./secondary/faq";
+import {styles} from "../css_styling/profile/RectangleProps";
+import {Text, TouchableOpacity, View} from "react-native";
+import {useRouter} from "expo-router";
 // @ts-ignore
 export const WelcomeScreen = ({ welcome }) => {
     const [showAbout, setShowAbout] = useState(false);
     const [showFAQ, setShowFAQ] = useState(false);
     const [showPrivacy, setShowPrivacy] = useState(false);
-    return (
+    const router = useRouter();
 
-        <div className="background-board">
+    return (
+        <View style={styles.container}>
             {showAbout && <About onClose={() => setShowAbout(false)} />}
             {showFAQ && <FAQ onClose={() => setShowFAQ(false)} />}
             {showPrivacy && <Privacy onClose={() => setShowPrivacy(false)} />}
-            {/* Logo */}
-            <div className="logo-welcomePage">
-                <Image source={require("../assets/Logo.webp")} style={{width: 903, height: 516 }}></Image>
-            </div>
-            {/* Slogan */}
-            <div className="shape text a-tua-sala-24b9efeac4eb">
-                <div className="text-node">
-                    <p style={{
-                        color: '#671b22',
-                        fontSize: '55px',
-                        fontFamily: '"Roboto Condensed"',
-                        fontWeight: 400,
-                        whiteSpace: 'pre-wrap',
-                        textAlign: 'center',
-                    }}><p>
-                        {welcome.title}
-                    </p>
-                        A tua sala de aula, mais simples.
-                    </p>
-                </div>
-            </div>
-            <div className="microsoft-auth-button">
-                <MicrosoftAuthButton/>
-            </div>
 
+            <View style={styles.centerContainer}>
+                <Image source={require('../assets/Logo.webp')} style={styles.logo} />
+                <Text style={styles.slogan}>{welcome.title}</Text>
+                <Text style={styles.slogan}>A tua sala de aula, mais simples.</Text>
+                <View style={{ marginTop: 10 }}>
+                    <TouchableOpacity
+                        style={styles.loginRegisterButton}
+                        onPress={() => router.push('/auth/login')}
+                    >
+                        <Text style={styles.loginRegisterButtonText}>Login</Text>
+                    </TouchableOpacity>
 
+                    <TouchableOpacity
+                        style={styles.loginRegisterButton}
+                        onPress={() => router.push('/auth/register')}
+                    >
+                        <Text style={styles.loginRegisterButtonText}>Register</Text>
+                    </TouchableOpacity>
+                </View>
+                <View style={styles.microsoftButtonContainer}>
+                    <MicrosoftAuthButton />
+                </View>
+            </View>
 
-            <div style={{
-                position: 'absolute',
-                bottom: '0%',
-                left: 0,
-                right: 0,
-                display: 'flex',
-                gap: '20px'
-            }}>
-                <Button text="About" onClick={() => setShowAbout(true)} className="about-faq-privacy-button"/>
-                <Button text="FAQ" onClick={() => setShowFAQ(true)} className="about-faq-privacy-button"/>
-                <Button text="Privacy" onClick={() => setShowPrivacy(true)} className="about-faq-privacy-button"/>
-            </div>
-        </div>
+            <View style={styles.footerContainer}>
+                <TouchableOpacity onPress={() => setShowAbout(true)}>
+                    <Text style={styles.footerText}>About</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => setShowFAQ(true)}>
+                    <Text style={styles.footerText}>FAQ</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => setShowPrivacy(true)}>
+                    <Text style={styles.footerText}>Privacy</Text>
+                </TouchableOpacity>
+            </View>
+        </View>
     );
 };

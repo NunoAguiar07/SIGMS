@@ -16,6 +16,13 @@ class MockSubjectRepository : SubjectRepositoryInterface {
         return subjects.filter { it.university.id == universityId }.drop(offset).take(limit)
     }
 
+    override fun getSubjectsByNameAndUniversityId(universityId: Int, subjectPartialName: String, limit: Int, offset: Int): List<Subject> {
+        return subjects.filter {
+            it.university.id == universityId &&
+            it.name.contains(subjectPartialName, ignoreCase = true)
+        }.drop(offset).take(limit)
+    }
+
     override fun findSubjectById(id: Int): Subject? {
         return subjects.firstOrNull { it.id == id }
     }

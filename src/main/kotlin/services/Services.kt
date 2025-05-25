@@ -16,6 +16,7 @@ class Services(repositories: Repositories, jwtConfig: JwtConfig) {
         baseUrl = System.getenv("FRONTEND_URL")
     )
     val frontendUrl = System.getenv("FRONTEND_URL") ?: throw NullPointerException()
+    val universityService = UniversityService(repositories, repositories.ktormCommand)
     val classService = ClassService(repositories, repositories.ktormCommand)
     val userService = UserService(repositories, repositories.ktormCommand)
     val teacherRoomService = TeacherRoomService(repositories, repositories.ktormCommand)
