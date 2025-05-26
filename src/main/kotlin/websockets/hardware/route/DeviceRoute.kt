@@ -3,6 +3,7 @@ package isel.leic.group25.websockets.hardware.route
 import io.ktor.server.routing.*
 import io.ktor.server.websocket.*
 import io.ktor.websocket.*
+import isel.leic.group25.db.tables.timetables.Lectures.roomId
 import isel.leic.group25.websockets.WebsocketRoute
 import isel.leic.group25.websockets.hardware.event.*
 import isel.leic.group25.websockets.hardware.exceptions.UnexpectedEventException
@@ -38,7 +39,11 @@ object DeviceRoute: WebsocketRoute {
     private fun handleEvent(event: EventData, connection: DefaultWebSocketServerSession){
         when(event){
             is Hello -> {
-                deviceList.add(Device(event.id))
+                val device = if(event.roomId != null)
+                    Device(event.id, event.roomId.toInt())
+                else
+                    Device(event.id)
+                deviceList.add(device)
                 deviceConnectionMap[event.id] = connection
             }
             is ReceiveCapacity -> {
@@ -53,15 +58,17 @@ object DeviceRoute: WebsocketRoute {
     suspend fun updateRoomCapacities(){
         deviceList.filter{ it.roomId != 0 }.forEach {
             val connection = deviceConnectionMap[it.id] ?: return@forEach
-            val json = Json.encodeToString(UpdateCapacity())
+            val event = Event("updateCapacity", UpdateCapacity())
+            val json = Json.encodeToString(event)
             connection.send(json)
         }
     }
 
-    suspend fun setDeviceRoom(roomId: Int): Boolean{
+    suspend fun setDeviceRoom(roomId: Int, roomCapacity: Int): Boolean{
         val device = deviceList.firstOrNull { it.roomId == roomId } ?: return false
         val connection = deviceConnectionMap[device.id] ?: return false
-        val json = Json.encodeToString(Room(roomId))
+        val event = Event("room", Room(roomId, roomCapacity))
+        val json = Json.encodeToString(event)
         connection.send(json)
         return true
     }

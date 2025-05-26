@@ -6,4 +6,4 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 @SerialName("ROOM")
-data class Room(val roomId: Int): EventData
+data class Room(val roomId: Int, val roomCapacity: Int): EventData

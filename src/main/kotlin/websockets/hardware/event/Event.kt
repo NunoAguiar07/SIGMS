@@ -62,12 +62,13 @@ data class Event (
 
                 val dataSerializer = when (type) {
                     "hello" -> Hello.serializer()
-                    // add more mappings here
+                    "receiveCapacity" -> ReceiveCapacity.serializer()
+                    "updateCapacity" -> UpdateCapacity.serializer()
+                    "room" -> Room.serializer()
                     else -> error("Unknown type: $type")
                 }
 
                 val data = input.json.decodeFromJsonElement(dataSerializer, dataElement)
-
                 return Event(type, data)
             }
 

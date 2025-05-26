@@ -1,6 +1,8 @@
 package websocket
 
 import (
+	"crypto/rand"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"strings"
@@ -54,9 +56,17 @@ func (c *Capacity) UnmarshalJSON(data []byte) error {
 	return errors.New("invalid capacity value: " + str)
 }
 
+func generateRandomID(length int) (string, error) {
+	bytes := make([]byte, length/2)
+	if _, err := rand.Read(bytes); err != nil {
+		return "", err
+	}
+	return hex.EncodeToString(bytes), nil
+}
+
 type Hello struct {
 	Id     string `json:"id"`
-	RoomId string `json:"roomId"`
+	RoomId string `json:"roomId,omitempty"`
 }
 
 type SendCapacity struct {
@@ -65,5 +75,6 @@ type SendCapacity struct {
 }
 
 type Room struct {
-	Capacity Capacity `json:"capacity"`
+	RoomId       int      `json:"roomId"`
+	RoomCapacity Capacity `json:"roomCapacity"`
 }
