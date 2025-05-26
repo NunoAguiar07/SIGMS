@@ -1,4 +1,5 @@
 import axios from "axios";
+import {handleAxiosError} from "../../Utils/HandleAxiosError";
 
 
 export const RegisterRequest = (email: string, username: string, password:string, role:string, universityId:number, setError: any) => {
@@ -18,8 +19,7 @@ export const RegisterRequest = (email: string, username: string, password:string
                 return response.data.message;
             }
         } catch (error) {
-            console.log(error)
-            setError(error)
+            handleAxiosError(error, setError)
         }
     }
 };

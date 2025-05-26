@@ -19,6 +19,7 @@ export const NAV_CONFIG: RoleNavConfig = {
     ],
     ADMIN: [
         { href: '/userHome', iconName: 'home-outline', label: 'Home' },
+        { href: '/accessRoles', iconName: 'shield-checkmark-outline', label: 'Approvals' },
         { href: '/profile', iconName: 'person-outline', label: 'Profile' }
     ],
     TECHNICAL_SERVICES: [

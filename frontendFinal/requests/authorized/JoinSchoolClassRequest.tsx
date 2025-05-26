@@ -1,4 +1,5 @@
 import api from "../interceptors/DeviceInterceptor";
+import {handleAxiosError} from "../../Utils/HandleAxiosError";
 
 
 export const JoinSchoolClassRequest  = (subjectId: number, classId: number, setError: any) => {
@@ -11,9 +12,7 @@ export const JoinSchoolClassRequest  = (subjectId: number, classId: number, setE
                 return true;
             }
         } catch (error) {
-            console.error("Error joining school class:", error);
-            setError(error)
-            return false;
+            handleAxiosError(error, setError)
         }
     }
 }

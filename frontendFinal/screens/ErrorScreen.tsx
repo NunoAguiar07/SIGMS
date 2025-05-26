@@ -1,6 +1,7 @@
-import {Image} from "expo-image";
 import React from "react";
 import "../css_styling/Error.css"
+import {Text, TouchableOpacity, View} from "react-native";
+import {commonStyles} from "../css_styling/common/CommonProps";
 
 
 /**
@@ -13,13 +14,17 @@ import "../css_styling/Error.css"
 // @ts-ignore
 export const ErrorScreen = ({ errorStatus, errorMessage, goBack }) => {
     return (
-        <div className="error-container">
-            <div className="error-logo">
-                <Image source={require("../assets/Logo.webp")} style={{width: 903, height: 516}}></Image>
-            </div>
-            <h1 className="error-title">Error {errorStatus}</h1>
-            <p className="error-message">{errorMessage}</p>
-            <button className="error-button" onClick={goBack}>Go back</button>
-        </div>
+        <View style={commonStyles.container}>
+            <View style={commonStyles.card}>
+                <Text style={[commonStyles.title, { color: '#671b22' }]}>Error {errorStatus}</Text>
+                <Text style={[commonStyles.message, { marginBottom: 32 }]}>{errorMessage}</Text>
+                <TouchableOpacity
+                    style={commonStyles.loginRegisterButton}
+                    onPress={goBack}
+                >
+                    <Text style={commonStyles.loginRegisterButtonText}>Go Back</Text>
+                </TouchableOpacity>
+            </View>
+        </View>
     );
 };

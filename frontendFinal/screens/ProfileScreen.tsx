@@ -1,5 +1,7 @@
 // @ts-ignore
-import {styles} from "../css_styling/profile/RectangleProps";
+import {profileStyles} from "../css_styling/profile/RectangleProps";
+import {commonStyles} from "../css_styling/common/CommonProps";
+
 // @ts-ignore
 import {Image} from "expo-image";
 import React, {useState} from "react";
@@ -33,23 +35,23 @@ export const ProfileScreen = ({profile} ) => {
     };
     // @ts-ignore
     return (
-        <View style={styles.container}>
-            <View style={styles.card}>
-                    <TouchableOpacity onPress={pickImage} style={styles.imageWrapper}>
+        <View style={commonStyles.container}>
+            <View style={commonStyles.card}>
+                    <TouchableOpacity onPress={pickImage} style={profileStyles.imageWrapper}>
                         <Image
                             source={
                                 typeof image === 'string' && image.length > 0
                                     ? image
                                     : require('../assets/default-user-profile.png')
                             }
-                            style={styles.image}
+                            style={profileStyles.image}
                             contentFit="cover" // optional
                         />
                     </TouchableOpacity>
 
-                <Text style={styles.name}>{profile.name}</Text>
-                <Text style={styles.info}>{profile.email}</Text>
-                <Text style={styles.info}>{profile.university}</Text>
+                <Text style={profileStyles.name}>{profile.name}</Text>
+                <Text style={profileStyles.info}>{profile.email}</Text>
+                <Text style={profileStyles.info}>{profile.university}</Text>
             </View>
         </View>
     );

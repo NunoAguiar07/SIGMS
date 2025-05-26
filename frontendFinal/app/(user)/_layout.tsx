@@ -1,4 +1,4 @@
-import {styles} from "../../css_styling/profile/RectangleProps";
+import {navBarStyles} from "../../css_styling/navBar/NavBarProps";
 import {View} from "react-native";
 import {Stack} from "expo-router";
 import {UserNavBar} from "../../screens/navBar/UserNavBar";
@@ -6,7 +6,7 @@ import {UserNavBar} from "../../screens/navBar/UserNavBar";
 
 export default function UserLayout() {
     return (
-        <View style={styles.navContainer}>
+        <View style={navBarStyles.navContainer}>
             <Stack
                 screenOptions={{
                     headerShown: false,

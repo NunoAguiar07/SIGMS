@@ -19,7 +19,8 @@ class RoleApprovalRepository(private val database: Database) : RoleApprovalRepos
     private val tokenExpirationDays = 7
 
     override fun getApprovals(limit: Int, offset: Int): List<RoleApproval> = withDatabase {
-        return database.pendingRoleApprovals.drop(offset).take(limit).toList()
+        return database.pendingRoleApprovals.filter { it.status eq Status.PENDING }
+            .drop(offset).take(limit).toList()
     }
     override fun getApprovalByUserId(userId: Int): RoleApproval? = withDatabase {
         return database.pendingRoleApprovals.find { it.userId eq userId }

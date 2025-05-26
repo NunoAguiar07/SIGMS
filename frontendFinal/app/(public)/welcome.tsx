@@ -2,28 +2,57 @@ import {useEffect, useState} from "react";
 import {WelcomeInterface} from "../../interfaces/WelcomeInterface";
 import {ErrorInterface} from "../../interfaces/ErrorInterface";
 import {WelcomeScreen} from "../../screens/WelcomeScreen";
-import {GetData} from "../../requests/WelcomeRequest";
+import {WelcomeRequest} from "../../requests/WelcomeRequest";
 import ErrorHandler from "./error";
-import LoadingPresentation from "../../screens/Loading";
+import LoadingPresentation from "../../screens/LoadingScreen";
+import {useRouter} from "expo-router";
+import {initiateMicrosoftAuthRequest} from "../../requests/auth/Microsoft/InitiateMicrosoftAuthRequest";
+import {exchangeCodeForTokens} from "../../requests/auth/Microsoft/ExchangeCodeForTokenRequest";
+import {authenticateWithBackend} from "../../requests/auth/Microsoft/AuthenticateWithBackendRequest";
+import {fetchUserInfo} from "../../requests/authorized/FetchUserInfoRequest";
+import * as WebBrowser from 'expo-web-browser';
 
-const welcome = () => {
-        const [welcome, setHome] = useState<WelcomeInterface | null>(null)
-        const [error, setError] = useState<ErrorInterface | null>(null)
+WebBrowser.maybeCompleteAuthSession();
 
-        //Use effect that will do when we fetch the information about the home page.
-        useEffect(() => {
-            const fetchData = GetData(setHome, setError)
-            fetchData()
-        }, [])
+const Welcome = () => {
+    const router = useRouter();
+    const [welcome, setHome] = useState<WelcomeInterface | null>(null);
+    const [error, setError] = useState<ErrorInterface | null>(null);
+    const [request, response, promptAsync] = initiateMicrosoftAuthRequest();
 
-        //If an error happens we will show the error page.
-        if (error) return <ErrorHandler errorStatus={error.status} errorMessage={error.message} />
+    useEffect(() => {
+        const fetchData = WelcomeRequest(setHome, setError);
+        fetchData();
+    }, []);
 
-        //If the home is still loading we will represent the loading screen.
-        if (!welcome) return <LoadingPresentation />
+    useEffect(() => {
+        const handleAuthResponse = async () => {
+            if (response?.type === 'success') {
+                try {
+                    const { code } = response.params;
+                    const accessToken = await exchangeCodeForTokens(code, request?.codeVerifier ?? '');
+                    await authenticateWithBackend(accessToken);
+                    await fetchUserInfo(setError)
+                    router.push('/userHome');
+                } catch (error) {
+                    console.error('Authentication failed:', error);
+                }
+            }
+        };
 
-        //Return of the home screen.
-        return <WelcomeScreen welcome={welcome}/>
-}
+        handleAuthResponse();
+    }, [response]);
 
-export default welcome
+    if (error) return <ErrorHandler errorStatus={error.status} errorMessage={error.message} />;
+    if (!welcome) return <LoadingPresentation />;
+
+    return (
+        <WelcomeScreen
+            welcome={welcome}
+            request={request}
+            promptAsync={promptAsync}
+        />
+    );
+};
+
+export default Welcome;

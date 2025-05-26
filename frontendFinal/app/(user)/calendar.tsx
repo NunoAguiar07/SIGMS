@@ -2,7 +2,7 @@ import CalendarScreen from "../../screens/calendarScreen";
 import React, {useState} from "react";
 import {ErrorInterface} from "../../interfaces/ErrorInterface";
 import ErrorHandler from "../(public)/error";
-import LoadingPresentation from "../../screens/Loading";
+import LoadingPresentation from "../../screens/LoadingScreen";
 import {getSchedule} from "../../requests/authorized/CalendarPage";
 import {useFocusEffect} from "expo-router";
 

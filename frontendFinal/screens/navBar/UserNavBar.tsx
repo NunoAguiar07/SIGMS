@@ -1,5 +1,5 @@
 import {TouchableOpacity, View} from "react-native";
-import {styles} from "../../css_styling/profile/RectangleProps";
+import {navBarStyles} from "../../css_styling/navBar/NavBarProps";
 import {Link} from "expo-router";
 import {Ionicons} from "@expo/vector-icons";
 import {useEffect, useState} from "react";
@@ -24,17 +24,16 @@ export const UserNavBar = () => {
                 console.error('Failed to fetch user role', error);
             }
         };
-
         fetchUserRole();
     }, []);
 
     if (navItems.length === 0) return null;
 
     return (
-        <View style={styles.navBar}>
+        <View style={navBarStyles.navBar}>
             {navItems.map((item) => (
                 <Link href={item.href} asChild key={item.href}>
-                    <TouchableOpacity style={styles.iconContainer}>
+                    <TouchableOpacity style={navBarStyles.iconContainer}>
                         <Ionicons name={item.iconName} size={30} color="white" />
                     </TouchableOpacity>
                 </Link>

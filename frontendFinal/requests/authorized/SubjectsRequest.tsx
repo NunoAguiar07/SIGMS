@@ -1,4 +1,5 @@
 import api from "../interceptors/DeviceInterceptor";
+import {handleAxiosError} from "../../Utils/HandleAxiosError";
 
 
 export const SubjectsRequest = ( searchQuery:any, setSubjects: any, setError: any) => {
@@ -12,7 +13,7 @@ export const SubjectsRequest = ( searchQuery:any, setSubjects: any, setError: an
                 setSubjects(response.data.data)
             }
         } catch (error) {
-            setError(error)
+            handleAxiosError(error, setError)
         }
     }
 }

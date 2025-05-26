@@ -1,15 +1,15 @@
 import React from 'react';
 import {Text, TextInput, TouchableOpacity, View} from 'react-native';
-import {styles} from '../css_styling/profile/RectangleProps';
+import {commonStyles} from '../css_styling/common/CommonProps';
 
 // @ts-ignore
 export const LoginScreen = ({ email, password, onEmailChange, onPasswordChange, onLogin, onNavigateToRegister }) => (
-    <View style={styles.container}>
-        <View style={styles.card}>
-            <Text style={styles.title}>Login</Text>
+    <View style={commonStyles.container}>
+        <View style={commonStyles.card}>
+            <Text style={commonStyles.title}>Login</Text>
 
             <TextInput
-                style={styles.searchInput}
+                style={commonStyles.searchInput}
                 placeholder="Email"
                 value={email}
                 onChangeText={onEmailChange}
@@ -18,25 +18,25 @@ export const LoginScreen = ({ email, password, onEmailChange, onPasswordChange, 
             />
 
             <TextInput
-                style={styles.searchInput}
+                style={commonStyles.searchInput}
                 placeholder="Password"
                 value={password}
                 onChangeText={onPasswordChange}
                 secureTextEntry
             />
 
-            <View style={styles.buttonsContainer}>
+            <View style={commonStyles.buttonsContainer}>
                 <TouchableOpacity
-                    style={styles.loginRegisterButton}
+                    style={commonStyles.loginRegisterButton}
                     onPress={onLogin}
                 >
-                    <Text style={styles.loginRegisterButtonText}>Login</Text>
+                    <Text style={commonStyles.loginRegisterButtonText}>Login</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
-                    style={styles.loginRegisterButton}
+                    style={commonStyles.loginRegisterButton}
                     onPress={onNavigateToRegister}
                 >
-                    <Text style={styles.loginRegisterButtonText}>Go to Register</Text>
+                    <Text style={commonStyles.loginRegisterButtonText}>Go to Register</Text>
                 </TouchableOpacity>
             </View>
         </View>

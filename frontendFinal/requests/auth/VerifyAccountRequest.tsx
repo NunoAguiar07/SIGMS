@@ -1,4 +1,5 @@
 import axios from "axios";
+import {handleAxiosError} from "../../Utils/HandleAxiosError";
 
 
 export const VerifyAccountRequest = (token: string, setError: any) => {
@@ -9,7 +10,7 @@ export const VerifyAccountRequest = (token: string, setError: any) => {
             );
             return response.status === 204;
         } catch (error) {
-            setError(error);
+            handleAxiosError(error, setError)
             return false;
         }
     };

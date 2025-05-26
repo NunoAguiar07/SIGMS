@@ -9,7 +9,10 @@ import {goBack} from "expo-router/build/global-state/routing";
  */
 // @ts-ignore
 const ErrorHandler = ({errorStatus, errorMessage}) => {
-    return <ErrorScreen errorStatus={errorStatus} errorMessage={errorMessage.split('-').join(' ')} goBack={goBack}/>
+    return <ErrorScreen
+        errorStatus={errorStatus}
+        errorMessage={errorMessage.split('-').join(' ')}
+        goBack={goBack}/>
 }
 
 export default ErrorHandler

@@ -1,5 +1,6 @@
 import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
+import {handleAxiosError} from "../../Utils/HandleAxiosError";
 
 export const LoginRequest = (email: string, password:string, deviceType:string, setError: any) => {
     return async () => {
@@ -21,8 +22,9 @@ export const LoginRequest = (email: string, password:string, deviceType:string, 
                     await SecureStore.setItemAsync('authToken', token);
                 }
             }
+            return true
         } catch (error) {
-            setError(error)
+            handleAxiosError(error, setError)
         }
     }
 };

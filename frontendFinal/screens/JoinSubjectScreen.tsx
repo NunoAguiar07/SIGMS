@@ -1,15 +1,16 @@
 import {ActivityIndicator, FlatList, Text, TextInput, TouchableOpacity, View} from "react-native";
-import {styles} from "../css_styling/profile/RectangleProps";
+import {commonStyles} from "../css_styling/common/CommonProps";
+import {joinClassStyles} from "../css_styling/join_class/JoinClassProps";
 
 
 // @ts-ignore
 export const JoinSubjectScreen = ({subjects,schoolClasses,selectedSubject,searchQuery,onSearchChange,onSubjectSelect,onJoinClass}) => {
     return (
-        <View style={styles.joinClassContainer}>
+        <View style={joinClassStyles.joinClassContainer}>
             {/* Left Column - Search and Subjects */}
-            <View style={styles.leftColumn}>
+            <View style={commonStyles.leftColumn}>
                 <TextInput
-                    style={styles.searchSubjectInput}
+                    style={commonStyles.searchSubjectInput}
                     placeholder="Search subjects..."
                     value={searchQuery}
                     onChangeText={onSearchChange}
@@ -19,23 +20,23 @@ export const JoinSubjectScreen = ({subjects,schoolClasses,selectedSubject,search
                     keyExtractor={(item) => item.id.toString()}
                     renderItem={({ item }) => (
                         <TouchableOpacity
-                            style={styles.itemSearch}
+                            style={commonStyles.itemSearch}
                             onPress={() => onSubjectSelect(item)}
                         >
-                            <Text style={styles.itemText}>{item.name}</Text>
+                            <Text style={commonStyles.itemText}>{item.name}</Text>
                         </TouchableOpacity>
                     )}
                     ListEmptyComponent={
-                        <Text style={styles.emptyText}>No subjects found</Text>
+                        <Text style={commonStyles.emptyText}>No subjects found</Text>
                     }
                 />
             </View>
 
             {/* Right Column - Classes */}
-            <View style={styles.rightColumn}>
+            <View style={commonStyles.rightColumn}>
                 {selectedSubject && (
-                    <View style={styles.classesSection}>
-                        <Text style={styles.sectionTitle}>
+                    <View style={joinClassStyles.classesSection}>
+                        <Text style={commonStyles.sectionTitle}>
                             Classes for {selectedSubject.name}
                         </Text>
                         {schoolClasses.length <= 0 ? (
@@ -45,18 +46,18 @@ export const JoinSubjectScreen = ({subjects,schoolClasses,selectedSubject,search
                                 data={schoolClasses}
                                 keyExtractor={(item) => item.id.toString()}
                                 renderItem={({ item }) => (
-                                    <View style={styles.classItem}>
-                                        <Text style={styles.itemText}>{item.name}</Text>
+                                    <View style={joinClassStyles.classItem}>
+                                        <Text style={commonStyles.itemText}>{item.name}</Text>
                                         <TouchableOpacity
-                                            style={styles.joinClassButton}
+                                            style={joinClassStyles.joinClassButton}
                                             onPress={() => onJoinClass(selectedSubject.id, item.id)}
                                         >
-                                            <Text style={styles.joinButtonText}>Join Class</Text>
+                                            <Text style={joinClassStyles.joinButtonText}>Join Class</Text>
                                         </TouchableOpacity>
                                     </View>
                                 )}
                                 ListEmptyComponent={
-                                    <Text style={styles.emptyText}>No classes available</Text>
+                                    <Text style={commonStyles.emptyText}>No classes available</Text>
                                 }
                             />
                         )}

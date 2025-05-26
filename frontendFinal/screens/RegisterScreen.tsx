@@ -1,31 +1,33 @@
 import React from 'react';
 import {FlatList, Text, TextInput, TouchableOpacity, View} from 'react-native';
-import {styles} from "../css_styling/profile/RectangleProps";
+import {commonStyles} from "../css_styling/common/CommonProps";
+import {universityStyles} from "../css_styling/university/UniversityProps";
+
 import {Picker} from '@react-native-picker/picker';
 
 // @ts-ignore
 export const RegisterScreen = ({ email, username, password, role, universityId, universities, selectedUniversity, searchQuery, onEmailChange, onUsernameChange, onPasswordChange, onRoleChange, onUniversityChange, onSearchChange, onUniversitySelect, onRegister, onNavigateToLogin}) => {
     return (
-        <View style={styles.container}>
-            <View style={styles.card}>
-                <Text style={styles.title}>Register</Text>
+        <View style={commonStyles.container}>
+            <View style={commonStyles.card}>
+                <Text style={commonStyles.title}>Register</Text>
 
                 {/* Row for email, username, and password */}
-                <View style={styles.inputRow}>
+                <View style={commonStyles.inputRow}>
                     <TextInput
-                        style={[styles.searchInput, styles.inputRowItem]}
+                        style={[commonStyles.searchInput, commonStyles.inputRowItem]}
                         placeholder="Email"
                         value={email}
                         onChangeText={onEmailChange}
                     />
                     <TextInput
-                        style={[styles.searchInput, styles.inputRowItem]}
+                        style={[commonStyles.searchInput, commonStyles.inputRowItem]}
                         placeholder="Username"
                         value={username}
                         onChangeText={onUsernameChange}
                     />
                     <TextInput
-                        style={[styles.searchInput, styles.inputRowItem]}
+                        style={[commonStyles.searchInput, commonStyles.inputRowItem]}
                         placeholder="Password"
                         value={password}
                         onChangeText={onPasswordChange}
@@ -33,56 +35,56 @@ export const RegisterScreen = ({ email, username, password, role, universityId, 
                     />
                 </View>
 
-                <Text style={styles.centerMiddleText}>Select your role:</Text>
-                <View style={styles.pickerContainer}>
+                <Text style={commonStyles.centerMiddleText}>Select your role:</Text>
+                <View style={commonStyles.pickerContainer}>
                     <Picker
                         selectedValue={role}
                         onValueChange={onRoleChange}
-                        style={styles.picker}
+                        style={commonStyles.picker}
                         dropdownIconColor="#666"
                         mode="dropdown"
                     >
                         <Picker.Item label="Student" value="STUDENT" />
                         <Picker.Item label="Teacher" value="TEACHER" />
-                        <Picker.Item label="Technical Services" value="TECHNICAL_SERVICES" />
+                        <Picker.Item label="Technical Services" value="TECHNICAL_SERVICE" />
                     </Picker>
                 </View>
-                <View style={styles.universitySearchContainer}>
-                    <Text style={styles.centerMiddleText}>Search for your university:</Text>
+                <View style={universityStyles.universitySearchContainer}>
+                    <Text style={commonStyles.centerMiddleText}>Search for your university:</Text>
                     <TextInput
-                        style={styles.searchInput}
+                        style={commonStyles.searchInput}
                         placeholder="Search universities..."
                         value={searchQuery}
                         onChangeText={onSearchChange}
                     />
                     {universities.length > 0 && (
-                        <View style={styles.universityResultsContainer}>
+                        <View style={universityStyles.universityResultsContainer}>
                             <FlatList
                                 data={universities}
                                 keyExtractor={(item) => item.id.toString()}
                                 renderItem={({ item }) => (
                                     <TouchableOpacity
-                                        style={styles.itemSearch}
+                                        style={commonStyles.itemSearch}
                                         onPress={() => onUniversitySelect(item)}
                                     >
-                                        <Text style={styles.itemText}>{item.name}</Text>
+                                        <Text style={commonStyles.itemText}>{item.name}</Text>
                                     </TouchableOpacity>
                                 )}
                             />
                         </View>
                     )}
-                    <View style={styles.buttonsContainer}>
+                    <View style={commonStyles.buttonsContainer}>
                         <TouchableOpacity
-                            style={styles.loginRegisterButton}
+                            style={commonStyles.loginRegisterButton}
                             onPress={onRegister}
                         >
-                            <Text style={styles.loginRegisterButtonText}>Register</Text>
+                            <Text style={commonStyles.loginRegisterButtonText}>Register</Text>
                         </TouchableOpacity>
                         <TouchableOpacity
-                            style={styles.loginRegisterButton}
+                            style={commonStyles.loginRegisterButton}
                             onPress={onNavigateToLogin}
                         >
-                            <Text style={styles.loginRegisterButtonText}>Go to Login</Text>
+                            <Text style={commonStyles.loginRegisterButtonText}>Go to Login</Text>
                         </TouchableOpacity>
                     </View>
                 </View>

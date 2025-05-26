@@ -1,4 +1,5 @@
 import api from "../interceptors/DeviceInterceptor";
+import {handleAxiosError} from "../../Utils/HandleAxiosError";
 
 
 export const SchoolClassRequest = (subjectId: any, setClasses: any, setError: any) => {
@@ -11,7 +12,7 @@ export const SchoolClassRequest = (subjectId: any, setClasses: any, setError: an
                 setClasses(response.data.data);
             }
         } catch (error) {
-            setError(error)
+            handleAxiosError(error, setError)
         }
     }
 }
