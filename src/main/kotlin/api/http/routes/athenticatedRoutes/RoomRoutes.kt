@@ -18,6 +18,7 @@ import isel.leic.group25.api.model.response.RoomResponse
 import isel.leic.group25.api.model.response.TeacherOfficeResponse
 import isel.leic.group25.db.entities.types.Role
 import isel.leic.group25.db.entities.types.RoomType
+import isel.leic.group25.db.tables.rooms.Rooms.university
 import isel.leic.group25.services.Services
 
 /**
@@ -53,10 +54,17 @@ fun Route.baseRoomRoutes(services: Services) {
     get {
         val limit = call.queryParameters["limit"]?.toIntOrNull() ?: 10
         val offset = call.queryParameters["offset"]?.toIntOrNull() ?: 0
+        val searchQuery = call.queryParameters["search"]
+        val universityId = call.getUniversityIdFromPrincipal()
+            ?: return@get call.respond(HttpStatusCode.Unauthorized)
         if(offset < 0) return@get RequestError.Invalid("offset").toProblem().respond(call)
         if(limit < 1 || limit > 100) return@get RequestError.Invalid("limit").toProblem().respond(call)
         val result = services.from({roomService}){
-            getAllRooms(limit, offset)
+            if(searchQuery != null){
+                getRoomsByNameAndUniversityId(universityId, searchQuery, limit, offset)
+            }else {
+                getAllRooms(limit, offset)
+            }
         }
         call.respondEither(
             either = result,

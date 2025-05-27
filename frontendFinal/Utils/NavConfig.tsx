@@ -8,7 +8,8 @@ export const NAV_CONFIG: RoleNavConfig = {
         { href: '/calendar', iconName: 'calendar-outline', label: 'Calendar' },
         { href: '/joinSubject', iconName: 'checkbox-outline', label: 'Classes' },
         { href: '/profile', iconName: 'person-outline', label: 'Profile' },
-        { href: '/notifications', iconName: 'notifications-outline', label: 'Notifications' }
+        { href: '/notifications', iconName: 'notifications-outline', label: 'Notifications' },
+        { href: '/rooms', iconName: 'school-outline', label: 'Classrooms' },
     ],
     TEACHER: [
         { href: '/userHome', iconName: 'home-outline', label: 'Home' },

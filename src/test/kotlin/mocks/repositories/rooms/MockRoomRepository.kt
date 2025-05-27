@@ -29,6 +29,12 @@ class MockRoomRepository : RoomRepositoryInterface {
             .take(limit)
     }
 
+    override fun getAllRoomsByNameAndUniversityId(universityId: Int, roomPartialName: String, limit: Int, offset: Int): List<Room> {
+        return rooms.filter {
+            it.university.id == universityId && it.name.contains(roomPartialName, ignoreCase = true)
+        }.drop(offset).take(limit)
+    }
+
     override fun getRoomById(id: Int): Room? =
         rooms.firstOrNull { it.id == id }
 

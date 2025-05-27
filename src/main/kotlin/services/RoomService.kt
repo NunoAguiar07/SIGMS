@@ -27,6 +27,44 @@ class RoomService (
             failure(RoomError.ConnectionDbError(e.message))
         }
     }
+    /*
+     fun getSubjectsByNameAndUniversityId(
+        universityId: Int,
+        subjectPartialName: String,
+        limit: Int,
+        offset: Int
+    ): SubjectListResult {
+        return runCatching {
+            transactionable.useTransaction {
+                val university = repositories.from({universityRepository}) {getUniversityById(universityId)}
+                    ?: return@useTransaction failure(SubjectError.UniversityNotFound)
+                val subjects = repositories.from({subjectRepository}) {
+                    getSubjectsByNameAndUniversityId(university.id, subjectPartialName, limit, offset)
+                }
+                return@useTransaction success(subjects)
+            }
+        }
+    }
+     */
+
+    fun getRoomsByNameAndUniversityId(
+        universityId: Int,
+        roomPartialName: String,
+        limit: Int,
+        offset: Int
+    ): RoomListResult {
+        return runCatching {
+            transactionable.useTransaction {
+                val university = repositories.from({universityRepository}) {
+                    getUniversityById(universityId)
+                } ?: return@useTransaction failure(RoomError.UniversityNotFound)
+                val rooms = repositories.from({roomRepository}) {
+                    getAllRoomsByNameAndUniversityId(university.id, roomPartialName, limit, offset)
+                }
+                return@useTransaction success(rooms)
+            }
+        }
+    }
 
     fun getAllRooms(limit: Int, offset: Int): RoomListResult {
         return runCatching {
