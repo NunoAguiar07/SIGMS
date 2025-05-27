@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-const sniffPacketsCommand = "tshark -I -i wlan1 -Y \"wlan.fc.type_subtype == 4\" -a duration:180 -w capture.pcap"
+const sniffPacketsCommand = "tshark -I -i wlan1 -a duration:180 -w capture.pcap"
 const createFilteredTXTCommand = "tshark -r capture.pcap -Y \"wlan.fc.type_subtype == 4\" -T fields -E separator=, -e wlan.sa > macs.txt"
 
 func countMACs() int {
@@ -37,14 +37,6 @@ func addIfNotExists(list *[]string, item string) {
 	*list = append(*list, item)
 }
 
-func countListItems(list []string) int {
-	count := 0
-	for _, _ = range list {
-		count++
-	}
-	return count
-}
-
 func readUniqueMACs() int {
 	var macs []string
 	file, err := os.Open("macs.txt")
@@ -67,24 +59,26 @@ func readUniqueMACs() int {
 		log.Fatalf("Error reading file: %v\n", err)
 	}
 
-	return countListItems(macs)
+	return len(macs)
 }
 
-func ReadAtIntervalOrByUpdate(interval int, ewma EWMA, signalRead chan struct{}) {
+func ReadAtIntervalOrByUpdate(interval int, ewmaChannel chan EWMA, signalRead chan struct{}) {
 	ticker := time.NewTicker(time.Duration(interval) * time.Second)
+	ewma := NewEWMA(0.25)
+	readUpdateAndSave(ewma, ewmaChannel)
 	defer ticker.Stop()
 	for {
 		select {
 		case <-ticker.C:
-			{
-				count := countMACs()
-				ewma.Update(count)
-			}
+			readUpdateAndSave(ewma, ewmaChannel)
 		case <-signalRead:
-			{
-				count := countMACs()
-				ewma.Update(count)
-			}
+			readUpdateAndSave(ewma, ewmaChannel)
 		}
 	}
+}
+
+func readUpdateAndSave(ewma *EWMA, ewmaChannel chan EWMA) {
+	count := countMACs()
+	ewma.Update(count)
+	ewmaChannel <- *ewma
 }

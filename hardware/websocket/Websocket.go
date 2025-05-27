@@ -6,10 +6,8 @@ import (
 	"github.com/gorilla/websocket"
 	"hardware/packetsniffer"
 	"hardware/persistance"
-	"log"
 	"net"
 	"strconv"
-	"time"
 )
 
 func EstablishConnection(url string) (conn *websocket.Conn, err error) {
@@ -21,71 +19,76 @@ func EstablishConnection(url string) (conn *websocket.Conn, err error) {
 }
 
 func greetBackend(conn *websocket.Conn, device *persistance.Device) error {
-	var id string
 	var err error
-	if device.Id == ""{
-		id, err = generateRandomID(16)
-	} else {
-		id = device.Id
+	if device.Id == "" {
+		device.Id, err = generateRandomID(16)
 	}
 	if err != nil {
 		return err
 	}
-	hello := Hello{Id: id}
+	hello := Hello{Id: device.Id}
 	if device.RoomId != "" {
 		hello.RoomId = device.RoomId
 	}
 	rawHello, err := json.Marshal(hello)
-	event := Event{"receiveCapacity", rawHello}
+	event := Event{"hello", rawHello}
 	return conn.WriteJSON(event)
 }
 
 func EventLoop(conn *websocket.Conn, device *persistance.Device, ewmaChannel chan packetsniffer.EWMA, signalRead chan struct{}) error {
+	eventChannel := make(chan *Event)
+	errorChannel := make(chan error)
 	err := greetBackend(conn, device)
 	if err != nil {
 		return err
 	}
+	go awaitMessage(conn, eventChannel, errorChannel)
 	for {
 		select {
-		case ewma := <-ewmaChannel:
-			err := sendCapacity(ewma, device, conn)
+		case device.Ewma = <-ewmaChannel:
+			err := sendCapacity(device, conn)
 			if err != nil {
 				return err
 			}
-		default:
+			err = device.Save()
+			if err != nil {
+				return err
+			}
+		case event := <-eventChannel:
 			{
-				err := awaitMessage(device, signalRead, conn)
+				err := parseEvent(event, device, signalRead)
 				if err != nil {
 					return err
-				} else {
-					continue
 				}
 			}
+		case err := <-errorChannel:
+			{
+				return err
+			}
 		}
+
 	}
 }
-func awaitMessage(device *persistance.Device, signalRead chan struct{}, conn *websocket.Conn) error {
-	err := conn.SetReadDeadline(time.Now().Add(100 * time.Millisecond))
-	if err != nil {
-		return err
-	}
+func awaitMessage(conn *websocket.Conn, eventChannel chan *Event, errorChannel chan error) {
 	_, rawMessage, err := conn.ReadMessage()
 	if err != nil {
 		var netErr net.Error
 		if !errors.As(err, &netErr) || !netErr.Timeout() {
-			log.Printf("WebSocket error: %v", err)
-			return err
+			errorChannel <- err
+		}
+		if errors.As(err, &netErr) && netErr.Timeout() {
+			errorChannel <- err
 		}
 	}
 	var event Event
 	err = json.Unmarshal(rawMessage, &event)
 	if err != nil {
-		return err
+		errorChannel <- err
 	}
-	return parseEvent(event, device, signalRead)
+	eventChannel <- &event
 }
 
-func parseEvent(event Event, device *persistance.Device, signalRead chan struct{}) error {
+func parseEvent(event *Event, device *persistance.Device, signalRead chan struct{}) error {
 	switch event.Type {
 	case "room":
 		{
@@ -107,9 +110,9 @@ func parseEvent(event Event, device *persistance.Device, signalRead chan struct{
 	return nil
 }
 
-func sendCapacity(ewma packetsniffer.EWMA, device *persistance.Device, conn *websocket.Conn) error {
+func sendCapacity(device *persistance.Device, conn *websocket.Conn) error {
 	id := device.Id
-	capacity := ewma.ToCapacityLinear(5, device.RoomCapacity)
+	capacity := device.Ewma.ToCapacityLinear(device.RoomCapacity, 5)
 	sendCapacity := SendCapacity{
 		Id:       id,
 		Capacity: Capacity(capacity),

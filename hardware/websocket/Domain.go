@@ -32,10 +32,7 @@ func (c *Capacity) String() string {
 	return capacityToString[*c]
 }
 
-func (c *Capacity) MarshalJSON() ([]byte, error) {
-	if c == nil {
-		return nil, errors.New("cannot marshal nil Capacity")
-	}
+func (c Capacity) MarshalJSON() ([]byte, error) {
 	return json.Marshal(c.String())
 }
 

@@ -25,3 +25,19 @@ func (dev *Device) Save() error {
 	}
 	return nil
 }
+
+func Load() (*Device, error) {
+	jsonFile, err := os.ReadFile("device.json")
+	if err != nil {
+		if os.IsNotExist(err) {
+			return &Device{RoomCapacity: 30}, nil
+		}
+		return nil, fmt.Errorf("failed to open file: %w", err)
+	}
+	var device Device
+	err = json.Unmarshal(jsonFile, &device)
+	if err != nil {
+		return nil, fmt.Errorf("failed to unmarshal json: %w", err)
+	}
+	return &device, nil
+}

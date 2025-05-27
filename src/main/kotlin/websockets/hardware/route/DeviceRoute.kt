@@ -3,7 +3,6 @@ package isel.leic.group25.websockets.hardware.route
 import io.ktor.server.routing.*
 import io.ktor.server.websocket.*
 import io.ktor.websocket.*
-import isel.leic.group25.db.tables.timetables.Lectures.roomId
 import isel.leic.group25.websockets.WebsocketRoute
 import isel.leic.group25.websockets.hardware.event.*
 import isel.leic.group25.websockets.hardware.exceptions.UnexpectedEventException
@@ -43,7 +42,9 @@ object DeviceRoute: WebsocketRoute {
                     Device(event.id, event.roomId.toInt())
                 else
                     Device(event.id)
-                deviceList.add(device)
+                if(deviceList.none { it.id == device.id }){
+                    deviceList.add(device)
+                }
                 deviceConnectionMap[event.id] = connection
             }
             is ReceiveCapacity -> {
