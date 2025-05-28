@@ -65,8 +65,8 @@ object DeviceRoute: WebsocketRoute {
         }
     }
 
-    suspend fun setDeviceRoom(roomId: Int, roomCapacity: Int): Boolean{
-        val device = deviceList.firstOrNull { it.roomId == roomId } ?: return false
+    suspend fun setDeviceRoom(deviceId: String, roomId: Int, roomCapacity: Int): Boolean{
+        val device = deviceList.firstOrNull { it.id == deviceId } ?: return false
         val connection = deviceConnectionMap[device.id] ?: return false
         val event = Event("room", Room(roomId, roomCapacity))
         val json = Json.encodeToString(event)

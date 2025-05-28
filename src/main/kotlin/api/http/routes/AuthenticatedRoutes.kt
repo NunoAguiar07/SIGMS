@@ -32,6 +32,7 @@ fun Route.authenticatedRoutes(
         subjectRoutes(services)
         roomRoutes(services)
         lectureRoutes(services)
+        devicesRoutes(services)
         withRoles(setOf(Role.TEACHER, Role.STUDENT)){
             scheduleRoutes(services)
         }

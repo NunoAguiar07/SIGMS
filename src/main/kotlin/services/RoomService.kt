@@ -75,6 +75,17 @@ class RoomService (
         }
     }
 
+    fun getListOfRoomsByIds(roomIdList: List<Int>): RoomListResult {
+        return runCatching {
+            transactionable.useTransaction {
+                val rooms = repositories.from({roomRepository}){
+                    roomIdList.mapNotNull { getRoomById(it) }
+                }
+                return@useTransaction success(rooms)
+            }
+        }
+    }
+
     fun getAllRoomsByUniversityId(universityId: Int, limit: Int, offset: Int): RoomListResult {
         return runCatching {
             transactionable.useTransaction {
