@@ -9,4 +9,4 @@ export interface NavInterface {
     label: string;
 }
 
-export type UserRole = 'STUDENT' | 'TEACHER' | 'ADMIN' | 'TECHNICAL_SERVICES';
+export type UserRole = 'STUDENT' | 'TEACHER' | 'ADMIN' | 'TECHNICAL_SERVICE';

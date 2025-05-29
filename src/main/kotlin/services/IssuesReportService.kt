@@ -27,11 +27,12 @@ class IssuesReportService(private val repositories: Repositories,
         }
     }
 
-    fun getAllIssueReports(limit:Int, offset:Int): IssueReportListResult {
+    fun getAllIssueReports(limit:Int, offset:Int, unassigned: Boolean): IssueReportListResult {
         return runCatching {
             transactionable.useTransaction {
                 val issues = repositories.from({issueReportRepository}){
-                    getAllIssueReports(limit, offset)
+                    if (unassigned) getAllUnassignedIssueReports(limit, offset)
+                    else getAllIssueReports(limit, offset)
                 }
                 return@useTransaction success(issues)
             }

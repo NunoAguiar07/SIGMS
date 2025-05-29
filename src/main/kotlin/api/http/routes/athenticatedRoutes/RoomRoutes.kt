@@ -18,7 +18,6 @@ import isel.leic.group25.api.model.response.RoomResponse
 import isel.leic.group25.api.model.response.TeacherOfficeResponse
 import isel.leic.group25.db.entities.types.Role
 import isel.leic.group25.db.entities.types.RoomType
-import isel.leic.group25.db.tables.rooms.Rooms.university
 import isel.leic.group25.services.Services
 
 /**
@@ -289,94 +288,5 @@ fun Route.roomIssuesRoutes(services: Services) {
             )
         }
 
-        route("/{issueId}") {
-            issueCrudRoutes(services)
-            withRole(Role.TECHNICAL_SERVICE){
-                issueAssignmentRoutes(services)
-            }
-        }
-    }
-}
-
-/**
- * Handles basic issue operations:
- * - Get issue details (public)
- * - Update issue (technical service only)
- * - Delete issue (technical service only)
- */
-fun Route.issueCrudRoutes(services: Services) {
-    get {
-        val issueId = call.parameters["issueId"]
-        if(issueId.isNullOrBlank()) return@get RequestError.Missing("issueId").toProblem().respond(call)
-        if(issueId.toIntOrNull() == null) return@get RequestError.Invalid("issueId").toProblem().respond(call)
-        val result = services.from({issueReportService}){
-            getIssueReportById(issueId.toInt())
-        }
-        call.respondEither(
-            either = result,
-            transformError = { error -> error.toProblem() },
-            transformSuccess = { issue -> IssueReportResponse.from(issue) }
-        )
-    }
-
-    withRole(Role.TECHNICAL_SERVICE) {
-        delete("/delete") {
-            val issueId = call.parameters["issueId"]
-            if(issueId.isNullOrBlank()) return@delete RequestError.Missing("issueId").toProblem().respond(call)
-            if(issueId.toIntOrNull() == null) return@delete RequestError.Invalid("issueId").toProblem().respond(call)
-            val result = services.from({issueReportService}){
-                deleteIssueReport(issueId.toInt())
-            }
-            call.respondEither(
-                either = result,
-                transformError = { error -> error.toProblem() },
-                transformSuccess = { HttpStatusCode.NoContent }
-            )
-        }
-        put("/update") {
-            val issueId = call.parameters["issueId"]
-            if(issueId.isNullOrBlank()) return@put RequestError.Missing("issueId").toProblem().respond(call)
-            if(issueId.toIntOrNull() == null) return@put RequestError.Invalid("issueId").toProblem().respond(call)
-            val issueRequest = call.receive<IssueReportRequest>()
-            issueRequest.validate()?.let{ error ->
-                return@put error.toProblem().respond(call)
-            }
-            val result = services.from({issueReportService}){
-                updateIssueReport(
-                    id = issueId.toInt(),
-                    description = issueRequest.description
-                )
-            }
-            call.respondEither(
-                either = result,
-                transformError = { error -> error.toProblem() },
-                transformSuccess = { issue -> IssueReportResponse.from(issue) }
-            )
-        }
-    }
-}
-
-/**
- * Handles technician assignment to issues (technical service only)
- */
-fun Route.issueAssignmentRoutes(services: Services) {
-    route("/assign") {
-        put {
-            val userId = call.getUserIdFromPrincipal() ?: return@put call.respond(HttpStatusCode.Unauthorized)
-            val issueId = call.parameters["issueId"]
-            if(issueId.isNullOrBlank()) return@put call.respond(RequestError.Missing("issueId").toProblem())
-            if(issueId.toIntOrNull() == null) return@put call.respond(RequestError.Invalid("issueId").toProblem())
-            val result = services.from({issueReportService}){
-                assignTechnicianToIssueReport(
-                    technicianId = userId,
-                    reportId = issueId.toInt()
-                )
-            }
-            call.respondEither(
-                either = result,
-                transformError = { error -> error.toProblem() },
-                transformSuccess = { issue -> IssueReportResponse.from(issue) }
-            )
-        }
     }
 }

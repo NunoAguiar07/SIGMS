@@ -9,16 +9,8 @@ import isel.leic.group25.services.errors.IssueReportError
 import isel.leic.group25.utils.Failure
 import isel.leic.group25.utils.Success
 import mocks.repositories.MockRepositories
-import mocks.repositories.issues.MockIssueReportRepository
-import mocks.repositories.rooms.MockRoomRepository
-import mocks.repositories.timetables.MockUniversityRepository
-import mocks.repositories.users.MockTechnicalServiceRepository
-import mocks.repositories.users.MockUserRepository
-import mocks.repositories.utils.MockTransaction
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.ktorm.database.Database
-import repositories.DatabaseTestSetup
-import kotlin.test.AfterTest
 import kotlin.test.Test
 import kotlin.test.assertTrue
 
@@ -86,7 +78,8 @@ class IssueReportServiceTest {
         val room = createTestRooms()[0]
         val user = createTestUser()
         val reports = createTestIssueReports(5, room, user)
-        val result = issuesReportService.getAllIssueReports(10, 0)
+        val unassigned = false
+        val result = issuesReportService.getAllIssueReports(10, 0, unassigned)
         assertTrue(result is Success, "Expected Success")
         val successResult = result.value
         assertEquals(5, successResult.size, "Expected 5 reports")

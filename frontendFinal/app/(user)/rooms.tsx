@@ -4,11 +4,9 @@ import {ErrorInterface} from "../../interfaces/ErrorInterface";
 import {useDebounce} from "use-debounce";
 import {getRooms} from "../../requests/authorized/GetRooms";
 import {CreateReportScreen} from "../../screens/CreateReportScreen";
-import {SubjectInterface} from "../../interfaces/SubjectInterface";
 import ErrorHandler from "../(public)/error";
 import {CreateIssueReportRequest} from "../../requests/authorized/CreateIssueReport";
 import {Alert} from "react-native";
-import {GetIssuesByRoomRequest} from "../../requests/authorized/GetIssueReports";
 
 const Rooms = () => {
     const [rooms, setRooms] = useState<RoomInterface[]>([]);

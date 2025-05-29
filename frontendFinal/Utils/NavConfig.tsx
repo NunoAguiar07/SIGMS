@@ -16,15 +16,19 @@ export const NAV_CONFIG: RoleNavConfig = {
         { href: '/calendar', iconName: 'calendar-outline', label: 'Calendar' },
         { href: '/joinSubject', iconName: 'checkbox-outline', label: 'Classes' },
         { href: '/profile', iconName: 'person-outline', label: 'Profile' },
-        { href: '/notifications', iconName: 'notifications-outline', label: 'Notifications' }
+        { href: '/notifications', iconName: 'notifications-outline', label: 'Notifications' },
+        { href: '/rooms', iconName: 'school-outline', label: 'Classrooms' },
     ],
     ADMIN: [
         { href: '/userHome', iconName: 'home-outline', label: 'Home' },
         { href: '/accessRoles', iconName: 'shield-checkmark-outline', label: 'Approvals' },
-        { href: '/profile', iconName: 'person-outline', label: 'Profile' }
+        { href: '/profile', iconName: 'person-outline', label: 'Profile' },
+        { href: '/rooms', iconName: 'school-outline', label: 'Classrooms' },
     ],
-    TECHNICAL_SERVICES: [
+    TECHNICAL_SERVICE: [
         { href: '/userHome', iconName: 'home-outline', label: 'Home' },
-        { href: '/profile', iconName: 'person-outline', label: 'Profile' }
+        { href: '/issue-reports', iconName: 'shield-checkmark-outline', label: 'Issue Reports' },
+        { href: '/profile', iconName: 'person-outline', label: 'Profile' },
+        { href: '/rooms', iconName: 'school-outline', label: 'Classrooms' },
     ]
 };
