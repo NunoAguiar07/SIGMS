@@ -2,9 +2,8 @@ package isel.leic.group25
 
 import io.ktor.client.*
 import io.ktor.client.engine.okhttp.*
-import io.ktor.client.plugins.cookies.*
 import io.ktor.http.*
-import io.ktor.http.auth.HttpAuthHeader
+import io.ktor.http.auth.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
@@ -16,7 +15,7 @@ import io.ktor.server.websocket.*
 import isel.leic.group25.api.http.configureRouting
 import isel.leic.group25.api.jwt.JwtConfig
 import isel.leic.group25.db.repositories.Repositories
-import isel.leic.group25.services.*
+import isel.leic.group25.services.Services
 import kotlinx.serialization.json.Json
 import org.ktorm.database.Database
 import org.ktorm.support.postgresql.PostgreSqlDialect

@@ -13,7 +13,9 @@ export const WelcomeRequest = (setWelcome: (data: any) => void, setError: (error
     return async () => {
         try {
             const response = await axios.get(apiUrl);
-            setWelcome(response.data);
+            if(response.status == 200) {
+                setWelcome(response.data);
+            }
         } catch (error) {
             handleAxiosError(error, setError);
         }

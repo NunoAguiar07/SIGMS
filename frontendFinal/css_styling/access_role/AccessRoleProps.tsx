@@ -48,18 +48,5 @@ export const accessRoleStyles = StyleSheet.create({
     actionsCell: {
         flexDirection: 'row',
     },
-    actionButton: {
-        width: 32,
-        height: 32,
-        borderRadius: 16,
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginHorizontal: 2,
-    },
-    approveButton: {
-        backgroundColor: '#4CAF50',
-    },
-    rejectButton: {
-        backgroundColor: '#F44336',
-    },
+
 });

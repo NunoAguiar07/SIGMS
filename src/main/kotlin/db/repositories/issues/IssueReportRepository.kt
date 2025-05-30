@@ -9,11 +9,17 @@ import isel.leic.group25.db.repositories.utils.withDatabase
 import isel.leic.group25.db.tables.Tables.Companion.issueReports
 import org.ktorm.database.Database
 import org.ktorm.dsl.eq
+import org.ktorm.dsl.isNull
 import org.ktorm.entity.*
 
 class IssueReportRepository(private val database: Database) : IssueReportRepositoryInterface{
     override fun getAllIssueReports(limit:Int, offset:Int): List<IssueReport> = withDatabase {
         return database.issueReports.drop(offset).take(limit).toList()
+    }
+
+    override fun getAllUnassignedIssueReports(limit: Int, offset: Int): List<IssueReport> {
+        return database.issueReports.filter { it.assignedTo.isNull() }
+            .drop(offset).take(limit).toList()
     }
 
     override fun getIssuesReportByRoomId(roomId: Int, limit:Int, offset:Int): List<IssueReport> = withDatabase {

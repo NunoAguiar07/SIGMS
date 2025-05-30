@@ -58,13 +58,13 @@ export const AccessRolesScreen = ({approvals, onApprove, onReject, onNext, onPre
                             <View style={accessRoleStyles.actionsColumn}>
                                 <View style={[accessRoleStyles.actionsCell, accessRoleStyles.actionsColumn]}>
                                     <TouchableOpacity
-                                        style={[accessRoleStyles.actionButton, accessRoleStyles.approveButton]}
+                                        style={[commonStyles.actionButton, commonStyles.approveButton]}
                                         onPress={() => onApprove(item.id)}
                                     >
                                         <Ionicons name="checkmark" size={16} color="white" />
                                     </TouchableOpacity>
                                     <TouchableOpacity
-                                        style={[accessRoleStyles.actionButton, accessRoleStyles.rejectButton]}
+                                        style={[commonStyles.actionButton, commonStyles.rejectButton]}
                                         onPress={() => onReject(item.id)}
                                     >
                                         <Ionicons name="close" size={16} color="white" />

@@ -13,6 +13,11 @@ class MockIssueReportRepository : IssueReportRepositoryInterface {
         return issueReports.drop(offset).take(limit)
     }
 
+    override fun getAllUnassignedIssueReports(limit: Int, offset: Int): List<IssueReport> {
+        return issueReports.filter { it.assignedTo == null }.drop(offset).take(limit)
+    }
+
+
     override fun getIssuesReportByRoomId(roomId: Int, limit: Int, offset: Int): List<IssueReport> {
         return issueReports.filter { it.room.id == roomId }
             .drop(offset)
