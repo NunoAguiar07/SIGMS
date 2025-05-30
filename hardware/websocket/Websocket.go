@@ -19,6 +19,7 @@ func EstablishConnection(url string) (conn *websocket.Conn, err error) {
 
 func greetBackend(conn *websocket.Conn, device *persistance.Device) error {
 	var err error
+	//Isto e para verificar se ocorrem mudanças
 	if device.Id == "" {
 		device.Id, err = generateRandomID(16)
 	}
