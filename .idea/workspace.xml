@@ -1,0 +1,690 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="39bb7549-cfea-4cb7-a3b9-085007d7466c" name="Changes" comment="Changes:&#10;  - DeviceRoute to save roomId to Device data structure&#10;  - DeviceRoutes to fix bugs with implementation and add university filtering&#10;  - Domain to better transmit information between both sides&#10;  - Hello to have roomId as Int instead of String&#10;  - Json to save roomId as Int instead of String&#10;  - RoomService for function that returns list of rooms by id to be filtered by university id&#10;  - StudyRoomCapacity to be serializable (duuhhh)&#10;  - Websocket to have better error handling on failure to send capacity and to reflect event changes in their respective marshling/unmarshling">
+      <change afterPath="$PROJECT_DIR$/frontend/screens/RoomsScreen.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/backend/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/build.gradle.kts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/db/01_CreateProjectTable.sql" beforeDir="false" afterPath="$PROJECT_DIR$/backend/db/01_CreateProjectTable.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/db/02_AddData.sql" beforeDir="false" afterPath="$PROJECT_DIR$/backend/db/02_AddData.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/db/check_lecture_conflicts.sql" beforeDir="false" afterPath="$PROJECT_DIR$/backend/db/check_lecture_conflicts.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/db/enforce_disjunction_trigger.sql" beforeDir="false" afterPath="$PROJECT_DIR$/backend/db/enforce_disjunction_trigger.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/db/enforce_total_participation.sql" beforeDir="false" afterPath="$PROJECT_DIR$/backend/db/enforce_total_participation.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/backend/docker/Dockerfile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker/docker-compose.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/openapi.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/backend/docs/openapi.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/App.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/App.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/Utils/Button.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/Utils/Button.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/Utils/DeviceType.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/Utils/DeviceType.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/Utils/HandleAxiosError.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/Utils/HandleAxiosError.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/Utils/NavConfig.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/Utils/NavConfig.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/Utils/UriParser.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/Utils/UriParser.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/app.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/app/(public)/auth/login.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/(public)/auth/login.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/app/(public)/auth/register.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/(public)/auth/register.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/app/(public)/auth/verify-account.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/(public)/auth/verify-account.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/app/(public)/error.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/(public)/error.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/app/(public)/welcome.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/(public)/welcome.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/app/(user)/_layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/(user)/_layout.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/app/(user)/accessRoles.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/(user)/accessRoles.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/app/(user)/calendar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/(user)/calendar.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/app/(user)/issue-reports.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/(user)/issue-reports.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/app/(user)/joinSubject.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/(user)/joinSubject.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/app/(user)/profile.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/(user)/profile.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/app/(user)/rooms.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/(user)/rooms.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/app/(user)/userHome.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/(user)/userHome.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/app/_layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/_layout.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/app/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/assets/Logo.webp" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/assets/Logo.webp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/assets/adaptive-icon.png" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/assets/adaptive-icon.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/assets/default-user-profile.png" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/assets/default-user-profile.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/assets/favicon.png" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/assets/favicon.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/assets/icon.png" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/assets/icon.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/assets/microsoft-logo.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/assets/microsoft-logo.jpg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/assets/splash-icon.png" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/assets/splash-icon.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/babel.config.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/babel.config.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/css_styling/Error.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/css_styling/Error.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/css_styling/Properties.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/css_styling/Properties.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/css_styling/PropertiesAbout.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/css_styling/PropertiesAbout.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/css_styling/PropertiesWelcome.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/css_styling/PropertiesWelcome.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/css_styling/access_role/AccessRoleProps.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/css_styling/access_role/AccessRoleProps.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/css_styling/calendar/Props.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/css_styling/calendar/Props.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/css_styling/common/CommonProps.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/css_styling/common/CommonProps.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/css_styling/createReport/CreateReportStyle.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/css_styling/createReport/CreateReportStyle.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/css_styling/join_class/JoinClassProps.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/css_styling/join_class/JoinClassProps.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/css_styling/loading.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/css_styling/loading.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/css_styling/navBar/NavBarProps.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/css_styling/navBar/NavBarProps.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/css_styling/profile/RectangleProps.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/css_styling/profile/RectangleProps.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/css_styling/unassigned_issues/UnassignedIssues.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/css_styling/unassigned_issues/UnassignedIssues.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/css_styling/university/UniversityProps.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/css_styling/university/UniversityProps.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/css_styling/userHome/Props.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/css_styling/userHome/Props.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/css_styling/welcome/WelcomeProps.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/css_styling/welcome/WelcomeProps.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/interfaces/AccessRoleInterface.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/interfaces/AccessRoleInterface.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/interfaces/ErrorInterface.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/interfaces/ErrorInterface.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/interfaces/IssueReportInterface.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/interfaces/IssueReportInterface.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/interfaces/LinkInterface.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/interfaces/LinkInterface.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/interfaces/NavInterface.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/interfaces/NavInterface.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/interfaces/ProfileI.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/interfaces/ProfileI.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/interfaces/RoomInterface.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/interfaces/RoomInterface.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/interfaces/SchoolClassInterface.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/interfaces/SchoolClassInterface.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/interfaces/SubjectInterface.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/interfaces/SubjectInterface.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/interfaces/UniversityInterface.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/interfaces/UniversityInterface.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/interfaces/WelcomeInterface.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/interfaces/WelcomeInterface.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/requests/UniversityRequest.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/requests/UniversityRequest.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/requests/WelcomeRequest.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/requests/WelcomeRequest.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/requests/auth/LoginRequest.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/requests/auth/LoginRequest.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/requests/auth/Logout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/requests/auth/Logout.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/requests/auth/Microsoft/AuthenticateWithBackendRequest.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/requests/auth/Microsoft/AuthenticateWithBackendRequest.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/requests/auth/Microsoft/Discovery.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/requests/auth/Microsoft/Discovery.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/requests/auth/Microsoft/ExchangeCodeForTokenRequest.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/requests/auth/Microsoft/ExchangeCodeForTokenRequest.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/requests/auth/Microsoft/InitiateMicrosoftAuthRequest.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/requests/auth/Microsoft/InitiateMicrosoftAuthRequest.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/requests/auth/RegisterRequest.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/requests/auth/RegisterRequest.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/requests/auth/VerifyAccountRequest.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/requests/auth/VerifyAccountRequest.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/requests/authorized/AssignTechnicianToIssue.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/requests/authorized/AssignTechnicianToIssue.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/requests/authorized/CalendarPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/requests/authorized/CalendarPage.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/requests/authorized/CreateIssueReport.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/requests/authorized/CreateIssueReport.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/requests/authorized/FetchUserInfoRequest.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/requests/authorized/FetchUserInfoRequest.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/requests/authorized/FixIssueReport.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/requests/authorized/FixIssueReport.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/requests/authorized/GetIssueReports.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/requests/authorized/GetIssueReports.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/requests/authorized/GetRooms.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/requests/authorized/GetRooms.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/requests/authorized/JoinSchoolClassRequest.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/requests/authorized/JoinSchoolClassRequest.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/requests/authorized/PendingApprovalsRequest.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/requests/authorized/PendingApprovalsRequest.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/requests/authorized/ProcessApprovalRequest.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/requests/authorized/ProcessApprovalRequest.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/requests/authorized/ProfilePage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/requests/authorized/ProfilePage.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/requests/authorized/SchoolClassRequest.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/requests/authorized/SchoolClassRequest.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/requests/authorized/SubjectsRequest.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/requests/authorized/SubjectsRequest.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/requests/authorized/UpdateIssueReport.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/requests/authorized/UpdateIssueReport.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/requests/interceptors/DeviceInterceptor.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/requests/interceptors/DeviceInterceptor.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/screens/AccessRolesScreen.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/screens/AccessRolesScreen.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/screens/CreateReportScreen.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/screens/CreateReportScreen.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/screens/ErrorScreen.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/screens/ErrorScreen.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/screens/JoinSubjectScreen.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/screens/JoinSubjectScreen.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/screens/LoadingScreen.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/screens/LoadingScreen.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/screens/LoginScreen.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/screens/LoginScreen.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/screens/MicrosoftAuthButton.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/screens/MicrosoftAuthButton.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/screens/ProfileScreen.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/screens/ProfileScreen.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/screens/RegisterScreen.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/screens/RegisterScreen.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/screens/RoomsScreen.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/backend/build.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/screens/UnassignedIssuesScreen.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/screens/UnassignedIssuesScreen.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/screens/UserHomeScreen.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/screens/UserHomeScreen.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/screens/VerifyAccountScreen.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/screens/VerifyAccountScreen.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/screens/WelcomeScreen.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/screens/WelcomeScreen.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/screens/calendarScreen.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/screens/calendarScreen.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/screens/navBar/UserNavBar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/screens/navBar/UserNavBar.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/screens/secondary/about.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/screens/secondary/about.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/screens/secondary/faq.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/screens/secondary/faq.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/screens/secondary/privacy.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/screens/secondary/privacy.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontendFinal/tsconfig.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/tsconfig.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gradle.properties" beforeDir="false" afterPath="$PROJECT_DIR$/backend/gradle.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.jar" beforeDir="false" afterPath="$PROJECT_DIR$/backend/gradle/wrapper/gradle-wrapper.jar" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.properties" beforeDir="false" afterPath="$PROJECT_DIR$/backend/gradle/wrapper/gradle-wrapper.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gradlew" beforeDir="false" afterPath="$PROJECT_DIR$/backend/gradlew" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gradlew.bat" beforeDir="false" afterPath="$PROJECT_DIR$/backend/gradlew.bat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/settings.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/settings.gradle.kts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/Application.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/Application.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/api/exceptions/Problem.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/api/exceptions/Problem.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/api/exceptions/RequestError.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/api/exceptions/RequestError.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/api/http/Routing.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/api/http/Routing.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/api/http/routes/AuthRoutes.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/api/http/routes/AuthRoutes.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/api/http/routes/AuthenticatedRoutes.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/api/http/routes/AuthenticatedRoutes.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/api/http/routes/UniversityRoutes.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/api/http/routes/UniversityRoutes.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/api/http/routes/WelcomeRoutes.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/api/http/routes/WelcomeRoutes.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/api/http/routes/athenticatedRoutes/AssessRoleRoutes.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/api/http/routes/athenticatedRoutes/AssessRoleRoutes.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/api/http/routes/athenticatedRoutes/DeviceRoutes.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/api/http/routes/athenticatedRoutes/DeviceRoutes.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/api/http/routes/athenticatedRoutes/IssueReportRoutes.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/api/http/routes/athenticatedRoutes/IssueReportRoutes.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/api/http/routes/athenticatedRoutes/LectureRoutes.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/api/http/routes/athenticatedRoutes/LectureRoutes.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/api/http/routes/athenticatedRoutes/ProfileRoutes.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/api/http/routes/athenticatedRoutes/ProfileRoutes.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/api/http/routes/athenticatedRoutes/RoomRoutes.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/api/http/routes/athenticatedRoutes/RoomRoutes.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/api/http/routes/athenticatedRoutes/ScheduleRoutes.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/api/http/routes/athenticatedRoutes/ScheduleRoutes.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/api/http/routes/athenticatedRoutes/SubjectRoutes.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/api/http/routes/athenticatedRoutes/SubjectRoutes.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/api/http/routes/athenticatedRoutes/UserInfoRoutes.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/api/http/routes/athenticatedRoutes/UserInfoRoutes.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/api/http/utils/RoleAuthorization.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/api/http/utils/RoleAuthorization.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/api/http/utils/RoleAuthorizationConfig.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/api/http/utils/RoleAuthorizationConfig.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/api/http/utils/RouteRoleExtensions.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/api/http/utils/RouteRoleExtensions.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/api/jwt/JWTConfig.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/api/jwt/JWTConfig.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/api/jwt/JWTUserExtensions.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/api/jwt/JWTUserExtensions.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/api/model/ProblemDetail.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/api/model/ProblemDetail.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/api/model/request/ChangePasswordRequest.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/api/model/request/ChangePasswordRequest.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/api/model/request/ClassRequest.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/api/model/request/ClassRequest.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/api/model/request/IssueReportRequest.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/api/model/request/IssueReportRequest.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/api/model/request/LectureRequest.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/api/model/request/LectureRequest.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/api/model/request/LoginCredentialsRequest.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/api/model/request/LoginCredentialsRequest.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/api/model/request/RoomRequest.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/api/model/request/RoomRequest.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/api/model/request/SubjectRequest.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/api/model/request/SubjectRequest.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/api/model/request/TeacherOfficeRequest.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/api/model/request/TeacherOfficeRequest.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/api/model/request/UpdateLectureRequest.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/api/model/request/UpdateLectureRequest.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/api/model/request/UserCredentialsRequest.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/api/model/request/UserCredentialsRequest.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/api/model/request/UserUpdateRequest.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/api/model/request/UserUpdateRequest.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/api/model/response/AssessRoleResponse.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/api/model/response/AssessRoleResponse.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/api/model/response/ClassResponse.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/api/model/response/ClassResponse.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/api/model/response/IssueReportResponse.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/api/model/response/IssueReportResponse.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/api/model/response/LectureResponse.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/api/model/response/LectureResponse.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/api/model/response/LoginResponse.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/api/model/response/LoginResponse.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/api/model/response/RegisterResponse.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/api/model/response/RegisterResponse.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/api/model/response/RoomResponse.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/api/model/response/RoomResponse.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/api/model/response/ScheduleResponse.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/api/model/response/ScheduleResponse.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/api/model/response/StudyRoomCapacity.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/api/model/response/StudyRoomCapacity.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/api/model/response/SubjectResponse.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/api/model/response/SubjectResponse.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/api/model/response/TeacherOfficeResponse.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/api/model/response/TeacherOfficeResponse.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/api/model/response/UniversityResponse.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/api/model/response/UniversityResponse.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/api/model/response/UserInfoResponse.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/api/model/response/UserInfoResponse.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/api/model/response/UserProfileResponse.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/api/model/response/UserProfileResponse.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/api/model/response/WelcomePageResponse.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/api/model/response/WelcomePageResponse.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/api/oauth2/domain/MicrosoftUserInfo.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/api/oauth2/domain/MicrosoftUserInfo.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/api/oauth2/domain/Organization.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/api/oauth2/domain/Organization.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/api/oauth2/getOAuthInfo.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/api/oauth2/getOAuthInfo.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/db/entities/issues/IssueReport.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/db/entities/issues/IssueReport.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/db/entities/rooms/Classroom.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/db/entities/rooms/Classroom.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/db/entities/rooms/OfficeRoom.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/db/entities/rooms/OfficeRoom.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/db/entities/rooms/Room.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/db/entities/rooms/Room.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/db/entities/rooms/StudyRoom.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/db/entities/rooms/StudyRoom.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/db/entities/timetables/Class.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/db/entities/timetables/Class.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/db/entities/timetables/Lecture.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/db/entities/timetables/Lecture.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/db/entities/timetables/LectureChange.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/db/entities/timetables/LectureChange.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/db/entities/timetables/Subject.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/db/entities/timetables/Subject.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/db/entities/timetables/University.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/db/entities/timetables/University.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/db/entities/types/ClassType.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/db/entities/types/ClassType.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/db/entities/types/Role.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/db/entities/types/Role.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/db/entities/types/RoomType.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/db/entities/types/RoomType.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/db/entities/types/Status.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/db/entities/types/Status.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/db/entities/types/WeekDay.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/db/entities/types/WeekDay.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/db/entities/users/Admin.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/db/entities/users/Admin.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/db/entities/users/Attend.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/db/entities/users/Attend.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/db/entities/users/RoleApproval.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/db/entities/users/RoleApproval.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/db/entities/users/Student.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/db/entities/users/Student.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/db/entities/users/Teach.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/db/entities/users/Teach.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/db/entities/users/Teacher.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/db/entities/users/Teacher.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/db/entities/users/TechnicalService.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/db/entities/users/TechnicalService.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/db/entities/users/User.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/db/entities/users/User.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/db/repositories/Repositories.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/db/repositories/Repositories.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/db/repositories/interfaces/Transactionable.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/db/repositories/interfaces/Transactionable.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/db/repositories/issues/IssueReportRepository.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/db/repositories/issues/IssueReportRepository.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/db/repositories/issues/interfaces/IssueReportRepositoryInterface.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/db/repositories/issues/interfaces/IssueReportRepositoryInterface.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/db/repositories/ktorm/KtormCommand.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/db/repositories/ktorm/KtormCommand.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/db/repositories/rooms/RoomRepository.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/db/repositories/rooms/RoomRepository.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/db/repositories/rooms/interfaces/RoomRepositoryInterface.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/db/repositories/rooms/interfaces/RoomRepositoryInterface.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/db/repositories/timetables/ClassRepository.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/db/repositories/timetables/ClassRepository.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/db/repositories/timetables/LectureRepository.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/db/repositories/timetables/LectureRepository.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/db/repositories/timetables/SubjectRepository.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/db/repositories/timetables/SubjectRepository.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/db/repositories/timetables/UniversityRepository.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/db/repositories/timetables/UniversityRepository.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/db/repositories/timetables/interfaces/ClassRepositoryInterface.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/db/repositories/timetables/interfaces/ClassRepositoryInterface.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/db/repositories/timetables/interfaces/LectureRepositoryInterface.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/db/repositories/timetables/interfaces/LectureRepositoryInterface.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/db/repositories/timetables/interfaces/SubjectRepositoryInterface.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/db/repositories/timetables/interfaces/SubjectRepositoryInterface.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/db/repositories/timetables/interfaces/UniversityRepositoryInterface.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/db/repositories/timetables/interfaces/UniversityRepositoryInterface.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/db/repositories/users/AdminRepository.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/db/repositories/users/AdminRepository.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/db/repositories/users/RoleApprovalRepository.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/db/repositories/users/RoleApprovalRepository.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/db/repositories/users/StudentRepository.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/db/repositories/users/StudentRepository.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/db/repositories/users/TeacherRepository.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/db/repositories/users/TeacherRepository.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/db/repositories/users/TechnicalServiceRepository.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/db/repositories/users/TechnicalServiceRepository.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/db/repositories/users/UserRepository.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/db/repositories/users/UserRepository.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/db/repositories/users/interfaces/AdminRepositoryInterface.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/db/repositories/users/interfaces/AdminRepositoryInterface.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/db/repositories/users/interfaces/RoleApprovalRepositoryInterface.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/db/repositories/users/interfaces/RoleApprovalRepositoryInterface.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/db/repositories/users/interfaces/StudentRepositoryInterface.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/db/repositories/users/interfaces/StudentRepositoryInterface.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/db/repositories/users/interfaces/TeacherRepositoryInterface.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/db/repositories/users/interfaces/TeacherRepositoryInterface.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/db/repositories/users/interfaces/TechnicalServiceRepositoryInterface.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/db/repositories/users/interfaces/TechnicalServiceRepositoryInterface.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/db/repositories/users/interfaces/UserRepositoryInterface.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/db/repositories/users/interfaces/UserRepositoryInterface.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/db/repositories/utils/DatabaseException.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/db/repositories/utils/DatabaseException.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/db/tables/Tables.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/db/tables/Tables.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/db/tables/issues/IssueReports.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/db/tables/issues/IssueReports.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/db/tables/rooms/Classrooms.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/db/tables/rooms/Classrooms.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/db/tables/rooms/OfficeRooms.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/db/tables/rooms/OfficeRooms.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/db/tables/rooms/Rooms.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/db/tables/rooms/Rooms.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/db/tables/rooms/StudyRooms.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/db/tables/rooms/StudyRooms.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/db/tables/timetables/Classes.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/db/tables/timetables/Classes.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/db/tables/timetables/LectureChanges.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/db/tables/timetables/LectureChanges.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/db/tables/timetables/Lectures.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/db/tables/timetables/Lectures.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/db/tables/timetables/Subjects.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/db/tables/timetables/Subjects.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/db/tables/timetables/Universities.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/db/tables/timetables/Universities.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/db/tables/users/Admins.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/db/tables/users/Admins.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/db/tables/users/Attends.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/db/tables/users/Attends.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/db/tables/users/RoleApprovals.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/db/tables/users/RoleApprovals.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/db/tables/users/Students.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/db/tables/users/Students.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/db/tables/users/Teachers.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/db/tables/users/Teachers.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/db/tables/users/Teaches.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/db/tables/users/Teaches.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/db/tables/users/TechnicalServices.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/db/tables/users/TechnicalServices.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/db/tables/users/Users.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/db/tables/users/Users.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/services/AuthService.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/services/AuthService.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/services/ClassService.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/services/ClassService.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/services/IssuesReportService.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/services/IssuesReportService.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/services/LectureService.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/services/LectureService.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/services/RoomService.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/services/RoomService.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/services/Services.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/services/Services.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/services/SubjectService.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/services/SubjectService.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/services/TeacherRoomService.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/services/TeacherRoomService.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/services/UniversityService.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/services/UniversityService.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/services/UserClassService.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/services/UserClassService.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/services/UserService.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/services/UserService.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/services/email/EmailService.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/services/email/EmailService.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/services/email/SmtpEmailService.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/services/email/SmtpEmailService.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/services/email/model/EmailConfig.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/services/email/model/EmailConfig.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/services/email/model/UserDetails.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/services/email/model/UserDetails.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/services/errors/AuthError.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/services/errors/AuthError.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/services/errors/ClassError.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/services/errors/ClassError.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/services/errors/IssueReportError.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/services/errors/IssueReportError.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/services/errors/LectureError.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/services/errors/LectureError.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/services/errors/RoomError.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/services/errors/RoomError.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/services/errors/SubjectError.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/services/errors/SubjectError.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/services/errors/TeacherRoomError.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/services/errors/TeacherRoomError.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/services/errors/UserClassError.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/services/errors/UserClassError.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/utils/DurationParser.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/utils/DurationParser.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/utils/Either.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/utils/Either.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/utils/ReadInfoFromCSV.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/utils/ReadInfoFromCSV.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/websockets/WebsocketRoute.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/websockets/WebsocketRoute.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/websockets/hardware/enums/Capacity.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/websockets/hardware/enums/Capacity.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/websockets/hardware/event/Event.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/websockets/hardware/event/Event.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/websockets/hardware/event/EventData.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/websockets/hardware/event/EventData.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/websockets/hardware/event/Hello.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/websockets/hardware/event/Hello.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/websockets/hardware/event/ReceiveCapacity.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/websockets/hardware/event/ReceiveCapacity.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/websockets/hardware/event/Room.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/websockets/hardware/event/Room.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/websockets/hardware/event/UpdateCapacity.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/websockets/hardware/event/UpdateCapacity.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/websockets/hardware/exceptions/UnexpectedEventException.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/websockets/hardware/exceptions/UnexpectedEventException.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/websockets/hardware/model/Device.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/websockets/hardware/model/Device.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/websockets/hardware/route/DeviceRoute.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/websockets/hardware/route/DeviceRoute.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/HorarioTeste.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/resources/HorarioTeste.xlsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/application.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/resources/application.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/http-requests/auth.http" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/resources/http-requests/auth.http" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/http-requests/base.http" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/resources/http-requests/base.http" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/http-requests/http-client.env.json" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/resources/http-requests/http-client.env.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/http-requests/issue-reports.http" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/resources/http-requests/issue-reports.http" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/http-requests/lectures.http" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/resources/http-requests/lectures.http" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/http-requests/rooms.http" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/resources/http-requests/rooms.http" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/http-requests/schedule.http" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/resources/http-requests/schedule.http" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/http-requests/subject-class.http" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/resources/http-requests/subject-class.http" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/http-requests/user-class.http" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/resources/http-requests/user-class.http" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/http-requests/users.http" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/resources/http-requests/users.http" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/logback.xml" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/resources/logback.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/kotlin/mocks/repositories/MockRepositories.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/test/kotlin/mocks/repositories/MockRepositories.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/kotlin/mocks/repositories/issues/MockIssueReportRepository.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/test/kotlin/mocks/repositories/issues/MockIssueReportRepository.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/kotlin/mocks/repositories/rooms/MockRoomRepository.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/test/kotlin/mocks/repositories/rooms/MockRoomRepository.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/kotlin/mocks/repositories/timetables/MockClassRepository.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/test/kotlin/mocks/repositories/timetables/MockClassRepository.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/kotlin/mocks/repositories/timetables/MockLectureRepository.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/test/kotlin/mocks/repositories/timetables/MockLectureRepository.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/kotlin/mocks/repositories/timetables/MockSubjectRepository.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/test/kotlin/mocks/repositories/timetables/MockSubjectRepository.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/kotlin/mocks/repositories/timetables/MockUniversityRepository.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/test/kotlin/mocks/repositories/timetables/MockUniversityRepository.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/kotlin/mocks/repositories/users/MockAdminRepository.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/test/kotlin/mocks/repositories/users/MockAdminRepository.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/kotlin/mocks/repositories/users/MockRoleApprovalRepository.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/test/kotlin/mocks/repositories/users/MockRoleApprovalRepository.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/kotlin/mocks/repositories/users/MockStudentRepository.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/test/kotlin/mocks/repositories/users/MockStudentRepository.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/kotlin/mocks/repositories/users/MockTeacherRepository.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/test/kotlin/mocks/repositories/users/MockTeacherRepository.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/kotlin/mocks/repositories/users/MockTechnicalServiceRepository.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/test/kotlin/mocks/repositories/users/MockTechnicalServiceRepository.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/kotlin/mocks/repositories/users/MockUserRepository.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/test/kotlin/mocks/repositories/users/MockUserRepository.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/kotlin/mocks/repositories/utils/MockTransaction.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/test/kotlin/mocks/repositories/utils/MockTransaction.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/kotlin/mocks/services/MockEmailService.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/test/kotlin/mocks/services/MockEmailService.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/kotlin/repositories/Utils.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/test/kotlin/repositories/Utils.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/kotlin/repositories/issues/IssueReportRepositoryTest.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/test/kotlin/repositories/issues/IssueReportRepositoryTest.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/kotlin/repositories/rooms/RoomRepositoryTest.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/test/kotlin/repositories/rooms/RoomRepositoryTest.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/kotlin/repositories/timetables/ClassRepositoryTest.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/test/kotlin/repositories/timetables/ClassRepositoryTest.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/kotlin/repositories/timetables/LectureRepositoryTest.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/test/kotlin/repositories/timetables/LectureRepositoryTest.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/kotlin/repositories/timetables/SubjectRepositoryTest.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/test/kotlin/repositories/timetables/SubjectRepositoryTest.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/kotlin/repositories/users/AdminRepositoryTest.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/test/kotlin/repositories/users/AdminRepositoryTest.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/kotlin/repositories/users/StudentRepositoryTest.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/test/kotlin/repositories/users/StudentRepositoryTest.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/kotlin/repositories/users/TeacherRepositoryTest.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/test/kotlin/repositories/users/TeacherRepositoryTest.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/kotlin/repositories/users/TechnicalServiceRepositoryInterfaceTest.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/test/kotlin/repositories/users/TechnicalServiceRepositoryInterfaceTest.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/kotlin/repositories/users/UserRepositoryTest.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/test/kotlin/repositories/users/UserRepositoryTest.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/kotlin/services/AuthServiceTest.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/test/kotlin/services/AuthServiceTest.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/kotlin/services/ClassServiceTest.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/test/kotlin/services/ClassServiceTest.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/kotlin/services/IssueReportServiceTest.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/test/kotlin/services/IssueReportServiceTest.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/kotlin/services/LectureServiceTest.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/test/kotlin/services/LectureServiceTest.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/kotlin/services/RoomServiceTest.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/test/kotlin/services/RoomServiceTest.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/kotlin/services/SmtpEmailService.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/test/kotlin/services/SmtpEmailService.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/kotlin/services/SubjectServiceTest.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/test/kotlin/services/SubjectServiceTest.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/kotlin/services/UserClassServiceTest.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/test/kotlin/services/UserClassServiceTest.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/kotlin/services/UserServiceTest.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/test/kotlin/services/UserServiceTest.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/kotlin/tables/ClassTableTest.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/test/kotlin/tables/ClassTableTest.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/kotlin/tables/IssueTableTest.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/test/kotlin/tables/IssueTableTest.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/kotlin/tables/LectureTableTest.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/test/kotlin/tables/LectureTableTest.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/kotlin/tables/RoomTableTest.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/test/kotlin/tables/RoomTableTest.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/kotlin/tables/SubjectTableTest.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/test/kotlin/tables/SubjectTableTest.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/kotlin/tables/UserTableTests.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/test/kotlin/tables/UserTableTests.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/kotlin/tables/utils.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/test/kotlin/tables/utils.kt" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ExternalProjectsData">
+    <projectState path="$PROJECT_DIR$">
+      <ProjectState />
+    </projectState>
+    <projectState path="$PROJECT_DIR$/backend">
+      <ProjectState />
+    </projectState>
+  </component>
+  <component name="ExternalProjectsManager">
+    <system id="GRADLE">
+      <state>
+        <task path="$PROJECT_DIR$">
+          <activation />
+        </task>
+        <projects_view>
+          <tree_state>
+            <expand>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="SIGMS" type="f1a62948:ProjectNode" />
+              </path>
+            </expand>
+            <select />
+          </tree_state>
+        </projects_view>
+      </state>
+    </system>
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Kotlin Interface" />
+        <option value="Kotlin Class" />
+        <option value="Kotlin Data Class" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="SET_USER_NAME_GLOBALLY" value="false" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;Toms223&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/NunoAguiar07/SIGMS.git&quot;,
+    &quot;accountId&quot;: &quot;96ddd907-8b62-443e-b233-d359608acc56&quot;
+  }
+}</component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 7
+}</component>
+  <component name="ProjectId" id="2x68JDTfrzlyG1phMViWmK1AjTB" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Docker.docker.db: Compose Deployment.executor": "Run",
+    "Docker.docker.mailhog: Compose Deployment.executor": "Run",
+    "Gradle.Build SIGMS.executor": "Run",
+    "Gradle.Download Sources.executor": "Run",
+    "Kotlin.ApplicationKt.executor": "Run",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "SHELLCHECK.PATH": "/home/toms223/.local/share/JetBrains/IntelliJIdea2025.1/Shell Script/shellcheck",
+    "git-widget-placeholder": "master",
+    "last_opened_file_path": "/home/toms223/IdeaProjects/SIGMS",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "Modules",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.2",
+    "settings.editor.selected.configurable": "project.propVCSSupport.DirectoryMappings",
+    "vue.rearranger.settings.migration": "true"
+  },
+  "keyToStringList": {
+    "DatabaseDriversLRU": [
+      "postgresql"
+    ]
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/backend/docker" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Kotlin.ApplicationKt">
+    <configuration name="SIGMS [build]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value="build" />
+          </list>
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
+      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+      <DebugAllEnabled>false</DebugAllEnabled>
+      <RunAsTest>false</RunAsTest>
+      <method v="2" />
+    </configuration>
+    <configuration name="ApplicationKt" type="JetRunConfigurationType" temporary="true" nameIsGenerated="true">
+      <envs>
+        <env name="DB_PASSWORD" value="password123" />
+        <env name="DB_URL" value="jdbc:postgresql://localhost:5432/sigms" />
+        <env name="DB_USER" value="user" />
+        <env name="EMAIL_FROM" value="noreply@yourdomain.com" />
+        <env name="EMAIL_HOST" value="localhost" />
+        <env name="EMAIL_PASSWORD" value="" />
+        <env name="EMAIL_PORT" value="1025" />
+        <env name="EMAIL_USE_SSL" value="false" />
+        <env name="EMAIL_USERNAME" value="" />
+        <env name="FRONTEND_URL" value="http://localhost:8081/" />
+        <env name="JWT_AUDIENCE" value="http://localhost:8080/" />
+        <env name="JWT_ISSUER" value="http://localhost:8080/" />
+        <env name="JWT_REALM" value="'Access to isel.leic.group25'" />
+        <env name="JWT_SECRET" value="sigms" />
+        <env name="MICROSOFT_CLIENT_ID" value="'4707d0ae-6c74-40f6-9de2-c85160080c0e'" />
+        <env name="MICROSOFT_CLIENT_SECRET" value="'U.R8Q~N-Y2S2.T5wkTsI6VvkoxzXVZDZ-zgj6aB9'" />
+        <env name="MICROSOFT_TENANT_ID" value="'aa4a8b41-03f3-4d3a-8b78-86fa706ca209'" />
+      </envs>
+      <option name="MAIN_CLASS_NAME" value="isel.leic.group25.ApplicationKt" />
+      <module name="SIGMS.main" />
+      <shortenClasspath name="NONE" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="EngineMain (1)" type="KtorApplicationConfigurationType" factoryName="Ktor" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="io.ktor.server.jetty.jakarta.EngineMain" />
+      <module name="backend.SIGMS.main" />
+      <option name="alternativeJrePath" />
+      <option name="alternativeJrePathEnabled" value="false" />
+      <option name="includeProvidedScope" value="false" />
+      <option name="mainClass" value="io.ktor.server.jetty.jakarta.EngineMain" />
+      <option name="passParentEnvs" value="true" />
+      <option name="programParameters" />
+      <option name="shortenCommandLine" />
+      <option name="vmParameters" />
+      <option name="workingDirectory" value="$PROJECT_DIR$" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="EngineMain" type="KtorApplicationConfigurationType" factoryName="Ktor" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="io.ktor.server.jetty.jakarta.EngineMain" />
+      <module name="SIGMS.main" />
+      <option name="alternativeJrePath" />
+      <option name="alternativeJrePathEnabled" value="false" />
+      <option name="includeProvidedScope" value="false" />
+      <option name="mainClass" value="io.ktor.server.jetty.jakarta.EngineMain" />
+      <option name="passParentEnvs" value="true" />
+      <option name="programParameters" />
+      <option name="shortenCommandLine" />
+      <option name="vmParameters" />
+      <option name="workingDirectory" value="$PROJECT_DIR$" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="docker-deploy" factoryName="docker-compose.yml" temporary="true">
+      <deployment type="docker-compose.yml">
+        <settings />
+      </deployment>
+      <method v="2" />
+    </configuration>
+    <configuration name="docker.db: Compose Deployment" type="docker-deploy" factoryName="docker-compose.yml" temporary="true" server-name="Docker">
+      <deployment type="docker-compose.yml">
+        <settings>
+          <option name="envFilePath" value="" />
+          <option name="services">
+            <list>
+              <option value="db" />
+            </list>
+          </option>
+          <option name="sourceFilePath" value="docker/docker-compose.yml" />
+        </settings>
+      </deployment>
+      <method v="2" />
+    </configuration>
+    <configuration name="docker.mailhog: Compose Deployment" type="docker-deploy" factoryName="docker-compose.yml" temporary="true" server-name="Docker">
+      <deployment type="docker-compose.yml">
+        <settings>
+          <option name="services">
+            <list>
+              <option value="mailhog" />
+            </list>
+          </option>
+          <option name="sourceFilePath" value="docker/docker-compose.yml" />
+        </settings>
+      </deployment>
+      <method v="2" />
+    </configuration>
+    <list>
+      <item itemvalue="Docker.docker.db: Compose Deployment" />
+      <item itemvalue="Docker.docker.mailhog: Compose Deployment" />
+      <item itemvalue="Gradle.SIGMS [build]" />
+      <item itemvalue="Kotlin.ApplicationKt" />
+      <item itemvalue="Ktor.EngineMain (1)" />
+      <item itemvalue="Ktor.EngineMain" />
+    </list>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Kotlin.ApplicationKt" />
+        <item itemvalue="Docker.docker.mailhog: Compose Deployment" />
+        <item itemvalue="Docker.docker.db: Compose Deployment" />
+        <item itemvalue="Gradle.SIGMS [build]" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="39bb7549-cfea-4cb7-a3b9-085007d7466c" name="Changes" comment="" />
+      <created>1747247088497</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1747247088497</updated>
+      <workItem from="1747247089741" duration="2284000" />
+      <workItem from="1747265512186" duration="6441000" />
+      <workItem from="1747393772533" duration="126000" />
+      <workItem from="1748222274253" duration="27000" />
+      <workItem from="1748267516919" duration="6605000" />
+      <workItem from="1748357966958" duration="2785000" />
+      <workItem from="1748364531062" duration="615000" />
+      <workItem from="1748366910605" duration="5166000" />
+      <workItem from="1748378996849" duration="931000" />
+      <workItem from="1748392996598" duration="1674000" />
+      <workItem from="1748433935937" duration="601000" />
+      <workItem from="1748451243330" duration="787000" />
+      <workItem from="1748452053986" duration="549000" />
+      <workItem from="1748452674336" duration="1531000" />
+      <workItem from="1748467781793" duration="363000" />
+      <workItem from="1748468267788" duration="851000" />
+      <workItem from="1748533254971" duration="370000" />
+      <workItem from="1748619988198" duration="7135000" />
+      <workItem from="1748629330987" duration="1101000" />
+      <workItem from="1748633613824" duration="18000" />
+      <workItem from="1748633656292" duration="108000" />
+      <workItem from="1748633899644" duration="422000" />
+      <workItem from="1748634322546" duration="22000" />
+      <workItem from="1748634354019" duration="159000" />
+    </task>
+    <task id="LOCAL-00001" summary="Changes:&#10;  - Event structure to have polymorphic and interface driven behaviour&#10;  - Imports in Go&#10;  - Hardware project structure&#10;Add:&#10;  - Domain.go a file containing all the websocket related domain data&#10;  - EventData.kt an interface for all event data to implement&#10;  - ProbeRequests.go a file containing all the packet sniffing commands and processing&#10;  - Websocket.go a file containing all websocket related operations">
+      <option name="closed" value="true" />
+      <created>1747275009197</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1747275009197</updated>
+    </task>
+    <task id="LOCAL-00002" summary="Add:&#10;  - New event structure read and write to DeviceRoute object&#10;  - Missing serializer mappings in event deserialization&#10;  - EWMA to capacity by linear mapping&#10;  - ReadAtIntervalOrByUpdate function to ProbeRequests&#10;  - Websocket communication logic on hardware&#10;  - Persistence saving to json on hardware&#10;Changes:&#10;  - Room data class to include roomCapacity&#10;  - countMacs to be package only function">
+      <option name="closed" value="true" />
+      <created>1748280653047</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1748280653047</updated>
+    </task>
+    <task id="LOCAL-00003" summary="Add:&#10;  - DeviceRoutes containing all the API related routes for device actions&#10;  - StudyRoomCapacity a data class containing information about the current study room capacity like device id, room name and capacity&#10;Changes:&#10;  - AuthenticatedRoutes to include DeviceRoutes&#10;  - DeviceRoute to allow for setting of roomId to a device&#10;  - RoomService to include a function that from a list of ids returns a list of rooms.">
+      <option name="closed" value="true" />
+      <created>1748469118099</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1748469118099</updated>
+    </task>
+    <task id="LOCAL-00004" summary="Changes:&#10;  - DeviceRoute to save roomId to Device data structure&#10;  - DeviceRoutes to fix bugs with implementation and add university filtering&#10;  - Domain to better transmit information between both sides&#10;  - Hello to have roomId as Int instead of String&#10;  - Json to save roomId as Int instead of String&#10;  - RoomService for function that returns list of rooms by id to be filtered by university id&#10;  - StudyRoomCapacity to be serializable (duuhhh)&#10;  - Websocket to have better error handling on failure to send capacity and to reflect event changes in their respective marshling/unmarshling">
+      <option name="closed" value="true" />
+      <created>1748626683896</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1748626683896</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="UnknownFeatures">
+    <option featureType="com.intellij.fileTypeFactory" implementationName="*.go" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <ignored-roots>
+      <path value="$PROJECT_DIR$/../Metaverse - Onboarding (Backend)" />
+    </ignored-roots>
+    <MESSAGE value="Changes:&#10;  - Event structure to have polymorphic and interface driven behaviour&#10;  - Imports in Go&#10;  - Hardware project structure&#10;Add:&#10;  - Domain.go a file containing all the websocket related domain data&#10;  - EventData.kt an interface for all event data to implement&#10;  - ProbeRequests.go a file containing all the packet sniffing commands and processing&#10;  - Websocket.go a file containing all websocket related operations" />
+    <MESSAGE value="Add:&#10;  - New event structure read and write to DeviceRoute object&#10;  - Missing serializer mappings in event deserialization&#10;  - EWMA to capacity by linear mapping&#10;  - ReadAtIntervalOrByUpdate function to ProbeRequests&#10;  - Websocket communication logic on hardware&#10;  - Persistence saving to json on hardware&#10;Changes:&#10;  - Room data class to include roomCapacity&#10;  - countMacs to be package only function" />
+    <MESSAGE value="Add:&#10;  - DeviceRoutes containing all the API related routes for device actions&#10;  - StudyRoomCapacity a data class containing information about the current study room capacity like device id, room name and capacity&#10;Changes:&#10;  - AuthenticatedRoutes to include DeviceRoutes&#10;  - DeviceRoute to allow for setting of roomId to a device&#10;  - RoomService to include a function that from a list of ids returns a list of rooms." />
+    <MESSAGE value="Changes:&#10;  - DeviceRoute to save roomId to Device data structure&#10;  - DeviceRoutes to fix bugs with implementation and add university filtering&#10;  - Domain to better transmit information between both sides&#10;  - Hello to have roomId as Int instead of String&#10;  - Json to save roomId as Int instead of String&#10;  - RoomService for function that returns list of rooms by id to be filtered by university id&#10;  - StudyRoomCapacity to be serializable (duuhhh)&#10;  - Websocket to have better error handling on failure to send capacity and to reflect event changes in their respective marshling/unmarshling" />
+    <option name="LAST_COMMIT_MESSAGE" value="Changes:&#10;  - DeviceRoute to save roomId to Device data structure&#10;  - DeviceRoutes to fix bugs with implementation and add university filtering&#10;  - Domain to better transmit information between both sides&#10;  - Hello to have roomId as Int instead of String&#10;  - Json to save roomId as Int instead of String&#10;  - RoomService for function that returns list of rooms by id to be filtered by university id&#10;  - StudyRoomCapacity to be serializable (duuhhh)&#10;  - Websocket to have better error handling on failure to send capacity and to reflect event changes in their respective marshling/unmarshling" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="kotlin-line">
+          <url>file://$PROJECT_DIR$/backend/src/main/kotlin/api/http/routes/athenticatedRoutes/DeviceRoutes.kt</url>
+          <line>34</line>
+          <properties>
+            <option name="lambda-ordinal" value="-1" />
+          </properties>
+          <option name="timeStamp" value="4" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
+  </component>
+</project>
