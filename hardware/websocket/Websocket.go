@@ -7,7 +7,6 @@ import (
 	"hardware/packetsniffer"
 	"hardware/persistance"
 	"net"
-	"strconv"
 )
 
 func EstablishConnection(url string) (conn *websocket.Conn, err error) {
@@ -27,12 +26,15 @@ func greetBackend(conn *websocket.Conn, device *persistance.Device) error {
 		return err
 	}
 	hello := Hello{Id: device.Id}
-	if device.RoomId != "" {
+	if device.RoomId != 0 {
 		hello.RoomId = device.RoomId
 	}
 	rawHello, err := json.Marshal(hello)
 	event := Event{"hello", rawHello}
-	return conn.WriteJSON(event)
+	if conn != nil {
+		return conn.WriteJSON(event)
+	}
+	return errors.New("failed to establish connection")
 }
 
 func EventLoop(conn *websocket.Conn, device *persistance.Device, ewmaChannel chan packetsniffer.EWMA, signalRead chan struct{}) error {
@@ -97,8 +99,8 @@ func parseEvent(event *Event, device *persistance.Device, signalRead chan struct
 			if err != nil {
 				return err
 			}
-			device.RoomCapacity = int(room.RoomCapacity)
-			device.RoomId = strconv.Itoa(room.RoomId)
+			device.RoomCapacity = room.RoomCapacity
+			device.RoomId = room.RoomId
 			err = device.Save()
 			if err != nil {
 				return err

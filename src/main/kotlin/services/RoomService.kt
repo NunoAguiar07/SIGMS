@@ -75,11 +75,18 @@ class RoomService (
         }
     }
 
-    fun getListOfRoomsByIds(roomIdList: List<Int>): RoomListResult {
+    fun getUniversityListOfRoomsByIds(universityId: Int, roomIdList: List<Int>): RoomListResult {
         return runCatching {
             transactionable.useTransaction {
                 val rooms = repositories.from({roomRepository}){
-                    roomIdList.mapNotNull { getRoomById(it) }
+                    roomIdList.mapNotNull {
+                        val room = getRoomById(it)
+                        if(room?.university?.id == universityId){
+                            room
+                        } else {
+                            null
+                        }
+                    }
                 }
                 return@useTransaction success(rooms)
             }

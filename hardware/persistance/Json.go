@@ -10,7 +10,7 @@ import (
 type Device struct {
 	Ewma         packetsniffer.EWMA `json:"ewma"`
 	Id           string             `json:"id"`
-	RoomId       string             `json:"roomId"`
+	RoomId       int                `json:"roomId"`
 	RoomCapacity int                `json:"roomCapacity"`
 }
 

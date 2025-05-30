@@ -63,7 +63,7 @@ func generateRandomID(length int) (string, error) {
 
 type Hello struct {
 	Id     string `json:"id"`
-	RoomId string `json:"roomId,omitempty"`
+	RoomId int    `json:"roomId,omitempty"`
 }
 
 type SendCapacity struct {
@@ -72,6 +72,6 @@ type SendCapacity struct {
 }
 
 type Room struct {
-	RoomId       int      `json:"roomId"`
-	RoomCapacity Capacity `json:"roomCapacity"`
+	RoomId       int `json:"roomId"`
+	RoomCapacity int `json:"roomCapacity"`
 }

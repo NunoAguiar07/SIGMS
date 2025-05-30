@@ -71,6 +71,8 @@ object DeviceRoute: WebsocketRoute {
         val event = Event("room", Room(roomId, roomCapacity))
         val json = Json.encodeToString(event)
         connection.send(json)
+        deviceList.remove(device)
+        deviceList.add(device)
         return true
     }
 }

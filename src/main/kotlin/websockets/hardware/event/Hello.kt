@@ -5,4 +5,4 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 @SerialName("HELLO")
-data class Hello(val id: String, val roomId: String? = null): EventData
+data class Hello(val id: String, val roomId: Int? = null): EventData
