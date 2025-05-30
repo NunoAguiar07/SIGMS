@@ -49,6 +49,17 @@ class IssuesReportService(private val repositories: Repositories,
         }
     }
 
+    fun getIssueReportsByUserId(userId: Int, limit:Int, offset:Int): IssueReportListResult {
+        return runCatching {
+            transactionable.useTransaction {
+                val issues = repositories.from({issueReportRepository}){
+                    getIssueReportsByUserId(userId, limit, offset)
+                }
+                return@useTransaction success(issues)
+            }
+        }
+    }
+
     fun getIssuesReportByRoomId(roomId: Int, limit:Int, offset:Int): IssueReportListResult {
         return runCatching {
             transactionable.useTransaction {

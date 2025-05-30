@@ -242,4 +242,20 @@ export const commonStyles = StyleSheet.create({
     rejectButton: {
         backgroundColor: '#F44336',
     },
+    editableCell: {
+        borderWidth: 1,
+        borderColor: '#ccc',
+        borderRadius: 4,
+        padding: 8,
+        backgroundColor: '#fff',
+    },
+    saveButton: {
+        backgroundColor: '#4CAF50', // Green
+    },
+    cancelButton: {
+        backgroundColor: '#f44336', // Red
+    },
+    editButton: {
+        backgroundColor: '#FFC107', // Amber
+    },
 })

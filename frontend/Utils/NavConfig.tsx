@@ -28,7 +28,8 @@ export const NAV_CONFIG: RoleNavConfig = {
     TECHNICAL_SERVICE: [
         { href: '/userHome', iconName: 'home-outline', label: 'Home' },
         { href: '/issue-reports', iconName: 'warning-outline', label: 'Issue Reports' },
-        { href: '/profile', iconName: 'person-outline', label: 'Profile' },
+        { href: '/issue-reports/assigned', iconName: 'construct-outline', label: 'Issue Reports Assigned' },
         { href: '/rooms', iconName: 'school-outline', label: 'Classrooms' },
+        { href: '/profile', iconName: 'person-outline', label: 'Profile' },
     ]
 };
