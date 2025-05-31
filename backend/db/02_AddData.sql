@@ -194,8 +194,8 @@ VALUES (
            (SELECT id FROM CLASSROOM WHERE id = (SELECT id FROM ROOM WHERE room_name = 'A1')),
            'theoretical',
            1,
-           '09:00',
-           '10:30'
+           '08:00',
+           '9:30'
        );
 
 INSERT INTO LECTURE (class_id, room_id, class_type, week_day, start_time, end_time)
@@ -214,8 +214,8 @@ VALUES (
            (SELECT id FROM CLASSROOM WHERE id = (SELECT id FROM ROOM WHERE room_name = 'Lab Informática 1')),
            'practical',
            3,
-           '10:00',
-           '12:00'
+           '11:00',
+           '14:00'
        );
 
 INSERT INTO LECTURE (class_id, room_id, class_type, week_day, start_time, end_time)
@@ -224,8 +224,8 @@ VALUES (
            (SELECT id FROM CLASSROOM WHERE id = (SELECT id FROM ROOM WHERE room_name = 'B1')),
            'theoretical',
            4,
-           '08:30',
-           '10:00'
+           '08:00',
+           '11:00'
        );
 
 INSERT INTO LECTURE (class_id, room_id, class_type, week_day, start_time, end_time)
@@ -234,6 +234,116 @@ VALUES (
            (SELECT id FROM CLASSROOM WHERE id = (SELECT id FROM ROOM WHERE room_name = 'C1')),
            'theoretical_practical',
            5,
+           '15:30',
+           '17:00'
+       );
+
+-- Software Engineering - T1
+INSERT INTO LECTURE (class_id, room_id, class_type, week_day, start_time, end_time)
+VALUES (
+           (SELECT id FROM CLASS WHERE class_name = 'T1' AND subject_id = (SELECT id FROM SUBJECT WHERE subject_name = 'Software Engineering')),
+           (SELECT id FROM CLASSROOM WHERE id = (SELECT id FROM ROOM WHERE room_name = 'B2')),
+           'theoretical',
+           1,
+           '11:00',
+           '12:30'
+       );
+
+-- Software Engineering - T2
+INSERT INTO LECTURE (class_id, room_id, class_type, week_day, start_time, end_time)
+VALUES (
+           (SELECT id FROM CLASS WHERE class_name = 'T2' AND subject_id = (SELECT id FROM SUBJECT WHERE subject_name = 'Software Engineering')),
+           (SELECT id FROM CLASSROOM WHERE id = (SELECT id FROM ROOM WHERE room_name = 'B3')),
+           'practical',
+           3,
+           '15:30',
+           '18:30'
+       );
+
+-- Operating Systems - T1
+INSERT INTO LECTURE (class_id, room_id, class_type, week_day, start_time, end_time)
+VALUES (
+           (SELECT id FROM CLASS WHERE class_name = 'T1' AND subject_id = (SELECT id FROM SUBJECT WHERE subject_name = 'Operating Systems')),
+           (SELECT id FROM CLASSROOM WHERE id = (SELECT id FROM ROOM WHERE room_name = 'C2')),
+           'theoretical_practical',
+           2,
+           '09:30',
+           '12:30'
+       );
+
+-- Operating Systems - T2
+INSERT INTO LECTURE (class_id, room_id, class_type, week_day, start_time, end_time)
+VALUES (
+           (SELECT id FROM CLASS WHERE class_name = 'T2' AND subject_id = (SELECT id FROM SUBJECT WHERE subject_name = 'Operating Systems')),
+           (SELECT id FROM CLASSROOM WHERE id = (SELECT id FROM ROOM WHERE room_name = 'Lab Informática 2')),
+           'practical',
+           4,
            '14:00',
-           '16:00'
+           '15:30'
+       );
+
+-- Artificial Intelligence - T1
+INSERT INTO LECTURE (class_id, room_id, class_type, week_day, start_time, end_time)
+VALUES (
+           (SELECT id FROM CLASS WHERE class_name = 'T1' AND subject_id = (SELECT id FROM SUBJECT WHERE subject_name = 'Artificial Intelligence')),
+           (SELECT id FROM CLASSROOM WHERE id = (SELECT id FROM ROOM WHERE room_name = 'Auditório 1')),
+           'theoretical',
+           5,
+           '11:00',
+           '12:30'
+       );
+
+-- Artificial Intelligence - T2
+INSERT INTO LECTURE (class_id, room_id, class_type, week_day, start_time, end_time)
+VALUES (
+           (SELECT id FROM CLASS WHERE class_name = 'T2' AND subject_id = (SELECT id FROM SUBJECT WHERE subject_name = 'Artificial Intelligence')),
+           (SELECT id FROM CLASSROOM WHERE id = (SELECT id FROM ROOM WHERE room_name = 'Auditório 2')),
+           'theoretical',
+           3,
+           '08:00',
+           '9:30'
+       );
+
+-- Distributed Systems - T1
+INSERT INTO LECTURE (class_id, room_id, class_type, week_day, start_time, end_time)
+VALUES (
+           (SELECT id FROM CLASS WHERE class_name = 'T1' AND subject_id = (SELECT id FROM SUBJECT WHERE subject_name = 'Distributed Systems')),
+           (SELECT id FROM CLASSROOM WHERE id = (SELECT id FROM ROOM WHERE room_name = 'C1')),
+           'theoretical_practical',
+           1,
+           '9:30',
+           '11:00'
+       );
+
+-- Distributed Systems - T2
+INSERT INTO LECTURE (class_id, room_id, class_type, week_day, start_time, end_time)
+VALUES (
+           (SELECT id FROM CLASS WHERE class_name = 'T2' AND subject_id = (SELECT id FROM SUBJECT WHERE subject_name = 'Distributed Systems')),
+           (SELECT id FROM CLASSROOM WHERE id = (SELECT id FROM ROOM WHERE room_name = 'Lab Informática 1')),
+           'practical',
+           4,
+           '17:00',
+           '18:30'
+       );
+
+-- Database Systems - T1
+INSERT INTO LECTURE (class_id, room_id, class_type, week_day, start_time, end_time)
+VALUES (
+           (SELECT id FROM CLASS WHERE class_name = 'T1' AND subject_id = (SELECT id FROM SUBJECT WHERE subject_name = 'Database Systems')),
+           (SELECT id FROM CLASSROOM WHERE id = (SELECT id FROM ROOM WHERE room_name = 'Lab Informática 2')),
+           'practical',
+           2,
+           '14:00',
+           '15:30'
+       );
+
+-- Database Systems - T2
+INSERT INTO LECTURE (class_id, room_id, class_type, week_day, start_time, end_time)
+VALUES (
+           (SELECT id FROM CLASS WHERE class_name = 'T2' AND subject_id = (SELECT id FROM SUBJECT WHERE subject_name = 'Database Systems')),
+           (SELECT id FROM CLASSROOM WHERE id = (SELECT id FROM ROOM WHERE room_name = 'A3')),
+           'theoretical',
+           5,
+           '11:00',
+           '12:30'
        );
