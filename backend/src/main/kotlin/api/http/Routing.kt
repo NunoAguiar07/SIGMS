@@ -15,7 +15,7 @@ fun Application.configureRouting(
     client:HttpClient
 ) {
     routing {
-        route("/api") {
+        route("/api/") {
             welcomeRoutes()
             universityRoutes(services)
             authRoutes(services, client)

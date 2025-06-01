@@ -5,40 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="39bb7549-cfea-4cb7-a3b9-085007d7466c" name="Changes" comment="Changes:&#10;  - Re-structuring of project directories">
-      <change afterPath="$PROJECT_DIR$/frontend/.env" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/build.sh" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/docker/Dockerfile" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/docker/nginx.conf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/eas.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hardware/build.sh" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hardware/download_latest_raspberrypi_lite.sh" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hardware/generate_raspberry_image.sh" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hardware/start.sh" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/docker/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/backend/docker/Dockerfile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/kotlin/Application.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/Application.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/src/main/kotlin/api/http/Routing.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/api/http/Routing.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker/docker-compose.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/app.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/assets/adaptive-icon.png" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/assets/adaptive_icon.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/assets/default-user-profile.png" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/assets/default_user_profile.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/assets/microsoft-logo.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/assets/microsoft_logo.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/assets/splash-icon.png" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/assets/splash_icon.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/requests/UniversityRequest.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/requests/UniversityRequest.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/requests/WelcomeRequest.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/requests/WelcomeRequest.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/requests/auth/LoginRequest.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/requests/auth/LoginRequest.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/requests/auth/Microsoft/AuthenticateWithBackendRequest.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/requests/auth/Microsoft/AuthenticateWithBackendRequest.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/requests/auth/Microsoft/ExchangeCodeForTokenRequest.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/requests/auth/Microsoft/ExchangeCodeForTokenRequest.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/requests/auth/Microsoft/InitiateMicrosoftAuthRequest.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/requests/auth/Microsoft/InitiateMicrosoftAuthRequest.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/requests/auth/RegisterRequest.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/requests/auth/RegisterRequest.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/requests/auth/VerifyAccountRequest.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/requests/auth/VerifyAccountRequest.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/requests/interceptors/DeviceInterceptor.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/requests/interceptors/DeviceInterceptor.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/screens/MicrosoftAuthButton.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/screens/MicrosoftAuthButton.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/screens/ProfileScreen.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/screens/ProfileScreen.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/hardware/persistance/Json.go" beforeDir="false" afterPath="$PROJECT_DIR$/hardware/persistance/Json.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/hardware/websocket/Websocket.go" beforeDir="false" afterPath="$PROJECT_DIR$/hardware/websocket/Websocket.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -315,7 +283,7 @@
       <workItem from="1748723895074" duration="7594000" />
       <workItem from="1748738882236" duration="1558000" />
       <workItem from="1748746582134" duration="230000" />
-      <workItem from="1748747863571" duration="2101000" />
+      <workItem from="1748747863571" duration="3300000" />
     </task>
     <task id="LOCAL-00001" summary="Changes:&#10;  - Event structure to have polymorphic and interface driven behaviour&#10;  - Imports in Go&#10;  - Hardware project structure&#10;Add:&#10;  - Domain.go a file containing all the websocket related domain data&#10;  - EventData.kt an interface for all event data to implement&#10;  - ProbeRequests.go a file containing all the packet sniffing commands and processing&#10;  - Websocket.go a file containing all websocket related operations">
       <option name="closed" value="true" />
