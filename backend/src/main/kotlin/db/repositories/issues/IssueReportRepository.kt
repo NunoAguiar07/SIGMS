@@ -56,6 +56,12 @@ class IssueReportRepository(private val database: Database) : IssueReportReposit
         return issueReport
     }
 
+    override fun unassignTechnicianFromIssueReport(issueReport: IssueReport): IssueReport = withDatabase {
+        issueReport.assignedTo = null
+        database.issueReports.update(issueReport)
+        return issueReport
+    }
+
     override fun createIssueReport(user: User, room: Room, description: String): IssueReport = withDatabase {
         val newIssueReport = IssueReport {
             this.room = room

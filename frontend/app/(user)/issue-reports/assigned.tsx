@@ -6,6 +6,7 @@ import {useFocusEffect} from "expo-router";
 import {FixIssueReportRequest} from "../../../requests/authorized/FixIssueReport";
 import {Alert} from "react-native";
 import {UpdateIssueReportRequest} from "../../../requests/authorized/UpdateIssueReport";
+import {UnassignTechnicianToIssueRequest} from "../../../requests/authorized/UnassignTechnicianToIssue";
 import ErrorHandler from "../../(public)/error";
 import {TechnicianAssignedIssuesScreen} from "../../../screens/TechnicianAssignedIssuesScreen";
 
@@ -64,6 +65,18 @@ const TechnicianAssignedIssues = () => {
         }
     };
 
+    const handleUnassigned = async (issueId: number) => {
+        console.log('Unassigning issue with ID:', issueId);
+        const unassign = UnassignTechnicianToIssueRequest(issueId, setError);
+        const response = await unassign();
+        if (response) {
+            Alert.alert('Left the issue correctly');
+            loadIssues();
+        } else {
+            Alert.alert('Error', 'Failed to mark the issue as fixed.');
+        }
+    };
+
     const handleNext = () => setPage((prev) => prev + 1);
     const handlePrevious = () => setPage((prev) => Math.max(prev - 1, 0));
 
@@ -81,6 +94,7 @@ const TechnicianAssignedIssues = () => {
             onFix={handleFix}
             onEdit={handleStartEditing}
             onUpdate={handleUpdate}
+            onUnassigned={handleUnassigned}
             onCancelEdit={handleCancelEditing}
             editingId={editingId}
             editedDescription={editedDescription}

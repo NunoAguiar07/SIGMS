@@ -58,6 +58,15 @@ class Problem private constructor(
             )
         }
 
+        fun forbidden(title: String, detail: String? = null): Problem {
+            return Problem(
+                typeUri = URI("https://example.com/problems/forbidden"),
+                title = title,
+                status = HttpStatusCode.Forbidden,
+                detail = detail
+            )
+        }
+
         fun internalServerError(title: String, detail: String? = null): Problem {
             return Problem(
                 typeUri = URI("https://example.com/problems/internal-server-error"),

@@ -1,10 +1,10 @@
 import {commonStyles} from "../css_styling/common/CommonProps";
-import {assignedIssuesStyle} from "../../frontend/css_styling/assigned_issues/AssignedIssuesProps";
+import {assignedIssuesStyle} from "../css_styling/assigned_issues/AssignedIssuesProps";
 import {ActivityIndicator, View, Text, FlatList, TouchableOpacity, TextInput} from "react-native";
 import {Ionicons} from "@expo/vector-icons";
 
 // @ts-ignore
-export const TechnicianAssignedIssuesScreen = ({issues, isLoading, currentPage, onNext, onPrevious, onFix, onEdit, onUpdate, onCancelEdit, editingId, editedDescription, setEditedDescription, hasNext}) => {
+export const TechnicianAssignedIssuesScreen = ({issues, isLoading, currentPage, onNext, onPrevious, onFix, onEdit, onUpdate, onUnassigned, onCancelEdit, editingId, editedDescription, setEditedDescription, hasNext}) => {
     if (isLoading) {
         return (
             <View style={commonStyles.container}>
@@ -84,6 +84,12 @@ export const TechnicianAssignedIssuesScreen = ({issues, isLoading, currentPage, 
                                             onPress={() => onFix(item.id)}
                                         >
                                             <Ionicons name="checkmark-done" size={16} color="white" />
+                                        </TouchableOpacity>
+                                        <TouchableOpacity
+                                            style={[commonStyles.actionButton, commonStyles.rejectButton]}
+                                            onPress={() => onUnassigned(item.id)}
+                                        >
+                                            <Ionicons name="remove-circle-outline" size={16} color="white" />
                                         </TouchableOpacity>
                                     </>
                                 )}

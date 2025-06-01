@@ -47,6 +47,13 @@ class MockIssueReportRepository : IssueReportRepositoryInterface {
         } ?: issueReport
     }
 
+    override fun unassignTechnicianFromIssueReport(issueReport: IssueReport): IssueReport {
+        val existing = issueReports.firstOrNull { it.id == issueReport.id }
+        return existing?.apply {
+            this.assignedTo = null
+        } ?: issueReport
+    }
+
     override fun deleteIssueReport(id: Int): Boolean {
         return issueReports.removeIf { it.id == id }
     }

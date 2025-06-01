@@ -88,6 +88,21 @@ fun Route.issueCrudRoutes(services: Services) {
         )
     }
 
+    put("/unassign") {
+        val userId = call.getUserIdFromPrincipal() ?: return@put call.respond(HttpStatusCode.Unauthorized)
+        val issueId = call.parameters["issueId"]
+        if(issueId.isNullOrBlank()) return@put call.respond(RequestError.Missing("issueId").toProblem())
+        if(issueId.toIntOrNull() == null) return@put call.respond(RequestError.Invalid("issueId").toProblem())
+        val result = services.from({issueReportService}){
+            unassignTechnicianFromIssueReport(userId, issueId.toInt())
+        }
+        call.respondEither(
+            either = result,
+            transformError = { error -> error.toProblem() },
+            transformSuccess = { HttpStatusCode.NoContent }
+        )
+    }
+
 
     withRole(Role.TECHNICAL_SERVICE) {
         delete("/delete") {

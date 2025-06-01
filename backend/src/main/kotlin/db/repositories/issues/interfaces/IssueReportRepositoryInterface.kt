@@ -14,6 +14,7 @@ interface IssueReportRepositoryInterface {
     fun getIssuesReportByRoomId(roomId: Int, limit:Int, offset:Int): List<IssueReport>
     fun createIssueReport(user: User, room: Room, description: String): IssueReport
     fun assignIssueTo(issueReport: IssueReport, technician: TechnicalService) : IssueReport
+    fun unassignTechnicianFromIssueReport(issueReport: IssueReport): IssueReport
     fun deleteIssueReport(id: Int): Boolean
     fun updateIssueReport(issueReport: IssueReport, description: String): IssueReport
 }

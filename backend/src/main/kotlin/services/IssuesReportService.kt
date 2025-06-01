@@ -105,6 +105,25 @@ class IssuesReportService(private val repositories: Repositories,
         }
     }
 
+    fun unassignTechnicianFromIssueReport(technicianId: Int, reportId: Int): IssueReportResult {
+        return runCatching {
+            transactionable.useTransaction {
+                val issueReport = repositories.from({issueReportRepository}){
+                    getIssueReportById(reportId)
+                } ?: return@useTransaction failure(IssueReportError.InvalidIssueReportId)
+                val assignedTechnicianId = issueReport.assignedTo?.user?.id ?: 0
+                if (issueReport.assignedTo == null || assignedTechnicianId == 0
+                    || assignedTechnicianId != technicianId) {
+                    return@useTransaction failure(IssueReportError.NotAssignedToIssueReport)
+                }
+                val unassignedIssue = repositories.from({issueReportRepository}){
+                    unassignTechnicianFromIssueReport(issueReport)
+                }
+                return@useTransaction success(unassignedIssue)
+            }
+        }
+    }
+
     fun deleteIssueReport(id: Int): IssueReportDeletionResult {
         return runCatching {
             transactionable.useTransaction {

@@ -7,6 +7,7 @@ sealed class IssueReportError {
     data object IssueReportNotFound : IssueReportError()
     data object UserNotFound : IssueReportError()
     data object InvalidIssueReportId : IssueReportError()
+    data object NotAssignedToIssueReport : IssueReportError()
     data object InvalidRoomId : IssueReportError()
     data class ConnectionDbError(val message: String?) : IssueReportError()
 
@@ -23,6 +24,10 @@ sealed class IssueReportError {
             InvalidIssueReportId -> Problem.badRequest(
                 title = "Invalid issue report ID",
                 detail = "The provided issue report ID is invalid."
+            )
+            NotAssignedToIssueReport -> Problem.forbidden(
+                title = "Not assigned to issue",
+                detail = "You are not assigned to this issue report."
             )
             InvalidRoomId -> Problem.badRequest(
                 title = "Invalid room ID",

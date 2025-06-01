@@ -258,4 +258,9 @@ export const commonStyles = StyleSheet.create({
     editButton: {
         backgroundColor: '#FFC107', // Amber
     },
+    columnsContainer: {
+        flex: 1,
+        flexDirection: 'row', // Horizontal layout
+        backgroundColor: '#fef6ef',
+    },
 })
