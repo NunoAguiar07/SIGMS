@@ -29,6 +29,23 @@ val applicationHttpClient = HttpClient(OkHttp) {
     }
 }
 
+fun Application.configureSlidingCookieRefresh() {
+    intercept(ApplicationCallPipeline.Plugins) {
+        val token = call.request.cookies["auth_token"]
+        if (token != null) {
+            // Refresh the cookie
+            val refreshedCookie = Cookie(
+                name = "auth_token",
+                value = token,
+                httpOnly = true,
+                maxAge = 60 * 60, // 1 hour
+                path = "/api"
+            )
+            call.response.cookies.append(refreshedCookie)
+        }
+    }
+}
+
 fun main(args: Array<String>) {
     EngineMain.main(args)
 }
@@ -133,6 +150,7 @@ fun Application.module() {
             }
         }
     }
+    configureSlidingCookieRefresh()
     install(WebSockets) {
         pingPeriod = 15.seconds
         timeout = 30.seconds

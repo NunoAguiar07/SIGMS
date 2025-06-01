@@ -27,11 +27,14 @@ FILENAME_IMG="${FILENAME_XZ%.xz}"
 echo "[*] Found latest image:"
 echo "    $FULL_URL"
 
-echo "[*] Downloading $FILENAME_XZ..."
-curl -LO "$FULL_URL"
-
-echo "[*] Extracting $FILENAME_XZ..."
-unxz "$FILENAME_XZ"
+if [ -f "$FILENAME_IMG" ]; then
+    echo "[*] Skipping extraction; $FILENAME_IMG already exists."
+else
+    echo "[*] Downloading $FILENAME_XZ..."
+    curl -LO "$FULL_URL"
+    echo "[*] Extracting $FILENAME_XZ..."
+    unxz "$FILENAME_XZ"
+fi
 
 echo "[✓] Done. Extracted: $FILENAME_IMG"
 

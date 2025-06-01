@@ -44,8 +44,7 @@ RC_LOCAL="/mnt/rpi-root/etc/rc.local"
 if [ ! -f "$RC_LOCAL" ]; then
   echo "Creating $RC_LOCAL with minimal content..."
   sudo tee "$RC_LOCAL" > /dev/null << 'EOF'
-#!/bin/sh -e
-exit 0
+
 EOF
   sudo chmod +x "$RC_LOCAL"
 fi
