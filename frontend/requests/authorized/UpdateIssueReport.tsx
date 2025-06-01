@@ -10,7 +10,7 @@ export const UpdateIssueReportRequest = (
     return async () => {
         try {
             const response = await api.put(
-                `/issue-reports/${encodeURIComponent(issueId)}/update`,
+                `issue-reports/${encodeURIComponent(issueId)}/update`,
                 { description },
                 { withCredentials: true }
             );

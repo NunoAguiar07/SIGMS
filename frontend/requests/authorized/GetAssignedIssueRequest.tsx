@@ -11,7 +11,7 @@ export const GetAssignedIssuesRequest = (
 ) => {
     return async () => {
         try {
-            const response = await api.get(`/issue-reports/me?limit=${limit}&offset=${offset}`);
+            const response = await api.get(`issue-reports/me?limit=${limit}&offset=${offset}`);
             if (response.status === 200) {
                 return setIssues(response.data.data);
             }

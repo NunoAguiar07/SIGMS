@@ -1,12 +1,12 @@
 import axios from "axios";
 import {getDeviceType} from "../../../Utils/DeviceType";
 import * as SecureStore from 'expo-secure-store';
+import {apiUrl} from "../../WelcomeRequest";
 
 export const authenticateWithBackend = async (accessToken: string) => {
     try {
-        const apiUrl = process.env.EXPO_PUBLIC_API_URL
         const response = await axios.post(
-            `${apiUrl}/auth/microsoft`,
+            `${apiUrl}auth/microsoft`,
             {},
             {
                 withCredentials: true,

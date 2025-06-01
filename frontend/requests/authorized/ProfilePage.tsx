@@ -33,7 +33,7 @@ export const UpdateProfile = (
 ) => {
     return async () => {
         try {
-            const response = await api.put(`/profile`, profileData, { withCredentials: true });
+            const response = await api.put(`profile`, profileData, { withCredentials: true });
             setProfile(response.data);
         } catch (error) {
             handleAxiosError(error, setError)

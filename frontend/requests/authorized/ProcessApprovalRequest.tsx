@@ -6,7 +6,7 @@ export const processApproval = (token: string, approve: boolean, setError: any) 
     return async () => {
         try {
             const response = await api.put(
-                `/assess-roles/validate?token=${token}&status=${approve ? 'APPROVED' : 'REJECTED'}`,
+                `assess-roles/validate?token=${token}&status=${approve ? 'APPROVED' : 'REJECTED'}`,
                 {},
                 { withCredentials: true }
             );

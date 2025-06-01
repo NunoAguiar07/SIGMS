@@ -5,7 +5,7 @@ import {handleAxiosError} from "../../Utils/HandleAxiosError";
 
 export const fetchUserInfo = async (setError: (error: any) => void) => {
     try {
-        const response = await api.get(`/userInfo`, {withCredentials: true});
+        const response = await api.get(`userInfo`, {withCredentials: true});
         const {userId, universityId, userRole} = response.data;
         await AsyncStorage.multiSet([
             ['userId', userId],

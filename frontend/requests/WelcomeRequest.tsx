@@ -1,7 +1,7 @@
 import axios from "axios";
 import {handleAxiosError} from "../Utils/HandleAxiosError";
 
-export const apiUrl = 'http://localhost/api';
+export const apiUrl = 'http://localhost/api/';
 
 /**
  * Const "GetData" represents the information we want to represent on the home page.

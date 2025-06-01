@@ -4,9 +4,26 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="39bb7549-cfea-4cb7-a3b9-085007d7466c" name="Changes" comment="Changes:&#10;  - Re-structuring of project directories">
+    <list default="true" id="39bb7549-cfea-4cb7-a3b9-085007d7466c" name="Changes" comment="Changes:&#10;  - URI's to not include / as it is already present in environment variable">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/kotlin/api/http/Routing.kt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/kotlin/api/http/Routing.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/requests/WelcomeRequest.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/requests/WelcomeRequest.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/requests/auth/LoginRequest.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/requests/auth/LoginRequest.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/requests/auth/Microsoft/AuthenticateWithBackendRequest.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/requests/auth/Microsoft/AuthenticateWithBackendRequest.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/requests/auth/RegisterRequest.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/requests/auth/RegisterRequest.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/requests/auth/VerifyAccountRequest.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/requests/auth/VerifyAccountRequest.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/requests/authorized/CreateIssueReport.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/requests/authorized/CreateIssueReport.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/requests/authorized/FetchUserInfoRequest.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/requests/authorized/FetchUserInfoRequest.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/requests/authorized/FixIssueReport.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/requests/authorized/FixIssueReport.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/requests/authorized/GetAssignedIssueRequest.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/requests/authorized/GetAssignedIssueRequest.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/requests/authorized/GetIssueReports.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/requests/authorized/GetIssueReports.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/requests/authorized/GetRooms.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/requests/authorized/GetRooms.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/requests/authorized/JoinSchoolClassRequest.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/requests/authorized/JoinSchoolClassRequest.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/requests/authorized/PendingApprovalsRequest.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/requests/authorized/PendingApprovalsRequest.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/requests/authorized/ProcessApprovalRequest.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/requests/authorized/ProcessApprovalRequest.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/requests/authorized/ProfilePage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/requests/authorized/ProfilePage.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/requests/authorized/SchoolClassRequest.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/requests/authorized/SchoolClassRequest.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/requests/authorized/SubjectsRequest.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/requests/authorized/SubjectsRequest.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/requests/authorized/UpdateIssueReport.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/requests/authorized/UpdateIssueReport.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -283,7 +300,8 @@
       <workItem from="1748723895074" duration="7594000" />
       <workItem from="1748738882236" duration="1558000" />
       <workItem from="1748746582134" duration="230000" />
-      <workItem from="1748747863571" duration="3300000" />
+      <workItem from="1748747863571" duration="3861000" />
+      <workItem from="1748765654238" duration="1203000" />
     </task>
     <task id="LOCAL-00001" summary="Changes:&#10;  - Event structure to have polymorphic and interface driven behaviour&#10;  - Imports in Go&#10;  - Hardware project structure&#10;Add:&#10;  - Domain.go a file containing all the websocket related domain data&#10;  - EventData.kt an interface for all event data to implement&#10;  - ProbeRequests.go a file containing all the packet sniffing commands and processing&#10;  - Websocket.go a file containing all websocket related operations">
       <option name="closed" value="true" />
@@ -325,7 +343,15 @@
       <option name="project" value="LOCAL" />
       <updated>1748634823742</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="Changes:&#10;  - URI's to not include / as it is already present in environment variable">
+      <option name="closed" value="true" />
+      <created>1748751816971</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1748751816971</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -354,7 +380,8 @@
     <MESSAGE value="Add:&#10;  - DeviceRoutes containing all the API related routes for device actions&#10;  - StudyRoomCapacity a data class containing information about the current study room capacity like device id, room name and capacity&#10;Changes:&#10;  - AuthenticatedRoutes to include DeviceRoutes&#10;  - DeviceRoute to allow for setting of roomId to a device&#10;  - RoomService to include a function that from a list of ids returns a list of rooms." />
     <MESSAGE value="Changes:&#10;  - DeviceRoute to save roomId to Device data structure&#10;  - DeviceRoutes to fix bugs with implementation and add university filtering&#10;  - Domain to better transmit information between both sides&#10;  - Hello to have roomId as Int instead of String&#10;  - Json to save roomId as Int instead of String&#10;  - RoomService for function that returns list of rooms by id to be filtered by university id&#10;  - StudyRoomCapacity to be serializable (duuhhh)&#10;  - Websocket to have better error handling on failure to send capacity and to reflect event changes in their respective marshling/unmarshling" />
     <MESSAGE value="Changes:&#10;  - Re-structuring of project directories" />
-    <option name="LAST_COMMIT_MESSAGE" value="Changes:&#10;  - Re-structuring of project directories" />
+    <MESSAGE value="Changes:&#10;  - URI's to not include / as it is already present in environment variable" />
+    <option name="LAST_COMMIT_MESSAGE" value="Changes:&#10;  - URI's to not include / as it is already present in environment variable" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

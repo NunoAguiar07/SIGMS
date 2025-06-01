@@ -1,13 +1,13 @@
 import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
 import {handleAxiosError} from "../../Utils/HandleAxiosError";
+import {apiUrl} from "../WelcomeRequest";
 
 export const LoginRequest = (email: string, password:string, deviceType:string, setError: any) => {
     return async () => {
-        const apiUrl = process.env.EXPO_PUBLIC_API_URL
         try {
             const response = await axios.post(
-                `${apiUrl}/auth/login`,
+                `${apiUrl}auth/login`,
                 {email, password},
                 {
                     headers: {

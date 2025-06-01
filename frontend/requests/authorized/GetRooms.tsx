@@ -10,8 +10,8 @@ export const getRooms = (
     return async () => {
         try {
             const url = searchQuery
-                ? `/rooms?search=${encodeURIComponent(searchQuery)}`
-                : '/rooms';
+                ? `rooms?search=${encodeURIComponent(searchQuery)}`
+                : 'rooms';
             const response = await api.get(url, { withCredentials: true });
 
             if (response.status === 200) {

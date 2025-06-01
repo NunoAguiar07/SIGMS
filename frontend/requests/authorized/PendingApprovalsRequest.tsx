@@ -6,7 +6,7 @@ export const getPendingApprovals = (limit: number, offset: number, setError: any
     return async () => {
         try {
             const response = await api.get(
-                `/assess-roles?limit=${limit}&offset=${offset}`,
+                `assess-roles?limit=${limit}&offset=${offset}`,
                 { withCredentials: true }
             );
             if (response.status === 200) {

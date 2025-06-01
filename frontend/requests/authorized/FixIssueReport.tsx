@@ -9,7 +9,7 @@ export const FixIssueReportRequest = (
     return async () => {
         try {
             const response = await api.delete(
-                `/issue-reports/${encodeURIComponent(issueId)}/delete`,
+                `issue-reports/${encodeURIComponent(issueId)}/delete`,
                 { withCredentials: true }
             );
 

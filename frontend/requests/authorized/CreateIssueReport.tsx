@@ -9,7 +9,7 @@ export const CreateIssueReportRequest = (
     return async () => {
         try {
             const response = await api.post(
-                `/rooms/${encodeURIComponent(roomId)}/issues/add`,
+                `rooms/${encodeURIComponent(roomId)}/issues/add`,
                 { description },
                 { withCredentials: true }
             );
