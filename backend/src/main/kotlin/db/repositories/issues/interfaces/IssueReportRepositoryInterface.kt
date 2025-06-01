@@ -10,6 +10,7 @@ interface IssueReportRepositoryInterface {
     fun getAllIssueReports(limit:Int, offset:Int): List<IssueReport>
     fun getAllUnassignedIssueReports(limit:Int, offset:Int) : List<IssueReport>
     fun getIssueReportById(id: Int): IssueReport?
+    fun getIssueReportsByUserId(userId: Int, limit:Int, offset:Int): List<IssueReport>
     fun getIssuesReportByRoomId(roomId: Int, limit:Int, offset:Int): List<IssueReport>
     fun createIssueReport(user: User, room: Room, description: String): IssueReport
     fun assignIssueTo(issueReport: IssueReport, technician: TechnicalService) : IssueReport

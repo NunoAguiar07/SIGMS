@@ -29,6 +29,13 @@ class IssueReportRepository(private val database: Database) : IssueReportReposit
             .toList()
     }
 
+    override fun getIssueReportsByUserId(userId: Int, limit: Int, offset: Int): List<IssueReport> = withDatabase {
+        return database.issueReports.filter { it.assignedTo eq userId }
+            .drop(offset)
+            .take(limit)
+            .toList()
+    }
+
     override fun deleteIssueReport(id: Int): Boolean = withDatabase {
         val issueReport = database.issueReports.firstOrNull { it.id eq  id }
         return if (issueReport != null) {

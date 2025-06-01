@@ -33,6 +33,22 @@ fun Route.issueReportRoutes(
             )
         }
 
+        get("/me") {
+            val userId = call.getUserIdFromPrincipal() ?: return@get call.respond(HttpStatusCode.Unauthorized)
+            val limit = call.queryParameters["limit"]?.toIntOrNull() ?: 10
+            val offset = call.queryParameters["offset"]?.toIntOrNull() ?: 0
+            if(offset < 0) return@get RequestError.Invalid("offset").toProblem().respond(call)
+            if(limit < 1 || limit > 100) return@get RequestError.Invalid("limit").toProblem().respond(call)
+            val result = services.from({issueReportService}){
+                getIssueReportsByUserId(userId, limit, offset)
+            }
+            call.respondEither(
+                either = result,
+                transformError = { error -> error.toProblem() },
+                transformSuccess = { issues -> issues.map { IssueReportResponse.from(it) } }
+            )
+        }
+
         route("/{issueId}") {
             issueCrudRoutes(services)
         }

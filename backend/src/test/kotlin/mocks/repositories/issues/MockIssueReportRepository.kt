@@ -24,6 +24,12 @@ class MockIssueReportRepository : IssueReportRepositoryInterface {
             .take(limit)
     }
 
+    override fun getIssueReportsByUserId(userId: Int, limit: Int, offset: Int): List<IssueReport> {
+        return issueReports.filter { it.assignedTo?.user?.id == userId }
+            .drop(offset)
+            .take(limit)
+    }
+
     override fun createIssueReport(user: User, room: Room, description: String): IssueReport {
         val newIssueReport = IssueReport {
             this.room = room

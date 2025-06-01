@@ -7,9 +7,11 @@ const calendarScreen = ({ schedule }) => {
         console.log(schedule)
         const events = schedule.lectures
             .filter ((item: { weekDay: any; }) => item.weekDay === dayName)
-            .map((item: { startTime: any; endTime: any; type: any; room: any; }) => ({
+            .map((item: {
+                schoolClass: any; startTime: any; endTime: any; type: any; room: any;
+            }) => ({
                 time: `${item.startTime} ➜ ${item.endTime}`,
-                title: `${item.type}: ${item.room.name}`
+                title: `${item.schoolClass.subject.name} ( ${item.type} ), ${item.schoolClass.name}: ${item.room.name}`
             }));
         console.log(events)
         return events
