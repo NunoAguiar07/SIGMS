@@ -3,8 +3,9 @@ import axios from "axios";
 export const UniversitiesRequest = (searchQuery: string, setUniversities: any, setError: any) => {
     return async () => {
         try {
+            const apiUrl = process.env.EXPO_PUBLIC_API_URL
             const response = await axios.get(
-                `${process.env.EXPO_PUBLIC_API_URL}/universities?search=${encodeURIComponent(searchQuery)}`,
+                `${apiUrl}universities?search=${encodeURIComponent(searchQuery)}`,
                 {
                     headers: {
                         'Content-Type': 'application/json',

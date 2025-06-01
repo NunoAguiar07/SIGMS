@@ -14,7 +14,7 @@ const MicrosoftAuthButton = ({ request, promptAsync }) => {
                     disabled={!request}
                 >
                     <Image
-                        source={require('../assets/microsoft-logo.jpg')}
+                        source={require('../assets/microsoft_logo.jpg')}
                         style={{ width: 24, height: 24 }}
                         resizeMode="contain"
                     />

@@ -4,9 +4,10 @@ import {handleAxiosError} from "../../Utils/HandleAxiosError";
 
 export const LoginRequest = (email: string, password:string, deviceType:string, setError: any) => {
     return async () => {
+        const apiUrl = process.env.EXPO_PUBLIC_API_URL
         try {
             const response = await axios.post(
-                `${process.env.EXPO_PUBLIC_API_URL}/auth/login`,
+                `${apiUrl}/auth/login`,
                 {email, password},
                 {
                     headers: {

@@ -4,13 +4,11 @@ WORKDIR /app
 # Copy only the built artifact
 COPY  build/libs/SIGMS-all.jar ./SIGMS.jar
 
-COPY .env ./
-
 # Expose the port Ktor runs on
 EXPOSE 8080
 
 HEALTHCHECK --interval=30s --timeout=3s \
-  CMD curl -f http://localhost:8000/health || exit 1
+  CMD curl -f http://db:8000/health || exit 1
 
 # Start the application
 ENTRYPOINT ["java", "-jar", "SIGMS.jar"]

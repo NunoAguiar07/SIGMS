@@ -2,8 +2,9 @@ import axios from "axios";
 import {getDeviceType} from "../../Utils/DeviceType";
 import * as SecureStore from 'expo-secure-store';
 
+const apiUrl = process.env.EXPO_PUBLIC_API_URL
 const api = axios.create({
-    baseURL: process.env.EXPO_PUBLIC_API_URL,
+    baseURL: apiUrl,
     withCredentials: true,
 });
 

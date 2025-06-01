@@ -8,39 +8,50 @@
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/splash-icon.png",
+      "image": "./assets/splash_icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.toms223.frontendFinal",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/adaptive_icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": false
+      "edgeToEdgeEnabled": false,
+      "package": "com.toms223.frontendFinal"
     },
-    "scheme" : "frontendFinal",
+    "scheme": "frontendFinal",
     "web": {
       "favicon": "./assets/favicon.png",
       "bundler": "metro"
     },
     "plugins": [
       "expo-router",
-        [
-            "expo-asset",
-            {
-            "assets" : [
-                "./assets/icon.png",
-                "./assets/splash-icon.png",
-                "./assets/adaptive-icon.png",
-                "./assets/favicon.png",
-                "./assets/Logo.webp"
-            ]
-            }
-        ]
-    ]
+      [
+        "expo-asset",
+        {
+          "assets": [
+            "./assets/icon.png",
+            "./assets/splash_icon.png",
+            "./assets/adaptive_icon.png",
+            "./assets/favicon.png",
+            "./assets/Logo.webp"
+          ]
+        }
+      ]
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "5d959d54-1140-4d2d-a04c-7df400932c60"
+      }
+    }
   }
 }

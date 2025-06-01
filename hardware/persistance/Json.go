@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"hardware/packetsniffer"
+	"log"
 	"os"
 )
 
@@ -23,6 +24,7 @@ func (dev *Device) Save() error {
 	if err != nil {
 		return fmt.Errorf("failed to write file: %w", err)
 	}
+	log.Println("Saved device data")
 	return nil
 }
 
@@ -39,5 +41,6 @@ func Load() (*Device, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to unmarshal json: %w", err)
 	}
+	log.Println("Loaded device data")
 	return &device, nil
 }

@@ -34,9 +34,11 @@ fun main(args: Array<String>) {
 }
 
 fun Application.module() {
+    val frontEndUrl = System.getenv("FRONTEND_URL")
     install(CORS) {
         //allowSameOrigin
-        allowHost("localhost:8081", schemes = listOf("http")) // Expo front end
+        allowHost(frontEndUrl, schemes = listOf("http")) // Expo front end
+        allowHost("localhost:8081", schemes = listOf("http"))
         allowMethod(HttpMethod.Options)
         allowMethod(HttpMethod.Put)
         allowMethod(HttpMethod.Patch)
@@ -82,7 +84,7 @@ fun Application.module() {
     install(Authentication) {
         oauth("auth-microsoft") {
             client = applicationHttpClient
-            urlProvider = { "${System.getenv("FRONTEND_URL")}/auth/microsoft/callback" }
+            urlProvider = { "http://$frontEndUrl/auth/microsoft/callback" }
             providerLookup = {
                 OAuthServerSettings.OAuth2ServerSettings(
                     name = "microsoft",

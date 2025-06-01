@@ -42,7 +42,7 @@ export const ProfileScreen = ({profile} ) => {
                             source={
                                 typeof image === 'string' && image.length > 0
                                     ? image
-                                    : require('../assets/default-user-profile.png')
+                                    : require('../assets/default_user_profile.png')
                             }
                             style={profileStyles.image}
                             contentFit="cover" // optional
@@ -89,7 +89,7 @@ export const ProfileScreen = ({profile} ) => {
  *                         source={
  *                             image
  *                                 ? { uri: image }
- *                                 : require('../assets/default-user-profile.png')
+ *                                 : require('../assets/default_user_profile.png')
  *                         }
  *                         style={styles.image}
  *                     />

@@ -4,8 +4,9 @@ import * as SecureStore from 'expo-secure-store';
 
 export const authenticateWithBackend = async (accessToken: string) => {
     try {
+        const apiUrl = process.env.EXPO_PUBLIC_API_URL
         const response = await axios.post(
-            `${process.env.EXPO_PUBLIC_API_URL}/auth/microsoft`,
+            `${apiUrl}/auth/microsoft`,
             {},
             {
                 withCredentials: true,

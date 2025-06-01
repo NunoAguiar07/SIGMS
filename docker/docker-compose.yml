@@ -9,7 +9,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - ../db:/docker-entrypoint-initdb.d
+      - ../backend/db:/docker-entrypoint-initdb.d
     networks:
       - sigms-network
     healthcheck:
@@ -20,10 +20,10 @@ services:
 
   backend:
     build:
-      context: ..
-      dockerfile: ../backend/docker/Dockerfile
+      context: ../backend
+      dockerfile: ./docker/Dockerfile
     env_file:
-      - ..\.env
+      - ../backend/docker/.env
     container_name: backend
     ports:
       - "8080:8080"
@@ -32,6 +32,17 @@ services:
         condition: service_healthy
     networks:
       - sigms-network
+
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: ./docker/Dockerfile
+    ports:
+      - "80:80"
+    networks:
+      - sigms-network
+    depends_on:
+      - backend
 
   mailhog:
     image: mailhog/mailhog
