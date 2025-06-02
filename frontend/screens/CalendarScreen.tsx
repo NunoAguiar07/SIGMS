@@ -2,7 +2,7 @@ import {ScrollView, Text, View} from "react-native";
 import {styles} from "../css_styling/calendar/Props";
 
 // @ts-ignore
-const calendarScreen = ({ schedule }) => {
+const CalendarScreen = ({ schedule }) => {
     const getEventsForDay = (dayName:any) => {
         console.log(schedule)
         const events = schedule.lectures
@@ -69,4 +69,4 @@ const DaySection = ({ day, events }) => (
     </View>
 );
 
-export default calendarScreen;
+export default CalendarScreen;
