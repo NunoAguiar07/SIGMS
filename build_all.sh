@@ -40,11 +40,11 @@ fi
 # Build each component
 for dir in "${DIRS[@]}"; do
     echo "📦 Building $dir..."
-    if [ -x "$dir/build.bat" ]; then
-        (cd "$dir" && ./build.bat)
+    if [ -x "$dir/build.sh" ]; then
+        (cd "$dir" && ./build.sh)
         echo "✅ $dir built successfully."
     else
-        echo "❌ $dir/build.bat not found or not executable."
+        echo "❌ $dir/build.sh not found or not executable."
         exit 1
     fi
     echo ""
