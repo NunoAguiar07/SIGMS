@@ -13,8 +13,8 @@ export const assignedIssuesStyle = StyleSheet.create({
         flex: 4,
         padding: 8,
     },
-    actionsColumn: {paddingHorizontal: 32,
-
+    actionsColumn: {
+        paddingHorizontal: 32,
         flex: 4,
         minWidth: 100,
         flexDirection: 'row',

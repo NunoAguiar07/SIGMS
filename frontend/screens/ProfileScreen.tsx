@@ -1,53 +1,52 @@
-// @ts-ignore
 import {profileStyles} from "../css_styling/profile/RectangleProps";
 import {commonStyles} from "../css_styling/common/CommonProps";
-
-// @ts-ignore
+import {ProfileScreenType} from "./types/ProfileScreenType";
 import {Image} from "expo-image";
-import React, {useState} from "react";
+import {useState} from "react";
 import * as ImagePicker from "expo-image-picker";
 import {Text, TouchableOpacity, View} from "react-native";
 
-// @ts-ignore
-export const ProfileScreen = ({profile} ) => {
+
+export const ProfileScreen = ({ profile, onUpdateProfile }: ProfileScreenType) => {
     const [image, setImage] = useState(profile.image || null);
 
     const pickImage = async () => {
-        console.log('pickImage');
         const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
-
         if (!permissionResult.granted) {
             alert('Permission to access media library is required!');
             return;
         }
-
         const result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ['images'],
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
             allowsEditing: true,
             aspect: [1, 1],
             quality: 1,
         });
-        console.log(result);
-
         if (!result.canceled) {
-            setImage(result.assets[0].uri);
+            const newImage = result.assets[0].uri;
+            setImage(newImage);
+            try {
+                await onUpdateProfile({ image: newImage });
+            } catch (error) {
+                setImage(profile.image);
+            }
         }
     };
-    // @ts-ignore
+
     return (
         <View style={commonStyles.container}>
             <View style={commonStyles.card}>
-                    <TouchableOpacity onPress={pickImage} style={profileStyles.imageWrapper}>
-                        <Image
-                            source={
-                                typeof image === 'string' && image.length > 0
-                                    ? image
-                                    : require('../assets/default_user_profile.png')
-                            }
-                            style={profileStyles.image}
-                            contentFit="cover" // optional
-                        />
-                    </TouchableOpacity>
+                <TouchableOpacity onPress={pickImage} style={profileStyles.imageWrapper}>
+                    <Image
+                        source={
+                            typeof image === 'string' && image.length > 0
+                                ? { uri: image }
+                                : require('../assets/default_user_profile.png')
+                        }
+                        style={profileStyles.image}
+                        contentFit="cover"
+                    />
+                </TouchableOpacity>
 
                 <Text style={profileStyles.name}>{profile.name}</Text>
                 <Text style={profileStyles.info}>{profile.email}</Text>
@@ -55,7 +54,7 @@ export const ProfileScreen = ({profile} ) => {
             </View>
         </View>
     );
-}
+};
 
 /**
  * export const ProfileScreen = ({ profile }) => {

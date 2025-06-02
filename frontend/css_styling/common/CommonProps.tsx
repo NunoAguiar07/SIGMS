@@ -20,6 +20,16 @@ export const commonStyles = StyleSheet.create({
         alignItems: 'center',
         zIndex:3,
     },
+    containerRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        borderColor: '#651920',
+        alignItems: 'center',
+        borderWidth: 1,
+        borderRadius: 8,
+        paddingHorizontal: 12,
+        paddingVertical: 20,
+    },
     searchInput: {
         width: '100%',
         height: 50,
@@ -75,16 +85,24 @@ export const commonStyles = StyleSheet.create({
         borderRightWidth: 1,
         borderRightColor: '#651c24',
         alignItems: 'center',
+        justifyContent: 'center',
     },
     rightColumn: {
         flex: 1, // Takes 50% of width
         padding: 16,
+        justifyContent: 'center',
         alignItems: 'center',
     },
     centerContainer: {
         alignItems: 'center',
         justifyContent: 'center',
         flex: 1,
+    },
+    topMiddleContainer: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        flex: 3,
+        marginTop: 20,
     },
     logo: {
         width: 600,

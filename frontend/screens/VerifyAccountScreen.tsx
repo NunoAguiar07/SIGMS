@@ -1,9 +1,8 @@
 import {Text, TouchableOpacity, View} from "react-native";
 import {commonStyles} from "../css_styling/common/CommonProps";
+import {VerifyAccountScreenType} from "./types/VerifyAccountScreenType";
 
-
-// @ts-ignore
-export const VerifyAccountScreen = ({onNavigateToLogin, verificationSuccess}) => {
+export const VerifyAccountScreen = ({onNavigateToLogin, verificationSuccess}: VerifyAccountScreenType) => {
     return (
         <View style={commonStyles.container}>
             <View style={commonStyles.card}>

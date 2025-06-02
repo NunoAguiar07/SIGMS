@@ -1,19 +1,29 @@
 import axios from 'axios';
+import {ParsedError} from "../types/errors/ParseErrorTypes";
 
-export const handleAxiosError = (error: any, setError: (error: any) => void) => {
+
+export const handleAxiosError = (error: any): ParsedError => {
     if (axios.isAxiosError(error)) {
         if (error.response) {
-            const parsedError = {
+            return {
                 status: error.response.status,
                 message: error.response.data?.detail || 'Request failed',
             };
-            setError(parsedError);
         } else if (error.request) {
-            setError({ message: 'No response received from server' });
+            return {
+                status: 500,
+                message: 'No response received from server'
+            };
         } else {
-            setError({ message: error.message });
+            return {
+                status: 500,
+                message: error.message
+            };
         }
     } else {
-        setError({ message: 'An unexpected error occurred' });
+        return {
+            status: 500,
+            message: 'An unexpected error occurred'
+        };
     }
 };

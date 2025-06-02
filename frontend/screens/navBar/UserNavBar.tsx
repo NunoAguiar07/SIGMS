@@ -3,7 +3,7 @@ import {navBarStyles} from "../../css_styling/navBar/NavBarProps";
 import {Link} from "expo-router";
 import {Ionicons} from "@expo/vector-icons";
 import {useEffect, useState} from "react";
-import {NavInterface, UserRole} from "../../interfaces/NavInterface";
+import {NavInterface, UserRole} from "../../types/navBar/NavInterface";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {NAV_CONFIG} from "../../Utils/NavConfig";
 

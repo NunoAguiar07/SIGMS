@@ -38,7 +38,6 @@ class AuthService(
     private val emailService: EmailService,
     private val frontendUrl: String
 ) {
-
     private inline fun <T> runCatching(block: () -> Either<AuthError, T>): Either<AuthError, T> {
         return try {
             block()

@@ -45,7 +45,8 @@
             "./assets/Logo.webp"
           ]
         }
-      ]
+      ],
+      "expo-font"
     ],
     "extra": {
       "router": {},

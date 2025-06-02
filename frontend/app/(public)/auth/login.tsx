@@ -1,35 +1,21 @@
-import React, {useState} from 'react';
-import {LoginScreen} from '../../../screens/LoginScreen';
-import {LoginRequest} from '../../../requests/auth/LoginRequest';
-import {ErrorInterface} from '../../../interfaces/ErrorInterface';
-import {getDeviceType} from '../../../Utils/DeviceType';
-import {useRouter} from 'expo-router';
+import {LoginScreen} from '../../../screens/auth/LoginScreen';
 import ErrorHandler from "../error";
-import {fetchUserInfo} from "../../../requests/authorized/FetchUserInfoRequest";
+import LoadingPresentation from "../../../screens/auxScreens/LoadingScreen";
+import {useLogin} from "../../../hooks/useAuth";
 
 const Login = () => {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [error, setError] = useState<ErrorInterface | null>(null);
-    const deviceType = getDeviceType();
-    const router = useRouter();
+    const {
+        email,
+        setEmail,
+        password,
+        setPassword,
+        error,
+        loading,
+        handleLogin,
+        handleNavigateToRegister,
+    } = useLogin();
 
-    const handleNavigateToRegister = () => {
-        router.push('/auth/register');
-    };
-
-    const handleLogin = async () => {
-        console.log("ffh")
-        const login = LoginRequest(email, password, deviceType, setError);
-        const success = await login();
-        console.log("ffh")
-        if(success) {
-            console.log("ffh")
-            await fetchUserInfo(setError)
-            return router.push('/userHome');
-        }
-    };
-
+    if (loading) return <LoadingPresentation />;
     if (error) return <ErrorHandler errorStatus={error.status} errorMessage={error.message} />;
 
     return (

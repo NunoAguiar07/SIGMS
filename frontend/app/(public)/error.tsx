@@ -1,4 +1,4 @@
-import {ErrorScreen} from "../../screens/ErrorScreen";
+import {ErrorScreen} from "../../screens/auxScreens/ErrorScreen";
 import {goBack} from "expo-router/build/global-state/routing";
 
 

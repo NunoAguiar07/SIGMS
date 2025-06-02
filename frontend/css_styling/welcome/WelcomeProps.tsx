@@ -52,4 +52,41 @@ export const welcomeStyles = StyleSheet.create({
         fontWeight: '400',
         marginLeft: 10,
     },
+    modalOverlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 20,
+    },
+    modalContent: {
+        backgroundColor: 'white',
+        borderRadius: 8,
+        padding: 20,
+        width: '100%',
+        maxWidth: 400,
+    },
+    closeButton: {
+        alignSelf: 'flex-end',
+        paddingHorizontal: 6,
+        paddingVertical: 2,
+    },
+    closeButtonText: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        lineHeight: 24,
+    },
+    question: {
+        fontWeight: 'bold',
+        fontSize: 16,
+    },
+    answer: {
+        fontSize: 14,
+        marginTop: 4,
+    },
+    title: {
+        fontSize: 22,
+        fontWeight: 'bold',
+        marginBottom: 12,
+    },
 })

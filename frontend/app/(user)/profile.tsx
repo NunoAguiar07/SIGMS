@@ -1,27 +1,19 @@
-import {useEffect, useState} from "react";
-import {ErrorInterface} from "../../interfaces/ErrorInterface";
-import {GetProfile} from "../../requests/authorized/ProfilePage";
 import ErrorHandler from "../(public)/error";
-import LoadingPresentation from "../../screens/LoadingScreen";
+import LoadingPresentation from "../../screens/auxScreens/LoadingScreen";
 import {ProfileScreen} from "../../screens/ProfileScreen";
+import {useUpdateProfile} from "../../hooks/useUpdateProfile";
+import {useProfileData} from "../../hooks/useProfileData";
 
 
 const Profile = () => {
-    // @ts-ignore
-    const [profile, setProfile] = useState<IProfile | null>(null);
-    const [error, setError] = useState<ErrorInterface | null>(null);
+    const { profile, errorProfileData, loadingProfileData } = useProfileData();
+    const { updateProfile, errorUpdateProfile, loadingUpdateProfile } = useUpdateProfile();
 
-    useEffect(() => {
-        const fetchData = GetProfile(setProfile, setError);
-        fetchData();
-    }, []);
+    if (errorProfileData) return <ErrorHandler errorStatus={errorProfileData.status} errorMessage={errorProfileData.message} />;
+    if (errorUpdateProfile) return <ErrorHandler errorStatus={errorUpdateProfile.status} errorMessage={errorUpdateProfile.message} />;
+    if (loadingProfileData || !profile || loadingUpdateProfile) return <LoadingPresentation />;
 
-    // Handle errors
-    if (error) return <ErrorHandler errorStatus={error.status} errorMessage={error.message} />;
-
-    // Show loading while data is being fetched
-    if (!profile) return <LoadingPresentation />;
-    return <ProfileScreen profile ={profile}  />;
+    return <ProfileScreen profile={profile} onUpdateProfile={updateProfile} />;
 };
 
 export default Profile;
