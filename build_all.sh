@@ -27,17 +27,24 @@ check_command go
 echo "✅ Environment checks passed."
 echo ""
 
-# List of directories with build.sh
-DIRS=("backend" "frontend" "hardware")
+# Ask if the user wants to build the hardware component
+read -p "🛠️  Do you want to build the hardware component? (y/n): " build_hardware
+build_hardware=$(echo "$build_hardware" | tr '[:upper:]' '[:lower:]')  # Normalize input
+
+# Build order
+DIRS=("backend" "frontend")
+if [[ "$build_hardware" == "y" || "$build_hardware" == "yes" ]]; then
+    DIRS+=("hardware")
+fi
 
 # Build each component
 for dir in "${DIRS[@]}"; do
     echo "📦 Building $dir..."
-    if [ -x "$dir/build.sh" ]; then
-        (cd "$dir" && ./build.sh)
+    if [ -x "$dir/build.bat" ]; then
+        (cd "$dir" && ./build.bat)
         echo "✅ $dir built successfully."
     else
-        echo "❌ $dir/build.sh not found or not executable."
+        echo "❌ $dir/build.bat not found or not executable."
         exit 1
     fi
     echo ""
