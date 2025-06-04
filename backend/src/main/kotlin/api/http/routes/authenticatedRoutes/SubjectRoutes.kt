@@ -1,4 +1,4 @@
-package isel.leic.group25.api.http.routes.athenticatedRoutes
+package isel.leic.group25.api.http.routes.authenticatedRoutes
 
 import io.ktor.http.*
 import io.ktor.server.request.*
@@ -231,6 +231,7 @@ fun Route.classManagementRoutes(services: Services) {
  * Handles user enrollment in classes:
  * - Add user to class (teacher/student only)
  * - Remove user from class (teacher/student only)
+ * - get all user classes (teacher/student only)
  */
 fun Route.classUserRoutes(services: Services) {
     route("/users") {
@@ -269,6 +270,8 @@ fun Route.classUserRoutes(services: Services) {
                 }
             )
         }
+
+
     }
 }
 

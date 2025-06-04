@@ -13,6 +13,8 @@ const JoinSubject = () => {
         onSearchChange,
         onSubjectSelect,
         onJoinClass,
+        onLeaveClass,
+        userClasses
     } = useJoinSubject();
 
     if (error) return <ErrorHandler errorStatus={error.status} errorMessage={error.message} />;
@@ -26,7 +28,9 @@ const JoinSubject = () => {
             onSearchChange={onSearchChange}
             onSubjectSelect={onSubjectSelect}
             onJoinClass={onJoinClass}
+            onLeaveClass={onLeaveClass}
             loadingClasses={loadingClasses}
+            userClasses={userClasses}
         />
     );
 };

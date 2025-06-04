@@ -20,6 +20,16 @@ class MockClassRepository : ClassRepositoryInterface {
         return classes.filter { it.subject.id == subject.id }.drop(offset).take(limit)
     }
 
+    override fun findClassesByStudentId(userId: Int, limit: Int, offset: Int): List<Class> {
+        return studentsClasses.filter { it.student.user.id == userId }
+            .map { it.schoolClass }.drop(offset).take(limit)
+    }
+
+    override fun findClassesByTeacherId(userId: Int, limit: Int, offset: Int): List<Class> {
+        return teachersClasses.filter { it.teacher.user.id == userId }
+            .map { it.schoolClass }.drop(offset).take(limit)
+    }
+
     override fun addClass(name: String, subject: Subject): Class {
         val newClass = Class {
             this.name = name

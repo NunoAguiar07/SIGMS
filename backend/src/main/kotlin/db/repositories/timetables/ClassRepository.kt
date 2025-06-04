@@ -30,6 +30,16 @@ class ClassRepository(private val database: Database): ClassRepositoryInterface 
         return database.classes.filter { it.subject eq subject.id }.drop(offset).take(limit).toList()
     }
 
+    override fun findClassesByStudentId(userId: Int, limit:Int, offset:Int): List<Class> = withDatabase {
+        return database.studentsClasses.filter { it.studentId eq userId }
+            .map { it.schoolClass }.drop(offset).take(limit).toList()
+    }
+
+    override fun findClassesByTeacherId(userId: Int, limit:Int, offset:Int): List<Class> = withDatabase {
+        return database.teachersClasses.filter { it.teacherId eq userId }
+            .map { it.schoolClass }.drop(offset).take(limit).toList()
+    }
+
     override fun addClass(name: String, subject: Subject): Class = withDatabase {
         val newClass = Class {
             this.name = name

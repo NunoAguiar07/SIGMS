@@ -16,6 +16,10 @@ interface ClassRepositoryInterface {
 
     fun findClassesBySubject(subject: Subject, limit:Int, offset:Int): List<Class>
 
+    fun findClassesByStudentId(userId: Int, limit:Int, offset:Int): List<Class>
+
+    fun findClassesByTeacherId(userId: Int, limit:Int, offset:Int): List<Class>
+
     fun addClass(name: String, subject: Subject): Class
 
     fun updateClass(updatedClass: Class): Boolean

@@ -3,6 +3,9 @@ import {commonStyles} from "../../css_styling/common/CommonProps";
 import {joinClassStyles} from "../../css_styling/join_class/JoinClassProps";
 import {JoinSubjectScreenType} from "../types/JoinSubjectScreenType";
 
+
+
+
 export const JoinSubjectScreen = ({
                                       subjects,
                                       schoolClasses,
@@ -10,7 +13,9 @@ export const JoinSubjectScreen = ({
                                       searchQuery,
                                       onSearchChange,
                                       onSubjectSelect,
-                                      onJoinClass
+                                      onJoinClass,
+                                      onLeaveClass,
+                                      userClasses
 }: JoinSubjectScreenType) => {
     return (
         <View style={joinClassStyles.joinClassContainer}>
@@ -38,6 +43,24 @@ export const JoinSubjectScreen = ({
                 />
             </View>
             <View style={commonStyles.rightColumn}>
+                <View style={{ flex: 1, width: '100%' }}>
+                    <Text style={commonStyles.sectionTitle}>Your Classes</Text>
+                    {userClasses.length > 0 ? (
+                        userClasses.map((cls) => (
+                            <View key={cls.id} style={joinClassStyles.classItem}>
+                                <Text>{cls.subject.name} : {cls.name}</Text>
+                                <TouchableOpacity
+                                    style={joinClassStyles.joinClassButton}
+                                    onPress={() => onLeaveClass(cls.subject.id, cls.id)}
+                                >
+                                    <Text style={joinClassStyles.joinButtonText}>Leave</Text>
+                                </TouchableOpacity>
+                            </View>
+                        ))
+                    ) : (
+                        <Text style={commonStyles.emptyText}>You haven't joined any classes yet.</Text>
+                    )}
+                </View>
                 {selectedSubject && (
                     <View style={joinClassStyles.classesSection}>
                         <Text style={commonStyles.sectionTitle}>

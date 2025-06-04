@@ -1,4 +1,4 @@
-package isel.leic.group25.api.http.routes.athenticatedRoutes
+package isel.leic.group25.api.http.routes.authenticatedRoutes
 
 import api.model.response.ScheduleResponse
 import io.ktor.http.*
