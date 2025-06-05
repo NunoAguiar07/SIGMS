@@ -1,6 +1,6 @@
 import {commonStyles} from "../css_styling/common/CommonProps";
 import {styles} from "../css_styling/userHome/Props";
-import {HomeScreenType} from "./types/HomeScreenType";
+import {HomeScreenType} from "../types/HomeScreenType";
 import {Text, TouchableOpacity, View} from "react-native";
 
 export const HomeScreen = ({ onLogout }: HomeScreenType) => {

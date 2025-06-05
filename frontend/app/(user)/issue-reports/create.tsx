@@ -1,4 +1,4 @@
-import {CreateReportScreen} from "../../../screens/issues/CreateReportScreen";
+import {CreateReportScreen} from "../../../screens/mainScreens/CreateReportScreen";
 import ErrorHandler from "../../(public)/error";
 import {useCreateReport} from "../../../hooks/useCreateReport";
 

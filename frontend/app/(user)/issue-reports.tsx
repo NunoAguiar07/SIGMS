@@ -1,5 +1,5 @@
 import ErrorHandler from "../(public)/error";
-import TechnicianUnassignedIssuesScreen from "../../screens/issues/UnassignedIssuesScreen";
+import TechnicianUnassignedIssuesScreen from "../../screens/mainScreens/UnassignedIssuesScreen";
 import LoadingPresentation from "../../screens/auxScreens/LoadingScreen";
 import {useUnassignedIssues} from "../../hooks/useUnnasignedIssues";
 

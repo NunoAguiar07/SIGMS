@@ -1,4 +1,4 @@
-import {LoginScreen} from '../../../screens/auth/LoginScreen';
+import {LoginScreen} from '../../../screens/mainScreens/LoginScreen';
 import ErrorHandler from "../error";
 import LoadingPresentation from "../../../screens/auxScreens/LoadingScreen";
 import {useLogin} from "../../../hooks/useAuth";

@@ -1,5 +1,5 @@
 import ErrorHandler from "../../(public)/error";
-import {AssignedIssuesScreen} from "../../../screens/issues/AssignedIssuesScreen";
+import {AssignedIssuesScreen} from "../../../screens/mainScreens/AssignedIssuesScreen";
 import {useAssignedIssues} from "../../../hooks/useAssignedIssues";
 import LoadingPresentation from "../../../screens/auxScreens/LoadingScreen";
 

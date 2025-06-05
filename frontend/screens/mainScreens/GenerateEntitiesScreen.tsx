@@ -1,6 +1,6 @@
 import {TextInput, TouchableOpacity, View, Text, ActivityIndicator, FlatList} from "react-native";
-import {commonStyles} from "../../css_styling/common/CommonProps";
-import {generateEntitiesStyles} from "../../css_styling/generateEntities/GenerateEntitiesProps";
+import {commonStyles} from "../css_styling/common/CommonProps";
+import {generateEntitiesStyles} from "../css_styling/generateEntities/GenerateEntitiesProps";
 import {Picker} from "@react-native-picker/picker";
 import {EntityCreationScreenType, EntityType} from "../types/EntityCreationScreenType";
 import {Ionicons} from "@expo/vector-icons";
@@ -149,9 +149,9 @@ export const AdminEntityCreationScreen = ({
                                                     setFormValues({
                                                         ...formValues,
                                                         subjectId: item.id,
-                                                        schoolClassId: null // Reset class selection
+                                                        schoolClassId: null
                                                     });
-                                                    setSearchQuery(''); // Clear search query
+                                                    setSearchQuery('');
                                                 }}
                                             >
                                                 <Text style={generateEntitiesStyles.listItemText}>

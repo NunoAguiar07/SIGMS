@@ -1,6 +1,6 @@
 import api from "../interceptors/DeviceInterceptor";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import {handleAxiosError} from "../../Utils/HandleAxiosError";
+import {handleAxiosError} from "../../utils/HandleAxiosError";
 import {UserInfo} from "../../types/auth/authTypes";
 
 

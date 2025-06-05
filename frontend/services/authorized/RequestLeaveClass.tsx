@@ -1,5 +1,5 @@
 import api from "../interceptors/DeviceInterceptor";
-import {handleAxiosError} from "../../Utils/HandleAxiosError";
+import {handleAxiosError} from "../../utils/HandleAxiosError";
 
 export const leaveClass = async (subjectId: number, classId: number): Promise<boolean> => {
     try {
@@ -7,7 +7,7 @@ export const leaveClass = async (subjectId: number, classId: number): Promise<bo
             `/subjects/${encodeURIComponent(subjectId)}/classes/${encodeURIComponent(classId)}/users/remove`,
             { withCredentials: true }
         );
-        return response.status === 200;
+        return response.status === 204;
     } catch (error) {
         throw handleAxiosError(error);
     }

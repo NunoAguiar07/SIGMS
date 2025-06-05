@@ -1,7 +1,7 @@
 import axios from "axios";
 import {apiUrl} from "./fetchWelcome";
 import {UniversityInterface} from "../types/UniversityInterface";
-import {handleAxiosError} from "../Utils/HandleAxiosError";
+import {handleAxiosError} from "../utils/HandleAxiosError";
 
 export const fetchUniversities = async (searchQuery: string): Promise<UniversityInterface[]> => {
     try {

@@ -1,7 +1,7 @@
-import {clearMobileStorage, clearWebStorage} from "../Utils/ClearCredentials";
+import {clearMobileStorage, clearWebStorage} from "../utils/ClearCredentials";
 import {useEffect, useState} from "react";
 import {useLocalSearchParams, useRouter} from "expo-router";
-import {getDeviceType} from "../Utils/DeviceType";
+import {getDeviceType} from "../utils/DeviceType";
 import {ParsedError} from "../types/errors/ParseErrorTypes";
 import {requestLogin} from "../services/auth/requestLogin";
 import {useDebounce} from "use-debounce";
@@ -158,9 +158,7 @@ export const useRegister = () => {
         setPassword,
         role,
         handleRoleChange,
-        universityId,
         universities,
-        selectedUniversity,
         searchQuery,
         setSearchQuery,
         error,

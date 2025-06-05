@@ -1,20 +1,15 @@
 import {ScrollView, Text, View} from "react-native";
 import {styles} from "../css_styling/calendar/Props";
+import {CalendarScreenType} from "../types/CalendarScreenType";
+import {DayType} from "../types/components/DayType";
 
-// @ts-ignore
-const CalendarScreen = ({ schedule }) => {
-    const getEventsForDay = (dayName:any) => {
-        console.log(schedule)
-        const events = schedule.lectures
-            .filter ((item: { weekDay: any; }) => item.weekDay === dayName)
-            .map((item: {
-                schoolClass: any; startTime: any; endTime: any; type: any; room: any;
-            }) => ({
+const CalendarScreen = ({ schedule }: CalendarScreenType) => {
+    const getEventsForDay = (dayName:string) => {
+        return schedule.filter((item) => item.weekDay === dayName)
+            .map((item) => ({
                 time: `${item.startTime} ➜ ${item.endTime}`,
-                title: `${item.schoolClass.subject.name} ( ${item.type} ), ${item.schoolClass.name}: ${item.room.name}`
+                title: `${item.schoolClass.subject.name} (${item.type}), ${item.schoolClass.name}: ${item.room.name}`,
             }));
-        console.log(events)
-        return events
     };
 
 
@@ -34,26 +29,7 @@ const CalendarScreen = ({ schedule }) => {
     );
 };
 
-/*
-// @ts-ignore
-const DaySection = ({ day, date, events }) => (
-    <View style={styles.daySection}>
-        <Text style={styles.dayTitle}>{day}</Text>
-        <Text style={styles.daySubtitle}>{date}</Text>
-        {events.length > 0 && (
-            <View style={styles.eventBlock}>
-                {events.map((event:any, index:any) => (
-                    <View key={index} style={styles.eventItem}>
-                        <Text style={styles.eventTime}>{event.time}</Text>
-                        <Text style={styles.eventTitle}>{event.title}</Text>
-                    </View>
-                ))}
-            </View>
-        )}
-    </View>
-);*/
-// @ts-ignore
-const DaySection = ({ day, events }) => (
+const DaySection = ({ day, events } : DayType) => (
     <View style={styles.daySection}>
         <Text style={styles.dayTitle}>{day}</Text>
         {events.length > 0 && (

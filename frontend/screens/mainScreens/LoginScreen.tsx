@@ -1,8 +1,9 @@
 import {Text, TextInput, TouchableOpacity, View} from 'react-native';
-import {commonStyles} from '../../css_styling/common/CommonProps';
+import {commonStyles} from '../css_styling/common/CommonProps';
+import {LoginScreenType} from "../types/LoginScreenType";
 
-// @ts-ignore
-export const LoginScreen = ({ email, password, onEmailChange, onPasswordChange, onLogin, onNavigateToRegister }) => (
+
+export const LoginScreen = ({ email, password, onEmailChange, onPasswordChange, onLogin, onNavigateToRegister } : LoginScreenType) => (
     <View style={commonStyles.container}>
         <View style={commonStyles.card}>
             <Text style={commonStyles.title}>Login</Text>
@@ -25,19 +26,29 @@ export const LoginScreen = ({ email, password, onEmailChange, onPasswordChange, 
             />
 
             <View style={commonStyles.buttonsContainer}>
-                <TouchableOpacity
-                    style={commonStyles.loginRegisterButton}
-                    onPress={onLogin}
-                >
-                    <Text style={commonStyles.loginRegisterButtonText}>Login</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                    style={commonStyles.loginRegisterButton}
+                <AuthButton text="Login" onPress={onLogin} testID="login-button" />
+                <AuthButton
+                    text="Go to Register"
                     onPress={onNavigateToRegister}
-                >
-                    <Text style={commonStyles.loginRegisterButtonText}>Go to Register</Text>
-                </TouchableOpacity>
+                    testID="register-button"
+                />
             </View>
         </View>
     </View>
+);
+
+interface AuthButtonType {
+    text: string;
+    onPress: () => void;
+    testID?: string;
+}
+
+export const AuthButton = ({ text, onPress, testID }: AuthButtonType) => (
+    <TouchableOpacity
+        style={commonStyles.loginRegisterButton}
+        onPress={onPress}
+        testID={testID}
+    >
+        <Text style={commonStyles.loginRegisterButtonText}>{text}</Text>
+    </TouchableOpacity>
 );

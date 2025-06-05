@@ -1,6 +1,6 @@
 import {CalendarEvent} from "../../../types/calendar/CalendarEvent";
 
-export interface Day {
+export interface DayType {
     day: string;
     events: CalendarEvent[];
 }

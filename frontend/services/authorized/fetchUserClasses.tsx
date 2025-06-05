@@ -1,6 +1,6 @@
 import {SchoolClassInterface} from "../../types/SchoolClassInterface";
 import api from "../interceptors/DeviceInterceptor";
-import {handleAxiosError} from "../../Utils/HandleAxiosError";
+import {handleAxiosError} from "../../utils/HandleAxiosError";
 
 export const fetchUserClasses = async (
 ): Promise<SchoolClassInterface[]> => {

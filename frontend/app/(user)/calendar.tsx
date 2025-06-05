@@ -2,7 +2,7 @@ import React from "react";
 import ErrorHandler from "../(public)/error";
 import LoadingPresentation from "../../screens/auxScreens/LoadingScreen";
 import {useSchedule} from "../../hooks/useSchedule";
-import CalendarScreen from "../../screens/CalendarScreen";
+import CalendarScreen from "../../screens/mainScreens/CalendarScreen";
 
 const Calendar = () => {
     const { schedule, error, loading } = useSchedule();

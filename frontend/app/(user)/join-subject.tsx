@@ -1,6 +1,7 @@
 import ErrorHandler from "../(public)/error";
-import {JoinSubjectScreen} from "../../screens/subjects/JoinSubjectScreen";
+import {JoinSubjectScreen} from "../../screens/mainScreens/JoinSubjectScreen";
 import {useJoinSubject} from "../../hooks/useJoinSubject";
+import LoadingScreen from "../../screens/auxScreens/LoadingScreen";
 
 const JoinSubject = () => {
     const {
@@ -9,6 +10,7 @@ const JoinSubject = () => {
         selectedSubject,
         searchQuery,
         loadingClasses,
+        initialLoading,
         error,
         onSearchChange,
         onSubjectSelect,
@@ -18,6 +20,7 @@ const JoinSubject = () => {
     } = useJoinSubject();
 
     if (error) return <ErrorHandler errorStatus={error.status} errorMessage={error.message} />;
+    if (initialLoading) return <LoadingScreen/>;
 
     return (
         <JoinSubjectScreen

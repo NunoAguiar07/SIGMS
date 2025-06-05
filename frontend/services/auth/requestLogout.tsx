@@ -2,7 +2,7 @@ import {useRouter} from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {Alert} from "react-native";
 import * as SecureStore from 'expo-secure-store';
-import {getDeviceType} from "../../Utils/DeviceType";
+import {getDeviceType} from "../../utils/DeviceType";
 
 const router = useRouter();
 

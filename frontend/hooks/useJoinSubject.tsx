@@ -8,8 +8,6 @@ import {fetchSubjects} from "../services/authorized/fetchSubjects";
 import {fetchSubjectClasses} from "../services/authorized/fetchSubjectClasses";
 import {joinClass} from "../services/authorized/requestJoinClass";
 import {fetchUserClasses} from "../services/authorized/fetchUserClasses";
-import {fetchSchedule} from "../services/authorized/fetchSchedule";
-import {Schedule} from "../types/calendar/Schedule";
 import {leaveClass} from "../services/authorized/RequestLeaveClass";
 
 
@@ -22,6 +20,7 @@ export const useJoinSubject = () => {
     const [loadingClasses, setLoadingClasses] = useState<boolean>(false);
     const [error, setError] = useState<ParsedError | null>(null);
     const [userClasses, setUserClasses] = useState<SchoolClassInterface[]>([]);
+    const [initialLoading, setInitialLoading] = useState<boolean>(true);
 
     useEffect(() => {
         if (debouncedSearchQuery.trim().length > 0) {
@@ -35,23 +34,20 @@ export const useJoinSubject = () => {
         }
     }, [debouncedSearchQuery]);
 
-
-
     useEffect(() => {
-        const fetchJoinedClasses = async () => {
-            try {
-                const classes = await fetchUserClasses();
-                console.log("Fetched user classes:", classes);
-                setUserClasses(classes);
-            } catch (err) {
-                setError(err as ParsedError);
-            }
-        };
-        fetchJoinedClasses();
-    }, [userClasses]);
+        fetchAndUpdateUserClasses();
+    }, []);
 
-
-
+    const fetchAndUpdateUserClasses = async () => {
+        try {
+            setInitialLoading(true);
+            const updatedClasses = await fetchUserClasses();
+            setUserClasses(updatedClasses);
+            setInitialLoading(false);
+        } catch (err) {
+            setError(err as ParsedError);
+        }
+    };
 
     const onSubjectSelect = async (subject: SubjectInterface) => {
         setSelectedSubject(subject);
@@ -70,11 +66,10 @@ export const useJoinSubject = () => {
         try {
             const success = await joinClass(subjectId, classId);
             if (success) {
-                Alert.alert("Success", "You have joined the class successfully!");
                 setSelectedSubject(null);
                 setSchoolClasses([]);
-                const updatedClasses = await fetchUserClasses()
-                setUserClasses(updatedClasses);
+                await fetchAndUpdateUserClasses();
+                Alert.alert("Success", "You have joined the class successfully!");
             } else {
                 Alert.alert("Error", "Failed to join the class. Please try again.");
             }
@@ -88,9 +83,8 @@ export const useJoinSubject = () => {
          try {
             const success = await leaveClass(subjectId, classId)
             if (success) {
+                await fetchAndUpdateUserClasses();
                 Alert.alert("Success", "You have left the class successfully!")
-                const updatedClasses = await fetchUserClasses()
-                setUserClasses(updatedClasses);
             } else {
                 Alert.alert("Error", "Failed to leave the class. Please try again.")
             }
@@ -101,14 +95,13 @@ export const useJoinSubject = () => {
 
     }
 
-
-
     return {
         subjects,
         schoolClasses,
         selectedSubject,
         searchQuery,
         loadingClasses,
+        initialLoading,
         error,
         onSearchChange: setSearchQuery,
         onSubjectSelect,

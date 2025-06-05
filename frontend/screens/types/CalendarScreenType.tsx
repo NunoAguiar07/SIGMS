@@ -1,5 +1,4 @@
-import {Schedule} from "../../types/calendar/Schedule";
-
+import {Lecture} from "../../types/calendar/Lecture";
 export interface CalendarScreenType {
-    schedule: Schedule;
+    schedule: Lecture[]
 }

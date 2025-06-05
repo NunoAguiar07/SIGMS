@@ -1,5 +1,5 @@
 import {ActivityIndicator, View} from "react-native";
-import {commonStyles} from "../../css_styling/common/CommonProps";
+import {commonStyles} from "../css_styling/common/CommonProps";
 
 /**
  * Const "Loadingpresentation" representing the loading screen when we are loading something.

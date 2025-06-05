@@ -1,5 +1,5 @@
 import axios from "axios";
-import {handleAxiosError} from "../../Utils/HandleAxiosError";
+import {handleAxiosError} from "../../utils/HandleAxiosError";
 import {apiUrl} from "../fetchWelcome";
 
 

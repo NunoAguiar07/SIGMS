@@ -1,6 +1,6 @@
 import {ProfileInterface} from "../../types/ProfileInterface";
 import api from "../interceptors/DeviceInterceptor";
-import {handleAxiosError} from "../../Utils/HandleAxiosError";
+import {handleAxiosError} from "../../utils/HandleAxiosError";
 
 
 export const requestUpdateProfile = async (profileData: Partial<ProfileInterface>): Promise<ProfileInterface> => {

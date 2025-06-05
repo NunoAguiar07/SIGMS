@@ -1,19 +1,37 @@
 import ErrorHandler from "../(public)/error";
 import LoadingPresentation from "../../screens/auxScreens/LoadingScreen";
-import {ProfileScreen} from "../../screens/ProfileScreen";
-import {useUpdateProfile} from "../../hooks/useUpdateProfile";
-import {useProfileData} from "../../hooks/useProfileData";
+import {ProfileScreen} from "../../screens/mainScreens/ProfileScreen";
+import {useProfile} from "../../hooks/useProfile";
 
 
 const Profile = () => {
-    const { profile, errorProfileData, loadingProfileData } = useProfileData();
-    const { updateProfile, errorUpdateProfile, loadingUpdateProfile } = useUpdateProfile();
+    const {
+        profile,
+        image,
+        loading,
+        error,
+        updateLoading,
+        updateError,
+        pickImage,
+    } = useProfile();
 
-    if (errorProfileData) return <ErrorHandler errorStatus={errorProfileData.status} errorMessage={errorProfileData.message} />;
-    if (errorUpdateProfile) return <ErrorHandler errorStatus={errorUpdateProfile.status} errorMessage={errorUpdateProfile.message} />;
-    if (loadingProfileData || !profile || loadingUpdateProfile) return <LoadingPresentation />;
+    if (error) {
+        return <ErrorHandler errorStatus={error.status} errorMessage={error.message} />;
+    }
+    if(updateError) {
+        return <ErrorHandler errorStatus={updateError.status} errorMessage={updateError.message} />;
+    }
+    if (loading || !profile || updateLoading) {
+        return <LoadingPresentation />;
+    }
 
-    return <ProfileScreen profile={profile} onUpdateProfile={updateProfile} />;
+    return (
+        <ProfileScreen
+            profile={profile}
+            image={image}
+            onPickImage={pickImage}
+        />
+    );
 };
 
 export default Profile;

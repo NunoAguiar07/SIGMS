@@ -1,5 +1,5 @@
 import api from "../interceptors/DeviceInterceptor";
-import {handleAxiosError} from "../../Utils/HandleAxiosError";
+import {handleAxiosError} from "../../utils/HandleAxiosError";
 import {ProfileInterface} from "../../types/ProfileInterface";
 
 export const fetchProfile = async (): Promise<ProfileInterface> => {
