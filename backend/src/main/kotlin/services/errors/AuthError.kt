@@ -32,11 +32,11 @@ sealed class AuthError {
             )
             UserNotFound -> Problem.notFound(
                 title = "User not found",
-                detail = "The user with the given ID was not found."
+                detail = "The user was not found."
             )
             UniversityNotFound -> Problem.notFound(
                 title = "University not found",
-                detail = "The university with the given ID was not found."
+                detail = "The university was not found."
             )
             UserDeleteFailed -> Problem.internalServerError(
                 title = "User delete failed",

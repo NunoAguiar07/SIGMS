@@ -25,6 +25,11 @@ data class UserCredentialsRequest(
             return RequestError.Missing(missingFields)
         }
 
+        // Check email validity (only if email exists)
+        if (!isValidEmailFast(email)) {
+            return RequestError.Invalid("email")
+        }
+
         // Check password security (only if password exists)
         if (password.isNotBlank() && User.isNotSecurePassword(password)) {
             return RequestError.InsecurePassword
@@ -35,6 +40,19 @@ data class UserCredentialsRequest(
             return RequestError.Invalid("role")
         }
         return null
+    }
+
+    private fun isValidEmailFast(email: String): Boolean {
+        if (email.isBlank()) return false
+
+        // Check for exactly one '@' and at least one '.' after it
+        val atIndex = email.indexOf('@')
+        if (atIndex <= 0 || atIndex != email.lastIndexOf('@')) return false
+
+        val dotIndex = email.lastIndexOf('.')
+        if (dotIndex <= atIndex + 1 || dotIndex == email.length - 1) return false
+
+        return true
     }
 }
 
