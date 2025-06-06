@@ -2,7 +2,7 @@ import {useStudyRooms} from "../../hooks/useStudyRooms";
 import LoadingPresentation from "../../screens/auxScreens/LoadingScreen";
 import ErrorHandler from "../(public)/error";
 import React from "react";
-import StudyRoomScreen from "../../screens/StudyRoomScreen";
+import StudyRoomScreen from "../../screens/mainScreens/StudyRoomScreen";
 
 const StudyRooms = () => {
     const { studyRooms, setUpdate, error, loading } = useStudyRooms();
