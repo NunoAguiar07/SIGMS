@@ -1,4 +1,4 @@
-package isel.leic.group25.websockets.hardware.exceptions
+package isel.leic.group25.websockets.exceptions
 
 import java.lang.Exception
 

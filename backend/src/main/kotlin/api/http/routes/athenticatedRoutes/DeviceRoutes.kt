@@ -14,15 +14,14 @@ import isel.leic.group25.api.model.response.StudyRoomCapacity.Companion.toStudyR
 import isel.leic.group25.db.entities.types.Role
 import isel.leic.group25.services.Services
 import isel.leic.group25.utils.Either
-import isel.leic.group25.websockets.hardware.event.Room
-import isel.leic.group25.websockets.hardware.route.DeviceRoute
+import isel.leic.group25.websockets.hardware.route.Devices
 
 fun Route.devicesRoutes(services: Services) {
     route("/devices") {
         retrieveCapacity(services)
         forceCapacityUpdate()
         withRoles(setOf(Role.ADMIN, Role.TECHNICAL_SERVICE)){
-            retrieveDevicesWithoutRoom(services)
+            retrieveDevicesWithoutRoom()
             addRoomToDevice(services)
         }
     }
@@ -32,7 +31,7 @@ fun Route.retrieveCapacity(services: Services) {
     get {
         val universityId = call.getUniversityIdFromPrincipal()
             ?: return@get call.respond(HttpStatusCode.Unauthorized)
-        val roomToDevice = DeviceRoute.deviceList.filter { it.roomId != 0 }.associateBy { it.roomId }
+        val roomToDevice = Devices.deviceList.filter { it.roomId != 0 }.associateBy { it.roomId }
         val result = services.from({roomService}){
             getUniversityListOfRoomsByIds(universityId, roomToDevice.keys.toList())
         }
@@ -49,16 +48,16 @@ fun Route.retrieveCapacity(services: Services) {
     }
 }
 
-fun Route.retrieveDevicesWithoutRoom(services: Services){
+fun Route.retrieveDevicesWithoutRoom(){
     get("/unregistered") {
-        val devices = DeviceRoute.deviceList.filter { it.roomId == 0 }.map { it.toStudyRoomCapacity("")}
+        val devices = Devices.deviceList.filter { it.roomId == 0 }.map { it.toStudyRoomCapacity("")}
         call.respond(HttpStatusCode.OK, mapOf("data" to devices))
     }
 }
 
 fun Route.forceCapacityUpdate(){
     put("/update") {
-        DeviceRoute.updateRoomCapacities()
+        Devices.updateRoomCapacities()
         call.respond(HttpStatusCode.NoContent)
     }
 }
@@ -81,7 +80,7 @@ fun Route.addRoomToDevice(services: Services){
                 if(room.university.id != universityId){
                     RequestError.Invalid("roomId").toProblem().respond(call)
                 }
-                DeviceRoute.setDeviceRoom(deviceId, roomId, capacity)
+                Devices.setDeviceRoom(deviceId, roomId, capacity)
                 call.respond(HttpStatusCode.NoContent)
             }
         }

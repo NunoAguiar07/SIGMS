@@ -10,6 +10,7 @@ export const NAV_CONFIG: RoleNavConfig = {
         { href: '/notifications', iconName: 'notifications-outline', label: 'Notifications' },
         { href: '/issue-reports/create', iconName: 'school-outline', label: 'Classrooms' },
         { href: '/profile', iconName: 'person-outline', label: 'Profile' },
+        { href: '/study-rooms', iconName: 'book-outline', label: 'Study Rooms' },
     ],
     TEACHER: [
         { href: '/home', iconName: 'home-outline', label: 'Home' },

@@ -5,16 +5,16 @@ import io.ktor.server.websocket.*
 import io.ktor.websocket.*
 import isel.leic.group25.websockets.WebsocketRoute
 import isel.leic.group25.websockets.hardware.event.*
-import isel.leic.group25.websockets.hardware.exceptions.UnexpectedEventException
+import isel.leic.group25.websockets.exceptions.UnexpectedEventException
 import isel.leic.group25.websockets.hardware.model.Device
 import kotlinx.serialization.json.Json
 
-object DeviceRoute: WebsocketRoute {
+object Devices: WebsocketRoute {
     val deviceList: MutableList<Device> = mutableListOf()
     private val deviceConnectionMap: MutableMap<String, DefaultWebSocketServerSession> = mutableMapOf()
 
     override fun Route.install(){
-        webSocket("/ws") {
+        webSocket("/hardware") {
             try {
                 for (frame in incoming) {
                     if (frame is Frame.Text) {
@@ -22,7 +22,7 @@ object DeviceRoute: WebsocketRoute {
                         handleEvent(event.data, this)
                     }
                 }
-            } catch (e: UnexpectedEventException){
+            } catch (e: Exception){
                 println(e)
             }
             finally {
@@ -39,7 +39,7 @@ object DeviceRoute: WebsocketRoute {
         when(event){
             is Hello -> {
                 val device = if(event.roomId != null)
-                    Device(event.id, event.roomId.toInt())
+                    Device(event.id, event.roomId)
                 else
                     Device(event.id)
                 if(deviceList.none { it.id == device.id }){
