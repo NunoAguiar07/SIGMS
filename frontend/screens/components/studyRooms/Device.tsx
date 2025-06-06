@@ -1,6 +1,6 @@
 import {StudyRoomCapacity} from "../../../types/StudyRoomCapacity";
 import {Text, View} from "react-native";
-import {commonStyles} from "../../../css_styling/common/CommonProps";
+import {commonStyles} from "../../css_styling/common/CommonProps";
 
 const Device = ({studyRoom}: {studyRoom: StudyRoomCapacity}) => {
     return (<View style={commonStyles.container}>
