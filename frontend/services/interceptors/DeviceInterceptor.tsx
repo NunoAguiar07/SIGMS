@@ -1,5 +1,5 @@
 import axios from "axios";
-import {getDeviceType} from "../../Utils/DeviceType";
+import {getDeviceType} from "../../utils/DeviceType";
 import * as SecureStore from 'expo-secure-store';
 import {apiUrl} from "../fetchWelcome";
 

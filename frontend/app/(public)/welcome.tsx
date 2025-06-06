@@ -1,4 +1,4 @@
-import {WelcomeScreen} from "../../screens/WelcomeScreen";
+import {WelcomeScreen} from "../../screens/mainScreens/WelcomeScreen";
 import ErrorHandler from "./error";
 import LoadingPresentation from "../../screens/auxScreens/LoadingScreen";
 import * as WebBrowser from 'expo-web-browser';

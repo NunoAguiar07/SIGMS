@@ -1,4 +1,4 @@
-import {AdminEntityCreationScreen} from "../../screens/admin/GenerateEntitiesScreen";
+import {AdminEntityCreationScreen} from "../../screens/mainScreens/GenerateEntitiesScreen";
 import ErrorHandler from "../(public)/error";
 import {useAdminEntityCreation} from "../../hooks/useAdminEntityCreation";
 

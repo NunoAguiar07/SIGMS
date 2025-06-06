@@ -1,7 +1,7 @@
-import {navBarStyles} from "../../css_styling/navBar/NavBarProps";
+import {navBarStyles} from "../../screens/css_styling/navBar/NavBarProps";
 import {View} from "react-native";
 import {Stack} from "expo-router";
-import {UserNavBar} from "../../screens/navBar/UserNavBar";
+import {UserNavBar} from "../../screens/components/navBar/UserNavBar";
 
 
 export default function UserLayout() {

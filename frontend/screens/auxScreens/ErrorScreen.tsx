@@ -1,5 +1,6 @@
 import {Text, TouchableOpacity, View} from "react-native";
-import {commonStyles} from "../../css_styling/common/CommonProps";
+import {commonStyles} from "../css_styling/common/CommonProps";
+import {ErrorScreenType} from "../types/ErrorScreenType";
 
 
 /**
@@ -9,8 +10,7 @@ import {commonStyles} from "../../css_styling/common/CommonProps";
  * @param goBack represent the button/function to do when we want to go back before the error.
  * @return the error page.
  */
-// @ts-ignore
-export const ErrorScreen = ({ errorStatus, errorMessage, goBack }) => {
+export const ErrorScreen = ({ errorStatus, errorMessage, goBack } : ErrorScreenType) => {
     return (
         <View style={commonStyles.container}>
             <View style={commonStyles.card}>

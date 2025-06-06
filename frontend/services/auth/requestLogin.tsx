@@ -1,6 +1,6 @@
 import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
-import {handleAxiosError} from "../../Utils/HandleAxiosError";
+import {handleAxiosError} from "../../utils/HandleAxiosError";
 import {apiUrl} from "../fetchWelcome";
 import {ParsedError} from "../../types/errors/ParseErrorTypes";
 

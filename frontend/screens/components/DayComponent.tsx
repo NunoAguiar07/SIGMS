@@ -1,8 +1,8 @@
-import {Day} from "../types/components/Day";
+import {DayType} from "../types/components/DayType";
 import {View, Text} from "react-native";
-import {styles} from "../../css_styling/calendar/Props";
+import {styles} from "../css_styling/calendar/Props";
 
-export const DayComponent = ({ day, events }: Day) => (
+export const DayComponent = ({ day, events }: DayType) => (
     <View style={styles.daySection}>
         <Text style={styles.dayTitle}>{day}</Text>
         {events.length > 0 && (

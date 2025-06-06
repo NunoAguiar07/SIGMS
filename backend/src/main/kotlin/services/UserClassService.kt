@@ -18,6 +18,8 @@ typealias UserClassDeleted = Either<UserClassError, Boolean>
 
 typealias UserLectureListResult = Either<UserClassError, List<Lecture>>
 
+typealias UserClassListResult = Either<UserClassError, List<Class>>
+
 class UserClassService(
     private val repositories: Repositories,
     private val transactionable: Transactionable
@@ -27,6 +29,29 @@ class UserClassService(
             block()
         } catch (e: SQLException) {
             failure(UserClassError.ConnectionDbError(e.message))
+        }
+    }
+
+    fun getUserClasses(userId: Int, role: Role, limit: Int, offset: Int): UserClassListResult {
+        return runCatching {
+            transactionable.useTransaction {
+                val user = repositories.from({userRepository}){ findById(userId) }
+                    ?: return@useTransaction failure(UserClassError.UserNotFound)
+
+                return@useTransaction when (role) {
+                    Role.STUDENT -> {
+                        success(repositories.from({classRepository}){
+                            findClassesByStudentId(user.id, limit, offset)
+                        })
+                    }
+                    Role.TEACHER -> {
+                        success(repositories.from({classRepository}){
+                            findClassesByTeacherId(user.id, limit, offset)
+                        })
+                    }
+                    else -> failure(UserClassError.InvalidRole)
+                }
+            }
         }
     }
 

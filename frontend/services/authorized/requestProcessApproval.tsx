@@ -1,5 +1,5 @@
 import api from "../interceptors/DeviceInterceptor";
-import {handleAxiosError} from "../../Utils/HandleAxiosError";
+import {handleAxiosError} from "../../utils/HandleAxiosError";
 
 
 export const requestProcessApproval = async (token: string, approve: boolean): Promise<boolean> => {

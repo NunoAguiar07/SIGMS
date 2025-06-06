@@ -1,4 +1,4 @@
-import {AccessRolesScreen} from "../../screens/admin/AccessRolesScreen";
+import {AccessRolesScreen} from "../../screens/mainScreens/AccessRolesScreen";
 import ErrorHandler from "../(public)/error";
 import LoadingPresentation from "../../screens/auxScreens/LoadingScreen";
 import {useAccessRoles} from "../../hooks/useAccessRoles";

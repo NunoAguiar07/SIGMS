@@ -7,6 +7,8 @@ import {Alert} from "react-native";
 import {fetchSubjects} from "../services/authorized/fetchSubjects";
 import {fetchSubjectClasses} from "../services/authorized/fetchSubjectClasses";
 import {joinClass} from "../services/authorized/requestJoinClass";
+import {fetchUserClasses} from "../services/authorized/fetchUserClasses";
+import {leaveClass} from "../services/authorized/RequestLeaveClass";
 
 
 export const useJoinSubject = () => {
@@ -17,6 +19,8 @@ export const useJoinSubject = () => {
     const [debouncedSearchQuery] = useDebounce(searchQuery, 500);
     const [loadingClasses, setLoadingClasses] = useState<boolean>(false);
     const [error, setError] = useState<ParsedError | null>(null);
+    const [userClasses, setUserClasses] = useState<SchoolClassInterface[]>([]);
+    const [initialLoading, setInitialLoading] = useState<boolean>(true);
 
     useEffect(() => {
         if (debouncedSearchQuery.trim().length > 0) {
@@ -29,6 +33,21 @@ export const useJoinSubject = () => {
             setSchoolClasses([]);
         }
     }, [debouncedSearchQuery]);
+
+    useEffect(() => {
+        fetchAndUpdateUserClasses();
+    }, []);
+
+    const fetchAndUpdateUserClasses = async () => {
+        try {
+            setInitialLoading(true);
+            const updatedClasses = await fetchUserClasses();
+            setUserClasses(updatedClasses);
+            setInitialLoading(false);
+        } catch (err) {
+            setError(err as ParsedError);
+        }
+    };
 
     const onSubjectSelect = async (subject: SubjectInterface) => {
         setSelectedSubject(subject);
@@ -47,9 +66,10 @@ export const useJoinSubject = () => {
         try {
             const success = await joinClass(subjectId, classId);
             if (success) {
-                Alert.alert("Success", "You have joined the class successfully!");
                 setSelectedSubject(null);
                 setSchoolClasses([]);
+                await fetchAndUpdateUserClasses();
+                Alert.alert("Success", "You have joined the class successfully!");
             } else {
                 Alert.alert("Error", "Failed to join the class. Please try again.");
             }
@@ -59,15 +79,34 @@ export const useJoinSubject = () => {
         }
     };
 
+    const onLeaveClass = async (subjectId: number, classId: number) =>  {
+         try {
+            const success = await leaveClass(subjectId, classId)
+            if (success) {
+                await fetchAndUpdateUserClasses();
+                Alert.alert("Success", "You have left the class successfully!")
+            } else {
+                Alert.alert("Error", "Failed to leave the class. Please try again.")
+            }
+         } catch (err) {
+            setError(err as ParsedError);
+            Alert.alert("Error", "Something went wrong while leaving the class.");
+         }
+
+    }
+
     return {
         subjects,
         schoolClasses,
         selectedSubject,
         searchQuery,
         loadingClasses,
+        initialLoading,
         error,
         onSearchChange: setSearchQuery,
         onSubjectSelect,
         onJoinClass,
+        onLeaveClass,
+        userClasses,
     };
 };

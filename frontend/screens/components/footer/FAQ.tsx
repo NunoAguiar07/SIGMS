@@ -1,8 +1,9 @@
 import React from "react";
 import {Modal, TouchableOpacity, View, Text} from "react-native";
-import {welcomeStyles} from "../../../css_styling/welcome/WelcomeProps";
+import {welcomeStyles} from "../../css_styling/welcome/WelcomeProps";
+import {FooterType} from "../../types/FooterType";
 
-export const FAQ = ({ onClose }) => (
+export const FAQ = ({ onClose } :FooterType) => (
     <Modal visible={true} animationType="fade" transparent={true} onRequestClose={onClose}>
         <View style={welcomeStyles.modalOverlay}>
             <View style={welcomeStyles.modalContent}>

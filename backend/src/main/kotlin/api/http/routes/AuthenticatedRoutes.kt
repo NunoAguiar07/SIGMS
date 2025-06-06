@@ -2,7 +2,7 @@ package isel.leic.group25.api.http.routes
 
 import io.ktor.server.auth.*
 import io.ktor.server.routing.*
-import isel.leic.group25.api.http.routes.athenticatedRoutes.*
+import isel.leic.group25.api.http.routes.authenticatedRoutes.*
 import isel.leic.group25.api.http.utils.withRoles
 import isel.leic.group25.db.entities.types.Role
 import isel.leic.group25.services.Services
@@ -25,7 +25,7 @@ fun Route.authenticatedRoutes(
     services: Services
 ) {
     authenticate("auth-jwt") {
-        userInfoRoutes()
+        userInfoRoutes(services)
         issueReportRoutes(services)
         assessRoleRoutes(services)
         profileRoutes(services)

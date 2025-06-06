@@ -1,5 +1,5 @@
 import React from 'react'
-import {HomeScreen} from "../../screens/HomeScreen";
+import {HomeScreen} from "../../screens/mainScreens/HomeScreen";
 import LoadingPresentation from "../../screens/auxScreens/LoadingScreen";
 import ErrorHandler from "../(public)/error";
 import {useLogout} from "../../hooks/useAuth";

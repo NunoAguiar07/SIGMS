@@ -10,5 +10,7 @@ export interface JoinSubjectScreenType {
     onSearchChange: (text: string) => void;
     onSubjectSelect: (subject: SubjectInterface) => void;
     onJoinClass: (subjectId: number, classId: number) => void;
+    onLeaveClass: (subjectId:number, classId: number) => void;
     loadingClasses: boolean;
+    userClasses: SchoolClassInterface[];
 }

@@ -5,11 +5,11 @@ export type LectureType = 'PRACTICAL' | 'THEORETICAL' | 'THEORETICAL_PRACTICAL';
 
 export interface FormCreateEntityValues {
     name?: string;
-    subjectId?: number;
-    capacity?: number;
+    subjectId?: number | null;
+    capacity?: number | null;
     roomType?: RoomType;
     lectureType?: LectureType;
-    schoolClassId?: number;
+    schoolClassId?: number | null;
     roomId?: number;
     weekDay?: number;
     startTime?: string;

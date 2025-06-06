@@ -1,5 +1,6 @@
 import {ErrorScreen} from "../../screens/auxScreens/ErrorScreen";
 import {goBack} from "expo-router/build/global-state/routing";
+import {ErrorHandlerType} from "../../screens/types/ErrorScreenType";
 
 
 /**
@@ -7,8 +8,7 @@ import {goBack} from "expo-router/build/global-state/routing";
  * @param errorStatus represents the code of the error that happened.
  * @param errorMessage represents the message of the error.
  */
-// @ts-ignore
-const ErrorHandler = ({errorStatus, errorMessage}) => {
+const ErrorHandler = ({errorStatus, errorMessage} : ErrorHandlerType) => {
     return <ErrorScreen
         errorStatus={errorStatus}
         errorMessage={errorMessage.split('-').join(' ')}

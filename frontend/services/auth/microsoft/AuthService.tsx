@@ -2,10 +2,10 @@ import * as AuthSession from 'expo-auth-session';
 import {AuthConfig, BackendAuthResponse} from "../../../types/auth/microsoft/authMicrosoftTypes";
 import axios from "axios";
 import {apiUrl} from "../../fetchWelcome";
-import {getDeviceType} from "../../../Utils/DeviceType";
+import {getDeviceType} from "../../../utils/DeviceType";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as SecureStore from 'expo-secure-store';
-import {handleAxiosError} from "../../../Utils/HandleAxiosError";
+import {handleAxiosError} from "../../../utils/HandleAxiosError";
 
 const discovery = {
     authorizationEndpoint: 'https://login.microsoftonline.com/common/oauth2/v2.0/authorize',

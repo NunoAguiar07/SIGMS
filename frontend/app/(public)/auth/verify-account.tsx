@@ -1,5 +1,5 @@
 import ErrorHandler from "../error";
-import {VerifyAccountScreen} from "../../../screens/VerifyAccountScreen";
+import {VerifyAccountScreen} from "../../../screens/mainScreens/VerifyAccountScreen";
 import LoadingPresentation from "../../../screens/auxScreens/LoadingScreen";
 import {useVerifyAccount} from "../../../hooks/useAuth";
 

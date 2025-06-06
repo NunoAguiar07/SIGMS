@@ -1,5 +1,5 @@
 import api from "../interceptors/DeviceInterceptor";
-import {handleAxiosError} from "../../Utils/HandleAxiosError";
+import {handleAxiosError} from "../../utils/HandleAxiosError";
 
 
 export const joinClass = async (subjectId: number, classId: number): Promise<boolean> => {
@@ -9,7 +9,7 @@ export const joinClass = async (subjectId: number, classId: number): Promise<boo
             {},
             { withCredentials: true }
         );
-        return response.status === 200;
+        return response.status === 204;
     } catch (error) {
         throw handleAxiosError(error);
     }

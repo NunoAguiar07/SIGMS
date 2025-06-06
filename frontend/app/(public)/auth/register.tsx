@@ -1,4 +1,4 @@
-import {RegisterScreen} from '../../../screens/auth/RegisterScreen';
+import {RegisterScreen} from '../../../screens/mainScreens/RegisterScreen';
 import ErrorHandler from "../error";
 import {useRegister} from "../../../hooks/useAuth";
 import LoadingPresentation from "../../../screens/auxScreens/LoadingScreen";
@@ -13,9 +13,7 @@ const Register = () => {
         setPassword,
         role,
         handleRoleChange,
-        universityId,
         universities,
-        selectedUniversity,
         searchQuery,
         setSearchQuery,
         error,
@@ -34,9 +32,7 @@ const Register = () => {
             username={username}
             password={password}
             role={role}
-            universityId={universityId}
             universities={universities}
-            selectedUniversity={selectedUniversity}
             searchQuery={searchQuery}
             onEmailChange={setEmail}
             onUsernameChange={setUsername}

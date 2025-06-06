@@ -6,9 +6,7 @@ export interface RegisterScreenType {
     username: string;
     password: string;
     role: string;
-    universityId: number;
     universities: UniversityInterface[];
-    selectedUniversity: UniversityInterface | null;
     searchQuery: string;
     onEmailChange: (text: string) => void;
     onUsernameChange: (text: string) => void;

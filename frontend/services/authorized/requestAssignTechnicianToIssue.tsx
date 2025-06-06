@@ -1,5 +1,5 @@
 import api from "../interceptors/DeviceInterceptor";
-import {handleAxiosError} from "../../Utils/HandleAxiosError";
+import {handleAxiosError} from "../../utils/HandleAxiosError";
 
 export const requestAssignTechnicianToIssue = async (issueId: number): Promise<boolean> => {
     try {

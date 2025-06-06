@@ -1,4 +1,4 @@
-import {handleAxiosError} from "../../Utils/HandleAxiosError";
+import {handleAxiosError} from "../../utils/HandleAxiosError";
 import api from "../interceptors/DeviceInterceptor";
 
 export const CreateIssueReportRequest = async (
