@@ -13,6 +13,7 @@ import isel.leic.group25.utils.failure
 import isel.leic.group25.utils.hoursAndMinutesToDuration
 import isel.leic.group25.utils.success
 import java.sql.SQLException
+import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 
@@ -162,9 +163,12 @@ class LectureService(
             transactionable.useTransaction(IsolationLevel.SERIALIZABLE) {
                 val lecture = repositories.from({lectureRepository}){getLectureById(lectureId)}
                         ?: return@useTransaction failure(LectureError.LectureNotFound)
-                val newParsedStartTime = newStartTime?.hoursAndMinutesToDuration() ?: lecture.startTime
+                val currentDate = Clock.System.now()
+                val newParsedStartTime = newStartTime?.hoursAndMinutesToDuration()?.takeIf {
+                    it.inWholeSeconds >= currentDate.epochSeconds
+                } ?: lecture.startTime
                 val newParsedEndTime = newEndTime?.hoursAndMinutesToDuration() ?: lecture.endTime
-                if (newParsedStartTime >= newParsedEndTime) {
+                if (newParsedStartTime >= newParsedEndTime || newParsedEndTime.inWholeSeconds < currentDate.epochSeconds) {
                     return@useTransaction failure(LectureError.InvalidLectureDate)
                 }
                 val newClassroom = repositories.from({roomRepository}){

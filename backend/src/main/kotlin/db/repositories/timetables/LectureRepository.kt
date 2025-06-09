@@ -134,7 +134,7 @@ class LectureRepository(private val database: Database) : LectureRepositoryInter
         return when {
             isPermanentChange(effectiveFrom, effectiveUntil) ->
                 applyPermanentChange(lecture, newClassroom, newType, newWeekDay, newStartTime, newEndTime)
-            isImmediateChange(effectiveFrom) ->
+            isImmediateChange(effectiveUntil) ->
                 applyImmediateChange(lecture, newClassroom, newType, newWeekDay, newStartTime, newEndTime, effectiveUntil)
             else ->{
                 lecture.apply {

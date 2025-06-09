@@ -1,5 +1,8 @@
 services:
   db:
+    build:
+      context: ../backend
+      dockerfile: ./db/Dockerfile
     image: postgres:latest
     container_name: db
     environment:
