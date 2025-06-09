@@ -8,6 +8,7 @@ sealed class LectureError {
     data object InvalidLectureSubject : LectureError()
     data object InvalidLectureRoom : LectureError()
     data object InvalidLectureDate : LectureError()
+    data object InvalidLectureUntilDate: LectureError()
     data object LectureNotFound : LectureError()
     data object LectureTimeConflict : LectureError()
     data class ConnectionDbError(val message: String?) : LectureError()
@@ -33,6 +34,10 @@ sealed class LectureError {
             InvalidLectureDate -> Problem.badRequest(
                 title = "Invalid lecture date",
                 detail = "The provided lecture date is invalid."
+            )
+            InvalidLectureUntilDate -> Problem.badRequest(
+                title = "Invalid lecture until date",
+                detail = "The provided lecture until date is invalid."
             )
             LectureNotFound -> Problem.notFound(
                 title = "Lecture not found",

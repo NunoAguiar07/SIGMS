@@ -10,6 +10,7 @@ import mocks.repositories.MockRepositories
 import mocks.services.MockEmailService
 import org.ktorm.database.Database
 import kotlin.test.*
+import kotlin.time.Clock
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.ExperimentalTime
 
@@ -456,64 +457,7 @@ class LectureServiceTest {
 
     @OptIn(ExperimentalTime::class)
     @Test
-    fun `updateLecture should update lecture permanently when numberOfWeeks is 0`() {
-        // Setup test data
-        val university = mockRepositories.from({universityRepository}){
-            createUniversity("Test University")
-        }
-        val subject = mockRepositories.from({subjectRepository}){
-            createSubject("Math", university)
-        }
-        val schoolClass = mockRepositories.from({classRepository}){
-            addClass("Algebra", subject)
-        }
-        val room1 =mockRepositories.from({roomRepository}){
-            createRoom(30, "Room 101", university)
-        }
-        mockRepositories.from({roomRepository}){createClassRoom(room1)}
-        val room2 =mockRepositories.from({roomRepository}){
-            createRoom(30, "Room 102", university)
-        }
-        mockRepositories.from({roomRepository}){createClassRoom(room2)}
-        val classroom1 = mockRepositories.from({roomRepository}){getClassRoomById(room1.id)}
-        val classroom2 = mockRepositories.from({roomRepository}){getClassRoomById(room2.id)}
-        assertNotNull(classroom1, "Classroom should be created")
-        assertNotNull(classroom2, "Classroom should be created")
-
-        val lecture = mockRepositories.from({lectureRepository}){
-            createLecture(
-                schoolClass = schoolClass,
-                classroom = classroom1,
-                type = ClassType.THEORETICAL,
-                weekDay = WeekDay.MONDAY,
-                startTime = 9.hours,
-                endTime = 11.hours
-            )
-        }
-
-        // Test
-        val result = lectureService.updateLecture(
-            lectureId = lecture.id,
-            newRoomId = room2.id,
-            newType = ClassType.PRACTICAL,
-            newWeekDay = WeekDay.TUESDAY,
-            newStartTime = "10:00",
-            newEndTime = "12:00",
-            effectiveFrom = null,
-            effectiveUntil = null,
-        )
-
-        assertTrue(result is Success, "Should return success")
-        assertEquals(room2.id, result.value.classroom.room.id, "Should update room")
-        assertEquals(ClassType.PRACTICAL, result.value.type, "Should update type")
-        assertEquals(WeekDay.TUESDAY, result.value.weekDay, "Should update weekday")
-        assertEquals(10.hours, result.value.startTime, "Should update start time")
-        assertEquals(12.hours, result.value.endTime, "Should update end time")
-    }
-
-    @OptIn(ExperimentalTime::class)
-    @Test
-    fun `updateLecture should create temporary change when numberOfWeeks greater than 0`() {
+    fun `updateLecture should create permanent change when from and until are null`() {
         // Setup test data
         val university = mockRepositories.from({universityRepository}){
             createUniversity("Test University")
@@ -566,6 +510,71 @@ class LectureServiceTest {
         val updatedLecture = mockRepositories.from({lectureRepository}){
             getLectureById(lecture.id)
         }
+        assertNotNull(updatedLecture, "Updated lecture should exist")
+        assertEquals(room2.id, updatedLecture.classroom.room.id, "Updated room should be")
+        assertEquals(ClassType.PRACTICAL, updatedLecture.type, "Updated type should be")
+        assertEquals(WeekDay.TUESDAY, updatedLecture.weekDay, "Updated weekday should be")
+        assertEquals(10.hours, updatedLecture.startTime, "Updated start time should be")
+    }
+
+    @OptIn(ExperimentalTime::class)
+    @Test
+    fun `updateLecture should create temporary change when from is null`() {
+        // Setup test data
+        val university = mockRepositories.from({universityRepository}){
+            createUniversity("Test University")
+        }
+        val subject = mockRepositories.from({subjectRepository}){
+            createSubject("Math", university)
+        }
+        val schoolClass = mockRepositories.from({classRepository}){
+            addClass("Algebra", subject)
+        }
+        val room1 =mockRepositories.from({roomRepository}){
+            createRoom(30, "Room 101", university)
+        }
+        mockRepositories.from({roomRepository}){createClassRoom(room1)}
+        val room2 =mockRepositories.from({roomRepository}){
+            createRoom(30, "Room 102", university)
+        }
+        mockRepositories.from({roomRepository}){createClassRoom(room2)}
+        val classroom1 = mockRepositories.from({roomRepository}){getClassRoomById(room1.id)}
+        val classroom2 = mockRepositories.from({roomRepository}){getClassRoomById(room2.id)}
+        assertNotNull(classroom1, "Classroom should be created")
+        assertNotNull(classroom2, "Classroom should be created")
+
+
+        val lecture =  mockRepositories.from({lectureRepository}){
+            createLecture(
+                schoolClass = schoolClass,
+                classroom = classroom1,
+                type = ClassType.THEORETICAL,
+                weekDay = WeekDay.MONDAY,
+                startTime = 9.hours,
+                endTime = 11.hours
+            )
+        }
+
+        val currentDate = Clock.System.now().plus(1.hours)
+
+        // Test
+        val result = lectureService.updateLecture(
+            lectureId = lecture.id,
+            newRoomId = room2.id,
+            newType = ClassType.PRACTICAL,
+            newWeekDay = WeekDay.TUESDAY,
+            newStartTime = "10:00",
+            newEndTime = "12:00",
+            effectiveFrom = null,
+            effectiveUntil = currentDate,
+        )
+
+        assertTrue(result is Success, "Should return success")
+        // Check that change was created
+        val updatedLecture = mockRepositories.from({lectureRepository}){
+            getLectureById(lecture.id)
+        }
+
         assertNotNull(updatedLecture, "Updated lecture should exist")
         assertEquals(room2.id, updatedLecture.classroom.room.id, "Updated room should be")
         assertEquals(ClassType.PRACTICAL, updatedLecture.type, "Updated type should be")

@@ -16,7 +16,7 @@ class MockLectureRepository : LectureRepositoryInterface {
     private val lectureChanges = mutableListOf<LectureChange>()
 
     override fun getLectureById(id: Int): Lecture? {
-        return lectures.firstOrNull { it.id == id }?.let { applyActiveChanges(it) }
+        return lectures.firstOrNull { it.id == id }
     }
 
     override fun getLectureChangeById(id: Int): LectureChange? {
@@ -24,11 +24,11 @@ class MockLectureRepository : LectureRepositoryInterface {
     }
 
     override fun getAllLectures(): List<Lecture> {
-        return lectures.map { applyActiveChanges(it) }
+        return lectures
     }
 
     override fun getAllLectures(limit: Int, offset: Int): List<Lecture> {
-        return lectures.drop(offset).take(limit).map { applyActiveChanges(it) }
+        return lectures.drop(offset).take(limit)
     }
 
     override fun getAllLectureChanges(): List<LectureChange> {
@@ -54,7 +54,7 @@ class MockLectureRepository : LectureRepositoryInterface {
                     it.weekDay == weekDay &&
                     it.startTime == startTime &&
                     it.endTime == endTime
-        }?.let { applyActiveChanges(it) }
+        }
     }
 
     override fun createLecture(
@@ -81,18 +81,16 @@ class MockLectureRepository : LectureRepositoryInterface {
         return lectures.filter { it.classroom.room.id == roomId }
             .drop(offSet)
             .take(limit)
-            .map { applyActiveChanges(it) }
     }
 
     override fun getLecturesByClass(classId: Int, limit: Int, offSet: Int): List<Lecture> {
         return lectures.filter { it.schoolClass.id == classId }
             .drop(offSet)
             .take(limit)
-            .map { applyActiveChanges(it) }
     }
 
     override fun getLecturesByType(type: ClassType): List<Lecture> {
-        return lectures.filter { it.type == type }.map { applyActiveChanges(it) }
+        return lectures.filter { it.type == type }
     }
 
     override fun deleteLecture(id: Int): Boolean {
@@ -159,6 +157,7 @@ class MockLectureRepository : LectureRepositoryInterface {
                     startTime = newStartTime
                     endTime = newEndTime
                 }
+                lectures.replaceAll { if (it.id == lecture.id) lecture else it }
                 lecture
             }
             // Future change
@@ -222,25 +221,6 @@ class MockLectureRepository : LectureRepositoryInterface {
         return (start1 >= start2 && start1 < end2) ||
                 (end1 > start2 && end1 <= end2) ||
                 (start1 <= start2 && end1 >= end2)
-    }
-
-    @OptIn(ExperimentalTime::class)
-    private fun applyActiveChanges(lecture: Lecture): Lecture {
-        val activeChange = lectureChanges.firstOrNull { change ->
-            change.lecture.id == lecture.id
-        }
-
-        return if (activeChange != null) {
-            lecture.apply {
-                weekDay = activeChange.originalWeekDay
-                startTime = activeChange.originalStartTime
-                endTime = activeChange.originalEndTime
-                classroom = activeChange.originalClassroom
-                type = activeChange.originalType
-            }
-        } else {
-            lecture
-        }
     }
 
     fun clear() {

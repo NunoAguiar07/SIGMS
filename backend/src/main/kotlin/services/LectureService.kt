@@ -164,11 +164,9 @@ class LectureService(
                 val lecture = repositories.from({lectureRepository}){getLectureById(lectureId)}
                         ?: return@useTransaction failure(LectureError.LectureNotFound)
                 val currentDate = Clock.System.now()
-                val newParsedStartTime = newStartTime?.hoursAndMinutesToDuration()?.takeIf {
-                    it.inWholeSeconds >= currentDate.epochSeconds
-                } ?: lecture.startTime
+                val newParsedStartTime = newStartTime?.hoursAndMinutesToDuration() ?: lecture.startTime
                 val newParsedEndTime = newEndTime?.hoursAndMinutesToDuration() ?: lecture.endTime
-                if (newParsedStartTime >= newParsedEndTime || newParsedEndTime.inWholeSeconds < currentDate.epochSeconds) {
+                if (newParsedStartTime >= newParsedEndTime) {
                     return@useTransaction failure(LectureError.InvalidLectureDate)
                 }
                 val newClassroom = repositories.from({roomRepository}){
@@ -177,13 +175,17 @@ class LectureService(
                     ?: return@useTransaction failure(LectureError.InvalidLectureRoom)
                 repositories.from({classRepository}){findClassById(lecture.schoolClass.id)}
                     ?: return@useTransaction failure(LectureError.InvalidLectureClass)
+                if( effectiveUntil != null && effectiveUntil < currentDate) {
+                    return@useTransaction failure(LectureError.InvalidLectureUntilDate)
+                }
+                val newEffectiveFrom = effectiveFrom.takeIf { it != null && it > currentDate }
                 val conflictingLectures = repositories.from({lectureRepository}){
                     findConflictingLectures(
                         newRoomId = newRoomId ?: lecture.classroom.room.id,
                         newWeekDay = newWeekDay ?: lecture.weekDay,
                         newStartTime = newParsedStartTime,
                         newEndTime = newParsedEndTime,
-                        effectiveFrom = effectiveFrom,
+                        effectiveFrom = newEffectiveFrom,
                         effectiveUntil = effectiveUntil,
                         currentLecture = lecture
                     )}
@@ -198,7 +200,7 @@ class LectureService(
                         newWeekDay ?: lecture.weekDay,
                         newParsedStartTime,
                         newParsedEndTime,
-                        effectiveFrom,
+                        newEffectiveFrom,
                         effectiveUntil
                     )}
                 val students = repositories.from({classRepository}){
