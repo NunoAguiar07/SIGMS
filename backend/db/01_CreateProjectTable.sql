@@ -111,7 +111,7 @@ CREATE TABLE IF NOT EXISTS LECTURE_CHANGE (
     original_week_day INT CHECK(original_week_day > 0 AND original_week_day < 8),
     original_start_time TIME NOT NULL,
     original_end_time TIME NOT NULL,
-    original_class_type VARCHAR(20) CHECK (original_class_type IN ('theoretical', 'practical', 'theoretical_practical')),
+    original_class_type VARCHAR(25) CHECK (original_class_type IN ('theoretical', 'practical', 'theoretical_practical')),
     effective_from TIMESTAMP,
     effective_until TIMESTAMP,
     CHECK (effective_until > effective_from),
