@@ -2,6 +2,7 @@ import api from "../interceptors/DeviceInterceptor";
 import {RoomInterface} from "../../types/RoomInterface";
 import {handleAxiosError} from "../../utils/HandleAxiosError";
 
+
 export const fetchRooms = async (
     searchQuery: string
 ): Promise<RoomInterface[]> => {

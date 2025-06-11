@@ -82,6 +82,7 @@ export const commonStyles = StyleSheet.create({
     leftColumn: {
         flex: 1, // Takes 50% of width
         padding: 16,
+        paddingTop: '7%',
         borderRightWidth: 1,
         borderRightColor: '#651c24',
         alignItems: 'center',
@@ -280,5 +281,31 @@ export const commonStyles = StyleSheet.create({
         flex: 1,
         flexDirection: 'row', // Horizontal layout
         backgroundColor: '#fef6ef',
+    },
+    input: {
+        borderWidth: 1,
+        borderColor: '#ccc',
+        borderRadius: 5,
+        padding: 10,
+        marginVertical: 5,
+        fontSize: 16,
+        backgroundColor: '#fff',
+    },
+
+    inputLabel: {
+        fontWeight: 'bold',
+        marginTop: 10,
+        marginBottom: 4,
+        fontSize: 14,
+    },
+    actionButton_2: {
+        marginTop: 16,
+        paddingVertical: 8,
+        paddingHorizontal: 24,
+        backgroundColor: '#651920',
+        color: 'white',
+        borderRadius: 16,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
 })

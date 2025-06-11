@@ -1,7 +1,7 @@
 
 import api from "../interceptors/DeviceInterceptor";
-import {handleAxiosError} from "../../Utils/HandleAxiosError";
 import {StudyRoomCapacity} from "../../types/StudyRoomCapacity";
+import {handleAxiosError} from "../../utils/HandleAxiosError";
 
 export const fetchStudyRoomCapacity = async (): Promise<StudyRoomCapacity[]> => {
     try {

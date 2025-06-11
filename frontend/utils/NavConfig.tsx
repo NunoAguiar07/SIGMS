@@ -19,6 +19,8 @@ export const NAV_CONFIG: RoleNavConfig = {
         { href: '/notifications', iconName: 'notifications-outline', label: 'Notifications' },
         { href: '/issue-reports/create', iconName: 'school-outline', label: 'Classrooms' },
         { href: '/profile', iconName: 'person-outline', label: 'Profile' },
+        { href: '/update-lecture', iconName: 'bar-chart-outline', label: 'Update Lecture' },
+
     ],
     ADMIN: [
         { href: '/home', iconName: 'home-outline', label: 'Home' },
@@ -26,6 +28,7 @@ export const NAV_CONFIG: RoleNavConfig = {
         { href: '/issue-reports/create', iconName: 'school-outline', label: 'Classrooms' },
         { href: '/generate-entities', iconName: 'add-circle-outline', label: 'Subjects' },
         { href: '/profile', iconName: 'person-outline', label: 'Profile' },
+        { href: '/update-lecture', iconName: 'bar-chart-outline', label: 'Update Lecture' }
     ],
     TECHNICAL_SERVICE: [
         { href: '/home', iconName: 'home-outline', label: 'Home' },
