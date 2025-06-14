@@ -1,4 +1,4 @@
-package isel.leic.group25.websockets.notifications.event
+package isel.leic.group25.notifications.model
 
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Polymorphic
@@ -29,8 +29,7 @@ data class Event (
         val eventModule = SerializersModule {
             polymorphic(EventData::class) {
                 subclass(Greet::class)
-                subclass(Notification::class)
-                subclass(Acknowledge::class)
+                subclass(ExpoNotification::class)
             }
         }
 
@@ -60,11 +59,9 @@ data class Event (
 
                 val dataSerializer = when (type) {
                     "greet" -> Greet.serializer()
-                    "notification" -> Notification.serializer()
-                    "acknowledge" -> Acknowledge.serializer()
+                    "notification" -> ExpoNotification.serializer()
                     else -> error("Unknown type: $type")
                 }
-
                 val data = input.json.decodeFromJsonElement(dataSerializer, dataElement)
                 return Event(type, data)
             }
@@ -75,8 +72,7 @@ data class Event (
 
                 val dataElement = when (val d = value.data) {
                     is Greet -> output.json.encodeToJsonElement(Greet.serializer(), d)
-                    is Notification -> output.json.encodeToJsonElement(Notification.serializer(), d)
-                    is Acknowledge -> output.json.encodeToJsonElement(Acknowledge.serializer(), d)
+                    is ExpoNotification -> output.json.encodeToJsonElement(ExpoNotification.serializer(), d)
                 }
 
                 val json = buildJsonObject {
@@ -88,6 +84,4 @@ data class Event (
             }
         }
     }
-
-
 }

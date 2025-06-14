@@ -9,7 +9,7 @@ import (
 )
 
 const interval = 5 * 60
-const url = "ws://localhost:8080/ws"
+const url = "ws://localhost:8080/ws/hardware"
 
 func main() {
 	conn, err := websocket.EstablishConnection(url)
@@ -18,7 +18,7 @@ func main() {
 			log.Println("Error establishing websocket connection:", err)
 			log.Println("Retrying in 10 seconds...")
 			time.Sleep(10 * time.Second)
-			conn, err = websocket.EstablishConnection("ws://localhost:8080/ws")
+			conn, err = websocket.EstablishConnection(url)
 		} else {
 			break
 		}

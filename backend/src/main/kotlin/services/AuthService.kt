@@ -13,6 +13,7 @@ import isel.leic.group25.services.errors.AuthError
 import isel.leic.group25.utils.Either
 import isel.leic.group25.utils.failure
 import isel.leic.group25.utils.success
+import isel.leic.group25.notifications.websocket.route.Notifications
 import org.apache.commons.mail.EmailException
 import java.sql.SQLException
 import java.util.*
@@ -110,6 +111,8 @@ class AuthService(
                             requestedRole = role.name,
                         )
                         if(adminEmails.isNotEmpty()){
+                            val admins = adminEmails.mapNotNull { repositories.from({adminRepository}){findAdminByEmail(it)} }
+                            Notifications.notify { Pair(admins.map{it.user.id},userDetails) }
                             emailService.sendAdminApprovalRequest(adminEmails, approvalLink, userDetails)
                         }
                         success(false)

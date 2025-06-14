@@ -16,7 +16,7 @@ export const useStudyRooms = () => {
             const data = await fetchStudyRoomCapacity()
             setStudyRooms(data)
         } catch (e){
-            setError(e)
+            setError(e as ParsedError)
         } finally {
             setLoading(false)
         }
@@ -26,7 +26,7 @@ export const useStudyRooms = () => {
         try {
            await updateStudyRoomCapacity()
         } catch (err) {
-            setError(err)
+            setError(err as ParsedError)
         }
     }
 

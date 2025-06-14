@@ -1,4 +1,4 @@
-package isel.leic.group25.websockets.notifications.event
+package isel.leic.group25.notifications.model
 
 import kotlinx.serialization.Serializable
 

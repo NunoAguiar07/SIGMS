@@ -1,4 +1,3 @@
-
 import api from "../interceptors/DeviceInterceptor";
 import {StudyRoomCapacity} from "../../types/StudyRoomCapacity";
 import {handleAxiosError} from "../../utils/HandleAxiosError";

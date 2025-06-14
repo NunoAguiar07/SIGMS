@@ -11,6 +11,7 @@ import isel.leic.group25.api.jwt.getUserRoleFromPrincipal
 import isel.leic.group25.api.model.response.ClassResponse
 import isel.leic.group25.api.model.response.UserInfoResponse
 import isel.leic.group25.db.entities.types.Role
+import isel.leic.group25.notifications.ExpoNotifications
 import isel.leic.group25.services.Services
 import kotlin.text.get
 
@@ -28,6 +29,12 @@ fun Route.userInfoRoutes(services: Services) {
                 )
             )
         }
+    }
+    post("/expoToken") {
+        val userId = call.getUserIdFromPrincipal() ?: return@post call.respond(HttpStatusCode.Unauthorized)
+        val expoToken = call.request.headers["X-Expo-Token"] ?: return@post call.respond(HttpStatusCode.BadRequest)
+        ExpoNotifications.saveToken(userId, expoToken)
+        call.respond(HttpStatusCode.Created)
     }
     route("/userClasses") {
         get {

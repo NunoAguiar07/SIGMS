@@ -1,5 +1,6 @@
 package isel.leic.group25
 
+import RequestResponseLogging
 import io.ktor.client.*
 import io.ktor.client.engine.okhttp.*
 import io.ktor.http.*
@@ -159,7 +160,9 @@ fun Application.module() {
     }
     val repositories = Repositories(db)
     val services = Services(repositories, jwtConfig)
-
+    install(RequestResponseLogging) {
+        includeHeaders = true
+    }
     configureRouting(
         services,
         applicationHttpClient

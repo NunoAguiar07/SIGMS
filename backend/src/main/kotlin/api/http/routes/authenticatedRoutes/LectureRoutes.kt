@@ -140,7 +140,7 @@ fun Route.updateLectureRoute(services: Services) {
     put("/update") {
         val updateLectureRequest = call.receive<UpdateLectureRequest>()
         updateLectureRequest.validate()?.let { error ->
-            return@put call.respond(error.toProblem())
+            return@put error.toProblem().respond(call)
         }
         val lectureIdString = call.parameters["lectureId"]
             ?: return@put RequestError.Missing("id").toProblem().respond(call)

@@ -12,6 +12,7 @@ import isel.leic.group25.utils.Either
 import isel.leic.group25.utils.failure
 import isel.leic.group25.utils.hoursAndMinutesToDuration
 import isel.leic.group25.utils.success
+import isel.leic.group25.notifications.websocket.route.Notifications
 import java.sql.SQLException
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
@@ -208,6 +209,7 @@ class LectureService(
                 }
                 if(students.isNotEmpty()){
                     emailService.sendStudentsChangeInLecture(students.map { it.user.email }, updatedLecture)
+                    Notifications.notify { Pair(students.map { it.user.id },updatedLecture ) }
                 }
                 return@useTransaction success(updatedLecture)
             }

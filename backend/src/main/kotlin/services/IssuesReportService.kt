@@ -7,6 +7,7 @@ import isel.leic.group25.services.errors.IssueReportError
 import isel.leic.group25.utils.Either
 import isel.leic.group25.utils.failure
 import isel.leic.group25.utils.success
+import isel.leic.group25.notifications.websocket.route.Notifications
 import java.sql.SQLException
 
 typealias IssueReportListResult = Either<IssueReportError, List<IssueReport>>
@@ -71,7 +72,7 @@ class IssuesReportService(private val repositories: Repositories,
         }
     }
 
-    fun createIssueReport(userId: Int, roomId: Int, description: String):IssueReportResult {
+    fun createIssueReport(userId: Int, roomId: Int, description: String) :IssueReportResult {
         return runCatching {
             transactionable.useTransaction {
                 val room = repositories.from({roomRepository}){getRoomById(roomId)}
@@ -82,6 +83,8 @@ class IssuesReportService(private val repositories: Repositories,
                 val newIssue = repositories.from({issueReportRepository}){
                     createIssueReport(user, room, description)
                 }
+                val technicians = repositories.from({technicalServiceRepository}){universityTechnicalServices(user.university.id)}
+                Notifications.notify { Pair(technicians.map { it.user.id }, newIssue) }
                 return@useTransaction success(newIssue)
             }
         }

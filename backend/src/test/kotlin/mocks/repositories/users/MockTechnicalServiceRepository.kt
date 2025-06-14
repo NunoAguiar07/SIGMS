@@ -21,6 +21,10 @@ class MockTechnicalServiceRepository : TechnicalServiceRepositoryInterface {
         return technicalServices.any { it.user.id == user.id }
     }
 
+    override fun universityTechnicalServices(universityId: Int): List<TechnicalService> {
+        return technicalServices.filter { it.user.university.id == universityId }
+    }
+
     fun clear() {
         technicalServices.clear()
         mockUsers.clear()

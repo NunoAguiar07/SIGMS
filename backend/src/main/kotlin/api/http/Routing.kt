@@ -9,7 +9,7 @@ import isel.leic.group25.api.http.routes.universityRoutes
 import isel.leic.group25.api.http.routes.welcomeRoutes
 import isel.leic.group25.services.*
 import isel.leic.group25.websockets.hardware.route.Devices
-import isel.leic.group25.websockets.notifications.route.Notifications
+import isel.leic.group25.notifications.websocket.route.Notifications
 
 fun Application.configureRouting(
     services: Services,

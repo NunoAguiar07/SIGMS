@@ -11,21 +11,23 @@ import (
 const sniffPacketsCommand = "tshark -I -i wlan1 -a duration:180 -w capture.pcap"
 const createFilteredTXTCommand = "tshark -r capture.pcap -Y \"wlan.fc.type_subtype == 4\" -T fields -E separator=, -e wlan.sa > macs.txt"
 
-func countMACs() int {
+func countMACs() (int, error) {
 	err := exec.Command("sh", "-c", sniffPacketsCommand).Run()
 	if err != nil {
 		log.Fatalf("Error: %v\n", err)
+		return 0, err
 	} else {
 		log.Printf("Successfully read MACs")
 	}
 
 	err = exec.Command("sh", "-c", createFilteredTXTCommand).Run()
 	if err != nil {
-		log.Fatalf("Error: %v\n", err)
+		log.Printf("Error: %v\n", err)
+		return 0, err
 	} else {
-		log.Printf("Successfully read MACs")
+		log.Printf("Successfully filtered MACs")
 	}
-	return readUniqueMACs()
+	return readUniqueMACs(), nil
 }
 
 func addIfNotExists(list *[]string, item string) {
@@ -65,20 +67,39 @@ func readUniqueMACs() int {
 func ReadAtIntervalOrByUpdate(interval int, ewmaChannel chan EWMA, signalRead chan struct{}) {
 	ticker := time.NewTicker(time.Duration(interval) * time.Second)
 	ewma := NewEWMA(0.25)
-	readUpdateAndSave(ewma, ewmaChannel)
+	executing := true
+	executingChannel := make(chan bool)
+	go readUpdateAndSave(ewma, ewmaChannel, executingChannel)
 	defer ticker.Stop()
 	for {
 		select {
 		case <-ticker.C:
-			readUpdateAndSave(ewma, ewmaChannel)
+
+			{
+				if !executing {
+					executing = true
+					go readUpdateAndSave(ewma, ewmaChannel, executingChannel)
+				}
+			}
 		case <-signalRead:
-			readUpdateAndSave(ewma, ewmaChannel)
+			{
+				if !executing {
+					executing = true
+					go readUpdateAndSave(ewma, ewmaChannel, executingChannel)
+				}
+			}
+		case executing = <-executingChannel:
 		}
 	}
 }
 
-func readUpdateAndSave(ewma *EWMA, ewmaChannel chan EWMA) {
-	count := countMACs()
+func readUpdateAndSave(ewma *EWMA, ewmaChannel chan EWMA, executingChannel chan bool) {
+	count, err := countMACs()
+	if err != nil {
+		log.Println("Error reading MACs")
+		return
+	}
 	ewma.Update(count)
 	ewmaChannel <- *ewma
+	executingChannel <- false
 }

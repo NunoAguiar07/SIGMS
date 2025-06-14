@@ -9,4 +9,6 @@ interface TechnicalServiceRepositoryInterface {
     fun findTechnicalServiceByEmail(email: String): TechnicalService?
 
     fun isTechnicalService(user: User): Boolean
+
+    fun universityTechnicalServices(universityId: Int): List<TechnicalService>
 }
