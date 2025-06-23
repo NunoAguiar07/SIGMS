@@ -18,7 +18,7 @@ export const ProfileScreen = ({
                         onPress={onPickImage}
                     />
                     <ProfileInfo
-                        name={profile.name}
+                        name={profile.username}
                         email={profile.email}
                         university={profile.university}
                     />
@@ -36,7 +36,7 @@ const ProfileImage = ({ imageUri, onPress }: ProfileImageType) => (
     <TouchableOpacity onPress={onPress} style={profileStyles.imageWrapper}>
         <Image
             source={
-                typeof imageUri === 'string' && imageUri
+                typeof imageUri === 'string' && imageUri.startsWith('data:image/jpeg;base64,')
                     ? { uri: imageUri }
                     : require('../../assets/default_user_profile.png')
             }

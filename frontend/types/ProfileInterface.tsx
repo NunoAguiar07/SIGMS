@@ -1,6 +1,6 @@
 export interface ProfileInterface {
-    name: string;
+    username: string;
     email: string;
-    image: string;
+    image: number[];
     university: string;
 }

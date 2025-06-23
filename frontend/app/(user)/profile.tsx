@@ -7,7 +7,7 @@ import {useProfile} from "../../hooks/useProfile";
 const Profile = () => {
     const {
         profile,
-        image,
+        imageUri,
         loading,
         error,
         updateLoading,
@@ -25,10 +25,11 @@ const Profile = () => {
         return <LoadingPresentation />;
     }
 
+
     return (
         <ProfileScreen
             profile={profile}
-            image={image}
+            image={imageUri}
             onPickImage={pickImage}
         />
     );
