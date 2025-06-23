@@ -19,7 +19,7 @@ sealed interface User: Entity<User> {
     var email: String
     var username: String
     var password: String
-    var profileImage: ByteArray
+    var profileImage: ByteArray?
     var authProvider: String
     var university: University
 

@@ -68,7 +68,7 @@ fun Route.updateProfileRoute(services: Services) {
             updateUser(
                 id = userId,
                 username = updateRequest.username,
-                image = updateRequest.image
+                image = updateRequest.image.map { it.toByte() }.toByteArray()
             )
         }
         call.respondEither(

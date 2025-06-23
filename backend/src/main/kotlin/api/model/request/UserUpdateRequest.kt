@@ -5,5 +5,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class UserUpdateRequest(
     val username: String,
-    val image: ByteArray
+    val image: List<Int>
 )

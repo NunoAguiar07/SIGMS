@@ -10,8 +10,10 @@ import isel.leic.group25.db.tables.Tables.Companion.students
 import isel.leic.group25.db.tables.Tables.Companion.teachers
 import isel.leic.group25.db.tables.Tables.Companion.technicalServices
 import isel.leic.group25.db.tables.Tables.Companion.users
+import isel.leic.group25.db.tables.users.Users
 import org.ktorm.database.Database
 import org.ktorm.dsl.eq
+import org.ktorm.dsl.update
 import org.ktorm.entity.*
 
 class UserRepository(private val database: Database): UserRepositoryInterface {
@@ -46,7 +48,6 @@ class UserRepository(private val database: Database): UserRepositoryInterface {
             this.email = email
             this.username = username
             this.password = User.hashPassword(password)
-            this.profileImage = ByteArray(0)
             this.authProvider = authProvider
             this.university = university
         }
@@ -59,7 +60,6 @@ class UserRepository(private val database: Database): UserRepositoryInterface {
             this.email = email
             this.username = username
             this.password = User.hashPassword(password)
-            this.profileImage = ByteArray(0)
             this.authProvider = authProvider
             this.university = university
         }
@@ -67,8 +67,13 @@ class UserRepository(private val database: Database): UserRepositoryInterface {
         return newUser
     }
 
-    override fun update(user: User): Int = withDatabase {
-        return database.users.update(user)
+    override fun update(user: User): Int =
+        withDatabase {
+        database.update(Users) {
+            set(it.username, user.username)
+            set(it.profileImage, user.profileImage)
+            where { it.id eq user.id }
+        }
     }
 
     override fun getRoleById(id: Int): Role? = withDatabase {
