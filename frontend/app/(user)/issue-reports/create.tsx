@@ -5,6 +5,7 @@ import {useCreateReport} from "../../../hooks/useCreateReport";
 const CreateReport = () => {
     const {
         rooms,
+        issues,
         selectedRoom,
         reportText,
         searchQuery,
@@ -22,6 +23,7 @@ const CreateReport = () => {
     return (
         <CreateReportScreen
             rooms={rooms}
+            issues={issues}
             selectedRoom={selectedRoom}
             reportText={reportText}
             searchQuery={searchQuery}

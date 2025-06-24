@@ -3,6 +3,7 @@ import {RoomInterface} from "../../types/RoomInterface";
 
 export interface CreateReportScreenType {
     rooms: RoomInterface[];
+    issues : any[]
     selectedRoom: RoomInterface | null;
     reportText: string;
     searchQuery: string;

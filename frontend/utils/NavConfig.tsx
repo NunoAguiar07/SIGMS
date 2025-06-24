@@ -28,7 +28,8 @@ export const NAV_CONFIG: RoleNavConfig = {
         { href: '/issue-reports/create', iconName: 'school-outline', label: 'Classrooms' },
         { href: '/generate-entities', iconName: 'add-circle-outline', label: 'Subjects' },
         { href: '/profile', iconName: 'person-outline', label: 'Profile' },
-        { href: '/update-lecture', iconName: 'bar-chart-outline', label: 'Update Lecture' }
+        { href: '/update-lecture', iconName: 'bar-chart-outline', label: 'Update Lecture' },
+        { href: '/notifications', iconName: 'notifications-outline', label: 'Notifications' },
     ],
     TECHNICAL_SERVICE: [
         { href: '/home', iconName: 'home-outline', label: 'Home' },
@@ -36,5 +37,6 @@ export const NAV_CONFIG: RoleNavConfig = {
         { href: '/issue-reports/assigned', iconName: 'construct-outline', label: 'Issue Reports Assigned' },
         { href: '/issue-reports/create', iconName: 'school-outline', label: 'Classrooms' },
         { href: '/profile', iconName: 'person-outline', label: 'Profile' },
+        { href: '/notifications', iconName: 'notifications-outline', label: 'Notifications' },
     ]
 };

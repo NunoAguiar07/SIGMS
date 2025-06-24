@@ -3,6 +3,7 @@ import {StyleSheet} from "react-native";
 
 export const createReportStyle = StyleSheet.create({
     joinClassButton: {
+        width: '20%',
         marginTop: 16,
         paddingVertical: 8,
         paddingHorizontal: 24,
@@ -11,6 +12,7 @@ export const createReportStyle = StyleSheet.create({
         borderRadius: 16,
         justifyContent: 'center',
         alignItems: 'center',
+        alignSelf : 'center',
     },
     classItem: {
         flexDirection: 'row',
@@ -21,8 +23,34 @@ export const createReportStyle = StyleSheet.create({
         backgroundColor: '#fef6ef',
         borderBottomColor: '#651c24',
     },
+    issuesListContainer: {
+        marginTop: 0,
+        padding: 10,
+        width: '60%',
+        backgroundColor: '#fff',
+        borderRadius: 8,
+        borderLeftWidth: 6,
+        borderLeftColor: '#3e1f1f',
+        shadowColor: '#000',
+        shadowOffset: { width: 1, height: 1 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 3,
+    },
+
+    issueItem: {
+        paddingVertical: 4,
+        borderBottomWidth: 1,
+        borderBottomColor: '#ddd',
+    },
+
+    issueText: {
+        fontSize: 14,
+        color: '#444',
+    },
     classesSection: {
         marginTop: '10%',
+        width: '60%',
         borderTopWidth: 1,
         borderTopColor: '#fef6ef',
         paddingTop: 20,

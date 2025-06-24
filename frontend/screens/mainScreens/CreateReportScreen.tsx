@@ -13,13 +13,14 @@ import {RoomInterface} from "../../types/RoomInterface";
 
 export const CreateReportScreen = ({
     rooms,
+    issues,
     selectedRoom,
     reportText,
     searchQuery,
     onSearchChange,
     onRoomSelect,
     onReportTextChange,
-    onSubmitReport
+    onSubmitReport,
 } : CreateReportScreenType) => {
     return (
         <View style={createReportStyle.joinClassContainer}>
@@ -34,12 +35,34 @@ export const CreateReportScreen = ({
 
             <View style={commonStyles.rightColumn}>
                 {selectedRoom && (
-                    <RoomReportForm
-                        selectedRoom={selectedRoom}
-                        reportText={reportText}
-                        onReportTextChange={onReportTextChange}
-                        onSubmitReport={onSubmitReport}
-                    />
+                    <>
+                        {/* Issues List for Selected Room */}
+                        <View style={createReportStyle.issuesListContainer}>
+                            <Text style={commonStyles.sectionTitle}>
+                                Previous Reports for {selectedRoom.name}
+                            </Text>
+
+                            {issues.length > 0 ? (
+                                issues.map((issue, index) => (
+                                    <View key={issue.id || index} style={createReportStyle.issueItem}>
+                                        <Text style={createReportStyle.issueText}>- {issue.description}</Text>
+                                    </View>
+                                ))
+                            ) : (
+                                <Text style={commonStyles.emptyText}>
+                                    No issues reported for this room.
+                                </Text>
+                            )}
+                        </View>
+
+                        {/* Report Form */}
+                        <RoomReportForm
+                            selectedRoom={selectedRoom}
+                            reportText={reportText}
+                            onReportTextChange={onReportTextChange}
+                            onSubmitReport={onSubmitReport}
+                        />
+                    </>
                 )}
             </View>
         </View>
