@@ -55,7 +55,7 @@ fun Application.module() {
     val frontEndUrl = System.getenv("FRONTEND_URL")
     install(CORS) {
         //allowSameOrigin
-        allowHost(frontEndUrl, schemes = listOf("http")) // Expo front end
+        allowHost(frontEndUrl, schemes = listOf("http","https")) // Expo front end
         allowHost("localhost:8081", schemes = listOf("http"))
         allowMethod(HttpMethod.Options)
         allowMethod(HttpMethod.Put)

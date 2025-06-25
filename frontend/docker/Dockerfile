@@ -11,5 +11,9 @@ COPY dist/ .
 # Copy custom nginx config
 COPY ./docker/nginx.conf /etc/nginx/conf.d/default.conf
 
-EXPOSE 80
+# Copy certificate to nginx
+COPY docker/selfsigned.crt /etc/nginx/ssl/selfsigned.crt
+COPY docker/selfsigned.key /etc/nginx/ssl/selfsigned.key
+
+EXPOSE 443
 CMD ["nginx", "-g", "daemon off;"]
