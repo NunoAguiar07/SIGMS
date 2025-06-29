@@ -9,6 +9,7 @@ import {commonStyles} from "../css_styling/common/CommonProps";
 import {createReportStyle} from "../css_styling/createReport/CreateReportStyle";
 import {CreateReportScreenType} from "../types/CreateReportScreenType";
 import {RoomInterface} from "../../types/RoomInterface";
+import {isMobile} from "../../utils/DeviceType";
 
 
 export const CreateReportScreen = ({
@@ -22,16 +23,17 @@ export const CreateReportScreen = ({
     onReportTextChange,
     onSubmitReport,
 } : CreateReportScreenType) => {
-    return (
-        <View style={createReportStyle.joinClassContainer}>
-            <View style={commonStyles.leftColumn}>
-                <RoomSearchList
-                    rooms={rooms}
-                    searchQuery={searchQuery}
-                    onSearchChange={onSearchChange}
-                    onRoomSelect={onRoomSelect}
-                />
-            </View>
+    if (!isMobile) {
+        return (
+            <View style={createReportStyle.joinClassContainer}>
+                <View style={commonStyles.leftColumn}>
+                    <RoomSearchList
+                        rooms={rooms}
+                        searchQuery={searchQuery}
+                        onSearchChange={onSearchChange}
+                        onRoomSelect={onRoomSelect}
+                    />
+                </View>
 
             <View style={commonStyles.rightColumn}>
                 {selectedRoom && (
@@ -67,6 +69,31 @@ export const CreateReportScreen = ({
             </View>
         </View>
     );
+    } else {
+        return (
+            <View style={createReportStyle.joinClassContainer}>
+                {!selectedRoom ? (
+                    <View style={commonStyles.leftColumn}>
+                        <RoomSearchList
+                            rooms={rooms}
+                            searchQuery={searchQuery}
+                            onSearchChange={onSearchChange}
+                            onRoomSelect={onRoomSelect}
+                        />
+                    </View>
+                ) : (
+                    <View style={commonStyles.rightColumn}>
+                        <RoomReportForm
+                            selectedRoom={selectedRoom}
+                            reportText={reportText}
+                            onReportTextChange={onReportTextChange}
+                            onSubmitReport={onSubmitReport}
+                        />
+                    </View>
+                )}
+            </View>
+        );
+    }
 };
 
 interface RoomSearchListType {

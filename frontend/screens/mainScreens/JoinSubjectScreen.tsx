@@ -4,6 +4,7 @@ import {joinClassStyles} from "../css_styling/join_class/JoinClassProps";
 import {JoinSubjectScreenType} from "../types/JoinSubjectScreenType";
 import {SubjectInterface} from "../../types/SubjectInterface";
 import {SchoolClassInterface} from "../../types/SchoolClassInterface";
+import {isMobile} from "../../utils/DeviceType";
 
 export const JoinSubjectScreen = ({
     subjects,
@@ -16,28 +17,56 @@ export const JoinSubjectScreen = ({
     onLeaveClass,
     userClasses
 }: JoinSubjectScreenType) => {
-    return (
-        <View style={joinClassStyles.joinClassContainer}>
-            <View style={commonStyles.leftColumn}>
-                <SubjectSearchList
-                    subjects={subjects}
-                    searchQuery={searchQuery}
-                    onSearchChange={onSearchChange}
-                    onSubjectSelect={onSubjectSelect}
-                />
-            </View>
-            <View style={commonStyles.rightColumn}>
-                <UserClassList userClasses={userClasses} onLeaveClass={onLeaveClass} />
-                {selectedSubject && (
-                    <SelectedSubjectClasses
-                        subject={selectedSubject}
-                        schoolClasses={schoolClasses}
-                        onJoinClass={onJoinClass}
+    if (!isMobile) {
+        return (
+            <View style={joinClassStyles.joinClassContainer}>
+                <View style={commonStyles.leftColumn}>
+                    <SubjectSearchList
+                        subjects={subjects}
+                        searchQuery={searchQuery}
+                        onSearchChange={onSearchChange}
+                        onSubjectSelect={onSubjectSelect}
                     />
+                </View>
+                <View style={commonStyles.rightColumn}>
+                    <UserClassList userClasses={userClasses} onLeaveClass={onLeaveClass} />
+                    {selectedSubject && (
+                        <SelectedSubjectClasses
+                            subject={selectedSubject}
+                            schoolClasses={schoolClasses}
+                            onJoinClass={onJoinClass}
+                        />
+                    )}
+                </View>
+            </View>
+        );
+    } else {
+        return (
+            <View style={joinClassStyles.joinClassContainer}>
+                {!selectedSubject ? (
+                    <View style={commonStyles.leftColumn}>
+                        <SubjectSearchList
+                            subjects={subjects}
+                            searchQuery={searchQuery}
+                            onSearchChange={onSearchChange}
+                            onSubjectSelect={onSubjectSelect}
+                        />
+                        <UserClassList userClasses={userClasses} onLeaveClass={onLeaveClass} />
+                    </View>
+                ) : (
+                    <View style={commonStyles.rightColumn}>
+                        <View style={{ flex: 1 }}>
+                            <SelectedSubjectClasses
+                                subject={selectedSubject}
+                                schoolClasses={schoolClasses}
+                                onJoinClass={onJoinClass}
+                            />
+                        </View>
+                    </View>
                 )}
             </View>
-        </View>
-    );
+        );
+    }
 };
 
 

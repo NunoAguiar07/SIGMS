@@ -6,7 +6,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class LectureRequest(
-    val id : Int,
     val schoolClassId: Int,
     val roomId: Int,
     val type: String,
@@ -15,7 +14,6 @@ data class LectureRequest(
     val endTime: String
 ) {
     fun validate(): RequestError?{
-        if (id < 0) return RequestError.Invalid("id")
         if (schoolClassId <= 0) return RequestError.Invalid("schoolClassId")
         if (roomId <= 0) return RequestError.Invalid("schoolClassId")
         if (startTime.isBlank()) return RequestError.Missing("startTime")

@@ -1,32 +1,55 @@
-import {FlatList, Text, TouchableOpacity, View} from "react-native";
+import {Animated, FlatList, Text, TouchableOpacity, View} from "react-native";
 import {commonStyles} from "../css_styling/common/CommonProps";
 import {unassignedIssuesStyle} from "../css_styling/unassigned_issues/UnassignedIssues";
 import {Ionicons} from "@expo/vector-icons";
 import {UnassignedIssuesScreenType} from "../types/UnassignedIssuesScreenType";
 import {IssueReportInterface} from "../../types/IssueReportInterface";
+import {mobileStyles} from "../css_styling/common/MobileProps";
+import {isMobile} from "../../utils/DeviceType";
+import {useSwipeAnimation} from "../../hooks/mobile/useSwipeAnimation";
 
-export const TechnicianUnassignedIssuesScreen = ({issues, onAssign, currentPage, onNext, onPrevious, hasNext} : UnassignedIssuesScreenType) => {
+export const TechnicianUnassignedIssuesScreen = ({
+    issues,
+    onAssign,
+    currentPage,
+    onNext,
+    onPrevious,
+    hasNext
+}: UnassignedIssuesScreenType) => {
+
     return (
         <View style={commonStyles.container}>
             <Text style={commonStyles.title}>Unassigned Room Issues</Text>
 
-            <View style={commonStyles.tableContainer}>
-                <TableHeader />
-                <FlatList
-                    data={issues}
-                    keyExtractor={(item) => item.id.toString()}
-                    renderItem={({ item }) => (
-                        <IssueRow item={item} onAssign={onAssign} />
-                    )}
+            {isMobile ? (
+                <MobileIssueView
+                    issues={issues}
+                    onAssign={onAssign}
+                    currentPage={currentPage}
+                    onNext={onNext}
+                    onPrevious={onPrevious}
+                    hasNext={hasNext}
                 />
-            </View>
-
-            <PaginationControls
-                currentPage={currentPage}
-                hasNext={hasNext}
-                onNext={onNext}
-                onPrevious={onPrevious}
-            />
+            ) : (
+                <>
+                    <View style={commonStyles.tableContainer}>
+                        <TableHeader />
+                        <FlatList
+                            data={issues}
+                            keyExtractor={(item) => item.id.toString()}
+                            renderItem={({ item }) => (
+                                <IssueRow item={item} onAssign={onAssign} />
+                            )}
+                        />
+                    </View>
+                    <PaginationControls
+                        currentPage={currentPage}
+                        hasNext={hasNext}
+                        onNext={onNext}
+                        onPrevious={onPrevious}
+                    />
+                </>
+            )}
         </View>
     );
 };
@@ -105,3 +128,79 @@ export const PaginationControls = ({
     </View>
 );
 
+const MobileIssueView = ({
+    issues,
+    onAssign,
+    currentPage,
+    onNext,
+    onPrevious,
+    hasNext
+}: UnassignedIssuesScreenType) => {
+    const { currentIndex, pan, panResponder } = useSwipeAnimation(
+        issues.length,
+        currentPage,
+        hasNext,
+        onNext,
+        onPrevious
+    );
+
+    const currentIssue = issues[currentIndex];
+
+    if (!issues.length) {
+        return (
+            <View style={mobileStyles.container}>
+                <Text style={mobileStyles.emptyText}>No unassigned issues</Text>
+            </View>
+        );
+    }
+
+    return (
+        <View style={mobileStyles.container}>
+            <Animated.View
+                style={[
+                    mobileStyles.card,
+                    {
+                        transform: [{ translateX: pan.x }]
+                    }
+                ]}
+                {...panResponder.panHandlers}
+            >
+                <View style={mobileStyles.cardContent}>
+                    <Text style={mobileStyles.roomName}>{currentIssue.room.name}</Text>
+
+                    <View style={mobileStyles.detailSection}>
+                        <Text style={mobileStyles.detailLabel}>Description:</Text>
+                        <Text style={mobileStyles.detailValue}>{currentIssue.description}</Text>
+                    </View>
+
+                    <TouchableOpacity
+                        style={mobileStyles.assignButton}
+                        onPress={() => onAssign(currentIssue.id)}
+                    >
+                        <Ionicons name="checkmark" size={20} color="white" />
+                        <Text style={mobileStyles.buttonText}>Assign to Me</Text>
+                    </TouchableOpacity>
+                </View>
+            </Animated.View>
+
+            <View style={mobileStyles.paginationDots}>
+                {issues.map((_, index) => (
+                    <View
+                        key={index}
+                        style={[
+                            mobileStyles.dot,
+                            index === currentIndex && mobileStyles.activeDot
+                        ]}
+                    />
+                ))}
+            </View>
+
+            <PaginationControls
+                currentPage={currentPage}
+                hasNext={hasNext}
+                onNext={onNext}
+                onPrevious={onPrevious}
+            />
+        </View>
+    );
+};

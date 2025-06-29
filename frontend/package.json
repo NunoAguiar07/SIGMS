@@ -11,6 +11,7 @@
   "dependencies": {
     "@expo/vector-icons": "^14.1.0",
     "@react-native-async-storage/async-storage": "^2.1.2",
+    "@react-navigation/drawer": "^7.5.1",
     "axios": "^1.9.0",
     "expo": "~53.0.9",
     "expo-asset": "^11.1.5",
@@ -31,11 +32,14 @@
     "react": "19.0.0",
     "react-dom": "19.0.0",
     "react-native": "0.79.2",
+    "react-native-gesture-handler": "~2.24.0",
     "react-native-picker-select": "^9.3.1",
+    "react-native-reanimated": "~3.17.4",
     "react-native-safe-area-context": "5.4.0",
     "react-native-screens": "~4.10.0",
     "react-native-web": "^0.20.0",
     "react-router-dom": "^7.5.3",
+    "styled-components": "^6.1.19",
     "use-debounce": "^10.0.4"
   },
   "devDependencies": {

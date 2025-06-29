@@ -14,14 +14,13 @@ export const generateEntitiesStyles = StyleSheet.create({
         alignItems: 'center',
     },
     createInput: {
-        width: '100%',
+        minWidth: 150,
         height: 50,
         borderWidth: 1,
         borderColor: '#651c24',
         borderRadius: 8,
         paddingHorizontal: 12,
         marginBottom: 16,
-        marginTop: '10%',
     },
     formSection: {
         flex: 1,
@@ -33,6 +32,7 @@ export const generateEntitiesStyles = StyleSheet.create({
     },
     list: {
         maxHeight: 200,
+        overflow: 'hidden',
         borderWidth: 1,
         borderColor: '#651920',
         borderRadius: 5,
@@ -103,5 +103,8 @@ export const generateEntitiesStyles = StyleSheet.create({
         borderRadius: 5,
         padding: 10,
         marginLeft: 10,
+    },
+    scrollContainer: {
+        paddingBottom: 20,
     },
 });

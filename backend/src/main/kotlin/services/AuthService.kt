@@ -94,7 +94,7 @@ class AuthService(
                 }
                 return@useTransaction when(role) {
                     Role.STUDENT -> {
-                        val verificationLink = "${frontendUrl}auth/verify-account?token=$verificationToken"
+                        val verificationLink = "${frontendUrl}/auth/verify-account?token=$verificationToken"
                         emailService.sendStudentVerificationEmail(
                             userEmail = user.email,
                             username = user.username,
@@ -104,7 +104,7 @@ class AuthService(
                     }
                     Role.TEACHER, Role.TECHNICAL_SERVICE -> {
                         val adminEmails = repositories.from({adminRepository}){getAllAdminEmails()}
-                        val approvalLink = "${frontendUrl}approve-request?id=$verificationToken"
+                        val approvalLink = "${frontendUrl}/approve-request?id=$verificationToken"
                         val userDetails = UserDetails(
                             username = user.username,
                             email = user.email,
