@@ -1,6 +1,7 @@
 import {AdminEntityCreationScreen} from "../../screens/mainScreens/GenerateEntitiesScreen";
 import ErrorHandler from "../(public)/error";
 import {useAdminEntityCreation} from "../../hooks/useAdminEntityCreation";
+import {BackgroundImage} from "../../screens/components/BackgroundImage";
 
 
 const AdminEntityCreation = () => {
@@ -24,19 +25,21 @@ const AdminEntityCreation = () => {
     }
 
     return (
-        <AdminEntityCreationScreen
-            selectedEntity={selectedEntity}
-            onEntitySelect={setSelectedEntity}
-            formValues={formValues}
-            setFormValues={setFormValues}
-            onSubmit={handleSubmit}
-            subjects={subjects}
-            subjectClasses={subjectClasses}
-            rooms={rooms}
-            searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
-            isLoading={isLoading}
-        />
+        <BackgroundImage>
+            <AdminEntityCreationScreen
+                selectedEntity={selectedEntity}
+                onEntitySelect={setSelectedEntity}
+                formValues={formValues}
+                setFormValues={setFormValues}
+                onSubmit={handleSubmit}
+                subjects={subjects}
+                subjectClasses={subjectClasses}
+                rooms={rooms}
+                searchQuery={searchQuery}
+                setSearchQuery={setSearchQuery}
+                isLoading={isLoading}
+            />
+        </BackgroundImage>
     );
 };
 

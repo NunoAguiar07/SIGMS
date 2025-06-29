@@ -8,7 +8,7 @@ export const commonStyles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         padding: 32, // 4rem ≈ 64px
-        backgroundColor: '#f8f0e6FF',
+        backgroundColor: 'transparent',
     },
     card: {
         backgroundColor: '#bb9996',
@@ -58,7 +58,7 @@ export const commonStyles = StyleSheet.create({
         padding: 16,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#fef6ef',
+        backgroundColor: '#ead6bd',
     },
     searchSubjectInput: {
         height: 50,
@@ -71,7 +71,7 @@ export const commonStyles = StyleSheet.create({
     },
     centerMiddleText: {
         color: '#671b22',
-        fontFamily: '"Roboto Condensed"',
+        fontFamily: 'RobotoCondensed',
         fontWeight: 400,
     },
     sectionTitle: {
@@ -107,9 +107,9 @@ export const commonStyles = StyleSheet.create({
         marginTop: 20,
     },
     logo: {
-        width: 600,
-        height: 300,
-        resizeMode: 'contain',
+        width: '100%',
+        height: 250,
+        resizeMode: 'center',
         marginBottom: 20,
     },
     loginRegisterButton: {
@@ -126,7 +126,7 @@ export const commonStyles = StyleSheet.create({
     loginRegisterButtonText: {
         color: '#fff',
         fontSize: 18,
-        fontFamily: 'Roboto Condensed',
+        fontFamily: 'RobotoCondensed',
         fontWeight: '400',
     },
 
@@ -145,7 +145,7 @@ export const commonStyles = StyleSheet.create({
     picker: {
         width: '100%',
         height: 50,
-        backgroundColor: '#f8f0e6',
+        backgroundColor: '#ead6bd',
         borderRadius: 8,
     },
     inputRow: {
@@ -192,7 +192,7 @@ export const commonStyles = StyleSheet.create({
     buttonText: {
         color: '#fff',
         fontSize: 18,
-        fontFamily: 'Roboto Condensed',
+        fontFamily: 'RobotoCondensed',
         fontWeight: '400',
     },
     tableHeader: {
@@ -292,7 +292,7 @@ export const commonStyles = StyleSheet.create({
     columnsContainer: {
         flex: 1,
         flexDirection: 'row', // Horizontal layout
-        backgroundColor: '#f8f0e6FF',
+        backgroundColor: '#ead6bd',
     },
     input: {
         borderWidth: 1,

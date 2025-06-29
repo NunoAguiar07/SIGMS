@@ -14,17 +14,15 @@ const CalendarScreen = ({ schedule }: CalendarScreenType) => {
 
 
     return (
-        <View style={styles.container}>
-            <View style={styles.cardContainer}>
-                <ScrollView style={styles.content}>
-                    <DaySection day="Monday"  events={getEventsForDay("MONDAY")} />
-                    <DaySection day="Tuesday"  events={getEventsForDay("TUESDAY")} />
-                    <DaySection day="Wednesday"  events={getEventsForDay("WEDNESDAY")} />
-                    <DaySection day="Thursday"  events={getEventsForDay("THURSDAY")} />
-                    <DaySection day="Friday"  events={getEventsForDay("FRIDAY")} />
-                    <DaySection day="Saturday"  events={getEventsForDay("SATURDAY")} />
-                </ScrollView>
-            </View>
+        <View style={styles.cardContainer}>
+            <ScrollView style={styles.content} contentContainerStyle={{height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+                <DaySection day="Monday"  events={getEventsForDay("MONDAY")} />
+                <DaySection day="Tuesday"  events={getEventsForDay("TUESDAY")} />
+                <DaySection day="Wednesday"  events={getEventsForDay("WEDNESDAY")} />
+                <DaySection day="Thursday"  events={getEventsForDay("THURSDAY")} />
+                <DaySection day="Friday"  events={getEventsForDay("FRIDAY")} />
+                <DaySection day="Saturday"  events={getEventsForDay("SATURDAY")} />
+            </ScrollView>
         </View>
     );
 };

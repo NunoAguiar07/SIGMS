@@ -7,14 +7,14 @@ export const styles = StyleSheet.create({
         alignItems: 'center',
         width: '95%',
         padding: 20,
-        backgroundColor: '#fef6ef',
+        backgroundColor: '#ead6bd',
     },
     homeContainer: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
         padding: 20,
-        backgroundColor: '#fef6ef',
+        backgroundColor: '#ead6bd',
     },
 
     scrollbar: {
@@ -29,9 +29,11 @@ export const styles = StyleSheet.create({
 
     content: {
         paddingRight: 10,
+        height: '100%'
     },
 
     daySection: {
+        width: '100%',
         backgroundColor: '#caa8a0',
         borderRadius: 12,
         padding: 12,
@@ -83,9 +85,10 @@ export const styles = StyleSheet.create({
         flexShrink: 1,
     },
     cardContainer: {
+        alignContent: 'space-evenly',
         width: '95%',
         maxWidth: 1000,
-        height: 600, // adjust this value to fit ~3 day sections
+        height: '100%', // adjust this value to fit ~3 day sections
         borderRadius: 20,
         backgroundColor: '#b88d89',
         padding: 16,

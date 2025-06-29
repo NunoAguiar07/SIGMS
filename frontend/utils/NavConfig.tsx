@@ -7,7 +7,6 @@ export const NAV_CONFIG: RoleNavConfig = {
         { href: '/home', iconName: 'home-outline', label: 'Home' },
         { href: '/calendar', iconName: 'calendar-outline', label: 'Calendar' },
         { href: '/join-subject', iconName: 'checkbox-outline', label: 'Classes' },
-        { href: '/notifications', iconName: 'notifications-outline', label: 'Notifications' },
         { href: '/issue-reports/create', iconName: 'school-outline', label: 'Create Issue' },
         { href: '/profile', iconName: 'person-outline', label: 'Profile' },
         { href: '/study-rooms', iconName: 'book-outline', label: 'Study Rooms' },
@@ -16,7 +15,6 @@ export const NAV_CONFIG: RoleNavConfig = {
         { href: '/home', iconName: 'home-outline', label: 'Home' },
         { href: '/calendar', iconName: 'calendar-outline', label: 'Calendar' },
         { href: '/join-subject', iconName: 'checkbox-outline', label: 'Classes' },
-        { href: '/notifications', iconName: 'notifications-outline', label: 'Notifications' },
         { href: '/issue-reports/create', iconName: 'school-outline', label: 'Create Issue' },
         { href: '/profile', iconName: 'person-outline', label: 'Profile' },
         { href: '/update-lecture', iconName: 'bar-chart-outline', label: 'Update Lecture' },
@@ -29,7 +27,6 @@ export const NAV_CONFIG: RoleNavConfig = {
         { href: '/generate-entities', iconName: 'add-circle-outline', label: 'Add Entities' },
         { href: '/profile', iconName: 'person-outline', label: 'Profile' },
         { href: '/update-lecture', iconName: 'bar-chart-outline', label: 'Update Lecture' },
-        { href: '/notifications', iconName: 'notifications-outline', label: 'Notifications' },
     ],
     TECHNICAL_SERVICE: [
         { href: '/home', iconName: 'home-outline', label: 'Home' },
@@ -37,6 +34,5 @@ export const NAV_CONFIG: RoleNavConfig = {
         { href: '/issue-reports/assigned', iconName: 'construct-outline', label: 'Issue Reports Assigned' },
         { href: '/issue-reports/create', iconName: 'school-outline', label: 'Create Issue' },
         { href: '/profile', iconName: 'person-outline', label: 'Profile' },
-        { href: '/notifications', iconName: 'notifications-outline', label: 'Notifications' },
     ]
 };
