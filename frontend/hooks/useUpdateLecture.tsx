@@ -1,7 +1,6 @@
 import {useEffect, useState} from "react";
 import {Lecture} from "../types/calendar/Lecture";
 import {ParsedError} from "../types/errors/ParseErrorTypes";
-import {Schedule} from "../types/calendar/Schedule";
 import {fetchLectures} from "../services/authorized/FetchLectures";
 import {Alert} from "react-native";
 import {updateLectureSchedule} from "../services/authorized/RequestUpdateLecture";
@@ -113,7 +112,6 @@ export const useUpdateLecture = () => {
                 effectiveFromDate,
                 effectiveUntilDate
             );
-
 
             if (!updated) {
                 throw new Error("Update failed.");
