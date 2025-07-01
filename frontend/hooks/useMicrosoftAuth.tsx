@@ -4,6 +4,7 @@ import * as WebBrowser from 'expo-web-browser';
 import {AuthService} from '../services/auth/microsoft/AuthService';
 import {ParsedError} from "../types/errors/ParseErrorTypes";
 import {fetchUserInfo} from "../services/authorized/fetchUserInfo";
+import {isMobile} from "../utils/DeviceType";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -13,26 +14,58 @@ export const useMicrosoftAuth = () => {
     const [loading, setLoading] = useState(false);
     const [request, response, promptAsync] = AuthService.initiateMicrosoftAuth();
 
+    const handleAuthPress = async () => {
+        try {
+            // On mobile, we need to warm up the browser first
+            if (isMobile) {
+                await WebBrowser.warmUpAsync();
+            }
+
+            const result = await promptAsync();
+
+            // On mobile, cool down the browser after auth
+            if (isMobile && result.type !== 'cancel') {
+                await WebBrowser.coolDownAsync();
+            }
+        } catch (err) {
+            console.error('Prompt error:', err);
+            setError(err as ParsedError);
+        }
+    };
+
     useEffect(() => {
         const handleAuthResponse = async () => {
             if (response?.type === 'success') {
                 try {
                     setLoading(true);
                     const { code } = response.params;
-                    const accessToken = await AuthService.exchangeCodeForTokens(code, request?.codeVerifier ?? '');
+                    const accessToken = await AuthService.exchangeCodeForTokens(
+                        code,
+                        request?.codeVerifier ?? ''
+                    );
                     await AuthService.authenticateWithBackend(accessToken);
                     await fetchUserInfo();
-                    setLoading(false);
                     router.push('/home');
                 } catch (error) {
-                    setLoading(false);
                     setError(error as ParsedError);
+                } finally {
+                    setLoading(false);
                 }
+            } else if (response?.type === 'error') {
+                setError({
+                    status: 500,
+                    message: response.error?.message || 'Authentication failed'
+                });
             }
         };
 
         handleAuthResponse();
     }, [response]);
 
-    return { promptAsync, disabled: !request, errorMicrosoftAuth :error, loadingMicrosoftAuth:loading };
+    return {
+        promptAsync: handleAuthPress,
+        disabled: !request,
+        errorMicrosoftAuth: error,
+        loadingMicrosoftAuth: loading
+    };
 };

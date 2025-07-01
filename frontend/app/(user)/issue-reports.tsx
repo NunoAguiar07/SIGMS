@@ -2,6 +2,7 @@ import ErrorHandler from "../(public)/error";
 import TechnicianUnassignedIssuesScreen from "../../screens/mainScreens/UnassignedIssuesScreen";
 import LoadingPresentation from "../../screens/auxScreens/LoadingScreen";
 import {useUnassignedIssues} from "../../hooks/useUnnasignedIssues";
+import {BackgroundImage} from "../../screens/components/BackgroundImage";
 
 
 const TechnicianUnassignedIssues = () => {
@@ -20,15 +21,16 @@ const TechnicianUnassignedIssues = () => {
     if (error) return <ErrorHandler errorStatus={error.status} errorMessage={error.message} />;
 
     return (
-        <TechnicianUnassignedIssuesScreen
-            issues={issues}
-            isLoading={loading}
-            currentPage={currentPage}
-            onNext={goToNextPage}
-            onPrevious={goToPreviousPage}
-            onAssign={assignIssue}
-            hasNext={hasNext}
-        />
+        <BackgroundImage>
+            <TechnicianUnassignedIssuesScreen
+                issues={issues}
+                currentPage={currentPage}
+                onNext={goToNextPage}
+                onPrevious={goToPreviousPage}
+                onAssign={assignIssue}
+                hasNext={hasNext}
+            />
+        </BackgroundImage>
     );
 };
 

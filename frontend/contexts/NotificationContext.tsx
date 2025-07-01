@@ -1,10 +1,10 @@
 import React, { createContext, ReactNode, useEffect, useState } from 'react';
-import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useWebsocketNotifications} from "../hooks/notifications/useWebsocketNotifications";
 import {useExpoPushNotifications} from "../hooks/notifications/useExpoPushNotifications";
 import {Notification} from "../types/notifications/Notification";
 import LoadingPresentation from "../screens/auxScreens/LoadingScreen";
+import {isMobile} from "../utils/DeviceType";
 
 
 interface NotificationContextType {
@@ -53,9 +53,7 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({child
 
 
 const useNotificationsInternal = (userId: number) => {
-    const platform = Platform.OS
-    console.log(Platform.OS)
-    if (platform === "web") {
+    if (!isMobile) {
         return useWebsocketNotifications({ userId });
     } else {
         return useExpoPushNotifications();

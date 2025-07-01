@@ -9,8 +9,8 @@ export const fetchUserInfo = async (): Promise<UserInfo> => {
         const response = await api.get('userInfo', { withCredentials: true });
         const { userId, universityId, userRole } = response.data;
         await AsyncStorage.multiSet([
-            ['userId', userId],
-            ['universityId', universityId],
+            ['userId', JSON.stringify(userId)],
+            ['universityId', JSON.stringify(universityId)],
             ['userRole', userRole]
         ]);
         return response.data;

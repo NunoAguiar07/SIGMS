@@ -1,10 +1,11 @@
 import {StyleSheet} from 'react-native';
+import {isMobile} from "../../../utils/DeviceType";
 
 export const profileStyles = StyleSheet.create({
     imageWrapper: {
         position: 'relative',
-        width: 300,
-        height: 300,
+        width: 200,
+        height: 200,
         marginBottom: 32,
         justifyContent: 'center',
         alignItems: 'center',
@@ -17,13 +18,13 @@ export const profileStyles = StyleSheet.create({
     },
     name: {
         fontWeight: 'bold',
-        fontSize: 36,
+        fontSize: !isMobile ? 32 : 24,
         marginBottom: 16,
         color: '#f4ece5',
     },
     info: {
         marginVertical: 6,
-        fontSize: 24,
+        fontSize: !isMobile ? 32 : 24,
         color: '#f4ece5',
     },
     editButton: {
@@ -51,5 +52,9 @@ export const profileStyles = StyleSheet.create({
         shadowOpacity: 0.1,
         shadowRadius: 4,
         elevation: 2,
+    },
+    infoContainer: {
+        alignSelf: 'stretch',
+        alignItems: 'center',
     },
 });

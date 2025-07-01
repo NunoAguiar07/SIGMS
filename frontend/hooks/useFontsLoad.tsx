@@ -1,23 +1,14 @@
-import {useEffect, useState} from "react";
-import * as Font from 'expo-font';
+import {useFonts} from "expo-font";
 
 export const useFontsLoad = () => {
-    const [fontsLoaded, setFontsLoaded] = useState(false);
-
-    useEffect(() => {
-        async function loadFonts() {
-            try {
-                await Font.loadAsync({
-                    'Roboto Condensed': require('../assets/fonts/roboto/RobotoCondensed-Regular.ttf'),
-                    'Roboto Condensed Bold': require('../assets/fonts/roboto/RobotoCondensed-Bold.ttf'),
-                });
-                setFontsLoaded(true);
-            } catch (error) {
-                console.error('Error loading fonts', error);
-            }
-        }
-        loadFonts();
-    }, []);
-
+    const [fontsLoaded, error] = useFonts({
+        'RobotoCondensed-Regular': require('../assets/fonts/roboto/RobotoCondensed-Regular.ttf'),
+        'RobotoCondensed-Light': require('../assets/fonts/roboto/RobotoCondensed-Light.ttf'),
+        'RobotoCondensed-Black': require('../assets/fonts/roboto/RobotoCondensed-Black.ttf'),
+        'RobotoCondensed-Bold': require('../assets/fonts/roboto/RobotoCondensed-Bold.ttf')
+    })
+    if(error){
+        console.log(error)
+    }
     return fontsLoaded;
 };

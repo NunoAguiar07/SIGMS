@@ -20,7 +20,6 @@ export const styles = StyleSheet.create({
         padding: 16,
     },
     logoutButton: {
-        position: 'relative',
         backgroundColor: '#671b22',
         paddingVertical: 12,
         paddingHorizontal: 24,

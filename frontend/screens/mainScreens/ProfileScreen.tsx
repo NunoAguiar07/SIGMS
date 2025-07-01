@@ -53,10 +53,16 @@ interface ProfileInfoType {
 }
 
 const ProfileInfo = ({ name, email, university }: ProfileInfoType) => (
-    <>
-        <Text style={profileStyles.name}>{name}</Text>
-        <Text style={profileStyles.info}>{email}</Text>
-        <Text style={profileStyles.info}>{university}</Text>
-    </>
+    <View style={profileStyles.infoContainer}>
+        <Text style={profileStyles.name} numberOfLines={1} ellipsizeMode="tail">
+            {name}
+        </Text>
+        <Text style={profileStyles.info} numberOfLines={2} ellipsizeMode="tail">
+            {email}
+        </Text>
+        <Text style={profileStyles.info} numberOfLines={2} ellipsizeMode="tail">
+            {university}
+        </Text>
+    </View>
 );
 

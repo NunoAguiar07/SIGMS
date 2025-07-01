@@ -2,6 +2,7 @@ import ErrorHandler from "../(public)/error";
 import LoadingPresentation from "../../screens/auxScreens/LoadingScreen";
 import {ProfileScreen} from "../../screens/mainScreens/ProfileScreen";
 import {useProfile} from "../../hooks/useProfile";
+import {BackgroundImage} from "../../screens/components/BackgroundImage";
 
 
 const Profile = () => {
@@ -27,11 +28,13 @@ const Profile = () => {
 
 
     return (
-        <ProfileScreen
-            profile={profile}
-            image={imageUri}
-            onPickImage={pickImage}
-        />
+        <BackgroundImage>
+            <ProfileScreen
+                profile={profile}
+                image={imageUri}
+                onPickImage={pickImage}
+            />
+        </BackgroundImage>
     );
 };
 

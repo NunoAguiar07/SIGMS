@@ -1,4 +1,5 @@
 import {StyleSheet} from "react-native";
+import {isMobile} from "../../../utils/DeviceType";
 
 
 export const commonStyles = StyleSheet.create({
@@ -6,14 +7,13 @@ export const commonStyles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        padding: 64, // 4rem ≈ 64px
-        backgroundColor: '#f8f0e6FF',
+        padding: 32, // 4rem ≈ 64px
+        backgroundColor: 'transparent',
     },
     card: {
         backgroundColor: '#bb9996',
         borderRadius: 32, // 2rem ≈ 32px
-        padding: 64,
-        width: 600,
+        padding: 48,
         borderWidth: 8,
         borderColor: '#651920',
         position: 'relative',
@@ -31,7 +31,7 @@ export const commonStyles = StyleSheet.create({
         paddingVertical: 20,
     },
     searchInput: {
-        width: '100%',
+        alignSelf: 'stretch',
         height: 50,
         borderWidth: 1,
         borderColor: '#651c24',
@@ -58,7 +58,7 @@ export const commonStyles = StyleSheet.create({
         padding: 16,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#fef6ef',
+        backgroundColor: '#ead6bd',
     },
     searchSubjectInput: {
         height: 50,
@@ -71,10 +71,11 @@ export const commonStyles = StyleSheet.create({
     },
     centerMiddleText: {
         color: '#671b22',
-        fontFamily: '"Roboto Condensed"',
+        fontFamily: 'RobotoCondensed',
         fontWeight: 400,
     },
     sectionTitle: {
+        textAlign: 'center',
         fontSize: 18,
         fontWeight: 'bold',
         marginBottom: 15,
@@ -82,7 +83,7 @@ export const commonStyles = StyleSheet.create({
     leftColumn: {
         flex: 1, // Takes 50% of width
         padding: 16,
-        paddingTop: '7%',
+        paddingTop: '10%',
         borderRightWidth: 1,
         borderRightColor: '#651c24',
         alignItems: 'center',
@@ -106,9 +107,9 @@ export const commonStyles = StyleSheet.create({
         marginTop: 20,
     },
     logo: {
-        width: 600,
-        height: 300,
-        resizeMode: 'contain',
+        width: '100%',
+        height: 250,
+        resizeMode: 'center',
         marginBottom: 20,
     },
     loginRegisterButton: {
@@ -125,9 +126,10 @@ export const commonStyles = StyleSheet.create({
     loginRegisterButtonText: {
         color: '#fff',
         fontSize: 18,
-        fontFamily: 'Roboto Condensed',
+        fontFamily: 'RobotoCondensed',
         fontWeight: '400',
     },
+
     title: {
         fontSize: 24,
         fontWeight: 'bold',
@@ -136,14 +138,14 @@ export const commonStyles = StyleSheet.create({
     },
     pickerContainer: {
         marginTop: 20,
-        width: '100%',
+        alignSelf: 'stretch',
+        backgroundColor: '#f8f0e6',
         marginBottom: 20,
     },
     picker: {
         width: '100%',
         height: 50,
-        color: '#000',
-        backgroundColor: '#f8f0e6',
+        backgroundColor: '#ead6bd',
         borderRadius: 8,
     },
     inputRow: {
@@ -156,9 +158,19 @@ export const commonStyles = StyleSheet.create({
         width: '30%',
         marginTop: '5%',
     },
+    inputColumn: {
+        alignSelf: 'stretch',
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    inputColumnItem: {
+        marginBottom: 16,
+    },
     buttonsContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
+        flexDirection: isMobile ? 'column' : 'row',
+        justifyContent: 'center', // Center along main axis
+        alignItems: 'center', // Center along cross axis
         width: '100%',
         marginTop: 20,
     },
@@ -180,7 +192,7 @@ export const commonStyles = StyleSheet.create({
     buttonText: {
         color: '#fff',
         fontSize: 18,
-        fontFamily: 'Roboto Condensed',
+        fontFamily: 'RobotoCondensed',
         fontWeight: '400',
     },
     tableHeader: {
@@ -280,7 +292,7 @@ export const commonStyles = StyleSheet.create({
     columnsContainer: {
         flex: 1,
         flexDirection: 'row', // Horizontal layout
-        backgroundColor: '#fef6ef',
+        backgroundColor: '#ead6bd',
     },
     input: {
         borderWidth: 1,

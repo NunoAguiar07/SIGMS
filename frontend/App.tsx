@@ -1,5 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
+import {useFontsLoad} from "./hooks/useFontsLoad";
+import LoadingPresentation from "./screens/auxScreens/LoadingScreen";
 
 export default function App() {
   return (

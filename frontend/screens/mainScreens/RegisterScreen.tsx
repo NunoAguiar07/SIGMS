@@ -4,6 +4,7 @@ import {universityStyles} from "../css_styling/university/UniversityProps";
 import {Picker} from '@react-native-picker/picker';
 import {RegisterScreenType} from "../types/RegisterScreenType";
 import {UniversityInterface} from "../../types/UniversityInterface";
+import {isMobile} from "../../utils/DeviceType";
 
 export const RegisterScreen = ({
     email,
@@ -70,9 +71,9 @@ export const AuthFormFields = ({
     onUsernameChange,
     onPasswordChange
 }: AuthFormFieldsType) => (
-    <View style={commonStyles.inputRow}>
+    <View style={!isMobile ? commonStyles.inputRow : commonStyles.inputColumn}>
         <TextInput
-            style={[commonStyles.searchInput, commonStyles.inputRowItem]}
+            style={[commonStyles.searchInput, !isMobile ? commonStyles.inputRowItem : commonStyles.inputColumnItem]}
             placeholder="Email"
             value={email}
             onChangeText={onEmailChange}
@@ -80,14 +81,14 @@ export const AuthFormFields = ({
             keyboardType="email-address"
         />
         <TextInput
-            style={[commonStyles.searchInput, commonStyles.inputRowItem]}
+            style={[commonStyles.searchInput, !isMobile ? commonStyles.inputRowItem : commonStyles.inputColumnItem]}
             placeholder="Username"
             value={username}
             onChangeText={onUsernameChange}
             autoCapitalize="none"
         />
         <TextInput
-            style={[commonStyles.searchInput, commonStyles.inputRowItem]}
+            style={[commonStyles.searchInput, !isMobile ? commonStyles.inputRowItem : commonStyles.inputColumnItem]}
             placeholder="Password"
             value={password}
             onChangeText={onPasswordChange}

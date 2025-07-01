@@ -31,28 +31,30 @@ const UpdateLecture = () => {
     }
 
     return (
-        <UpdateLectureScreen
-            lectures={lectures}
-            selectedLecture={selectedLecture}
-            newSchedule={selectedLecture}
-            onLectureSelect={onLectureSelect}
-            onScheduleChange={onScheduleChange}
-            onSaveSchedule={onSaveSchedule}
-            isSaving={isSaving}
-            rooms={rooms}
-            setSearchQuery={setSearchQuery}
-            searchQuery={searchQuery}
-            selectedRoom={selectedRoom}
-            handleRoomSelect={handleRoomSelect}
-            effectiveFrom={effectiveFrom}
-            setEffectiveFrom={setEffectiveFrom}
-            effectiveUntil={effectiveUntil}
-            setEffectiveUntil={setEffectiveUntil}
-            setEffectiveFromText={setEffectiveFromText}
-            setEffectiveUntilText={setEffectiveUntilText}
-            effectiveFromText={effectiveFromText}
-            effectiveUntilText={effectiveUntilText}
-        />
+        <BackgroundImage>
+            <UpdateLectureScreen
+                lectures={lectures}
+                selectedLecture={selectedLecture}
+                newSchedule={selectedLecture}
+                onLectureSelect={onLectureSelect}
+                onScheduleChange={onScheduleChange}
+                onSaveSchedule={onSaveSchedule}
+                isSaving={isSaving}
+                rooms={rooms}
+                setSearchQuery={setSearchQuery}
+                searchQuery={searchQuery}
+                selectedRoom={selectedRoom}
+                handleRoomSelect={handleRoomSelect}
+                effectiveFrom={effectiveFrom}
+                setEffectiveFrom={setEffectiveFrom}
+                effectiveUntil={effectiveUntil}
+                setEffectiveUntil={setEffectiveUntil}
+                setEffectiveFromText={setEffectiveFromText}
+                setEffectiveUntilText={setEffectiveUntilText}
+                effectiveFromText={effectiveFromText}
+                effectiveUntilText={effectiveUntilText}
+            />
+        </BackgroundImage>
     );
 };
 

@@ -1,5 +1,6 @@
-import {Platform} from "react-native";
+import {Dimensions, Platform} from "react-native";
 
+export const isMobile = Platform.OS !== 'web' || Dimensions.get('window').width < 768;
 
 export const getDeviceType = () => {
     if (Platform.OS === 'web') return 'WEB';

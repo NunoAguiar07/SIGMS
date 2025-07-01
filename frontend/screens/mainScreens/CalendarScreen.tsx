@@ -18,10 +18,11 @@ const CalendarScreen = ({ schedule, onClickProfile, onClickRoom }: CalendarScree
             }));
     };
 
+
     return (
         <View style={styles.container}>
             <View style={styles.cardContainer}>
-                <ScrollView style={styles.content}>
+                <ScrollView style={styles.content} contentContainerStyle={{height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
                     <DaySection day="Monday"  events={getEventsForDay("MONDAY")} onClickProfile={onClickProfile} onClickRoom={onClickRoom} />
                     <DaySection day="Tuesday"  events={getEventsForDay("TUESDAY")} onClickProfile={onClickProfile} onClickRoom={onClickRoom} />
                     <DaySection day="Wednesday"  events={getEventsForDay("WEDNESDAY")} onClickProfile={onClickProfile} onClickRoom={onClickRoom} />

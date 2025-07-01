@@ -9,6 +9,7 @@ import {About} from "../components/footer/About";
 import {FAQ} from "../components/footer/FAQ";
 import {Privacy} from "../components/footer/Privacy";
 import {WelcomeScreenType} from "../types/WelcomeScreenType";
+import {Logo} from "../components/Logo";
 
 export const WelcomeScreen = ({ welcome, onMicrosoftPress, microsoftDisabled } : WelcomeScreenType) => {
     const [showAbout, setShowAbout] = useState(false);
@@ -28,7 +29,7 @@ export const WelcomeScreen = ({ welcome, onMicrosoftPress, microsoftDisabled } :
             />
 
             <View style={commonStyles.centerContainer}>
-                <Image source={require('../../assets/Logo.webp')} style={commonStyles.logo} />
+                <Logo/>
                 <Text style={welcomeStyles.slogan}>{welcome.title}</Text>
                 <Text style={welcomeStyles.slogan}>A tua sala de aula, mais simples.</Text>
 

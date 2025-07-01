@@ -3,13 +3,13 @@ import {StyleSheet} from "react-native";
 
 export const createReportStyle = StyleSheet.create({
     joinClassButton: {
-        width: '20%',
+        minWidth: 150,
         marginTop: 16,
         paddingVertical: 8,
         paddingHorizontal: 24,
         backgroundColor: '#651920',
         color: 'white', // Only applies in text components
-        borderRadius: 16,
+        borderRadius: 8,
         justifyContent: 'center',
         alignItems: 'center',
         alignSelf : 'center',
@@ -20,7 +20,7 @@ export const createReportStyle = StyleSheet.create({
         alignItems: 'center',
         paddingVertical: 12,
         borderBottomWidth: 1,
-        backgroundColor: '#fef6ef',
+        backgroundColor: '#f8f0e6FF',
         borderBottomColor: '#651c24',
     },
     issuesListContainer: {
@@ -52,7 +52,7 @@ export const createReportStyle = StyleSheet.create({
         marginTop: '10%',
         width: '60%',
         borderTopWidth: 1,
-        borderTopColor: '#fef6ef',
+        borderTopColor: '#f8f0e6FF',
         paddingTop: 20,
     },
     joinButtonText: {
@@ -63,7 +63,7 @@ export const createReportStyle = StyleSheet.create({
     joinClassContainer: {
         flex: 1,
         flexDirection: 'row', // Horizontal layout
-        backgroundColor: '#fef6ef',
+        backgroundColor: '#f8f0e6FF',
     },
     reportInput: {
         height: 120,

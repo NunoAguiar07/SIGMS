@@ -14,7 +14,7 @@ const MicrosoftAuthButton = ({ onPress, disabled } : MicrosoftAuthButtonType) =>
                 disabled={disabled}
             >
                 <Image
-                    source={require('../../assets/microsoft_logo.jpg')}
+                    source={require('../../assets/Microsoft_logo.svg.png')}
                     style={{ width: 24, height: 24 }}
                     resizeMode="contain"
                 />

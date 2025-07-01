@@ -4,6 +4,7 @@ import LoadingPresentation from "../../screens/auxScreens/LoadingScreen";
 import * as WebBrowser from 'expo-web-browser';
 import {useMicrosoftAuth} from "../../hooks/useMicrosoftAuth";
 import {useWelcomeData} from "../../hooks/useWelcomeData";
+import {BackgroundImage} from "../../screens/components/BackgroundImage";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -16,11 +17,13 @@ const Welcome = () => {
     if (loadingWelcomeData || !data || loadingMicrosoftAuth) return <LoadingPresentation />;
 
     return (
-        <WelcomeScreen
-            welcome={data}
-            onMicrosoftPress={promptAsync}
-            microsoftDisabled={disabled}
-        />
+        <BackgroundImage>
+            <WelcomeScreen
+                welcome={data}
+                onMicrosoftPress={promptAsync}
+                microsoftDisabled={disabled}
+            />
+        </BackgroundImage>
     );
 };
 

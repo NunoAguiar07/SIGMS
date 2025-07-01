@@ -3,7 +3,7 @@ import {StyleSheet} from "react-native";
 
 export const universityStyles = StyleSheet.create({
     universitySearchContainer: {
-        width: '100%',
+        alignSelf: "stretch",
         justifyContent:'center',
         alignItems: 'center',
         position: 'relative',
@@ -11,15 +11,14 @@ export const universityStyles = StyleSheet.create({
     },
     universityResultsContainer: {
         position: 'absolute',
-        top: '55%', // Position below the search input
-        left: 0,
-        right: 0,
+        top: '100%',
+        alignSelf: 'stretch',
         backgroundColor: '#fff',
         maxHeight: 200,
         borderWidth: 1,
         borderColor: '#651c24',
         borderRadius: 8,
-        zIndex: 4,
+        zIndex: 4, // Ensure it appears above other elements
         elevation: 3, // For Android shadow
         shadowColor: '#000', // For iOS shadow
         shadowOffset: { width: 0, height: 2 },

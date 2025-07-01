@@ -15,7 +15,7 @@ export const welcomeStyles = StyleSheet.create({
     slogan: {
         color: '#671b22',
         fontSize: 42,
-        fontFamily: 'Roboto Condensed',
+        fontFamily: 'RobotoCondensed',
         textAlign: 'center',
         marginBottom: 20,
     },
@@ -26,7 +26,7 @@ export const welcomeStyles = StyleSheet.create({
     footerText: {
         color: 'rgba(184, 178, 171, 1)',
         fontSize: 40,
-        fontFamily: 'Roboto Condensed',
+        fontFamily: 'RobotoCondensed',
         fontWeight: '400',
         textTransform: 'none',
         textAlign: 'left',
@@ -48,7 +48,7 @@ export const welcomeStyles = StyleSheet.create({
     microsoftButtonText: {
         color: '#671b22',
         fontSize: 18,
-        fontFamily: 'Roboto Condensed',
+        fontFamily: 'RobotoCondensed',
         fontWeight: '400',
         marginLeft: 10,
     },
