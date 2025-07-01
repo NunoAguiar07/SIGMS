@@ -102,7 +102,7 @@ fun Application.module() {
     install(Authentication) {
         oauth("auth-microsoft") {
             client = applicationHttpClient
-            urlProvider = { "http://$frontEndUrl/auth/microsoft/callback" }
+            urlProvider = { "https://$frontEndUrl/auth/microsoft/callback" }
             providerLookup = {
                 OAuthServerSettings.OAuth2ServerSettings(
                     name = "microsoft",

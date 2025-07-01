@@ -1,6 +1,7 @@
 package isel.leic.group25.services
 
 import isel.leic.group25.db.entities.types.Role
+import isel.leic.group25.db.entities.users.Teacher
 import isel.leic.group25.db.entities.users.User
 import isel.leic.group25.db.repositories.Repositories
 import isel.leic.group25.db.repositories.interfaces.Transactionable
@@ -11,6 +12,8 @@ import isel.leic.group25.utils.success
 import java.sql.SQLException
 
 typealias UserResult = Either<AuthError, User>
+
+typealias TeacherResult = Either<AuthError, Teacher>
 
 typealias RoleResult = Either<AuthError, Role?>
 
@@ -32,6 +35,14 @@ class UserService(private val repositories: Repositories,
                 findById(id)
             } ?: return@runCatching failure(AuthError.UserNotFound)
             return@runCatching success(user)
+        }
+    }
+
+    fun getTeacherById(id: Int): TeacherResult {
+        return runCatching {
+            val teacher = repositories.from({teacherRepository}){findTeacherById(id)}
+                ?: return@runCatching failure(AuthError.UserNotFound)
+            return@runCatching success(teacher)
         }
     }
 

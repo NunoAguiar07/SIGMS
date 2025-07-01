@@ -3,6 +3,7 @@ package isel.leic.group25.services
 import isel.leic.group25.db.entities.timetables.Class
 import isel.leic.group25.db.entities.timetables.Lecture
 import isel.leic.group25.db.entities.types.Role
+import isel.leic.group25.db.entities.users.Teacher
 import isel.leic.group25.db.entities.users.User
 import isel.leic.group25.db.repositories.Repositories
 import isel.leic.group25.db.repositories.interfaces.Transactionable
@@ -17,6 +18,8 @@ typealias UserClassCreated = Either<UserClassError, Boolean>
 typealias UserClassDeleted = Either<UserClassError, Boolean>
 
 typealias UserLectureListResult = Either<UserClassError, List<Lecture>>
+
+typealias UserLectureWithTeacherListResult = Either<UserClassError, List<Pair<Lecture, List<Teacher>>>>
 
 typealias UserClassListResult = Either<UserClassError, List<Class>>
 
@@ -94,7 +97,7 @@ class UserClassService(
         }
     }
 
-    fun getScheduleByUserId(userId: Int, role: Role, limit:Int, offset:Int): UserLectureListResult {
+    fun getScheduleByUserId(userId: Int, role: Role, limit:Int, offset:Int): UserLectureWithTeacherListResult {
         return runCatching {
             transactionable.useTransaction {
                 val user = repositories.from({userRepository}){
@@ -105,7 +108,7 @@ class UserClassService(
                         studentSchedule(user, limit, offset)
                     }
                     Role.TEACHER -> {
-                        teacherSchedule(user)
+                        teacherSchedule(user, limit, offset)
                     }
                     else -> failure(UserClassError.InvalidRole)
                 }
@@ -182,38 +185,50 @@ class UserClassService(
         return success(true)
     }
 
-    private fun studentSchedule(user: User, limit:Int, offset: Int): Either<UserClassError, List<Lecture>> {
-        val classes = repositories.from({classRepository}){
+    private fun studentSchedule(user: User, limit: Int, offset: Int): Either<UserClassError, List<Pair<Lecture, List<Teacher>>>> {
+        val classes = repositories.from({ classRepository }) {
             findClassesByStudentId(user.id)
         }
-        if(classes.isEmpty()) {
+        if (classes.isEmpty()) {
             return success(emptyList())
         }
-        val lectures = classes.flatMap { classEntity ->
+
+        val lectureTeacherPairs = classes.flatMap { classEntity ->
+            val teacher = repositories.from({ teacherRepository }) {
+                findTeachersByClassId(classEntity.id)
+            }
+
             repositories.from({ lectureRepository }) {
                 getLecturesByClass(classEntity.id, limit, offset)
+            }.map { lecture ->
+                lecture to teacher
             }
-        }.sortedBy { it.weekDay }
-        if(lectures.isEmpty()) {
-            return success(emptyList())
-        }
-        return success(lectures)
+        }.sortedBy { it.first.weekDay }
+        println(lectureTeacherPairs)
+        return success(lectureTeacherPairs)
     }
 
-    private fun teacherSchedule(user: User): Either<UserClassError, List<Lecture>> {
-        val classes = repositories.from({classRepository}){
-            findClassesByTeacherId(user.id)
+    private fun teacherSchedule(user: User, limit: Int, offset: Int): Either<UserClassError, List<Pair<Lecture, List<Teacher>>>> {
+        val classes = repositories.from({ classRepository }) {
+            findClassesByStudentId(user.id)
         }
-        if(classes.isEmpty()) {
+        if (classes.isEmpty()) {
             return success(emptyList())
         }
-        val lectures = repositories.from({lectureRepository}){
-            getLecturesByClass(classes[0].id, 100, 0)
-        }
-        if(lectures.isEmpty()) {
-            return success(emptyList())
-        }
-        return success(lectures)
+
+        val lectureTeacherPairs = classes.flatMap { classEntity ->
+            val teacher = repositories.from({ teacherRepository }) {
+                findTeachersByClassId(classEntity.id)
+            }
+
+            repositories.from({ lectureRepository }) {
+                getLecturesByClass(classEntity.id, limit, offset)
+            }.map { lecture ->
+                lecture to teacher
+            }
+        }.sortedBy { it.first.weekDay }
+
+        return success(lectureTeacherPairs)
     }
 }
 

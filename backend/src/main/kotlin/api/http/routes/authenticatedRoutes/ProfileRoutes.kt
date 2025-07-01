@@ -9,6 +9,7 @@ import io.ktor.server.routing.*
 import io.ktor.server.response.*
 import isel.leic.group25.api.exceptions.respondEither
 import isel.leic.group25.api.jwt.getUserIdFromPrincipal
+import isel.leic.group25.api.model.response.TeacherResponse
 import isel.leic.group25.services.Services
 
 /**
@@ -25,6 +26,7 @@ import isel.leic.group25.services.Services
 fun Route.profileRoutes(services: Services) {
     route("/profile") {
         getProfileRoute(services)
+        getTeacherProfileByIdRoute(services)
         updateProfileRoute(services)
         changePasswordRoute(services)
     }
@@ -51,6 +53,30 @@ fun Route.getProfileRoute(services: Services) {
             }
         )
     }
+}
+
+/**
+ * Retrieves a user's profile by their ID.
+ * Requires valid authentication.
+ *
+ * @receiver Route The Ktor route for this endpoint
+ * @param userService Service handling user data retrieval
+ */
+fun Route.getTeacherProfileByIdRoute(services: Services) {
+    get("/{userId}") {
+        val userId = call.parameters["userId"]?.toIntOrNull() ?: return@get call.respond(HttpStatusCode.BadRequest, "Invalid user ID")
+        val result = services.from({userService}){
+            getTeacherById(userId)
+        }
+        call.respondEither(
+            either = result,
+            transformError = { error -> error.toProblem() },
+            transformSuccess = { teacher ->
+                TeacherResponse.from(teacher)
+            }
+        )
+    }
+
 }
 
 /**

@@ -347,3 +347,187 @@ VALUES (
            '11:00',
            '12:30'
        );
+
+
+INSERT INTO USERS (email, username, password, auth_provider, university_id)
+VALUES
+    ('teacher1@example.com', 'teacher1', 'hashed_password', 'local', (SELECT id FROM UNIVERSITY WHERE university_name = 'Instituto Superior de Engenharia de Lisboa')),
+    ('teacher2@example.com', 'teacher2', 'hashed_password', 'local', (SELECT id FROM UNIVERSITY WHERE university_name = 'Instituto Superior de Engenharia de Lisboa')),
+    ('teacher3@example.com', 'teacher3', 'hashed_password', 'local', (SELECT id FROM UNIVERSITY WHERE university_name = 'Instituto Superior de Engenharia de Lisboa')),
+    ('teacher4@example.com', 'teacher4', 'hashed_password', 'local', (SELECT id FROM UNIVERSITY WHERE university_name = 'Instituto Superior de Engenharia de Lisboa')),
+    ('teacher5@example.com', 'teacher5', 'hashed_password', 'local', (SELECT id FROM UNIVERSITY WHERE university_name = 'Instituto Superior de Engenharia de Lisboa')),
+    ('teacher6@example.com', 'teacher6', 'hashed_password', 'local', (SELECT id FROM UNIVERSITY WHERE university_name = 'Instituto Superior de Engenharia de Lisboa'))
+ON CONFLICT (email) DO NOTHING;
+
+-- Insert office rooms for teachers
+INSERT INTO ROOM (room_name, capacity, university_id)
+VALUES
+    ('Office_Teacher1', 1, (SELECT id FROM UNIVERSITY WHERE university_name = 'Instituto Superior de Engenharia de Lisboa')),
+    ('Office_Teacher2', 1, (SELECT id FROM UNIVERSITY WHERE university_name = 'Instituto Superior de Engenharia de Lisboa')),
+    ('Office_Teacher3', 1, (SELECT id FROM UNIVERSITY WHERE university_name = 'Instituto Superior de Engenharia de Lisboa')),
+    ('Office_Teacher4', 1, (SELECT id FROM UNIVERSITY WHERE university_name = 'Instituto Superior de Engenharia de Lisboa')),
+    ('Office_Teacher5', 1, (SELECT id FROM UNIVERSITY WHERE university_name = 'Instituto Superior de Engenharia de Lisboa')),
+    ('Office_Teacher6', 1, (SELECT id FROM UNIVERSITY WHERE university_name = 'Instituto Superior de Engenharia de Lisboa'))
+ON CONFLICT (room_name, university_id) DO NOTHING;
+
+
+-- Register the inserted rooms as OFFICE_ROOMs
+INSERT INTO OFFICE_ROOM (id)
+SELECT id FROM ROOM
+WHERE room_name IN (
+                    'Office_Teacher1',
+                    'Office_Teacher2',
+                    'Office_Teacher3',
+                    'Office_Teacher4',
+                    'Office_Teacher5',
+                   'Office_Teacher6'
+    )
+ON CONFLICT DO NOTHING;
+
+INSERT INTO TEACHER (user_id, office_id)
+VALUES
+    (
+        (SELECT id FROM USERS WHERE email = 'teacher1@example.com'),
+        (SELECT id FROM ROOM WHERE room_name = 'Office_Teacher1')
+    ),
+    (
+        (SELECT id FROM USERS WHERE email = 'teacher2@example.com'),
+        (SELECT id FROM ROOM WHERE room_name = 'Office_Teacher2')
+    ),
+    (
+        (SELECT id FROM USERS WHERE email = 'teacher3@example.com'),
+        (SELECT id FROM ROOM WHERE room_name = 'Office_Teacher3')
+    ),
+    (
+        (SELECT id FROM USERS WHERE email = 'teacher4@example.com'),
+        (SELECT id FROM ROOM WHERE room_name = 'Office_Teacher4')
+    ),
+    (
+        (SELECT id FROM USERS WHERE email = 'teacher5@example.com'),
+        (SELECT id FROM ROOM WHERE room_name = 'Office_Teacher5')
+    ),
+    (
+        (SELECT id FROM USERS WHERE email = 'teacher6@example.com'),
+        (SELECT id FROM ROOM WHERE room_name = 'Office_Teacher6')
+    )
+
+ON CONFLICT (user_id) DO NOTHING;
+
+
+
+-- teacher1 teaches Calculus T1, T2
+INSERT INTO TEACH (teacher_id, class_id)
+SELECT t.user_id, c.id
+FROM TEACHER t, CLASS c
+WHERE t.user_id = (SELECT id FROM USERS WHERE email = 'teacher1@example.com')
+  AND c.subject_id = (SELECT id FROM SUBJECT WHERE subject_name = 'Calculus')
+  AND c.class_name IN ('T1', 'T2')
+ON CONFLICT DO NOTHING;
+-- calculus has 2 teachers
+INSERT INTO TEACH (teacher_id, class_id)
+SELECT t.user_id, c.id
+FROM TEACHER t, CLASS c
+WHERE t.user_id = (SELECT id FROM USERS WHERE email = 'teacher6@example.com')
+  AND c.subject_id = (SELECT id FROM SUBJECT WHERE subject_name = 'Calculus')
+  AND c.class_name IN ('T1', 'T2')
+ON CONFLICT DO NOTHING;
+
+-- teacher2 teaches Linear Algebra T1 and Physics T2
+INSERT INTO TEACH (teacher_id, class_id)
+SELECT t.user_id, c.id
+FROM TEACHER t, CLASS c
+WHERE t.user_id = (SELECT id FROM USERS WHERE email = 'teacher2@example.com')
+  AND (
+    (c.subject_id = (SELECT id FROM SUBJECT WHERE subject_name = 'Linear Algebra') AND c.class_name = 'T1') OR
+    (c.subject_id = (SELECT id FROM SUBJECT WHERE subject_name = 'Physics') AND c.class_name = 'T2')
+    )
+ON CONFLICT DO NOTHING;
+
+-- teacher3 teaches Programming Fundamentals T1, T3
+INSERT INTO TEACH (teacher_id, class_id)
+SELECT t.user_id, c.id
+FROM TEACHER t, CLASS c
+WHERE t.user_id = (SELECT id FROM USERS WHERE email = 'teacher3@example.com')
+  AND c.subject_id = (SELECT id FROM SUBJECT WHERE subject_name = 'Programming Fundamentals')
+  AND c.class_name IN ('T1', 'T3')
+ON CONFLICT DO NOTHING;
+
+-- teacher4 teaches Operating Systems T2 and Database Systems T2
+INSERT INTO TEACH (teacher_id, class_id)
+SELECT t.user_id, c.id
+FROM TEACHER t, CLASS c
+WHERE t.user_id = (SELECT id FROM USERS WHERE email = 'teacher4@example.com')
+  AND (
+    (c.subject_id = (SELECT id FROM SUBJECT WHERE subject_name = 'Operating Systems') AND c.class_name = 'T2') OR
+    (c.subject_id = (SELECT id FROM SUBJECT WHERE subject_name = 'Database Systems') AND c.class_name = 'T2')
+    )
+ON CONFLICT DO NOTHING;
+
+-- teacher5 teaches Artificial Intelligence T1 and Distributed Systems T2
+INSERT INTO TEACH (teacher_id, class_id)
+SELECT t.user_id, c.id
+FROM TEACHER t, CLASS c
+WHERE t.user_id = (SELECT id FROM USERS WHERE email = 'teacher5@example.com')
+  AND (
+    (c.subject_id = (SELECT id FROM SUBJECT WHERE subject_name = 'Artificial Intelligence') AND c.class_name = 'T1') OR
+    (c.subject_id = (SELECT id FROM SUBJECT WHERE subject_name = 'Distributed Systems') AND c.class_name = 'T2')
+    )
+ON CONFLICT DO NOTHING;
+
+INSERT INTO LECTURE (class_id, room_id, class_type, week_day, start_time, end_time)
+VALUES (
+           (SELECT id FROM CLASS WHERE class_name = 'T2' AND subject_id = (SELECT id FROM SUBJECT WHERE subject_name = 'Linear Algebra')),
+           (SELECT id FROM CLASSROOM WHERE id = (SELECT id FROM ROOM WHERE room_name = 'B2')),
+           'theoretical',
+           4,
+           '09:30',
+           '11:00'
+       );
+
+
+-- Physics – T1
+INSERT INTO LECTURE (class_id, room_id, class_type, week_day, start_time, end_time)
+VALUES (
+           (SELECT id FROM CLASS WHERE class_name = 'T1' AND subject_id = (SELECT id FROM SUBJECT WHERE subject_name = 'Physics')),
+           (SELECT id FROM CLASSROOM WHERE id = (SELECT id FROM ROOM WHERE room_name = 'A3')),
+           'theoretical',
+           1,
+           '14:00',
+           '15:30'
+       );
+
+-- Programming Fundamentals – T2
+INSERT INTO LECTURE (class_id, room_id, class_type, week_day, start_time, end_time)
+VALUES (
+           (SELECT id FROM CLASS WHERE class_name = 'T2' AND subject_id = (SELECT id FROM SUBJECT WHERE subject_name = 'Programming Fundamentals')),
+           (SELECT id FROM CLASSROOM WHERE id = (SELECT id FROM ROOM WHERE room_name = 'Lab Informática 2')),
+           'practical',
+           2,
+           '15:30',
+           '18:30'
+       );
+
+
+-- Programming Fundamentals – T3
+INSERT INTO LECTURE (class_id, room_id, class_type, week_day, start_time, end_time)
+VALUES (
+           (SELECT id FROM CLASS WHERE class_name = 'T3' AND subject_id = (SELECT id FROM SUBJECT WHERE subject_name = 'Programming Fundamentals')),
+           (SELECT id FROM CLASSROOM WHERE id = (SELECT id FROM ROOM WHERE room_name = 'B3')),
+           'practical',
+           5,
+           '08:00',
+           '10:30'
+       );
+
+-- Computer Networks – T2
+INSERT INTO LECTURE (class_id, room_id, class_type, week_day, start_time, end_time)
+VALUES (
+           (SELECT id FROM CLASS WHERE class_name = 'T2' AND subject_id = (SELECT id FROM SUBJECT WHERE subject_name = 'Computer Networks')),
+           (SELECT id FROM CLASSROOM WHERE id = (SELECT id FROM ROOM WHERE room_name = 'C2')),
+           'theoretical_practical',
+           3,
+           '14:00',
+           '15:30'
+       );
+
+

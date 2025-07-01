@@ -9,4 +9,6 @@ interface TeacherRepositoryInterface {
     fun findTeacherByEmail(email: String): Teacher?
 
     fun isTeacher(user: User): Boolean
+
+    fun findTeachersByClassId(classId: Int): List<Teacher>
 }
