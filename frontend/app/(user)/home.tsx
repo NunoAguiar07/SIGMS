@@ -11,7 +11,7 @@ import {BackgroundImage} from "../../screens/components/BackgroundImage";
 const Home = () => {
     const { handleLogout, loadingLogout, errorLogout } = useLogout();
     const { profile, loading: loadingProfile, error: errorProfile } = useProfile();
-    const { schedule, loading: loadingSchedule, error: errorSchedule } = useSchedule()
+    const { schedule, loading: loadingSchedule, error: errorSchedule, onClickProfile, onClickRoom } = useSchedule()
     const { notifications, clearNotification } = useNotifications()
     const errors = [errorLogout, errorProfile, errorSchedule];
     const firstError = errors.find(err => err != null);
@@ -23,7 +23,7 @@ const Home = () => {
     }
     return (
         <BackgroundImage>
-            <HomeScreen onLogout={handleLogout} username={profile.username} schedule={schedule} notifications={notifications} clearNotification={clearNotification} />
+            <HomeScreen onLogout={handleLogout} username={profile.username} schedule={schedule} notifications={notifications} clearNotification={clearNotification} onClickRoom={onClickRoom} onClickProfile={onClickProfile} />
         </BackgroundImage>
     );
 };

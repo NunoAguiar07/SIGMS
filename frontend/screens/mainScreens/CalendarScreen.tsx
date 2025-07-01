@@ -47,7 +47,7 @@ const DaySection = ({ day, events, onClickProfile, onClickRoom } : DayType) => (
 
 
                         <Text style={styles.teacherNames}>
-                            Teachers: {event.teachers.map(t => t.name).join(", ")}
+                            Teachers: {event.teachers.map((t: { name: string; }) => t.name).join(', ')}
                         </Text>
 
 

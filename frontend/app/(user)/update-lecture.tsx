@@ -1,6 +1,8 @@
 import ErrorHandler from "../(public)/error";
 import {UpdateLectureScreen} from "../../screens/mainScreens/UpdateLectureScreen";
-import {useUpdateLecture} from "../../hooks/UseUpdateLecture";
+import {useUpdateLecture} from "../../hooks/useUpdateLecture";
+import {BackgroundImage} from "../../screens/components/BackgroundImage";
+
 
 const UpdateLecture = () => {
     const {

@@ -8,7 +8,7 @@ import {TextStyles} from "../css_styling/common/Text";
 import CalendarScreen from "./CalendarScreen";
 import {NotificationsScreen} from "./NotificationsScreen";
 
-export const HomeScreen = ({ onLogout, username, schedule, notifications, clearNotification }: HomeScreenType) => {
+export const HomeScreen = ({ onLogout, username, schedule, notifications, clearNotification, onClickProfile, onClickRoom }: HomeScreenType) => {
     return (
         <View style={commonStyles.container}>
 
@@ -21,7 +21,7 @@ export const HomeScreen = ({ onLogout, username, schedule, notifications, clearN
                     </View>
                 </View>
                 <View style={[getColumnStyle(60, 0), {margin: 10}]}>
-                    <CalendarScreen schedule={schedule}/>
+                    <CalendarScreen schedule={schedule} onClickProfile={onClickProfile} onClickRoom={onClickRoom}/>
                 </View>
                 <View style={[getColumnStyle(10, 0), {margin: 10}]}>
                     <NotificationsScreen notifications={notifications} clearNotification={clearNotification}/>
