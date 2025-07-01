@@ -1,5 +1,5 @@
 import ErrorHandler from "../(public)/error";
-import {UpdateLectureScreen} from "../../screens/UpdateLectureScreen";
+import {UpdateLectureScreen} from "../../screens/mainScreens/UpdateLectureScreen";
 import {useUpdateLecture} from "../../hooks/UseUpdateLecture";
 
 const UpdateLecture = () => {

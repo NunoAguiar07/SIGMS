@@ -62,13 +62,14 @@ export const styles = StyleSheet.create({
     },
 
     eventItem: {
-        flexDirection: 'row',
-        alignItems: 'center',
+        flexDirection: 'column',
+        alignItems: 'flex-start',
         marginBottom: 16,
         paddingLeft: 10,
         borderLeftWidth: 4,
         borderLeftColor: '#651c24',
     },
+
 
     eventTime: {
         fontWeight: 'bold',
@@ -98,5 +99,39 @@ export const styles = StyleSheet.create({
         elevation: 5,
         overflow: 'hidden', // important for clean scroll boundaries
     },
+    teacherButtonRow: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        justifyContent: 'flex-end',
+        width: '100%',
+        marginTop: 8,
+    },
+
+    teacherCard: {
+        backgroundColor: '#eee',
+        paddingVertical: 8,
+        paddingHorizontal: 16,
+        borderRadius: 12,
+        marginRight: 8,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.2,
+        shadowRadius: 2,
+        elevation: 2,
+    },
+
+    teacherCardText: {
+        fontWeight: 'bold',
+        fontSize: 14,
+        color: '#651920',
+    },
+    teacherNames: {
+        fontSize: 14,
+        fontWeight: '500',
+        marginTop: 4,
+        marginBottom: 4,
+        color: '#333', // adjust color if needed
+    },
+
 
 });

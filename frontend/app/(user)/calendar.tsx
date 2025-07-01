@@ -5,12 +5,12 @@ import {useSchedule} from "../../hooks/useSchedule";
 import CalendarScreen from "../../screens/mainScreens/CalendarScreen";
 
 const Calendar = () => {
-    const { schedule, error, loading } = useSchedule();
+    const { schedule, error, loading, onClickProfile, onClickRoom } = useSchedule();
 
     if (loading) return <LoadingPresentation />;
     if (error) return <ErrorHandler errorStatus={error.status} errorMessage={error.message} />;
 
-    return <CalendarScreen schedule={schedule} />;
+    return <CalendarScreen schedule={schedule} onClickProfile={onClickProfile} onClickRoom={onClickRoom} />;
 };
 
 export default Calendar;

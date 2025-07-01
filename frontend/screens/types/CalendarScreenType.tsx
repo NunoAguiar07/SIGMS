@@ -1,4 +1,7 @@
-import {Lecture} from "../../types/calendar/Lecture";
+
+import {LectureWithTeacher} from "../../types/LectureWithTeacher";
 export interface CalendarScreenType {
-    schedule: Lecture[]
+    schedule: LectureWithTeacher[];
+    onClickProfile : (id:number) => void;
+    onClickRoom : (id:number) => void;
 }

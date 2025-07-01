@@ -5,7 +5,7 @@ import {ProfileInterface} from "../../types/ProfileInterface";
 export const fetchProfile = async (): Promise<ProfileInterface> => {
     try {
         const response = await api.get('/profile', { withCredentials: true });
-        console.log("Fetched profile data:", response.data);
+        console.log("Fetched teacher data:", response.data);
         return response.data;
     } catch (error) {
         throw handleAxiosError(error);

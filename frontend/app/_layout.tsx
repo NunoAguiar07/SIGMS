@@ -9,8 +9,7 @@ export default function RootLayout() {
                     headerShown: false, // Hides the header for all screens in (user)
                 }}
             >
-                {/* Optional: If you still need tabs somewhere */}
-                {/*<Stack.Screen name="(tabs)" options={{ headerShown: false }} />*/}
+
             </Stack>
         </NotificationProvider>
     );

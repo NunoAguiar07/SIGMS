@@ -1,9 +1,9 @@
 import {ActivityIndicator, FlatList, Text, TextInput, TouchableOpacity, View} from "react-native";
-import {scheduleLectureStyles} from "../css_styling/lecture/scheduleLectureStyles";
-import {commonStyles} from "./css_styling/common/CommonProps";
+import {scheduleLectureStyles} from "../../css_styling/lecture/scheduleLectureStyles";
+import {commonStyles} from "../css_styling/common/CommonProps";
 import {Picker} from "@react-native-picker/picker";
-import {RoomInterface} from "../types/RoomInterface";
-import {Lecture} from "../types/calendar/Lecture";
+import {RoomInterface} from "../../types/RoomInterface";
+import {Lecture} from "../../types/calendar/Lecture";
 
 
 interface Props {

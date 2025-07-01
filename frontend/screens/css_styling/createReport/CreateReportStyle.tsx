@@ -75,7 +75,13 @@ export const createReportStyle = StyleSheet.create({
         marginTop: 12,
         marginBottom: 16,
         textAlignVertical: 'top',
-    }
+    },
+    fullScreenContainer: {
+        padding: 20,
+        backgroundColor: "#fff",
+        flexGrow: 1,
+    },
+
 })
 
 
