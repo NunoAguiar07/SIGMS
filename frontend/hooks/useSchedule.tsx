@@ -2,11 +2,10 @@ import {useFocusEffect, useRouter} from "expo-router";
 import {useCallback, useState} from "react";
 import {ParsedError} from "../types/errors/ParseErrorTypes";
 import {fetchSchedule} from "../services/authorized/fetchSchedule";
-import {Lecture} from "../types/calendar/Lecture";
-import {ScheduleItem} from "../types/ScheduleItem";
+import {LectureWithTeacher} from "../types/LectureWithTeacher";
 
 export const useSchedule = () => {
-    const [schedule, setSchedule] = useState<ScheduleItem[]>([]);
+    const [schedule, setSchedule] = useState<LectureWithTeacher[]>([]);
     const [error, setError] = useState<ParsedError | null>(null);
     const [loading, setLoading] = useState(true);
     const TIMING = 150000; // 2.5min
@@ -33,11 +32,9 @@ export const useSchedule = () => {
     );
 
     const onClickProfile =  (id :number) => {
-        console.log("Clicked profile with ID:", id);
         router.push(`/teacher/` + encodeURIComponent(id));
     }
     const onClickRoom = (id: number) => {
-        console.log("Clicked room with ID:", id);
         router.push(`/roomReports/` + encodeURIComponent(id));
     }
 

@@ -52,7 +52,7 @@ export const useProfile = () => {
             allowsEditing: true,
             aspect: [1, 1],
             quality: 1,
-            base64: true, // ✅ Request base64 format explicitly
+            base64: true,
         });
 
         if (!result.canceled && result.assets[0]) {
@@ -71,7 +71,6 @@ export const useProfile = () => {
                         username: profile?.username
                     });
 
-                    // ✅ Update UI state
                     setImage(byteArray);
                     setImageUri(`data:image/jpeg;base64,${base64Image}`);
                 } catch (err) {

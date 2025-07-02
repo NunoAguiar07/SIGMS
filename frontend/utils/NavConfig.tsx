@@ -2,6 +2,12 @@ import {NavInterface, UserRole} from "../types/navBar/NavInterface";
 
 type RoleNavConfig = Record<UserRole, NavInterface[]>;
 
+
+/**
+ * NAV_CONFIG is a configuration object that defines the navigation items for different user roles.
+ * Each role has its own set of navigation items, each with a link (href), an icon name, and a label.
+ * This configuration is used to dynamically generate the navigation bar based on the user's role.
+ */
 export const NAV_CONFIG: RoleNavConfig = {
     STUDENT: [
         { href: '/home', iconName: 'home-outline', label: 'Home' },

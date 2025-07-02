@@ -1,12 +1,12 @@
-import {Lecture} from "../../types/calendar/Lecture";
+
 import {Notification} from "../../types/notifications/Notification";
-import {ScheduleItem} from "../../types/ScheduleItem";
+import {LectureWithTeacher} from "../../types/LectureWithTeacher";
 
 
 export interface HomeScreenType {
     onLogout: () => void;
     username: string,
-    schedule: ScheduleItem[],
+    schedule: LectureWithTeacher[],
     notifications: Notification[],
     clearNotification:  (notificationToBeRemoved: Notification) => void,
     onClickProfile: (id:number) => void,

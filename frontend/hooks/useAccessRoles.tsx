@@ -7,6 +7,8 @@ import {requestProcessApproval} from "../services/authorized/requestProcessAppro
 import {Alert} from "react-native";
 import {ParsedError} from "../types/errors/ParseErrorTypes";
 
+
+
 export const useAccessRoles = () => {
     const [approvals, setApprovals] = useState<AccessRoleInterface[]>([]);
     const [currentPage, setCurrentPage] = useState(0);
@@ -61,7 +63,7 @@ export const useAccessRoles = () => {
     const handleReject = async (id: number) => {
         const approval = approvals.find(a => a.id === id);
         if (!approval) return;
-
+ 
         try {
             const success = await requestProcessApproval(approval.verificationToken, false);
             if (success) {

@@ -12,13 +12,12 @@ export const useTeacherProfile = (teacherId: number) => {
         const fetchProfile = async () => {
             try {
                 const response = await fetchTeacherProfileById(teacherId);
-                console.log("Fetched profile:", response);
                 setProfile(response);
             } catch (err) {
                 console.error("Error:", err);
                 setError(err as ParsedError);
             } finally {
-                setLoading(false); // Make sure this always runs
+                setLoading(false);
             }
         };
 

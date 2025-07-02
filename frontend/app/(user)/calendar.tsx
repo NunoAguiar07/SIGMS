@@ -16,7 +16,7 @@ const Calendar = () => {
     return (
         <BackgroundImage>
             <View style={[ContainerStyles.container, {height: '100%', justifyContent: 'center', alignItems: 'center'}]}>
-                <View style={{height: '80%', width: '100%', alignItems: 'center'}}>
+                <View style={{height: 'auto', width: '60%', alignItems: 'center'}}>
                     <CalendarScreen schedule={schedule} onClickProfile={onClickProfile} onClickRoom={onClickRoom} />;
                 </View>
             </View>

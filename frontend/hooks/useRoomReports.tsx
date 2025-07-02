@@ -16,7 +16,7 @@ export const useRoomReports = (roomId: number) => {
             const data = await fetchIssueReportsByRoom(roomId);
             setReports(data);
             if (data.length > 0) {
-                setRoom(data[0].room); // Assuming all reports have the same room
+                setRoom(data[0].room);
             }
         } catch (err) {
             setError(err as ParsedError);

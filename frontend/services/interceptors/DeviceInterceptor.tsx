@@ -13,7 +13,6 @@ const api = axios.create({
 api.interceptors.request.use(async (config) => {
     config.headers['X-Device'] = getDeviceType();
     config.headers['Content-Type'] = 'application/json';
-    // Add auth token for mobile
     if (getDeviceType() !== 'WEB') {
         const token = await SecureStore.getItemAsync('authToken');
         if (token) {

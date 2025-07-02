@@ -68,10 +68,9 @@ export const useAdminEntityCreation = () => {
 
         if (selectedEntity === 'lecture') {
             if (formValues.subjectId) {
-                // If we have a subject selected, don't load anything here
                 return;
             }
-            // If no subject selected, load subjects when searching
+
             if (debouncedSearchQuery.trim().length > 0) {
                 loadSubjects();
             }

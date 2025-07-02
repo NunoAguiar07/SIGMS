@@ -3,7 +3,6 @@ import LoadingPresentation from "../../../screens/auxScreens/LoadingScreen";
 import {useLocalSearchParams} from "expo-router";
 import {useRoomReports} from "../../../hooks/useRoomReports";
 import {RoomReportsScreen} from "../../../screens/mainScreens/RoomReportScreen";
-import {IssueReportInterface} from "../../../types/IssueReportInterface";
 
 const RoomId = () => {
     const {roomId} = useLocalSearchParams();
