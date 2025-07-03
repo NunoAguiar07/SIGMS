@@ -4,6 +4,8 @@ import {commonStyles} from "../css_styling/common/CommonProps";
 import {Picker} from "@react-native-picker/picker";
 import {RoomInterface} from "../../types/RoomInterface";
 import {Lecture} from "../../types/calendar/Lecture";
+import {isMobile} from "../../utils/DeviceType";
+import {UpdateLectureProps} from "../css_styling/update_lecture/UpdateLectureProps";
 
 
 export const UpdateLectureScreen = ({
