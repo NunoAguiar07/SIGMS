@@ -11,7 +11,6 @@ import {NotificationsScreen} from "./NotificationsScreen";
 export const HomeScreen = ({ onLogout, username, schedule, notifications, clearNotification, onClickProfile, onClickRoom }: HomeScreenType) => {
     return (
         <View style={commonStyles.container}>
-
             <View style={ContainerStyles.container}>
                 <View style={getColumnStyle(30, 0)}>
                     <Logo/>
@@ -20,14 +19,13 @@ export const HomeScreen = ({ onLogout, username, schedule, notifications, clearN
                         <Text style={[TextStyles.h1, TextStyles.regular, TextStyles.primary]}>Bem vindo, {username}</Text>
                     </View>
                 </View>
-                <View style={[getColumnStyle(60, 0), {margin: 10}]}>
+                {schedule.length != 0 && (<View style={[getColumnStyle(55, 0), {margin: 5}]}>
                     <CalendarScreen schedule={schedule} onClickProfile={onClickProfile} onClickRoom={onClickRoom}/>
-                </View>
-                <View style={[getColumnStyle(10, 0), {margin: 10}]}>
+                </View>)}
+                <View style={[getColumnStyle(15, 0), {margin: 5}]}>
                     <NotificationsScreen notifications={notifications} clearNotification={clearNotification}/>
                 </View>
             </View>
-
             <View style={commonStyles.footerContainer}>
                 <TouchableOpacity style={styles.logoutButton} onPress={onLogout}>
                     <Text style={styles.logoutButtonText}>Logout</Text>

@@ -74,6 +74,7 @@ class SmtpEmailService(private val config: EmailConfig) : EmailService {
                 hostName = config.host
                 setSmtpPort(config.port)
                 setAuthenticator(DefaultAuthenticator(config.username, config.password))
+                isStartTLSEnabled = true
                 isSSLOnConnect = config.useSsl
                 setFrom(config.from)
                 subject = "Verify Your Student Account"
