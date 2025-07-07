@@ -134,5 +134,59 @@ class IssueReportRepositoryTest {
             assert(updatedIssueReport.description == "updatedDescription")
         }
     }
+    @Test
+    fun `Should assign a technician to issue and retrieve it by userId`() {
+        kTormCommand.useTransaction {
+            val university = universityRepository.createUniversity("uni")
+            val user = userRepository.createWithRole("student@test.com", "student", User.hashPassword("pass"), Role.STUDENT, university, "local")
+            val technician = userRepository.createWithRole("tech@test.com", "tech", User.hashPassword("pass"), Role.TECHNICAL_SERVICE, university, "local")
+            val room = roomRepository.createRoom(101, "room101", university)
+            val issue = issueReportRepository.createIssueReport(user, room, "printer not working")
+
+            val assigned = issueReportRepository.assignIssueTo(issue, technician.toTechnicalService(database))
+            val foundByTech = issueReportRepository.getIssueReportsByUserId(technician.id, 10, 0)
+
+            assertEquals(technician.id, assigned.assignedTo?.user?.id)
+            assertEquals(1, foundByTech.size)
+            assertEquals(assigned.id, foundByTech[0].id)
+        }
+    }
+    @Test
+    fun `Should unassign technician from issue and include it in unassigned list`() {
+        kTormCommand.useTransaction {
+            val university = universityRepository.createUniversity("uni")
+            val user = userRepository.createWithRole("user@test.com", "user", User.hashPassword("pass"), Role.STUDENT, university, "local")
+            val tech = userRepository.createWithRole("tech@test.com", "tech", User.hashPassword("pass"), Role.TECHNICAL_SERVICE, university, "local")
+            val room = roomRepository.createRoom(102, "room102", university)
+            val issue = issueReportRepository.createIssueReport(user, room, "light broken")
+
+            issueReportRepository.assignIssueTo(issue, tech.toTechnicalService(database))
+            val unassigned = issueReportRepository.unassignTechnicianFromIssueReport(issue)
+            val unassignedList = issueReportRepository.getAllUnassignedIssueReports(10, 0)
+
+            assertEquals(null, unassigned.assignedTo)
+            assert(unassignedList.any { it.id == issue.id })
+        }
+    }
+    @Test
+    fun `Should get issue reports by roomId`() {
+        kTormCommand.useTransaction {
+            val university = universityRepository.createUniversity("uni")
+            val user = userRepository.createWithRole("user@test.com", "user", User.hashPassword("pass"), Role.STUDENT, university, "local")
+            val roomA = roomRepository.createRoom(201, "roomA", university)
+            val roomB = roomRepository.createRoom(202, "roomB", university)
+
+            issueReportRepository.createIssueReport(user, roomA, "Issue A1")
+            issueReportRepository.createIssueReport(user, roomB, "Issue B1")
+            issueReportRepository.createIssueReport(user, roomA, "Issue A2")
+
+            val roomAIssues = issueReportRepository.getIssuesReportByRoomId(roomA.id, 10, 0)
+            assertEquals(2, roomAIssues.size)
+            assert(roomAIssues.all { it.room.id == roomA.id })
+        }
+    }
+
+
+
 
 }

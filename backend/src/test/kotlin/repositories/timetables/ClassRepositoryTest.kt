@@ -9,6 +9,7 @@ import isel.leic.group25.db.repositories.timetables.ClassRepository
 import isel.leic.group25.db.repositories.timetables.SubjectRepository
 import isel.leic.group25.db.repositories.timetables.UniversityRepository
 import isel.leic.group25.db.repositories.users.StudentRepository
+import isel.leic.group25.db.repositories.users.TeacherRepository
 import isel.leic.group25.db.repositories.users.UserRepository
 import kotlin.test.*
 
@@ -17,7 +18,7 @@ class ClassRepositoryTest {
     private val universityRepository = UniversityRepository(DatabaseTestSetup.database)
     private val userRepository = UserRepository(DatabaseTestSetup.database)
     private val studentRepository = StudentRepository(DatabaseTestSetup.database)
-    private val teacherRepository = StudentRepository(DatabaseTestSetup.database)
+    private val teacherRepository = TeacherRepository(DatabaseTestSetup.database)
     private val classRepository = ClassRepository(DatabaseTestSetup.database)
     private val subjectRepository = SubjectRepository(DatabaseTestSetup.database)
 
@@ -215,26 +216,160 @@ class ClassRepositoryTest {
         assertNotNull(foundClasses)
         assertTrue(foundClasses.isNotEmpty())
     }
-    // need to add method to add a teacher to a class
-    /*
+
     @Test
-    fun `should find classes by teacherId`(){
-        val className = Class {
-            name = "Test Class8"
+    fun `Should add a teacher to a class`() {
+        kTormCommand.useTransaction {
+            val newUniversity = universityRepository.createUniversity("Test University")
+            val subject = subjectRepository.createSubject("Subject1", newUniversity)
+            val clazz = classRepository.addClass("Class with Teacher", subject)
+
+            val user = User {
+                email = "teacher1@test.com"
+                username = "teacher1"
+                password = User.hashPassword("pass")
+                profileImage = byteArrayOf()
+                authProvider = "local"
+                university = newUniversity
+            }.let { userRepository.createWithRole(it.email, it.username, it.password, Role.TEACHER, it.university, it.authProvider) }
+
+            val teacher = teacherRepository.findTeacherById(user.id)
+            assertNotNull(teacher)
+            val result = classRepository.addTeacherToClass(teacher, clazz)
+            assertTrue(result)
+
+            val classes = classRepository.findClassesByTeacherId(user.id)
+            assertTrue(classes.any { it.id == clazz.id })
         }
-        val subject = Subject {
-            name = "Test Subject8"
+    }
+
+    @Test
+    fun `Should remove a teacher from a class`() {
+        kTormCommand.useTransaction {
+            val newUniversity = universityRepository.createUniversity("Test University")
+            val subject = subjectRepository.createSubject("Subject2", newUniversity)
+            val clazz = classRepository.addClass("Removable Class", subject)
+
+            val user = User {
+                email = "teacher2@test.com"
+                username = "teacher2"
+                password = User.hashPassword("pass")
+                profileImage = byteArrayOf()
+                authProvider = "local"
+                university = newUniversity
+            }.let { userRepository.createWithRole(it.email, it.username, it.password, Role.TEACHER, it.university, it.authProvider) }
+
+            val teacher = teacherRepository.findTeacherById(user.id)
+            assertNotNull(teacher)
+            classRepository.addTeacherToClass(teacher, clazz)
+            val removed = classRepository.removeTeacherFromClass(user, clazz)
+            assertTrue(removed)
+            val classes = classRepository.findClassesByTeacherId(user.id)
+            assertTrue(classes.none { it.id == clazz.id })
         }
-        val newSubject = subjectRepository.createSubject(subject.name)
-        val clazz = classRepository.addClass(className.name, newSubject!!)
-        val newUser = User {
-            email = "teste1234mail@test.com"
-            username = "tester1234"
-            password = User.hashPassword("test")
-            profileImage = byteArrayOf()
-        }.let { userRepository.create(it, Role.TEACHER) }
-        classRepository.addStudentToClass(newUser, clazz)
-    }*/
+    }
+
+    @Test
+    fun `Should verify student is in class`() {
+        kTormCommand.useTransaction {
+            val newUniversity = universityRepository.createUniversity("Test University")
+            val subject = subjectRepository.createSubject("Subject3", newUniversity)
+            val clazz = classRepository.addClass("Enrolled Class", subject)
+
+            val user = User {
+                email = "student@test.com"
+                username = "student"
+                password = User.hashPassword("test")
+                profileImage = byteArrayOf()
+                authProvider = "local"
+                university = newUniversity
+            }.let { userRepository.createWithRole(it.email, it.username, it.password, Role.STUDENT, it.university, it.authProvider) }
+
+            val student = studentRepository.findStudentById(user.id)
+            assertNotNull(student)
+            classRepository.addStudentToClass(student, clazz)
+
+            val isInClass = classRepository.checkStudentInClass(user.id, clazz.id)
+            assertTrue(isInClass)
+        }
+    }
+
+    @Test
+    fun `Should verify teacher is in class`() {
+        kTormCommand.useTransaction {
+            val newUniversity = universityRepository.createUniversity("Test University")
+            val subject = subjectRepository.createSubject("Subject4", newUniversity)
+            val clazz = classRepository.addClass("Teaching Class", subject)
+
+            val user = User {
+                email = "teacher@test.com"
+                username = "teacher"
+                password = User.hashPassword("pass")
+                profileImage = byteArrayOf()
+                authProvider = "local"
+                university = newUniversity
+            }.let { userRepository.createWithRole(it.email, it.username, it.password, Role.TEACHER, it.university, it.authProvider) }
+
+            val teacher = teacherRepository.findTeacherById(user.id)
+            assertNotNull(teacher)
+            classRepository.addTeacherToClass(teacher, clazz)
+
+            val isInClass = classRepository.checkTeacherInClass(user.id, clazz.id)
+            assertTrue(isInClass)
+        }
+    }
+
+    @Test
+    fun `Should find students by class ID`() {
+        kTormCommand.useTransaction {
+            val newUniversity = universityRepository.createUniversity("Test University")
+            val subject = subjectRepository.createSubject("Subject5", newUniversity)
+            val clazz = classRepository.addClass("Class with Students", subject)
+
+            val user = User {
+                email = "student2@test.com"
+                username = "student2"
+                password = User.hashPassword("test")
+                profileImage = byteArrayOf()
+                authProvider = "local"
+                university = newUniversity
+            }.let { userRepository.createWithRole(it.email, it.username, it.password, Role.STUDENT, it.university, it.authProvider) }
+
+            val student = studentRepository.findStudentById(user.id)
+            assertNotNull(student)
+            classRepository.addStudentToClass(student, clazz)
+
+            val students = classRepository.findStudentsByClassId(clazz.id)
+            assertTrue(students.any { it.user.id == student.user.id })
+        }
+    }
+
+    @Test
+    fun `Should find teachers by class ID`() {
+        kTormCommand.useTransaction {
+            val newUniversity = universityRepository.createUniversity("Test University")
+            val subject = subjectRepository.createSubject("Subject6", newUniversity)
+            val clazz = classRepository.addClass("Class with Teachers", subject)
+
+            val user = User {
+                email = "teacher3@test.com"
+                username = "teacher3"
+                password = User.hashPassword("pass")
+                profileImage = byteArrayOf()
+                authProvider = "local"
+                university = newUniversity
+            }.let { userRepository.createWithRole(it.email, it.username, it.password, Role.TEACHER, it.university, it.authProvider) }
+
+            val teacher = teacherRepository.findTeacherById(user.id)
+            assertNotNull(teacher)
+            classRepository.addTeacherToClass(teacher, clazz)
+
+            val teachers = classRepository.findTeachersByClassId(clazz.id)
+            assertTrue(teachers.any { it.user.id == teacher.user.id })
+        }
+    }
+
+
 
 
 }

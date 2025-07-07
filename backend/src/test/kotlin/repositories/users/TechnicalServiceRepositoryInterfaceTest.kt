@@ -11,81 +11,92 @@ import kotlin.test.*
 
 class TechnicalServiceRepositoryInterfaceTest {
 
-    @AfterTest
-    fun clearDatabase() {
-        DatabaseTestSetup.clearDB()
-    }
-
     private val technicalServiceRepository = TechnicalServiceRepository(DatabaseTestSetup.database)
     private val userRepository = UserRepository(DatabaseTestSetup.database)
     private val universityRepository = UniversityRepository(DatabaseTestSetup.database)
     private val kTormCommand = KtormCommand(DatabaseTestSetup.database)
 
-    @Test
-    fun `Should create a new technical service and find it by id`(){
-        kTormCommand.useTransaction {
-            val newUniversity = universityRepository.createUniversity("testUniversity")
-            val newUser = User {
-                email = "testemail@test.com"
-                username = "tester"
-                password = User.hashPassword("test")
-                profileImage = byteArrayOf()
-                authProvider = "local"
-                university = newUniversity
-            }.let { userRepository.createWithRole(it.email, it.username, it.password, Role.TECHNICAL_SERVICE, it.university, it.authProvider) }
-            val technicalService = technicalServiceRepository.findTechnicalServiceById(newUser.id)
-            assertNotNull(technicalService)
-            assertEquals(newUser.id, technicalService.user.id)
-        }
+    @AfterTest
+    fun clearDatabase() {
+        DatabaseTestSetup.clearDB()
+    }
+
+    private fun createTechnicalService(email: String = "tech@test.com"): User = kTormCommand.useTransaction {
+        val university = universityRepository.createUniversity("TestUni")
+        return@useTransaction userRepository.createWithRole(
+            email = email,
+            username = "techUser",
+            password = User.hashPassword("pass"),
+            role = Role.TECHNICAL_SERVICE,
+            university = university,
+            authProvider = "local"
+        )
     }
 
     @Test
-    fun `Should create a new technical service and find it by email`(){
-        kTormCommand.useTransaction {
-            val newUniversity = universityRepository.createUniversity("testUniversity")
-            val newUser = User {
-                email = "testemail@test.com"
-                username = "tester"
-                password = User.hashPassword("test")
-                profileImage = byteArrayOf()
-                authProvider = "local"
-                university = newUniversity
-            }.let { userRepository.createWithRole(it.email, it.username, it.password, Role.TECHNICAL_SERVICE, it.university, it.authProvider) }
-            val technicalService = technicalServiceRepository.findTechnicalServiceByEmail(newUser.email)
-            assertNotNull(technicalService)
-            assertEquals(newUser.id, technicalService.user.id)
-        }
+    fun `Should create a new technical service and find it by id`() = kTormCommand.useTransaction {
+        val user = createTechnicalService()
+        val tech = technicalServiceRepository.findTechnicalServiceById(user.id)
+        assertNotNull(tech)
+        assertEquals(user.id, tech.user.id)
     }
 
     @Test
-    fun `Should verify user is technical service`(){
-        kTormCommand.useTransaction {
-            val newUniversity = universityRepository.createUniversity("testUniversity")
-            val newUser = User {
-                email = "testemail@test.com"
-                username = "tester"
-                password = User.hashPassword("test")
-                profileImage = byteArrayOf()
-                authProvider = "local"
-                university = newUniversity
-            }.let { userRepository.createWithRole(it.email, it.username, it.password, Role.TECHNICAL_SERVICE, it.university, it.authProvider) }
-            assertTrue(technicalServiceRepository.isTechnicalService(newUser))
-        }
+    fun `Should return null for invalid technical service id`() = kTormCommand.useTransaction {
+        val tech = technicalServiceRepository.findTechnicalServiceById(-1)
+        assertNull(tech)
     }
 
     @Test
-    fun `Should verify user is not technical service`(){
-        kTormCommand.useTransaction {
-            val newUniversity = universityRepository.createUniversity("testUniversity")
-            val newUser = User {
-                email = "testemail@test.com"
-                username = "tester"
-                password = User.hashPassword("test")
-                profileImage = byteArrayOf()
-                authProvider = "local"
-                university = newUniversity
-            }.let { userRepository.createWithRole(it.email, it.username, it.password, Role.ADMIN, it.university, it.authProvider) }
-            assertFalse(technicalServiceRepository.isTechnicalService(newUser))
-        }
+    fun `Should create a new technical service and find it by email`() = kTormCommand.useTransaction {
+        val user = createTechnicalService("findme@test.com")
+        val tech = technicalServiceRepository.findTechnicalServiceByEmail("findme@test.com")
+        assertNotNull(tech)
+        assertEquals(user.id, tech.user.id)
+    }
+
+    @Test
+    fun `Should return null for invalid technical service email`() = kTormCommand.useTransaction {
+        val tech = technicalServiceRepository.findTechnicalServiceByEmail("doesnotexist@test.com")
+        assertNull(tech)
+    }
+
+    @Test
+    fun `Should verify user is technical service`() = kTormCommand.useTransaction {
+        val user = createTechnicalService()
+        assertTrue(technicalServiceRepository.isTechnicalService(user))
+    }
+
+    @Test
+    fun `Should verify user is not technical service`() = kTormCommand.useTransaction {
+        val university = universityRepository.createUniversity("TestUni")
+        val user = userRepository.createWithRole(
+            email = "admin@test.com",
+            username = "adminUser",
+            password = User.hashPassword("pass"),
+            role = Role.ADMIN,
+            university = university,
+            authProvider = "local"
+        )
+        assertFalse(technicalServiceRepository.isTechnicalService(user))
+    }
+
+    @Test
+    fun `Should return list of technical services for a university`() = kTormCommand.useTransaction {
+        val university = universityRepository.createUniversity("TechUni")
+        val user1 = userRepository.createWithRole("tech1@test.com", "t1", User.hashPassword("pass"), Role.TECHNICAL_SERVICE, university, "local")
+        val user2 = userRepository.createWithRole("tech2@test.com", "t2", User.hashPassword("pass"), Role.TECHNICAL_SERVICE, university, "local")
+
+        val services = technicalServiceRepository.universityTechnicalServices(university.id)
+        assertEquals(2, services.size)
+        assertTrue(services.any { it.user.id == user1.id })
+        assertTrue(services.any { it.user.id == user2.id })
+    }
+
+    @Test
+    fun `Should return empty list when no technical services exist for university`() = kTormCommand.useTransaction {
+        val university = universityRepository.createUniversity("EmptyUni")
+        val services = technicalServiceRepository.universityTechnicalServices(university.id)
+        assertTrue(services.isEmpty())
     }
 }

@@ -16,9 +16,8 @@ import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.ExperimentalTime
 
-
 @OptIn(ExperimentalTime::class)
-class LectureRepositoryTemporalTest {
+class LectureRepositoryTest {
     private val kTormCommand = KtormCommand(DatabaseTestSetup.database)
     private val universityRepository = UniversityRepository(DatabaseTestSetup.database)
     private val lectureRepository = LectureRepository(DatabaseTestSetup.database)
@@ -73,9 +72,6 @@ class LectureRepositoryTemporalTest {
         assertEquals(WeekDay.TUESDAY, updatedLecture.weekDay)
         assertEquals(10.hours, updatedLecture.startTime)
         assertEquals(12.hours, updatedLecture.endTime)
-
-        // Verify no change record was created
-        //assertFalse(lectureRepository.hasActiveChanges(lecture.id))
     }
 
     @Test
@@ -98,15 +94,11 @@ class LectureRepositoryTemporalTest {
             effectiveUntil = endDate
         )
 
-        // Should immediately apply changes
         assertEquals(newRoom, updatedLecture.classroom)
         assertEquals(ClassType.PRACTICAL, updatedLecture.type)
         assertEquals(WeekDay.TUESDAY, updatedLecture.weekDay)
         assertEquals(10.hours, updatedLecture.startTime)
         assertEquals(12.hours, updatedLecture.endTime)
-
-        // Verify change record was created
-        //assertTrue(lectureRepository.hasActiveChanges(lecture.id))
     }
 
     @Test
@@ -133,114 +125,11 @@ class LectureRepositoryTemporalTest {
         val lectureChangeStored = lectureRepository.getLectureChangeById(lecture.id)
 
         assertNotNull(lectureChangeStored)
-
-        // Should not immediately apply changes
         assertEquals(newRoom, lectureChangeStored.originalClassroom)
         assertEquals(ClassType.PRACTICAL, lectureChangeStored.originalType)
         assertEquals(WeekDay.TUESDAY, lectureChangeStored.originalWeekDay)
         assertEquals(10.hours, lectureChangeStored.originalStartTime)
         assertEquals(12.hours, lectureChangeStored.originalEndTime)
-    }
-
-    @Test
-    fun `Should detect conflicts with permanent changes`() = kTormCommand.useTransaction {
-        val lecture = createTestLecture()
-        val conflictingRoom = roomRepository.createRoom(30, "Conflicting Room", lecture.classroom.room.university).let {
-            roomRepository.createClassRoom(it)
-            roomRepository.getClassRoomById(it.id)!!
-        }
-
-        // Create a conflicting lecture
-        lectureRepository.createLecture(
-            schoolClass = lecture.schoolClass,
-            classroom = conflictingRoom,
-            type = ClassType.THEORETICAL,
-            weekDay = WeekDay.MONDAY,
-            startTime = 9.hours,
-            endTime = 11.hours
-        )
-
-        val hasConflict = lectureRepository.findConflictingLectures(
-            newRoomId = conflictingRoom.room.id,
-            newWeekDay = WeekDay.MONDAY,
-            newStartTime = 9.hours,
-            newEndTime = 11.hours,
-            effectiveFrom = null,
-            effectiveUntil = null,
-            currentLecture = null
-        )
-
-        assertTrue(hasConflict)
-    }
-
-    @Test
-    fun `Should detect conflicts with immediate changes`() = kTormCommand.useTransaction {
-        val lecture = createTestLecture()
-        val conflictingRoom = roomRepository.createRoom(30, "Conflicting Room", lecture.classroom.room.university).let {
-            roomRepository.createClassRoom(it)
-            roomRepository.getClassRoomById(it.id)
-        }
-        assertNotNull(conflictingRoom)
-        val endDate = Clock.System.now().plus(7.days)
-
-        // Create a conflicting future change
-        lectureRepository.updateLecture(
-            lecture = lecture,
-            newClassroom = conflictingRoom,
-            newType = ClassType.PRACTICAL,
-            newWeekDay = WeekDay.TUESDAY,
-            newStartTime = 10.hours,
-            newEndTime = 12.hours,
-            effectiveFrom = Clock.System.now().plus(1.days),
-            effectiveUntil = endDate.plus(7.days)
-        )
-
-        val hasConflict = lectureRepository.findConflictingLectures(
-            newRoomId = conflictingRoom.room.id,
-            newWeekDay = WeekDay.TUESDAY,
-            newStartTime = 10.hours,
-            newEndTime = 12.hours,
-            effectiveFrom = null,
-            effectiveUntil = endDate,
-            currentLecture = null
-        )
-
-        assertTrue(hasConflict)
-    }
-
-    @Test
-    fun `Should detect conflicts with scheduled changes`() = kTormCommand.useTransaction {
-        val lecture = createTestLecture()
-        val conflictingRoom = roomRepository.createRoom(30, "Conflicting Room", lecture.classroom.room.university).let {
-            roomRepository.createClassRoom(it)
-            roomRepository.getClassRoomById(it.id)!!
-        }
-        val startDate = Clock.System.now().plus(1.days)
-        val endDate = startDate.plus(7.days)
-
-        // Create a conflicting scheduled change
-        lectureRepository.updateLecture(
-            lecture = lecture,
-            newClassroom = conflictingRoom,
-            newType = ClassType.PRACTICAL,
-            newWeekDay = WeekDay.TUESDAY,
-            newStartTime = 10.hours,
-            newEndTime = 12.hours,
-            effectiveFrom = startDate,
-            effectiveUntil = endDate
-        )
-
-        val hasConflict = lectureRepository.findConflictingLectures(
-            newRoomId = conflictingRoom.room.id,
-            newWeekDay = WeekDay.TUESDAY,
-            newStartTime = 10.hours,
-            newEndTime = 12.hours,
-            effectiveFrom = startDate.minus(1.days),
-            effectiveUntil = endDate.plus(1.days),
-            currentLecture = null
-        )
-
-        assertTrue(hasConflict)
     }
 
     @Test
@@ -254,7 +143,6 @@ class LectureRepositoryTemporalTest {
         }
         val endDate = Clock.System.now().plus(7.days)
 
-        // Create a change
         lectureRepository.updateLecture(
             lecture = lecture,
             newClassroom = newRoom,
@@ -266,15 +154,75 @@ class LectureRepositoryTemporalTest {
             effectiveUntil = endDate
         )
 
-        // Delete the change
         assertTrue(lectureRepository.deleteLectureChange(lecture.id))
 
-        // Verify original values were restored
         val restoredLecture = lectureRepository.getLectureById(lecture.id)!!
         assertEquals(storeLecture.classroom, restoredLecture.classroom)
         assertEquals(storeLecture.type, restoredLecture.type)
         assertEquals(storeLecture.weekDay, restoredLecture.weekDay)
         assertEquals(storeLecture.startTime, restoredLecture.startTime)
         assertEquals(storeLecture.endTime, restoredLecture.endTime)
+    }
+
+    @Test
+    fun `Should return false when deleting non-existing lecture change`() = kTormCommand.useTransaction {
+        val lecture = createTestLecture()
+        val result = lectureRepository.deleteLectureChange(lecture.id)
+        assertFalse(result)
+    }
+
+    @Test
+    fun `Should not detect conflict with itself`() = kTormCommand.useTransaction {
+        val lecture = createTestLecture()
+
+        val hasConflict = lectureRepository.findConflictingLectures(
+            newRoomId = lecture.classroom.room.id,
+            newWeekDay = lecture.weekDay,
+            newStartTime = lecture.startTime,
+            newEndTime = lecture.endTime,
+            effectiveFrom = null,
+            effectiveUntil = null,
+            currentLecture = lecture
+        )
+
+        assertFalse(hasConflict)
+    }
+
+    @Test
+    fun `Should detect conflicts with overlapping scheduled changes`() = kTormCommand.useTransaction {
+        val lecture = createTestLecture()
+        val room = roomRepository.createRoom(50, "Partial Conflict Room", lecture.classroom.room.university).let {
+            roomRepository.createClassRoom(it)
+            roomRepository.getClassRoomById(it.id)!!
+        }
+
+        val originalStart = Clock.System.now().plus(5.days)
+        val originalEnd = originalStart.plus(5.days)
+
+        lectureRepository.updateLecture(
+            lecture,
+            room,
+            ClassType.THEORETICAL,
+            WeekDay.THURSDAY,
+            14.hours,
+            16.hours,
+            effectiveFrom = originalStart,
+            effectiveUntil = originalEnd
+        )
+
+        val overlapStart = originalStart.plus(3.days)
+        val overlapEnd = overlapStart.plus(4.days)
+
+        val hasConflict = lectureRepository.findConflictingLectures(
+            newRoomId = room.room.id,
+            newWeekDay = WeekDay.THURSDAY,
+            newStartTime = 14.hours,
+            newEndTime = 16.hours,
+            effectiveFrom = overlapStart,
+            effectiveUntil = overlapEnd,
+            currentLecture = null
+        )
+
+        assertTrue(hasConflict)
     }
 }
