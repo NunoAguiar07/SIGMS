@@ -3,8 +3,8 @@ import {IssueReportInterface} from "../types/IssueReportInterface";
 import {ParsedError} from "../types/errors/ParseErrorTypes";
 import {Alert} from "react-native";
 import {useFocusEffect} from "expo-router";
-import {fetchUnassignedIssues} from "../services/authorized/fetchUnassignedIssues";
-import {requestAssignTechnicianToIssue} from "../services/authorized/requestAssignTechnicianToIssue";
+import {fetchUnassignedIssues} from "../services/authorized/FetchUnassignedIssues";
+import {requestAssignTechnicianToIssue} from "../services/authorized/RequestAssignTechnicianToIssue";
 
 
 export const useUnassignedIssues = () => {

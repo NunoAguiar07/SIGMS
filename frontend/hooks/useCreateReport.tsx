@@ -1,7 +1,7 @@
 import {useEffect, useRef, useState} from "react";
 import {RoomInterface} from "../types/RoomInterface";
 import {useDebounce} from "use-debounce";
-import {fetchRooms} from "../services/authorized/fetchRooms";
+import {fetchRooms} from "../services/authorized/FetchRooms";
 import {CreateIssueReportRequest} from "../services/authorized/CreateIssueReport";
 import {Alert} from "react-native";
 import {ParsedError} from "../types/errors/ParseErrorTypes";

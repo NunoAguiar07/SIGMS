@@ -4,15 +4,15 @@ import {EntityType} from "../screens/types/EntityCreationScreenType";
 import {ParsedError} from "../types/errors/ParseErrorTypes";
 import {FormCreateEntityValues} from "../types/welcome/FormCreateEntityValues";
 import {SubjectInterface} from "../types/SubjectInterface";
-import {fetchSubjects} from "../services/authorized/fetchSubjects";
+import {fetchSubjects} from "../services/authorized/FetchSubjects";
 import {createSubject} from "../services/authorized/CreateSubjectRequest";
 import {createClass} from "../services/authorized/CreateClassRequest";
 import {createRoom} from "../services/authorized/CreateRoomSubject";
 import {Alert} from "react-native";
 import {SchoolClassInterface} from "../types/SchoolClassInterface";
-import {fetchSubjectClasses} from "../services/authorized/fetchSubjectClasses";
+import {fetchSubjectClasses} from "../services/authorized/FetchSubjectClasses";
 import {RoomInterface} from "../types/RoomInterface";
-import {fetchRooms} from "../services/authorized/fetchRooms";
+import {fetchRooms} from "../services/authorized/FetchRooms";
 import {createLecture} from "../services/authorized/CreateLecture";
 
 

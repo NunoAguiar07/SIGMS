@@ -9,7 +9,7 @@ import {UniversityInterface} from "../types/UniversityInterface";
 import {fetchUniversities} from "../services/fetchUniversities";
 import {requestRegister} from "../services/auth/requestRegister";
 import {requestVerifyAccount} from "../services/auth/requestVerifyAccount";
-import {fetchUserInfo} from "../services/authorized/fetchUserInfo";
+import {fetchUserInfo} from "../services/authorized/FetchUserInfo";
 
 export const useLogout = () => {
     const [loading, setLoading] = useState(false);

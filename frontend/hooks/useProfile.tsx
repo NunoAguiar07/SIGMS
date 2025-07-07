@@ -1,9 +1,9 @@
 import {ParsedError} from "../types/errors/ParseErrorTypes";
-import {fetchProfile} from "../services/authorized/fetchProfile";
+import {fetchProfile} from "../services/authorized/FetchProfile";
 import {useEffect, useState} from "react";
 import {ProfileInterface} from "../types/ProfileInterface";
 import * as ImagePicker from "expo-image-picker";
-import {requestUpdateProfile} from "../services/authorized/requestUpdateProfile";
+import {requestUpdateProfile} from "../services/authorized/RequestUpdateProfile";
 
 
 export const useProfile = () => {

@@ -18,7 +18,6 @@ export const fetchUserClasses = async (
                 withCredentials: true
             }
         );
-        console.log(response.data);
         return response.data.data;
     } catch (error) {
         throw handleAxiosError(error);

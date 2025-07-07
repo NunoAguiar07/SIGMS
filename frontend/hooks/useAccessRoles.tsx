@@ -1,9 +1,9 @@
 import {useCallback, useState} from "react";
 import {AccessRoleInterface} from "../types/AccessRoleInterface";
-import {fetchPendingApprovals} from "../services/authorized/fetchPendingApprovals";
+import {fetchPendingApprovals} from "../services/authorized/FetchPendingApprovals";
 import {handleAxiosError} from "../utils/HandleAxiosError";
 import {useFocusEffect} from "expo-router";
-import {requestProcessApproval} from "../services/authorized/requestProcessApproval";
+import {requestProcessApproval} from "../services/authorized/RequestProcessApproval";
 import {Alert} from "react-native";
 import {ParsedError} from "../types/errors/ParseErrorTypes";
 

@@ -2,10 +2,10 @@ import {Alert} from "react-native";
 import {useCallback, useState} from "react";
 import {IssueReportInterface} from "../types/IssueReportInterface";
 import {useFocusEffect} from "expo-router";
-import {fetchAssignedIssues} from "../services/authorized/fetchAssignedIssues";
-import {requestUpdateIssue} from "../services/authorized/requestUpdateIssue";
-import {requestFixIssue} from "../services/authorized/requestFixIssue";
-import {requestUnassignFromIssue} from "../services/authorized/requestUnassignFromIssue";
+import {fetchAssignedIssues} from "../services/authorized/FetchAssignedIssues";
+import {requestUpdateIssue} from "../services/authorized/RequestUpdateIssue";
+import {requestFixIssue} from "../services/authorized/RequestFixIssue";
+import {requestUnassignFromIssue} from "../services/authorized/RequestUnassignFromIssue";
 import {ParsedError} from "../types/errors/ParseErrorTypes";
 
 

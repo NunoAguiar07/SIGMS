@@ -1,8 +1,8 @@
 import {useCallback, useState} from "react";
 import {StudyRoomCapacity} from "../types/StudyRoomCapacity";
 import {ParsedError} from "../types/errors/ParseErrorTypes";
-import {fetchStudyRoomCapacity} from "../services/authorized/fetchStudyRoomCapacity";
-import {updateStudyRoomCapacity} from "../services/authorized/updateStudyRoomCapacity";
+import {fetchStudyRoomCapacity} from "../services/authorized/FetchStudyRoomCapacity";
+import {updateStudyRoomCapacity} from "../services/authorized/UpdateStudyRoomCapacity";
 import {useFocusEffect} from "expo-router";
 
 export const useStudyRooms = () => {

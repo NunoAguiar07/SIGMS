@@ -1,7 +1,7 @@
 import {useFocusEffect, useRouter} from "expo-router";
 import {useCallback, useState} from "react";
 import {ParsedError} from "../types/errors/ParseErrorTypes";
-import {fetchSchedule} from "../services/authorized/fetchSchedule";
+import {fetchSchedule} from "../services/authorized/FetchSchedule";
 import {LectureWithTeacher} from "../types/LectureWithTeacher";
 
 export const useSchedule = () => {

@@ -4,10 +4,10 @@ import {SchoolClassInterface} from "../types/SchoolClassInterface";
 import {useDebounce} from "use-debounce";
 import {ParsedError} from "../types/errors/ParseErrorTypes";
 import {Alert} from "react-native";
-import {fetchSubjects} from "../services/authorized/fetchSubjects";
-import {fetchSubjectClasses} from "../services/authorized/fetchSubjectClasses";
-import {joinClass} from "../services/authorized/requestJoinClass";
-import {fetchUserClasses} from "../services/authorized/fetchUserClasses";
+import {fetchSubjects} from "../services/authorized/FetchSubjects";
+import {fetchSubjectClasses} from "../services/authorized/FetchSubjectClasses";
+import {joinClass} from "../services/authorized/RequestJoinClass";
+import {fetchUserClasses} from "../services/authorized/FetchUserClasses";
 import {leaveClass} from "../services/authorized/RequestLeaveClass";
 
 

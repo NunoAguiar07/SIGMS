@@ -3,6 +3,7 @@ import * as SecureStore from 'expo-secure-store';
 import {handleAxiosError} from "../../utils/HandleAxiosError";
 import {apiUrl} from "../fetchWelcome";
 import {ParsedError} from "../../types/errors/ParseErrorTypes";
+import api from "../interceptors/DeviceInterceptor";
 
 export const requestLogin = async (
     email: string,
@@ -10,7 +11,7 @@ export const requestLogin = async (
     deviceType: string
 ): Promise<{ success: boolean; error?: ParsedError }> => {
     try {
-        const response = await axios.post(
+        const response = await api.post(
             `${apiUrl}auth/login`,
             { email, password },
             {
@@ -18,6 +19,7 @@ export const requestLogin = async (
                     'Content-Type': 'application/json',
                     'X-Device': deviceType,
                 },
+                validateStatus: () => true,
                 withCredentials: true,
             }
         );
@@ -28,8 +30,9 @@ export const requestLogin = async (
                 await SecureStore.setItemAsync('authToken', token);
             }
             return { success: true };
+        }else if (response.status === 404) {
+            return { success: false };
         }
-        return { success: false };
     } catch (error) {
         throw handleAxiosError(error);
     }

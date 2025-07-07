@@ -3,7 +3,7 @@ import { useRouter } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
 import {AuthService} from '../services/auth/microsoft/AuthService';
 import {ParsedError} from "../types/errors/ParseErrorTypes";
-import {fetchUserInfo} from "../services/authorized/fetchUserInfo";
+import {fetchUserInfo} from "../services/authorized/FetchUserInfo";
 import {isMobile} from "../utils/DeviceType";
 
 WebBrowser.maybeCompleteAuthSession();

@@ -4,7 +4,7 @@ import {ParsedError} from "../types/errors/ParseErrorTypes";
 import {fetchLectures} from "../services/authorized/FetchLectures";
 import {Alert} from "react-native";
 import {updateLectureSchedule} from "../services/authorized/RequestUpdateLecture";
-import {fetchRooms} from "../services/authorized/fetchRooms";
+import {fetchRooms} from "../services/authorized/FetchRooms";
 import {RoomInterface} from "../types/RoomInterface";
 import {useDebounce} from "use-debounce";
 

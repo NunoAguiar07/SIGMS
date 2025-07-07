@@ -1,7 +1,7 @@
 import {useEffect, useState} from "react";
 import {TeacherUser} from "../types/teacher/TeacherUser";
 import {ParsedError} from "../types/errors/ParseErrorTypes";
-import {fetchTeacherProfileById} from "../services/authorized/fetchTeacherProfileById";
+import {fetchTeacherProfileById} from "../services/authorized/FetchTeacherProfileById";
 
 export const useTeacherProfile = (teacherId: number) => {
     const [profile, setProfile] = useState<TeacherUser | null>(null);

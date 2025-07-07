@@ -32,7 +32,6 @@ export const createLecture = async (
         }, { withCredentials: true });
         return response.status === 201;
     } catch (error) {
-        console.log(error);
         throw handleAxiosError(error);
     }
 };
