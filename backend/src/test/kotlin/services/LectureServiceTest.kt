@@ -646,4 +646,101 @@ class LectureServiceTest {
         assertEquals(LectureError.InvalidLectureRoom, result.value, "Should return InvalidLectureRoom error")
     }
 
+    @OptIn(ExperimentalTime::class)
+    @Test
+    fun `updateLecture should return InvalidLectureDate when start time is after end time`() {
+        // Setup
+        val university = mockRepositories.from({universityRepository}) {
+            createUniversity("Test University")
+        }
+        val subject = mockRepositories.from({subjectRepository}) {
+            createSubject("Math", university)
+        }
+        val schoolClass = mockRepositories.from({classRepository}) {
+            addClass("Algebra", subject)
+        }
+        val room = mockRepositories.from({roomRepository}) {
+            createRoom(30, "Room 101", university)
+        }
+        mockRepositories.from({roomRepository}) { createClassRoom(room) }
+        val classroom = mockRepositories.from({roomRepository}) { getClassRoomById(room.id) }
+        val lecture = mockRepositories.from({lectureRepository}) {
+            createLecture(
+                schoolClass = schoolClass,
+                classroom = classroom!!,
+                type = ClassType.THEORETICAL,
+                weekDay = WeekDay.MONDAY,
+                startTime = 9.hours,
+                endTime = 11.hours
+            )
+        }
+
+        // Act
+        val result = lectureService.updateLecture(
+            lectureId = lecture.id,
+            newRoomId = room.id,
+            newType = ClassType.THEORETICAL,
+            newWeekDay = WeekDay.MONDAY,
+            newStartTime = "12:00", // after endTime
+            newEndTime = "10:00",
+            effectiveFrom = null,
+            effectiveUntil = null
+        )
+
+        // Assert
+        assertTrue(result is Failure, "Should return failure")
+        assertEquals(LectureError.InvalidLectureDate, result.value, "Should return InvalidLectureDate error")
+    }
+
+    @OptIn(ExperimentalTime::class)
+    @Test
+    fun `updateLecture should return InvalidLectureUntilDate when effectiveUntil is in the past`() {
+        // Setup
+        val university = mockRepositories.from({universityRepository}) {
+            createUniversity("Test University")
+        }
+        val subject = mockRepositories.from({subjectRepository}) {
+            createSubject("Math", university)
+        }
+        val schoolClass = mockRepositories.from({classRepository}) {
+            addClass("Algebra", subject)
+        }
+        val room = mockRepositories.from({roomRepository}) {
+            createRoom(30, "Room 101", university)
+        }
+        mockRepositories.from({roomRepository}) { createClassRoom(room) }
+        val classroom = mockRepositories.from({roomRepository}) { getClassRoomById(room.id) }
+        val lecture = mockRepositories.from({lectureRepository}) {
+            createLecture(
+                schoolClass = schoolClass,
+                classroom = classroom!!,
+                type = ClassType.THEORETICAL,
+                weekDay = WeekDay.MONDAY,
+                startTime = 9.hours,
+                endTime = 11.hours
+            )
+        }
+
+        val past = Clock.System.now().minus(1.hours)
+
+        // Act
+        val result = lectureService.updateLecture(
+            lectureId = lecture.id,
+            newRoomId = room.id,
+            newType = ClassType.THEORETICAL,
+            newWeekDay = WeekDay.MONDAY,
+            newStartTime = "10:00",
+            newEndTime = "12:00",
+            effectiveFrom = null,
+            effectiveUntil = past
+        )
+
+        // Assert
+        assertTrue(result is Failure, "Should return failure")
+        assertEquals(LectureError.InvalidLectureUntilDate, result.value, "Should return InvalidLectureUntilDate error")
+    }
+
+
+
+
 }

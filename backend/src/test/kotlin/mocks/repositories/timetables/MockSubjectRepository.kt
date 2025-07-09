@@ -7,6 +7,7 @@ import isel.leic.group25.db.repositories.timetables.interfaces.SubjectRepository
 class MockSubjectRepository : SubjectRepositoryInterface {
 
     private val subjects = mutableListOf<Subject>()
+    private var nextSubjectId = 1  // Define this at the class level
 
     override fun getAllSubjects(limit: Int, offset: Int): List<Subject> {
         return subjects.drop(offset).take(limit)
@@ -31,8 +32,11 @@ class MockSubjectRepository : SubjectRepositoryInterface {
         return subjects.firstOrNull { it.name == name }
     }
 
+
+
     override fun createSubject(name: String, university: University): Subject {
         val newSubject = Subject {
+            this.id = nextSubjectId++            // Assign unique ID
             this.name = name
             this.university = university
         }

@@ -4,6 +4,10 @@ import isel.leic.group25.db.entities.timetables.Class
 import isel.leic.group25.db.entities.timetables.Subject
 import isel.leic.group25.db.entities.users.*
 import isel.leic.group25.db.repositories.timetables.interfaces.ClassRepositoryInterface
+import isel.leic.group25.db.tables.Tables.Companion.classes
+import org.ktorm.dsl.and
+import org.ktorm.dsl.eq
+import org.ktorm.entity.firstOrNull
 
 class MockClassRepository : ClassRepositoryInterface {
     private val classes = mutableListOf<Class>()
@@ -23,6 +27,10 @@ class MockClassRepository : ClassRepositoryInterface {
     override fun findClassesByStudentId(userId: Int, limit: Int, offset: Int): List<Class> {
         return studentsClasses.filter { it.student.user.id == userId }
             .map { it.schoolClass }.drop(offset).take(limit)
+    }
+
+    override fun findClassInSubjectByName(subject: Subject, name: String): Class? {
+        return classes.firstOrNull { (it.name == name) && (it.subject.id == subject.id) }
     }
 
     override fun findClassesByTeacherId(userId: Int, limit: Int, offset: Int): List<Class> {

@@ -35,6 +35,10 @@ class ClassRepository(private val database: Database): ClassRepositoryInterface 
             .map { it.schoolClass }.drop(offset).take(limit).toList()
     }
 
+    override fun findClassInSubjectByName(subject: Subject, name: String): Class? {
+        return database.classes.firstOrNull { (it.name eq name) and (it.subject eq subject.id) }
+    }
+
     override fun findClassesByTeacherId(userId: Int, limit:Int, offset:Int): List<Class> = withDatabase {
         return database.teachersClasses.filter { it.teacherId eq userId }
             .map { it.schoolClass }.drop(offset).take(limit).toList()
