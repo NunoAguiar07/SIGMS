@@ -2,6 +2,7 @@ package packetsniffer
 
 import (
 	"bufio"
+	"hardware/record"
 	"log"
 	"os"
 	"os/exec"
@@ -60,8 +61,13 @@ func readUniqueMACs() int {
 	if err := scanner.Err(); err != nil {
 		log.Fatalf("Error reading file: %v\n", err)
 	}
-
-	return len(macs)
+	csvManager := record.NewCSVManager("count")
+	count := len(macs)
+	err = csvManager.WriteEntry(count)
+	if err != nil {
+		log.Printf("Error writing entry: %v\n", err)
+	}
+	return count
 }
 
 func ReadAtIntervalOrByUpdate(interval int, ewmaChannel chan EWMA, signalRead chan struct{}) {

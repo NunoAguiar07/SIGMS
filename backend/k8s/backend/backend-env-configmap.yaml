@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backend-config
+  namespace: sigms
+  labels:
+    app: backend
+data:
+  EMAIL_FROM: "noreply@sigms.net"
+  EMAIL_HOST: "live.smtp.mailtrap.io"
+  EMAIL_PORT: "587"
+  EMAIL_USE_SSL: "false"
+  EMAIL_USERNAME: "smtp@mailtrap.io"
+  FRONTEND_URL: "sigms.net"
+  JWT_AUDIENCE: "http://sigms.net/"
+  JWT_ISSUER: "http://sigms.net/"
+  JWT_REALM: "Access to isel.leic.group25"

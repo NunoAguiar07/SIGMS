@@ -4,6 +4,16 @@ import {WelcomeData} from "../types/welcome/WelcomeInterfaces";
 import {isMobile} from "../utils/DeviceType";
 
 
+
+export const apiUrl: string =  ((): string => {
+    if(__DEV__){
+        return !isMobile
+            ? 'https://localhost/api/'
+            : 'http://10.0.2.2:8080/api/';
+    } else {
+        return process.env.EXPO_PUBLIC_API_URL
+    }
+})()
 /**
  * Fetches welcome data from the server.
  * This function constructs the API URL based on the device type (mobile or web)
@@ -12,9 +22,6 @@ import {isMobile} from "../utils/DeviceType";
  * @returns {Promise<WelcomeData>} - A promise that resolves to the welcome data.
  * @throws {Error} - Throws an error if the request fails.
  */
-export const apiUrl = !isMobile
-    ? 'https://localhost/api/'
-    : 'http://10.0.2.2:8080/api/';
 
 export const fetchWelcome = async (): Promise<WelcomeData> => {
     try {

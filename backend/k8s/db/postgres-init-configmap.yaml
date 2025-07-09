@@ -1,0 +1,557 @@
+apiVersion: v1
+data:
+  01_CreateProjectTable.sql: |+
+    CREATE TABLE IF NOT EXISTS UNIVERSITY (
+        id SERIAL PRIMARY KEY,
+        university_name VARCHAR(255) NOT NULL UNIQUE
+    );
+
+    CREATE TABLE IF NOT EXISTS ROOM (
+        id SERIAL PRIMARY KEY,
+        room_name VARCHAR(255) NOT NULL,
+        capacity INT NOT NULL,
+        university_id INT NOT NULL REFERENCES UNIVERSITY(id) ON DELETE CASCADE,
+        CHECK(capacity > 0),
+        CONSTRAINT unique_room_per_university UNIQUE (room_name, university_id)
+    );
+
+    CREATE TABLE IF NOT EXISTS STUDY_ROOM (
+        id SERIAL PRIMARY KEY REFERENCES ROOM(id) ON DELETE CASCADE
+    );
+
+    CREATE TABLE IF NOT EXISTS CLASSROOM (
+        id SERIAL PRIMARY KEY REFERENCES ROOM(id) ON DELETE CASCADE
+    );
+
+    CREATE TABLE IF NOT EXISTS OFFICE_ROOM (
+        id SERIAL PRIMARY KEY REFERENCES ROOM(id) ON DELETE CASCADE
+    );
+
+    CREATE TABLE IF NOT EXISTS USERS (
+        id SERIAL PRIMARY KEY,
+        email VARCHAR(255) UNIQUE NOT NULL,
+        username VARCHAR(255) NOT NULL,
+        password VARCHAR(255) NOT NULL,
+        profile_image text,
+        auth_provider VARCHAR(50) NOT NULL CHECK (auth_provider IN ('local', 'microsoft')),
+        university_id INT NOT NULL REFERENCES UNIVERSITY(id) ON DELETE CASCADE
+    );
+
+    CREATE TABLE IF NOT EXISTS STUDENT (
+        user_id INT UNIQUE NOT NULL REFERENCES USERS(id) ON DELETE CASCADE,
+        primary key (user_id)
+
+    );
+
+    CREATE TABLE IF NOT EXISTS TEACHER (
+        user_id INT UNIQUE NOT NULL REFERENCES USERS(id) ON DELETE CASCADE,
+        office_id INT DEFAULT NULL REFERENCES OFFICE_ROOM(id) ON DELETE SET NULL,
+        primary key (user_id)
+    );
+
+    CREATE TABLE IF NOT EXISTS TECHNICAL_SERVICES (
+        user_id INT UNIQUE NOT NULL REFERENCES USERS(id) ON DELETE CASCADE,
+        primary key (user_id)
+    );
+
+    CREATE TABLE IF NOT EXISTS ADMINISTRATOR (
+        user_id INT UNIQUE NOT NULL REFERENCES USERS(id) ON DELETE CASCADE,
+        primary key (user_id)
+    );
+
+    CREATE TABLE IF NOT EXISTS ROLE_APPROVALS (
+        id SERIAL PRIMARY KEY,
+        user_id INT NOT NULL REFERENCES USERS(id) ON DELETE CASCADE,
+        requested_role VARCHAR(50) NOT NULL CHECK (requested_role IN ('STUDENT','TEACHER', 'TECHNICAL_SERVICE')),
+        verification_token VARCHAR(255) UNIQUE NOT NULL,
+        verified_by INT REFERENCES ADMINISTRATOR(user_id) ON DELETE SET NULL,
+        created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+        expires_at TIMESTAMP NOT NULL,
+        status VARCHAR(20) DEFAULT 'PENDING' NOT NULL CHECK (status IN ('PENDING', 'APPROVED', 'REJECTED'))
+    );
+
+    CREATE TABLE IF NOT EXISTS SUBJECT (
+         id SERIAL PRIMARY KEY,
+         subject_name VARCHAR(255) NOT NULL,
+         university_id INT NOT NULL REFERENCES UNIVERSITY(id) ON DELETE CASCADE,
+        CONSTRAINT unique_subject_per_university UNIQUE (subject_name, university_id)
+    );
+
+    CREATE TABLE IF NOT EXISTS CLASS (
+        id SERIAL PRIMARY KEY,
+        class_name VARCHAR(255) NOT NULL,
+        subject_id INT NOT NULL REFERENCES SUBJECT(id) ON DELETE CASCADE,
+        CONSTRAINT unique_class_per_subject UNIQUE (class_name, subject_id)
+    );
+
+    CREATE TABLE IF NOT EXISTS TEACH (
+        teacher_id INT NOT NULL REFERENCES TEACHER(user_id) ON DELETE CASCADE,
+        class_id INT NOT NULL REFERENCES CLASS(id) ON DELETE CASCADE,
+        PRIMARY KEY (teacher_id, class_id)
+    );
+
+    CREATE TABLE IF NOT EXISTS ATTEND (
+        student_id INT NOT NULL REFERENCES STUDENT(user_id) ON DELETE CASCADE,
+        class_id INT NOT NULL REFERENCES CLASS(id) ON DELETE CASCADE,
+        PRIMARY KEY (student_id, class_id)
+    );
+
+    CREATE TABLE IF NOT EXISTS LECTURE (
+        id SERIAL PRIMARY KEY,
+        class_id INT NOT NULL REFERENCES CLASS(id) ON DELETE CASCADE,
+        room_id INT NOT NULL REFERENCES CLASSROOM(id) ON DELETE CASCADE,
+        class_type VARCHAR(30) CHECK (class_type IN ('theoretical', 'practical', 'theoretical_practical')),
+        week_day INT CHECK(week_day > 0 AND week_day < 8),
+        start_time TIME NOT NULL,
+        end_time TIME NOT NULL,
+        CHECK (end_time > start_time),
+        CONSTRAINT unique_class_room_time UNIQUE (class_id, room_id, week_day, start_time)
+        );
+
+    CREATE TABLE IF NOT EXISTS LECTURE_CHANGE (
+        lecture_id INT PRIMARY KEY REFERENCES LECTURE(id) ON DELETE CASCADE,
+        original_room_id INT NOT NULL REFERENCES CLASSROOM(id) ON DELETE CASCADE,
+        original_week_day INT CHECK(original_week_day > 0 AND original_week_day < 8),
+        original_start_time TIME NOT NULL,
+        original_end_time TIME NOT NULL,
+        original_class_type VARCHAR(25) CHECK (original_class_type IN ('theoretical', 'practical', 'theoretical_practical')),
+        effective_from TIMESTAMP,
+        effective_until TIMESTAMP,
+        CHECK (effective_until > effective_from),
+        CHECK (original_end_time > original_start_time)
+    );
+
+    CREATE TABLE IF NOT EXISTS ISSUE_REPORT (
+        id SERIAL PRIMARY KEY,
+        room_id INT NOT NULL REFERENCES ROOM(id) ON DELETE CASCADE,
+        created_by INT NOT NULL REFERENCES USERS(id) ON DELETE CASCADE,
+        assigned_to INT DEFAULT NULL REFERENCES TECHNICAL_SERVICES(user_id) ON DELETE SET NULL,
+        description TEXT NOT NULL
+    );
+
+  02_AddData.sql: |
+    -- Create ISEL university
+    INSERT INTO UNIVERSITY (university_name)
+    VALUES ('Instituto Superior de Engenharia de Lisboa')
+    ON CONFLICT (university_name) DO NOTHING;
+
+    -- Admin user 1
+    INSERT INTO USERS (email, username, password, auth_provider, university_id)
+    VALUES ('admin1@example.com',
+            'admin1',
+            '$argon2id$v=19$m=65536,t=10,p=1$eZVzlw07wQTuWdt7QCCxBw$HPjI9u1HhCei8lkWbESS6G6q+Cgbp0GMxNNGT8Y0GZY',
+            'local',
+            (SELECT id FROM UNIVERSITY WHERE university_name = 'Instituto Superior de Engenharia de Lisboa')
+            )
+
+    ON CONFLICT (email) DO NOTHING;
+
+    INSERT INTO ADMINISTRATOR (user_id)
+    SELECT id FROM USERS WHERE email = 'admin1@example.com'
+    ON CONFLICT (user_id) DO NOTHING;
+
+    -- Admin user 2
+    INSERT INTO USERS (email, username, password, auth_provider, university_id)
+    VALUES ('admin2@example.com',
+            'admin2',
+            '$argon2id$v=19$m=65536,t=10,p=1$eZVzlw07wQTuWdt7QCCxBw$HPjI9u1HhCei8lkWbESS6G6q+Cgbp0GMxNNGT8Y0GZY',
+            'local',
+            (SELECT id FROM UNIVERSITY WHERE university_name = 'Instituto Superior de Engenharia de Lisboa')
+           )
+    ON CONFLICT (email) DO NOTHING;
+
+    INSERT INTO ADMINISTRATOR (user_id)
+    SELECT id FROM USERS WHERE email = 'admin2@example.com'
+    ON CONFLICT (user_id) DO NOTHING;
+
+    -- Add subjects for ISEL
+    INSERT INTO SUBJECT (subject_name, university_id)
+    VALUES
+        ('Calculus', (SELECT id FROM UNIVERSITY WHERE university_name = 'Instituto Superior de Engenharia de Lisboa')),
+        ('Linear Algebra', (SELECT id FROM UNIVERSITY WHERE university_name = 'Instituto Superior de Engenharia de Lisboa')),
+        ('Physics', (SELECT id FROM UNIVERSITY WHERE university_name = 'Instituto Superior de Engenharia de Lisboa')),
+        ('Programming Fundamentals', (SELECT id FROM UNIVERSITY WHERE university_name = 'Instituto Superior de Engenharia de Lisboa')),
+        ('Database Systems', (SELECT id FROM UNIVERSITY WHERE university_name = 'Instituto Superior de Engenharia de Lisboa')),
+        ('Computer Networks', (SELECT id FROM UNIVERSITY WHERE university_name = 'Instituto Superior de Engenharia de Lisboa')),
+        ('Software Engineering', (SELECT id FROM UNIVERSITY WHERE university_name = 'Instituto Superior de Engenharia de Lisboa')),
+        ('Operating Systems', (SELECT id FROM UNIVERSITY WHERE university_name = 'Instituto Superior de Engenharia de Lisboa')),
+        ('Artificial Intelligence', (SELECT id FROM UNIVERSITY WHERE university_name = 'Instituto Superior de Engenharia de Lisboa')),
+        ('Distributed Systems', (SELECT id FROM UNIVERSITY WHERE university_name = 'Instituto Superior de Engenharia de Lisboa'))
+    ON CONFLICT (subject_name, university_id) DO NOTHING;
+
+    -- Add classes for each subject
+    -- Calculus classes
+    INSERT INTO CLASS (class_name, subject_id)
+    VALUES
+        ('T1', (SELECT id FROM SUBJECT WHERE subject_name = 'Calculus')),
+        ('T2', (SELECT id FROM SUBJECT WHERE subject_name = 'Calculus'))
+    ON CONFLICT (class_name, subject_id) DO NOTHING;
+
+    -- Linear Algebra classes
+    INSERT INTO CLASS (class_name, subject_id)
+    VALUES
+        ('T1', (SELECT id FROM SUBJECT WHERE subject_name = 'Linear Algebra')),
+        ('T2', (SELECT id FROM SUBJECT WHERE subject_name = 'Linear Algebra'))
+    ON CONFLICT (class_name, subject_id) DO NOTHING;
+
+    -- Physics classes
+    INSERT INTO CLASS (class_name, subject_id)
+    VALUES
+        ('T1', (SELECT id FROM SUBJECT WHERE subject_name = 'Physics')),
+        ('T2', (SELECT id FROM SUBJECT WHERE subject_name = 'Physics'))
+    ON CONFLICT (class_name, subject_id) DO NOTHING;
+
+    -- Programming Fundamentals classes
+    INSERT INTO CLASS (class_name, subject_id)
+    VALUES
+        ('T1', (SELECT id FROM SUBJECT WHERE subject_name = 'Programming Fundamentals')),
+        ('T2', (SELECT id FROM SUBJECT WHERE subject_name = 'Programming Fundamentals')),
+        ('T3', (SELECT id FROM SUBJECT WHERE subject_name = 'Programming Fundamentals'))
+    ON CONFLICT (class_name, subject_id) DO NOTHING;
+
+    -- Database Systems classes
+    INSERT INTO CLASS (class_name, subject_id)
+    VALUES
+        ('T1', (SELECT id FROM SUBJECT WHERE subject_name = 'Database Systems')),
+        ('T2', (SELECT id FROM SUBJECT WHERE subject_name = 'Database Systems'))
+    ON CONFLICT (class_name, subject_id) DO NOTHING;
+
+    -- Computer Networks classes
+    INSERT INTO CLASS (class_name, subject_id)
+    VALUES
+        ('T1', (SELECT id FROM SUBJECT WHERE subject_name = 'Computer Networks')),
+        ('T2', (SELECT id FROM SUBJECT WHERE subject_name = 'Computer Networks'))
+    ON CONFLICT (class_name, subject_id) DO NOTHING;
+
+    -- Software Engineering classes
+    INSERT INTO CLASS (class_name, subject_id)
+    VALUES
+        ('T1', (SELECT id FROM SUBJECT WHERE subject_name = 'Software Engineering')),
+        ('T2', (SELECT id FROM SUBJECT WHERE subject_name = 'Software Engineering'))
+    ON CONFLICT (class_name, subject_id) DO NOTHING;
+
+    -- Operating Systems classes
+    INSERT INTO CLASS (class_name, subject_id)
+    VALUES
+        ('T1', (SELECT id FROM SUBJECT WHERE subject_name = 'Operating Systems')),
+        ('T2', (SELECT id FROM SUBJECT WHERE subject_name = 'Operating Systems'))
+    ON CONFLICT (class_name, subject_id) DO NOTHING;
+
+    -- Artificial Intelligence classes
+    INSERT INTO CLASS (class_name, subject_id)
+    VALUES
+        ('T1', (SELECT id FROM SUBJECT WHERE subject_name = 'Artificial Intelligence')),
+        ('T2', (SELECT id FROM SUBJECT WHERE subject_name = 'Artificial Intelligence'))
+    ON CONFLICT (class_name, subject_id) DO NOTHING;
+
+    -- Distributed Systems classes
+    INSERT INTO CLASS (class_name, subject_id)
+    VALUES
+        ('T1', (SELECT id FROM SUBJECT WHERE subject_name = 'Distributed Systems')),
+        ('T2', (SELECT id FROM SUBJECT WHERE subject_name = 'Distributed Systems'))
+    ON CONFLICT (class_name, subject_id) DO NOTHING;
+
+    -- Insert Classrooms for ISEL
+    INSERT INTO ROOM (room_name, capacity, university_id)
+    VALUES
+        ('A1', 30, (SELECT id FROM UNIVERSITY WHERE university_name = 'Instituto Superior de Engenharia de Lisboa')),
+        ('A2', 30, (SELECT id FROM UNIVERSITY WHERE university_name = 'Instituto Superior de Engenharia de Lisboa')),
+        ('A3', 25, (SELECT id FROM UNIVERSITY WHERE university_name = 'Instituto Superior de Engenharia de Lisboa')),
+        ('B1', 40, (SELECT id FROM UNIVERSITY WHERE university_name = 'Instituto Superior de Engenharia de Lisboa')),
+        ('B2', 40, (SELECT id FROM UNIVERSITY WHERE university_name = 'Instituto Superior de Engenharia de Lisboa')),
+        ('B3', 35, (SELECT id FROM UNIVERSITY WHERE university_name = 'Instituto Superior de Engenharia de Lisboa')),
+        ('C1', 50, (SELECT id FROM UNIVERSITY WHERE university_name = 'Instituto Superior de Engenharia de Lisboa')),
+        ('C2', 50, (SELECT id FROM UNIVERSITY WHERE university_name = 'Instituto Superior de Engenharia de Lisboa')),
+        ('D1', 20, (SELECT id FROM UNIVERSITY WHERE university_name = 'Instituto Superior de Engenharia de Lisboa')),
+        ('D2', 20, (SELECT id FROM UNIVERSITY WHERE university_name = 'Instituto Superior de Engenharia de Lisboa')),
+        ('Auditório 1', 100, (SELECT id FROM UNIVERSITY WHERE university_name = 'Instituto Superior de Engenharia de Lisboa')),
+        ('Auditório 2', 80, (SELECT id FROM UNIVERSITY WHERE university_name = 'Instituto Superior de Engenharia de Lisboa')),
+        ('Lab Informática 1', 25, (SELECT id FROM UNIVERSITY WHERE university_name = 'Instituto Superior de Engenharia de Lisboa')),
+        ('Lab Informática 2', 25, (SELECT id FROM UNIVERSITY WHERE university_name = 'Instituto Superior de Engenharia de Lisboa')),
+        ('Lab Eletrónica', 20, (SELECT id FROM UNIVERSITY WHERE university_name = 'Instituto Superior de Engenharia de Lisboa'))
+    ON CONFLICT (room_name, university_id) DO NOTHING;
+
+    -- Add these rooms to CLASSROOM table
+    INSERT INTO CLASSROOM (id)
+    SELECT id FROM ROOM WHERE room_name IN (
+                                            'A1', 'A2', 'A3', 'B1', 'B2', 'B3', 'C1', 'C2', 'D1', 'D2',
+                                            'Auditório 1', 'Auditório 2', 'Lab Informática 1', 'Lab Informática 2', 'Lab Eletrónica'
+        )
+    ON CONFLICT (id) DO NOTHING;
+
+    -- Insert Study Rooms for ISEL
+    INSERT INTO ROOM (room_name, capacity, university_id)
+    VALUES
+        ('Sala Estudo 1', 10, (SELECT id FROM UNIVERSITY WHERE university_name = 'Instituto Superior de Engenharia de Lisboa')),
+        ('Sala Estudo 2', 10, (SELECT id FROM UNIVERSITY WHERE university_name = 'Instituto Superior de Engenharia de Lisboa')),
+        ('Sala Estudo 3', 8, (SELECT id FROM UNIVERSITY WHERE university_name = 'Instituto Superior de Engenharia de Lisboa')),
+        ('Sala Estudo 4', 8, (SELECT id FROM UNIVERSITY WHERE university_name = 'Instituto Superior de Engenharia de Lisboa')),
+        ('Sala Estudo 5', 6, (SELECT id FROM UNIVERSITY WHERE university_name = 'Instituto Superior de Engenharia de Lisboa')),
+        ('Sala Grupo 1', 15, (SELECT id FROM UNIVERSITY WHERE university_name = 'Instituto Superior de Engenharia de Lisboa')),
+        ('Sala Grupo 2', 15, (SELECT id FROM UNIVERSITY WHERE university_name = 'Instituto Superior de Engenharia de Lisboa')),
+        ('Sala Silêncio 1', 5, (SELECT id FROM UNIVERSITY WHERE university_name = 'Instituto Superior de Engenharia de Lisboa')),
+        ('Sala Silêncio 2', 5, (SELECT id FROM UNIVERSITY WHERE university_name = 'Instituto Superior de Engenharia de Lisboa'))
+    ON CONFLICT (room_name, university_id) DO NOTHING;
+
+    -- Add these rooms to STUDY_ROOM table
+    INSERT INTO STUDY_ROOM (id)
+    SELECT id FROM ROOM WHERE room_name LIKE 'Sala Estudo%'
+                           OR room_name LIKE 'Sala Grupo%'
+                           OR room_name LIKE 'Sala Silêncio%'
+    ON CONFLICT (id) DO NOTHING;
+
+    -- Insert Office Rooms for ISEL
+    INSERT INTO ROOM (room_name, capacity, university_id)
+    VALUES
+        ('Gab. Professor 1', 1, (SELECT id FROM UNIVERSITY WHERE university_name = 'Instituto Superior de Engenharia de Lisboa')),
+        ('Gab. Professor 2', 1, (SELECT id FROM UNIVERSITY WHERE university_name = 'Instituto Superior de Engenharia de Lisboa')),
+        ('Gab. Professor 3', 1, (SELECT id FROM UNIVERSITY WHERE university_name = 'Instituto Superior de Engenharia de Lisboa')),
+        ('Gab. Professor 4', 1, (SELECT id FROM UNIVERSITY WHERE university_name = 'Instituto Superior de Engenharia de Lisboa')),
+        ('Gab. Professor 5', 1, (SELECT id FROM UNIVERSITY WHERE university_name = 'Instituto Superior de Engenharia de Lisboa')),
+        ('Gab. Direção', 3, (SELECT id FROM UNIVERSITY WHERE university_name = 'Instituto Superior de Engenharia de Lisboa')),
+        ('Gab. Secretaria', 4, (SELECT id FROM UNIVERSITY WHERE university_name = 'Instituto Superior de Engenharia de Lisboa')),
+        ('Gab. Administração', 4, (SELECT id FROM UNIVERSITY WHERE university_name = 'Instituto Superior de Engenharia de Lisboa')),
+        ('Sala Reuniões 1', 10, (SELECT id FROM UNIVERSITY WHERE university_name = 'Instituto Superior de Engenharia de Lisboa')),
+        ('Sala Reuniões 2', 8, (SELECT id FROM UNIVERSITY WHERE university_name = 'Instituto Superior de Engenharia de Lisboa'))
+    ON CONFLICT (room_name, university_id) DO NOTHING;
+
+    -- Add these rooms to OFFICE_ROOM table
+    INSERT INTO OFFICE_ROOM (id)
+    SELECT id FROM ROOM WHERE room_name LIKE 'Gab.%' OR room_name LIKE 'Sala Reuniões%'
+    ON CONFLICT (id) DO NOTHING;
+
+    INSERT INTO LECTURE (class_id, room_id, class_type, week_day, start_time, end_time)
+    VALUES (
+               (SELECT id FROM CLASS WHERE class_name = 'T1' AND subject_id = (SELECT id FROM SUBJECT WHERE subject_name = 'Calculus')),
+               (SELECT id FROM CLASSROOM WHERE id = (SELECT id FROM ROOM WHERE room_name = 'A1')),
+               'theoretical',
+               1,
+               '08:00',
+               '9:30'
+           );
+
+    INSERT INTO LECTURE (class_id, room_id, class_type, week_day, start_time, end_time)
+    VALUES (
+               (SELECT id FROM CLASS WHERE class_name = 'T2' AND subject_id = (SELECT id FROM SUBJECT WHERE subject_name = 'Linear Algebra')),
+               (SELECT id FROM CLASSROOM WHERE id = (SELECT id FROM ROOM WHERE room_name = 'A2')),
+               'theoretical',
+               2,
+               '11:00',
+               '12:30'
+           );
+
+    INSERT INTO LECTURE (class_id, room_id, class_type, week_day, start_time, end_time)
+    VALUES (
+               (SELECT id FROM CLASS WHERE class_name = 'T1' AND subject_id = (SELECT id FROM SUBJECT WHERE subject_name = 'Programming Fundamentals')),
+               (SELECT id FROM CLASSROOM WHERE id = (SELECT id FROM ROOM WHERE room_name = 'Lab Informática 1')),
+               'practical',
+               3,
+               '11:00',
+               '14:00'
+           );
+
+    INSERT INTO LECTURE (class_id, room_id, class_type, week_day, start_time, end_time)
+    VALUES (
+               (SELECT id FROM CLASS WHERE class_name = 'T2' AND subject_id = (SELECT id FROM SUBJECT WHERE subject_name = 'Physics')),
+               (SELECT id FROM CLASSROOM WHERE id = (SELECT id FROM ROOM WHERE room_name = 'B1')),
+               'theoretical',
+               4,
+               '08:00',
+               '11:00'
+           );
+
+    INSERT INTO LECTURE (class_id, room_id, class_type, week_day, start_time, end_time)
+    VALUES (
+               (SELECT id FROM CLASS WHERE class_name = 'T1' AND subject_id = (SELECT id FROM SUBJECT WHERE subject_name = 'Computer Networks')),
+               (SELECT id FROM CLASSROOM WHERE id = (SELECT id FROM ROOM WHERE room_name = 'C1')),
+               'theoretical_practical',
+               5,
+               '15:30',
+               '17:00'
+           );
+
+    -- Software Engineering - T1
+    INSERT INTO LECTURE (class_id, room_id, class_type, week_day, start_time, end_time)
+    VALUES (
+               (SELECT id FROM CLASS WHERE class_name = 'T1' AND subject_id = (SELECT id FROM SUBJECT WHERE subject_name = 'Software Engineering')),
+               (SELECT id FROM CLASSROOM WHERE id = (SELECT id FROM ROOM WHERE room_name = 'B2')),
+               'theoretical',
+               1,
+               '11:00',
+               '12:30'
+           );
+
+    -- Software Engineering - T2
+    INSERT INTO LECTURE (class_id, room_id, class_type, week_day, start_time, end_time)
+    VALUES (
+               (SELECT id FROM CLASS WHERE class_name = 'T2' AND subject_id = (SELECT id FROM SUBJECT WHERE subject_name = 'Software Engineering')),
+               (SELECT id FROM CLASSROOM WHERE id = (SELECT id FROM ROOM WHERE room_name = 'B3')),
+               'practical',
+               3,
+               '15:30',
+               '18:30'
+           );
+
+    -- Operating Systems - T1
+    INSERT INTO LECTURE (class_id, room_id, class_type, week_day, start_time, end_time)
+    VALUES (
+               (SELECT id FROM CLASS WHERE class_name = 'T1' AND subject_id = (SELECT id FROM SUBJECT WHERE subject_name = 'Operating Systems')),
+               (SELECT id FROM CLASSROOM WHERE id = (SELECT id FROM ROOM WHERE room_name = 'C2')),
+               'theoretical_practical',
+               2,
+               '09:30',
+               '12:30'
+           );
+
+    -- Operating Systems - T2
+    INSERT INTO LECTURE (class_id, room_id, class_type, week_day, start_time, end_time)
+    VALUES (
+               (SELECT id FROM CLASS WHERE class_name = 'T2' AND subject_id = (SELECT id FROM SUBJECT WHERE subject_name = 'Operating Systems')),
+               (SELECT id FROM CLASSROOM WHERE id = (SELECT id FROM ROOM WHERE room_name = 'Lab Informática 2')),
+               'practical',
+               4,
+               '14:00',
+               '15:30'
+           );
+
+    -- Artificial Intelligence - T1
+    INSERT INTO LECTURE (class_id, room_id, class_type, week_day, start_time, end_time)
+    VALUES (
+               (SELECT id FROM CLASS WHERE class_name = 'T1' AND subject_id = (SELECT id FROM SUBJECT WHERE subject_name = 'Artificial Intelligence')),
+               (SELECT id FROM CLASSROOM WHERE id = (SELECT id FROM ROOM WHERE room_name = 'Auditório 1')),
+               'theoretical',
+               5,
+               '11:00',
+               '12:30'
+           );
+
+    -- Artificial Intelligence - T2
+    INSERT INTO LECTURE (class_id, room_id, class_type, week_day, start_time, end_time)
+    VALUES (
+               (SELECT id FROM CLASS WHERE class_name = 'T2' AND subject_id = (SELECT id FROM SUBJECT WHERE subject_name = 'Artificial Intelligence')),
+               (SELECT id FROM CLASSROOM WHERE id = (SELECT id FROM ROOM WHERE room_name = 'Auditório 2')),
+               'theoretical',
+               3,
+               '08:00',
+               '9:30'
+           );
+
+    -- Distributed Systems - T1
+    INSERT INTO LECTURE (class_id, room_id, class_type, week_day, start_time, end_time)
+    VALUES (
+               (SELECT id FROM CLASS WHERE class_name = 'T1' AND subject_id = (SELECT id FROM SUBJECT WHERE subject_name = 'Distributed Systems')),
+               (SELECT id FROM CLASSROOM WHERE id = (SELECT id FROM ROOM WHERE room_name = 'C1')),
+               'theoretical_practical',
+               1,
+               '9:30',
+               '11:00'
+           );
+
+    -- Distributed Systems - T2
+    INSERT INTO LECTURE (class_id, room_id, class_type, week_day, start_time, end_time)
+    VALUES (
+               (SELECT id FROM CLASS WHERE class_name = 'T2' AND subject_id = (SELECT id FROM SUBJECT WHERE subject_name = 'Distributed Systems')),
+               (SELECT id FROM CLASSROOM WHERE id = (SELECT id FROM ROOM WHERE room_name = 'Lab Informática 1')),
+               'practical',
+               4,
+               '17:00',
+               '18:30'
+           );
+
+    -- Database Systems - T1
+    INSERT INTO LECTURE (class_id, room_id, class_type, week_day, start_time, end_time)
+    VALUES (
+               (SELECT id FROM CLASS WHERE class_name = 'T1' AND subject_id = (SELECT id FROM SUBJECT WHERE subject_name = 'Database Systems')),
+               (SELECT id FROM CLASSROOM WHERE id = (SELECT id FROM ROOM WHERE room_name = 'Lab Informática 2')),
+               'practical',
+               2,
+               '14:00',
+               '15:30'
+           );
+
+    -- Database Systems - T2
+    INSERT INTO LECTURE (class_id, room_id, class_type, week_day, start_time, end_time)
+    VALUES (
+               (SELECT id FROM CLASS WHERE class_name = 'T2' AND subject_id = (SELECT id FROM SUBJECT WHERE subject_name = 'Database Systems')),
+               (SELECT id FROM CLASSROOM WHERE id = (SELECT id FROM ROOM WHERE room_name = 'A3')),
+               'theoretical',
+               5,
+               '11:00',
+               '12:30'
+           );
+  change_lectures.sql: |-
+    CREATE OR REPLACE FUNCTION apply_lecture_changes() RETURNS void AS $$
+    BEGIN
+        -- Apply lecture changes: replace data in LECTURE with that from LECTURE_CHANGE
+        UPDATE LECTURE l
+        SET room_id = lc.original_room_id,
+            week_day = lc.original_week_day,
+            start_time = lc.original_start_time,
+            end_time = lc.original_end_time,
+            class_type = lc.original_class_type
+        FROM LECTURE_CHANGE lc
+        WHERE l.id = lc.lecture_id
+          AND lc.effective_from <= now()
+          AND lc.effective_until > now();
+
+        -- Revert expired changes
+        UPDATE LECTURE l
+        SET room_id = lc.original_room_id,
+            week_day = lc.original_week_day,
+            start_time = lc.original_start_time,
+            end_time = lc.original_end_time,
+            class_type = lc.original_class_type
+        FROM LECTURE_CHANGE lc
+        WHERE l.id = lc.lecture_id
+          AND lc.effective_until <= now();
+
+        -- Delete expired changes
+        DELETE FROM LECTURE_CHANGE
+        WHERE effective_until <= now();
+    END;
+    $$ LANGUAGE plpgsql;
+  cron_schedule.sql: |-
+    CREATE EXTENSION IF NOT EXISTS pg_cron;
+
+    SELECT cron.schedule(
+                   'lecture_change_cron',
+                   '0 2 * * *',  -- 2:00 AM daily
+                   $$CALL apply_lecture_changes();$$
+           );
+  enforce_disjunction_trigger.sql: |-
+    CREATE OR REPLACE FUNCTION enforce_disjunction() RETURNS TRIGGER AS $$
+    BEGIN
+        IF EXISTS (
+            SELECT 1 FROM STUDENT WHERE user_id = NEW.user_id
+            UNION ALL
+            SELECT 1 FROM TEACHER WHERE user_id = NEW.user_id
+            UNION ALL
+            SELECT 1 FROM TECHNICAL_SERVICES WHERE user_id = NEW.user_id
+            UNION ALL
+            SELECT 1 FROM ADMINISTRATOR WHERE user_id = NEW.user_id
+        ) THEN
+            RAISE EXCEPTION 'User already belongs to another role.';
+        END IF;
+        RETURN NEW;
+    END;
+    $$ LANGUAGE plpgsql;
+
+    CREATE TRIGGER enforce_disjunction_student
+        BEFORE INSERT ON STUDENT
+        FOR EACH ROW EXECUTE FUNCTION enforce_disjunction();
+
+    CREATE TRIGGER enforce_disjunction_teacher
+        BEFORE INSERT ON TEACHER
+        FOR EACH ROW EXECUTE FUNCTION enforce_disjunction();
+
+    CREATE TRIGGER enforce_disjunction_technical_services
+        BEFORE INSERT ON TECHNICAL_SERVICES
+        FOR EACH ROW EXECUTE FUNCTION enforce_disjunction();
+
+    CREATE TRIGGER enforce_disjunction_admin
+        BEFORE INSERT ON ADMINISTRATOR
+        FOR EACH ROW EXECUTE FUNCTION enforce_disjunction();
+kind: ConfigMap
+metadata:
+  name: postgres-init-scripts
+  namespace: sigms

@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: db-service
+  namespace: sigms
+  labels:
+    app: db
+spec:
+  type: ClusterIP
+  selector:
+    app: db
+  ports:
+    - name: postgres
+      port: 5432
+      targetPort: 5432
+      protocol: TCP

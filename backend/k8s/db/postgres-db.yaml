@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: db
+  namespace: sigms
+  labels:
+    app: db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: db
+  template:
+    metadata:
+      name: db
+      labels:
+        app: db
+    spec:
+      serviceAccountName: secrets-account
+      containers:
+        - name: db
+          image: europe-west1-docker.pkg.dev/rising-city-464516-e8/sigms/db
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: sigms-secret-provider
+                  key: POSTGRES_USER
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: sigms-secret-provider
+                  key: POSTGRES_PASSWORD
+            - name: POSTGRES_DB
+              valueFrom:
+                secretKeyRef:
+                  name: sigms-secret-provider
+                  key: POSTGRES_DB
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "500m"
+            limits:
+              memory: "1Gi"
+              cpu: "1"
+          ports:
+            - containerPort: 5432
+              protocol: TCP
+          volumeMounts:
+            - name: init-scripts
+              mountPath: /docker-entrypoint-initdb.d
+              readOnly: true
+            - name: postgres-storage
+              mountPath: /var/lib/postgresql/data
+              subPath: postgres
+      volumes:
+        - name: init-scripts
+          configMap:
+            name: postgres-init-scripts
+        - name: postgres-storage
+          persistentVolumeClaim:
+            claimName: postgres-pvc
