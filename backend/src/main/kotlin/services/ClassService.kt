@@ -52,15 +52,22 @@ class ClassService(private val repositories: Repositories,
     fun createClass(name: String, subjectId: Int): ClassResult {
         return runCatching {
             transactionable.useTransaction {
-                val existingClass = repositories.from({classRepository}){findClassByName(name)}
-                if(existingClass != null) {
+                val subject = repositories.from({subjectRepository}) { findSubjectById(subjectId) }
+                    ?: return@useTransaction failure(ClassError.SubjectNotFound)
+
+                val existingClassInSubject = repositories.from({classRepository}) {
+                    findClassInSubjectByName(subject, name)
+                }
+                if (existingClassInSubject != null) {
                     return@useTransaction failure(ClassError.ClassAlreadyExists)
                 }
-                val existingSubject = repositories.from({subjectRepository}){findSubjectById(subjectId)}
-                    ?: return@useTransaction failure(ClassError.SubjectNotFound)
-                val newClass = repositories.from({classRepository}){addClass(name, existingSubject)}
+
+                val newClass = repositories.from({classRepository}) {
+                    addClass(name, subject)
+                }
                 return@useTransaction success(newClass)
             }
         }
     }
+
 }

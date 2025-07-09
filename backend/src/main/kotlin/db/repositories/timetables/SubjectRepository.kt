@@ -47,6 +47,6 @@ class SubjectRepository(private val database: Database): SubjectRepositoryInterf
 
     override fun deleteSubject(id: Int): Boolean = withDatabase {
         val condition = database.subjects.removeIf { it.id eq id }
-        return condition == 0
+        return condition > 0
     }
 }

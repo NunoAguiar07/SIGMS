@@ -141,4 +141,41 @@ class UserServiceTest {
         assertTrue(result is Failure, "User with this id should not exist")
         assertEquals(AuthError.UserNotFound, result.value, "Expected UserNotFound error")
     }
+    @Test
+    fun `changePassword should succeed when old password is correct`() {
+        val user = createTestUser().apply {
+            password = User.hashPassword("test123!")
+            mockRepositories.from({userRepository as MockUserRepository}) { update(this@apply) }
+        }
+        val newPassword = "newSecure123!"
+
+        val result = userService.changePassword(user.id, "test123!", newPassword)
+        assertTrue(result is Success, "Expected success result")
+        val updatedUser = result.value
+
+        assertTrue(User.verifyPassword(updatedUser.password, newPassword), "Password should match the new one")
+    }
+
+    @Test
+    fun `deleteUser should succeed when user exists`() {
+        val user = createTestUser()
+        val result = userService.deleteUser(user.id)
+
+        assertTrue(result is Success)
+        assertTrue(result.value)
+
+        // Verify deletion
+        val getResult = userService.getUserById(user.id)
+        assertTrue(getResult is Failure)
+        assertEquals(AuthError.UserNotFound, getResult.value)
+    }
+
+    @Test
+    fun `deleteUser should return UserNotFound when user doesn't exist`() {
+        val result = userService.deleteUser(9999)
+        assertTrue(result is Failure)
+        assertEquals(AuthError.UserNotFound, result.value)
+    }
+
+
 }

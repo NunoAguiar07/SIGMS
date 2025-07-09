@@ -135,4 +135,15 @@ class ClassServiceTest {
         )
     }
 
+    @Test
+    fun `createClass allows same name in different subjects`() {
+        val subjects = createTestSubjects(2)
+        val result1 = classService.createClass("Shared Name", subjects[0].id)
+        assertTrue(result1 is Success)
+
+        val result2 = classService.createClass("Shared Name", subjects[1].id)
+        assertTrue(result2 is Success)
+    }
+
+
 }

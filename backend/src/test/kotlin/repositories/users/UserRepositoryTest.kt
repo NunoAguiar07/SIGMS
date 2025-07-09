@@ -10,112 +10,83 @@ import kotlin.test.*
 
 class UserRepositoryTest {
 
+    private val userRepository = UserRepository(DatabaseTestSetup.database)
+    private val universityRepository = UniversityRepository(DatabaseTestSetup.database)
+    private val kTormCommand = KtormCommand(DatabaseTestSetup.database)
+
     @AfterTest
     fun clearDatabase() {
         DatabaseTestSetup.clearDB()
     }
 
-    private val userRepository = UserRepository(DatabaseTestSetup.database)
-    private val universityRepository = UniversityRepository(DatabaseTestSetup.database)
-    private val kTormCommand = KtormCommand(DatabaseTestSetup.database)
-/*
+    private fun createUniversity() = universityRepository.createUniversity("TestUniversity")
+
     @Test
-    fun `Should create a new user for every role`(){
-        kTransaction.useTransaction {
-            var userCount = 1
-            for(role in Role.entries){
-                val user = User {
-                    email = "testemail${role.name}@test.com"
-                    username = "tester${role.name}"
-                    password = User.hashPassword("test")
-                    profileImage = byteArrayOf()
-                }.let { userRepository.create(it, role) }
-                assertEquals(user.id, userCount)
-                assertEquals(user.email, "testemail${role.name}@test.com")
-                assertEquals(user.username, "tester${role.name}")
-                assertTrue(User.verifyPassword(user.password, "test"))
-                assertContentEquals(user.profileImage, byteArrayOf())
-                assertDoesNotThrow {
-                    when(role){
-                        Role.STUDENT -> {
-                            user.toStudent(database)
-                        }
-                        Role.TEACHER -> {
-                            user.toTeacher(database)
-                        }
-                        Role.ADMIN -> {
-                            user.toAdmin(database)
-                        }
-                        Role.TECHNICAL_SERVICE -> {
-                            user.toTechnicalService(database)
-                        }
-                    }
-                }
-                userCount += 1
-            }
-        }
-    }
-*/
-    @Test
-    fun `Should find user my id`() {
-        kTormCommand.useTransaction {
-            val newUniversity = universityRepository.createUniversity("testUniversity")
-            val newUser = User {
-                email = "testemail@test.com"
-                username = "tester"
-                password = User.hashPassword("test")
-                profileImage = byteArrayOf()
-                authProvider = "local"
-                university = newUniversity
-            }.let { userRepository.createWithRole(it.email, it.username, it.password, Role.STUDENT, it.university, it.authProvider) }
-            val user = userRepository.findById(newUser.id)
-            assertNotNull(user)
-            assertEquals(newUser.id, user.id)
-            assertEquals(newUser.email, user.email)
-            assertEquals(newUser.username, user.username)
-            assertContentEquals(newUser.profileImage, user.profileImage)
-        }
+    fun `Should find user by id`() = kTormCommand.useTransaction {
+        val uni = createUniversity()
+        val newUser = userRepository.createWithRole("email@test.com", "tester", "pass", Role.STUDENT, uni, "local")
+        val found = userRepository.findById(newUser.id)
+        assertNotNull(found)
+        assertEquals(newUser.id, found.id)
     }
 
     @Test
-    fun `Should find user my email`(){
-        kTormCommand.useTransaction {
-            val newUniversity = universityRepository.createUniversity("testUniversity")
-            val newUser = User {
-                email = "testemail@test.com"
-                username = "tester"
-                password = User.hashPassword("test")
-                profileImage = byteArrayOf()
-                authProvider = "local"
-                university = newUniversity
-            }.let { userRepository.createWithRole(it.email, it.username, it.password, Role.STUDENT, it.university, it.authProvider) }
-            val user = userRepository.findByEmail(newUser.email)
-            assertNotNull(user)
-            assertEquals(newUser.id, user.id)
-            assertEquals(newUser.email, user.email)
-            assertEquals(newUser.username, user.username)
-            assertContentEquals(newUser.profileImage, user.profileImage)
-        }
+    fun `Should find user by email`() = kTormCommand.useTransaction {
+        val uni = createUniversity()
+        val newUser = userRepository.createWithRole("find@test.com", "tester", "pass", Role.STUDENT, uni, "local")
+        val found = userRepository.findByEmail("find@test.com")
+        assertNotNull(found)
+        assertEquals(newUser.id, found.id)
     }
 
     @Test
-    fun `Should update the user username`(){
-        kTormCommand.useTransaction {
-            val newUniversity = universityRepository.createUniversity("testUniversity")
-            val newUser = User {
-                email = "testemail@test.com"
-                username = "tester"
-                password = User.hashPassword("test")
-                profileImage = byteArrayOf()
-                authProvider = "local"
-                university = newUniversity
-            }.let { userRepository.createWithRole(it.email, it.username, it.password, Role.STUDENT, it.university, it.authProvider) }
-            val newUsername = "newTester"
-            newUser.username = newUsername
-            userRepository.update(newUser)
-            val user = userRepository.findById(newUser.id)
-            assertNotNull(user)
-            assertEquals(newUsername, user.username)
-        }
+    fun `Should update the user username`() = kTormCommand.useTransaction {
+        val uni = createUniversity()
+        val newUser = userRepository.createWithRole("update@test.com", "tester", "pass", Role.STUDENT, uni, "local")
+        newUser.username = "updatedTester"
+        userRepository.update(newUser)
+        val found = userRepository.findById(newUser.id)
+        assertEquals("updatedTester", found?.username)
+    }
+
+    @Test
+    fun `Should create user without role`() = kTormCommand.useTransaction {
+        val uni = createUniversity()
+        val newUser = userRepository.createWithoutRole("nobody@test.com", "nobody", "pass", uni, "local")
+        assertNotNull(newUser)
+        assertEquals("nobody@test.com", newUser.email)
+        assertNull(userRepository.getRoleById(newUser.id))
+    }
+
+    @Test
+    fun `Should associate existing user with role`() = kTormCommand.useTransaction {
+        val uni = createUniversity()
+        val user = userRepository.createWithoutRole("late@test.com", "lateUser", "pass", uni, "local")
+        userRepository.associateWithRole(user, Role.TEACHER)
+        assertEquals(Role.TEACHER, userRepository.getRoleById(user.id))
+    }
+
+    @Test
+    fun `Should get correct role by user id`() = kTormCommand.useTransaction {
+        val uni = createUniversity()
+        val user = userRepository.createWithRole("role@test.com", "roleUser", "pass", Role.TECHNICAL_SERVICE, uni, "local")
+        val role = userRepository.getRoleById(user.id)
+        assertEquals(Role.TECHNICAL_SERVICE, role)
+    }
+
+    @Test
+    fun `Should delete user and its role`() = kTormCommand.useTransaction {
+        val uni = createUniversity()
+        val user = userRepository.createWithRole("delete@test.com", "deleteMe", "pass", Role.ADMIN, uni, "local")
+        val result = userRepository.delete(user.id)
+        assertTrue(result)
+        assertNull(userRepository.findById(user.id))
+        assertNull(userRepository.getRoleById(user.id))
+    }
+
+    @Test
+    fun `Should return false if user does not exist when deleting`() = kTormCommand.useTransaction {
+        val result = userRepository.delete(-999)
+        assertFalse(result)
     }
 }

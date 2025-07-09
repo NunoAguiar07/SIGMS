@@ -115,5 +115,76 @@ class RoomServiceTest {
         assertEquals("Study Room 1", successResult.name, "Expected room name to match")
         assertEquals(10, successResult.capacity, "Expected room capacity to match")
     }
+    @Test
+    fun `createRoom fails when university does not exist`() {
+        val result = roomService.createRoom(10, "Ghost Room", 999, RoomType.CLASS)
+        assertTrue(result is Failure, "Expected Failure")
+        assertEquals(RoomError.UniversityNotFound, result.value, "Expected UniversityNotFound")
+    }
+
+    @Test
+    fun `deleteRoom succeeds for existing room`() {
+        val room = createTestRooms(1)[0]
+        val result = roomService.deleteRoom(room.id)
+        assertTrue(result is Success, "Expected Success")
+        assertTrue(result.value, "Expected true (room deleted)")
+
+        // Double-check it’s gone
+        val check = roomService.getRoomById(room.id)
+        assertTrue(check is Failure, "Expected Failure after deletion")
+        assertEquals(RoomError.RoomNotFound, check.value)
+    }
+
+    @Test
+    fun `deleteRoom fails when room not found`() {
+        val result = roomService.deleteRoom(999)
+        assertTrue(result is Failure, "Expected Failure")
+        assertEquals(RoomError.RoomNotFound, result.value)
+    }
+
+    @Test
+    fun `updateRoom succeeds for existing room`() {
+        val room = createTestRooms(1)[0]
+        val result = roomService.updateRoom(room.id, "Updated Room", 20)
+        assertTrue(result is Success, "Expected Success")
+        val updated = result.value
+        assertEquals("Updated Room", updated.name)
+        assertEquals(20, updated.capacity)
+    }
+
+    @Test
+    fun `updateRoom fails when room not found`() {
+        val result = roomService.updateRoom(999, "Should Not Work", 10)
+        assertTrue(result is Failure, "Expected Failure")
+        assertEquals(RoomError.RoomNotFound, result.value)
+    }
+
+    @Test
+    fun `getAllRoomsByUniversityId returns rooms of a university`() {
+        val rooms = createTestRooms(3)
+        val universityId = rooms[0].university.id
+        val result = roomService.getAllRoomsByUniversityId(universityId, 10, 0)
+        assertTrue(result is Success)
+        assertTrue(result.value.isNotEmpty())
+        assertTrue(result.value.all { it.university.id == universityId })
+    }
+
+    @Test
+    fun `getRoomsByNameAndUniversityId returns matching rooms`() {
+        val university = mockRepositories.from({universityRepository}) {
+            createUniversity("Test University")
+        }
+        val room = mockRepositories.from({roomRepository}) {
+            createRoom(20, "Unique Room Name", university)
+        }
+        val result = roomService.getRoomsByNameAndUniversityId(university.id, "Unique", 10, 0)
+        assertTrue(result is Success)
+        assertEquals(1, result.value.size)
+        assertEquals(room.id, result.value.first().id)
+    }
+
+
+
+
 
 }

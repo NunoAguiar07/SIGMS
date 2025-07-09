@@ -17,7 +17,6 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class SubjectServiceTest {
-    // Test database setup
     val mockDB = Database.connect(
         url = "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1",
         user = "root",
@@ -109,4 +108,71 @@ class SubjectServiceTest {
         assertTrue(result is Failure, "Expected Failure")
         assertEquals(SubjectError.SubjectAlreadyExists, result.value,"Expected SubjectAlreadyExists error")
     }
+
+    @Test
+    fun `deleteSubject should succeed when subject exists`() {
+        val subject = createTestSubjects(1)[0]
+        val result = subjectService.deleteSubject(subject.id)
+
+        assertTrue(result is Success)
+        assertEquals(true, result.value, "Expected deletion to succeed")
+    }
+
+    @Test
+    fun `deleteSubject should fail when subject does not exist`() {
+        val result = subjectService.deleteSubject(999)
+
+        assertTrue(result is Failure)
+        assertEquals(SubjectError.SubjectNotFound, result.value, "Expected SubjectNotFound error")
+    }
+
+    @Test
+    fun `getAllSubjectsByUniversity should return subjects for given university`() {
+        val university = mockRepositories.from({universityRepository}) {
+            createUniversity("University A")
+        }
+        subjectService.createSubject("Math", university.id)
+        subjectService.createSubject("Physics", university.id)
+
+        val result = subjectService.getAllSubjectsByUniversity(university.id, 10, 0)
+
+        assertTrue(result is Success)
+        assertEquals(2, result.value.size)
+        assertTrue(result.value.all { it.university.id == university.id })
+    }
+
+    @Test
+    fun `getAllSubjectsByUniversity should return error for invalid university`() {
+        val result = subjectService.getAllSubjectsByUniversity(999, 10, 0)
+
+        assertTrue(result is Failure)
+        assertEquals(SubjectError.UniversityNotFound, result.value)
+    }
+
+    @Test
+    fun `getSubjectsByNameAndUniversityId should return filtered subjects`() {
+        val university = mockRepositories.from({universityRepository}) {
+            createUniversity("Filtered University")
+        }
+        subjectService.createSubject("Algorithms", university.id)
+        subjectService.createSubject("Algebra", university.id)
+        subjectService.createSubject("Physics", university.id)
+
+        val result = subjectService.getSubjectsByNameAndUniversityId(university.id, "Alg", 10, 0)
+
+        assertTrue(result is Success)
+        val matchedNames = result.value.map { it.name }
+        assertEquals(setOf("Algorithms", "Algebra"), matchedNames.toSet())
+    }
+
+    @Test
+    fun `getSubjectsByNameAndUniversityId should fail for non-existing university`() {
+        val result = subjectService.getSubjectsByNameAndUniversityId(999, "Any", 10, 0)
+
+        assertTrue(result is Failure)
+        assertEquals(SubjectError.UniversityNotFound, result.value)
+    }
+
+
+
 }

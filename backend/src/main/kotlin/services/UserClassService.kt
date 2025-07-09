@@ -209,22 +209,26 @@ class UserClassService(
     }
 
     private fun teacherSchedule(user: User, limit: Int, offset: Int): Either<UserClassError, List<Pair<Lecture, List<Teacher>>>> {
+        // Fetch classes where the user is a teacher
         val classes = repositories.from({ classRepository }) {
-            findClassesByStudentId(user.id)
+            findClassesByTeacherId(user.id)
         }
+
         if (classes.isEmpty()) {
             return success(emptyList())
         }
 
         val lectureTeacherPairs = classes.flatMap { classEntity ->
-            val teacher = repositories.from({ teacherRepository }) {
+            // Fetch teachers of the class
+            val teachers = repositories.from({ teacherRepository }) {
                 findTeachersByClassId(classEntity.id)
             }
 
+            // Fetch lectures of the class with pagination
             repositories.from({ lectureRepository }) {
                 getLecturesByClass(classEntity.id, limit, offset)
             }.map { lecture ->
-                lecture to teacher
+                lecture to teachers
             }
         }.sortedBy { it.first.weekDay }
 

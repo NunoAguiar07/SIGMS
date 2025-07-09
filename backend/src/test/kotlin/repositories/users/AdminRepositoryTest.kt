@@ -88,4 +88,42 @@ class AdminRepositoryTest {
             assertFalse(adminRepository.isAdmin(newUser))
         }
     }
+
+    @Test
+    fun `Should get all admin emails`() = kTormCommand.useTransaction {
+        val university = universityRepository.createUniversity("testUniversity")
+
+        val admin1 = userRepository.createWithRole(
+            "admin1@test.com", "admin1", User.hashPassword("123"),
+            Role.ADMIN, university, "local"
+        )
+        val admin2 = userRepository.createWithRole(
+            "admin2@test.com", "admin2", User.hashPassword("123"),
+            Role.ADMIN, university, "local"
+        )
+        val student = userRepository.createWithRole(
+            "student@test.com", "student", User.hashPassword("123"),
+            Role.STUDENT, university, "local"
+        )
+
+        val emails = adminRepository.getAllAdminEmails()
+
+        assertEquals(2, emails.size)
+        assertTrue("admin1@test.com" in emails)
+        assertTrue("admin2@test.com" in emails)
+        assertFalse("student@test.com" in emails)
+    }
+
+    @Test
+    fun `Should return null when admin email does not exist`() = kTormCommand.useTransaction {
+        val result = adminRepository.findAdminByEmail("doesnotexist@test.com")
+        assertNull(result)
+    }
+
+    @Test
+    fun `Should return null when admin id does not exist`() = kTormCommand.useTransaction {
+        val result = adminRepository.findAdminById(999999)
+        assertNull(result)
+    }
+
 }

@@ -97,7 +97,7 @@ class RoomRepository (private val database: Database) : RoomRepositoryInterface 
 
     override fun deleteRoom(id: Int): Boolean = withDatabase {
         val condition = database.rooms.removeIf { it.id eq id }
-        return condition == 0
+        return condition > 0
     }
 
     override fun updateRoom(room: Room, name: String, capacity: Int): Room = withDatabase {
