@@ -1,7 +1,10 @@
-import {ScrollView, Text, TouchableOpacity, View} from "react-native";
-import {styles} from "../css_styling/calendar/Props";
+import {ScrollView} from "react-native";
 import {CalendarScreenType} from "../types/CalendarScreenType";
 import {DayType} from "../types/components/DayType";
+import {Card, CenteredContainer, ColumnContainer, Container, RowContainer} from "../css_styling/common/NewContainers";
+import {theme} from "../css_styling/common/Theme";
+import {BodyText, Subtitle} from "../css_styling/common/Typography";
+import { Button } from "../css_styling/common/Buttons";
 
 
 
@@ -20,9 +23,9 @@ const CalendarScreen = ({ schedule, onClickProfile, onClickRoom }: CalendarScree
 
 
     return (
-        <View style={styles.container}>
-            <View style={styles.cardContainer}>
-                <ScrollView style={styles.content} contentContainerStyle={{height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+        <CenteredContainer width={"100%"} flex={1}>
+            <Card shadow="medium" gap="md" width={"60%"}>
+                <ScrollView contentContainerStyle={{height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
                     <DaySection day="Monday"  events={getEventsForDay("MONDAY")} onClickProfile={onClickProfile} onClickRoom={onClickRoom} />
                     <DaySection day="Tuesday"  events={getEventsForDay("TUESDAY")} onClickProfile={onClickProfile} onClickRoom={onClickRoom} />
                     <DaySection day="Wednesday"  events={getEventsForDay("WEDNESDAY")} onClickProfile={onClickProfile} onClickRoom={onClickRoom} />
@@ -30,51 +33,44 @@ const CalendarScreen = ({ schedule, onClickProfile, onClickRoom }: CalendarScree
                     <DaySection day="Friday"  events={getEventsForDay("FRIDAY")} onClickProfile={onClickProfile} onClickRoom={onClickRoom} />
                     <DaySection day="Saturday"  events={getEventsForDay("SATURDAY")} onClickProfile={onClickProfile} onClickRoom={onClickRoom} />
                 </ScrollView>
-            </View>
-        </View>
+            </Card>
+        </CenteredContainer>
     );
 };
 
 const DaySection = ({ day, events, onClickProfile, onClickRoom } : DayType) => (
-    <View style={styles.daySection}>
-        <Text style={styles.dayTitle}>{day}</Text>
+    <Container backgroundColor={theme.colors.background.tertiary} padding="md" margin="sm" borderRadius={"large"} width={"100%"} alignItems={"flex-start"}>
+        <Subtitle color={theme.colors.text.black} family={"bold"}>{day}</Subtitle>
         {events.length > 0 && (
-            <View style={styles.eventBlock}>
-                {events.map((event: any, index: number) => (
-                    <View key={index} style={styles.eventItem}>
-                        <Text style={styles.eventTime}>{event.time}</Text>
-                        <Text style={styles.eventTitle}>{event.title}</Text>
-
-
-                        <Text style={styles.teacherNames}>
-                            Teachers: {event.teachers.map((t: { name: string; }) => t.name).join(', ')}
-                        </Text>
-
-
-                        <View style={styles.teacherButtonRow}>
+            <Container backgroundColor={theme.colors.background.cream} padding="md" margin="sm" borderRadius={"large"} width={"100%"} gap={"md"}>
+                {events.map((event: any) => (
+                    <RowContainer borderRadius={"small"} justifyContent={"space-between"}>
+                        <ColumnContainer gap={"sm"}>
+                            <BodyText family={"bold"}>{event.time}</BodyText>
+                            <BodyText>{event.title}</BodyText>
+                        </ColumnContainer>
+                        <RowContainer gap="md" >
                             {event.teachers.map((teacher: any, i: number) => (
-                                <TouchableOpacity
+                                <Button
                                     key={i}
-                                    style={styles.teacherCard}
+                                    variant={"white"}
                                     onPress={() => onClickProfile(teacher.id)}
                                 >
-                                    <Text style={styles.teacherCardText}>👨‍🏫 {teacher.name}</Text>
-                                </TouchableOpacity>
+                                    <BodyText family={"bold"}>‍🏫 {teacher.name}</BodyText>
+                                </Button>
                             ))}
-
-                            {/* Room Reports button */}
-                            <TouchableOpacity
-                                style={styles.teacherCard}
+                            <Button
                                 onPress={() => onClickRoom(event.roomId)}
+                                variant={"white"}
                             >
-                                <Text style={styles.teacherCardText}>📄 Room Reports</Text>
-                            </TouchableOpacity>
-                        </View>
-                    </View>
+                                <BodyText family={"bold"}>📄 Room Reports</BodyText>
+                            </Button>
+                        </RowContainer>
+                    </RowContainer>
                 ))}
-            </View>
+            </Container>
         )}
-    </View>
+    </Container>
 );
 
 export default CalendarScreen;

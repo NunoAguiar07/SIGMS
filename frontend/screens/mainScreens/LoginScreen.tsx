@@ -1,54 +1,45 @@
-import {Text, TextInput, TouchableOpacity, View} from 'react-native';
-import {commonStyles} from '../css_styling/common/CommonProps';
 import {LoginScreenType} from "../types/LoginScreenType";
+import {Card, CenteredContainer} from "../css_styling/common/NewContainers";
+import {Title} from "../css_styling/common/Typography";
+import {Button, ButtonsContainer, ButtonText} from "../css_styling/common/Buttons";
+import {Input} from "../css_styling/common/Inputs";
 
 
 export const LoginScreen = ({ email, password, onEmailChange, onPasswordChange, onLogin, onNavigateToRegister } : LoginScreenType) => (
-    <View style={commonStyles.container}>
-        <View style={commonStyles.card}>
-            <Text style={commonStyles.title}>Login</Text>
-
-            <TextInput
-                style={commonStyles.searchInput}
+    <CenteredContainer flex={1} >
+        <Card shadow="medium" padding="md" gap="md">
+            <Title color="black">Login</Title>
+            <Input
                 placeholder="Email"
                 value={email}
                 onChangeText={onEmailChange}
                 keyboardType="email-address"
                 autoCapitalize="none"
+                placeholderTextColor="#666"
             />
-
-            <TextInput
-                style={commonStyles.searchInput}
+            <Input
                 placeholder="Password"
                 value={password}
                 onChangeText={onPasswordChange}
                 secureTextEntry
+                placeholderTextColor="#666"
             />
-
-            <View style={commonStyles.buttonsContainer}>
-                <AuthButton text="Login" onPress={onLogin} testID="login-button" />
-                <AuthButton
-                    text="Go to Register"
+            <ButtonsContainer gap="md">
+                <Button
+                    variant="primary"
+                    size="medium"
+                    onPress={onLogin}
+                >
+                    <ButtonText>Login</ButtonText>
+                </Button>
+                <Button
+                    variant="primary"
+                    size="medium"
                     onPress={onNavigateToRegister}
-                    testID="register-button"
-                />
-            </View>
-        </View>
-    </View>
-);
-
-interface AuthButtonType {
-    text: string;
-    onPress: () => void;
-    testID?: string;
-}
-
-export const AuthButton = ({ text, onPress, testID }: AuthButtonType) => (
-    <TouchableOpacity
-        style={commonStyles.loginRegisterButton}
-        onPress={onPress}
-        testID={testID}
-    >
-        <Text style={commonStyles.loginRegisterButtonText}>{text}</Text>
-    </TouchableOpacity>
+                >
+                    <ButtonText>Go to Register</ButtonText>
+                </Button>
+            </ButtonsContainer>
+        </Card>
+    </CenteredContainer>
 );

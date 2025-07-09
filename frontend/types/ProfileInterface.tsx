@@ -3,4 +3,5 @@ export interface ProfileInterface {
     email: string;
     image: number[];
     university: string;
+    officeRoomName?: string;
 }

@@ -4,7 +4,6 @@ import {ParsedError} from "../types/errors/ParseErrorTypes";
 import {fetchSchedule} from "../services/authorized/FetchSchedule";
 import {LectureWithTeacher} from "../types/LectureWithTeacher";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import {NAV_CONFIG} from "../utils/NavConfig";
 import {UserRole} from "../types/navBar/NavInterface";
 
 export const useSchedule = () => {
@@ -32,6 +31,7 @@ export const useSchedule = () => {
             const loadSchedule = async () => {
                 if(userRole && (userRole == 'STUDENT' || userRole == 'TEACHER')){
                     try {
+                        setLoading(true);
                         const data = await fetchSchedule();
                         setSchedule(data.lectures);
                     } catch (err) {
@@ -52,11 +52,13 @@ export const useSchedule = () => {
     );
 
     const onClickProfile =  (id :number) => {
-        router.push(`/teacher/` + encodeURIComponent(id));
+        router.push(`/profile/` + encodeURIComponent(id));
     }
     const onClickRoom = (id: number) => {
         router.push(`/roomReports/` + encodeURIComponent(id));
     }
 
-    return {schedule, error, loading, onClickProfile, onClickRoom};
+    const shouldShowCalendar = userRole === 'STUDENT' || userRole === 'TEACHER';
+
+    return {shouldShowCalendar, schedule, error, loading, onClickProfile, onClickRoom};
 };

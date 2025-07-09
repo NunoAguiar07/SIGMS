@@ -1,10 +1,14 @@
-import ErrorHandler from "../(public)/error";
-import LoadingPresentation from "../../screens/auxScreens/LoadingScreen";
-import {ProfileScreen} from "../../screens/mainScreens/ProfileScreen";
-import {useProfile} from "../../hooks/useProfile";
+import {useProfile} from "../../../hooks/useProfile";
+import ErrorHandler from "../../(public)/error";
+import LoadingPresentation from "../../../screens/auxScreens/LoadingScreen";
+import {ProfileScreen} from "../../../screens/mainScreens/ProfileScreen";
+import {useLocalSearchParams} from "expo-router";
 
 
 const Profile = () => {
+    const { id } = useLocalSearchParams();
+    console.log(id);
+
     const {
         profile,
         imageUri,
@@ -13,7 +17,7 @@ const Profile = () => {
         updateLoading,
         updateError,
         pickImage,
-    } = useProfile();
+    } = useProfile(+id);
 
     if (error) {
         return <ErrorHandler errorStatus={error.status} errorMessage={error.message} />;

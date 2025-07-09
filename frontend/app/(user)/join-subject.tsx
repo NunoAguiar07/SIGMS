@@ -2,7 +2,6 @@ import ErrorHandler from "../(public)/error";
 import {JoinSubjectScreen} from "../../screens/mainScreens/JoinSubjectScreen";
 import {useJoinSubject} from "../../hooks/useJoinSubject";
 import LoadingScreen from "../../screens/auxScreens/LoadingScreen";
-import {BackgroundImage} from "../../screens/components/BackgroundImage";
 
 const JoinSubject = () => {
     const {
@@ -24,20 +23,18 @@ const JoinSubject = () => {
     if (initialLoading) return <LoadingScreen/>;
 
     return (
-        <BackgroundImage>
-            <JoinSubjectScreen
-                subjects={subjects}
-                schoolClasses={schoolClasses}
-                selectedSubject={selectedSubject}
-                searchQuery={searchQuery}
-                onSearchChange={onSearchChange}
-                onSubjectSelect={onSubjectSelect}
-                onJoinClass={onJoinClass}
-                onLeaveClass={onLeaveClass}
-                loadingClasses={loadingClasses}
-                userClasses={userClasses}
-            />
-        </BackgroundImage>
+        <JoinSubjectScreen
+            subjects={subjects}
+            schoolClasses={schoolClasses}
+            selectedSubject={selectedSubject}
+            searchQuery={searchQuery}
+            onSearchChange={onSearchChange}
+            onSubjectSelect={onSubjectSelect}
+            onJoinClass={onJoinClass}
+            onLeaveClass={onLeaveClass}
+            loadingClasses={loadingClasses}
+            userClasses={userClasses}
+        />
     );
 };
 

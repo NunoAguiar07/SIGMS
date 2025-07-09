@@ -1,0 +1,6 @@
+
+
+/* Override all Expo Router generated divs with that specific background */
+div[style*="background-color: rgb(242, 242, 242)"] {
+    background-color: transparent !important;
+}

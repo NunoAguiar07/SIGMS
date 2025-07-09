@@ -1,15 +1,21 @@
 import {useState} from "react";
-import {Image} from "expo-image";
-import MicrosoftAuthButton from "../components/MicrosoftAuthButton";
-import {commonStyles} from "../css_styling/common/CommonProps";
-import {welcomeStyles} from "../css_styling/welcome/WelcomeProps";
-import {Text, TouchableOpacity, View} from "react-native";
 import {useRouter} from "expo-router";
 import {About} from "../components/footer/About";
 import {FAQ} from "../components/footer/FAQ";
 import {Privacy} from "../components/footer/Privacy";
 import {WelcomeScreenType} from "../types/WelcomeScreenType";
-import {Logo} from "../components/Logo";
+import {CenteredContainer} from "../css_styling/common/NewContainers";
+import {FooterContainer, FooterLink, FooterLinkText, ScreenContainer} from "../css_styling/common/Layout";
+import {
+    Button,
+    ButtonsContainer,
+    ButtonText,
+    MicrosoftAuthButton,
+    MicrosoftButtonText,
+    MicrosoftLogo
+} from "../css_styling/common/Buttons";
+import {Title} from "../css_styling/common/Typography";
+import {Logo} from "../css_styling/common/Images";
 
 export const WelcomeScreen = ({ welcome, onMicrosoftPress, microsoftDisabled } : WelcomeScreenType) => {
     const [showAbout, setShowAbout] = useState(false);
@@ -18,7 +24,7 @@ export const WelcomeScreen = ({ welcome, onMicrosoftPress, microsoftDisabled } :
     const router = useRouter();
 
     return (
-        <View style={commonStyles.container}>
+        <ScreenContainer>
             <ModalsContainer
                 showAbout={showAbout}
                 showFAQ={showFAQ}
@@ -27,26 +33,24 @@ export const WelcomeScreen = ({ welcome, onMicrosoftPress, microsoftDisabled } :
                 onCloseFAQ={() => setShowFAQ(false)}
                 onClosePrivacy={() => setShowPrivacy(false)}
             />
-
-            <View style={commonStyles.centerContainer}>
-                <Logo/>
-                <Text style={welcomeStyles.slogan}>{welcome.title}</Text>
-                <Text style={welcomeStyles.slogan}>A tua sala de aula, mais simples.</Text>
-
+            <CenteredContainer flex={1}>
+                <Logo />
+                <Title>{welcome.title}</Title>
+                <Title>A tua sala de aula, mais simples.</Title>
                 <AuthButtons
                     onLoginPress={() => router.push('/auth/login')}
                     onRegisterPress={() => router.push('/auth/register')}
                     onMicrosoftPress={onMicrosoftPress}
                     microsoftDisabled={microsoftDisabled}
                 />
-            </View>
+            </CenteredContainer>
 
             <FooterLinks
                 onAboutPress={() => setShowAbout(true)}
                 onFAQPress={() => setShowFAQ(true)}
                 onPrivacyPress={() => setShowPrivacy(true)}
             />
-        </View>
+        </ScreenContainer>
     );
 };
 
@@ -61,17 +65,17 @@ const FooterLinks = ({
     onFAQPress,
     onPrivacyPress,
 }: FooterLinksType) => (
-    <View style={commonStyles.footerContainer}>
-        <TouchableOpacity onPress={onAboutPress}>
-            <Text style={welcomeStyles.footerText}>About</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={onFAQPress}>
-            <Text style={welcomeStyles.footerText}>FAQ</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={onPrivacyPress}>
-            <Text style={welcomeStyles.footerText}>Privacy</Text>
-        </TouchableOpacity>
-    </View>
+    <FooterContainer>
+        <FooterLink onPress={onAboutPress}>
+            <FooterLinkText>About</FooterLinkText>
+        </FooterLink>
+        <FooterLink onPress={onFAQPress}>
+            <FooterLinkText>FAQ</FooterLinkText>
+        </FooterLink>
+        <FooterLink onPress={onPrivacyPress}>
+            <FooterLinkText>Privacy</FooterLinkText>
+        </FooterLink>
+    </FooterContainer>
 );
 
 interface AuthButtonsType {
@@ -87,26 +91,18 @@ const AuthButtons = ({
     onMicrosoftPress,
     microsoftDisabled
 }: AuthButtonsType) => (
-    <View style={{ marginTop: 10 }}>
-        <TouchableOpacity
-            style={commonStyles.loginRegisterButton}
-            onPress={onLoginPress}
-        >
-            <Text style={commonStyles.loginRegisterButtonText}>Login</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-            style={commonStyles.loginRegisterButton}
-            onPress={onRegisterPress}
-        >
-            <Text style={commonStyles.loginRegisterButtonText}>Register</Text>
-        </TouchableOpacity>
-
-        <MicrosoftAuthButton
-            onPress={onMicrosoftPress}
-            disabled={microsoftDisabled}
-        />
-    </View>
+    <ButtonsContainer gap="md">
+        <Button variant="primary" onPress={onLoginPress}>
+            <ButtonText>Login</ButtonText>
+        </Button>
+        <Button variant="primary" onPress={onRegisterPress}>
+            <ButtonText>Register</ButtonText>
+        </Button>
+        <MicrosoftAuthButton onPress={onMicrosoftPress} disabled={microsoftDisabled}>
+            <MicrosoftLogo />
+            <MicrosoftButtonText>Microsoft</MicrosoftButtonText>
+        </MicrosoftAuthButton>
+    </ButtonsContainer>
 );
 
 interface ModalsContainerType {

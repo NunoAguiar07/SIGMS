@@ -1,26 +1,15 @@
 import * as WebBrowser from 'expo-web-browser';
-import {Image, Text, TouchableOpacity, View} from 'react-native';
-import {welcomeStyles} from "../css_styling/welcome/WelcomeProps";
 import {MicrosoftAuthButtonType} from "../types/MicrosoftAuthButtonType";
+import {MicrosoftAuthButton, MicrosoftButtonText, MicrosoftLogo} from "../css_styling/common/Buttons";
 
 WebBrowser.maybeCompleteAuthSession();
 
-const MicrosoftAuthButton = ({ onPress, disabled } : MicrosoftAuthButtonType) => {
+const MicrosoftAuthButtonComponent = ({ onPress, disabled } : MicrosoftAuthButtonType) => {
     return (
-        <View style={welcomeStyles.microsoftButtonContainer}>
-            <TouchableOpacity
-                style={welcomeStyles.microsoftButton}
-                onPress={onPress}
-                disabled={disabled}
-            >
-                <Image
-                    source={require('../../assets/Microsoft_logo.svg.png')}
-                    style={{ width: 24, height: 24 }}
-                    resizeMode="contain"
-                />
-                <Text style={welcomeStyles.microsoftButtonText}>Microsoft</Text>
-            </TouchableOpacity>
-        </View>
+        <MicrosoftAuthButton onPress={onPress} disabled={disabled}>
+            <MicrosoftLogo />
+            <MicrosoftButtonText>Microsoft</MicrosoftButtonText>
+        </MicrosoftAuthButton>
     );
 };
 

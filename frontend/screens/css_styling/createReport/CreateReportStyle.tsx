@@ -63,7 +63,7 @@ export const createReportStyle = StyleSheet.create({
     joinClassContainer: {
         flex: 1,
         flexDirection: 'row', // Horizontal layout
-        backgroundColor: '#f8f0e6FF',
+        backgroundColor: 'transparent',
     },
     reportInput: {
         height: 120,

@@ -1,36 +1,70 @@
-import {commonStyles} from "../css_styling/common/CommonProps";
-import {styles} from "../css_styling/userHome/Props";
 import {HomeScreenType} from "../types/HomeScreenType";
-import {Text, TouchableOpacity, View} from "react-native";
-import {Logo} from "../components/Logo";
-import {ContainerStyles, getColumnStyle} from "../css_styling/common/Containers";
-import {TextStyles} from "../css_styling/common/Text";
+import {Container, GridColumn, GridRow} from "../css_styling/common/NewContainers";
+import {Title} from "../css_styling/common/Typography";
+import {FooterContainer, ScreenContainer} from "../css_styling/common/Layout";
+import {Button, ButtonText} from "../css_styling/common/Buttons";
 import CalendarScreen from "./CalendarScreen";
 import {NotificationsScreen} from "./NotificationsScreen";
+import {Logo} from "../components/Logo";
+import {isMobile} from "../../utils/DeviceType";
+import {ScrollView} from "react-native";
 
-export const HomeScreen = ({ onLogout, username, schedule, notifications, clearNotification, onClickProfile, onClickRoom }: HomeScreenType) => {
+export const HomeScreen = ({ shouldShowCalendar, onLogout, username, schedule, notifications, clearNotification, onClickProfile, onClickRoom }: HomeScreenType) => {
+    if (isMobile) {
+        return (
+            <ScreenContainer backgroundColor={"transparent"}>
+                <ScrollView contentContainerStyle={{ padding: 16, flexGrow: 1}}
+                            style={{
+                                flex: 1 // Takes all available space
+                            }}>
+                    {/* Header Section */}
+                    <Container style={{ marginBottom: 24}}>
+                        <Logo />
+                        <Title>A tua sala de aula, mais simples.</Title>
+                        <Title>Bem vindo, {username}</Title>
+                    </Container>
+
+                    {/* Notifications Section */}
+                    <Container style={{ marginBottom: 24 }}>
+                        <NotificationsScreen
+                            notifications={notifications}
+                            clearNotification={clearNotification}
+                        />
+                    </Container>
+
+                    {/* Logout Button */}
+                    <Button variant="primary" onPress={onLogout} style={{ marginTop: 16 }}>
+                        <ButtonText>Logout</ButtonText>
+                    </Button>
+                </ScrollView>
+            </ScreenContainer>
+        );
+    }
+
     return (
-        <View style={commonStyles.container}>
-            <View style={ContainerStyles.container}>
-                <View style={getColumnStyle(30, 0)}>
+        <Container flex={1} padding="md">
+            <GridRow>
+                <GridColumn widthPercent={shouldShowCalendar ? 30 : 90}>
                     <Logo/>
-                    <View style={getColumnStyle(100, 60)}>
-                        <Text style={[TextStyles.h1, TextStyles.regular, TextStyles.primary]}>A tua sala de aula, mais simples.</Text>
-                        <Text style={[TextStyles.h1, TextStyles.regular, TextStyles.primary]}>Bem vindo, {username}</Text>
-                    </View>
-                </View>
-                {schedule.length != 0 && (<View style={[getColumnStyle(55, 0), {margin: 5}]}>
-                    <CalendarScreen schedule={schedule} onClickProfile={onClickProfile} onClickRoom={onClickRoom}/>
-                </View>)}
-                <View style={[getColumnStyle(15, 0), {margin: 5}]}>
+                    <Title>A tua sala de aula, mais simples.</Title>
+                    <Title>Bem vindo, {username}</Title>
+                </GridColumn>
+
+                {shouldShowCalendar && (
+                    <GridColumn widthPercent={shouldShowCalendar ? 60 : 0}>
+                        <CalendarScreen schedule={schedule} onClickProfile={onClickProfile} onClickRoom={onClickRoom}/>
+                    </GridColumn>
+                )}
+
+                <GridColumn widthPercent={10}>
                     <NotificationsScreen notifications={notifications} clearNotification={clearNotification}/>
-                </View>
-            </View>
-            <View style={commonStyles.footerContainer}>
-                <TouchableOpacity style={styles.logoutButton} onPress={onLogout}>
-                    <Text style={styles.logoutButtonText}>Logout</Text>
-                </TouchableOpacity>
-            </View>
-        </View>
+                </GridColumn>
+            </GridRow>
+            <FooterContainer>
+                <Button variant="primary" onPress={onLogout}>
+                    <ButtonText>Logout</ButtonText>
+                </Button>
+            </FooterContainer>
+        </Container>
     );
 };

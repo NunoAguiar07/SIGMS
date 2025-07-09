@@ -3,7 +3,7 @@ import {FormCreateEntityValues} from "../../types/welcome/FormCreateEntityValues
 import {SchoolClassInterface} from "../../types/SchoolClassInterface";
 import {RoomInterface} from "../../types/RoomInterface";
 
-export type EntityType = 'subject' | 'class' | 'room' | 'lecture' | null;
+export type EntityType = 'Subject' | 'Class' | 'Room' | 'Lecture' | null;
 
 export interface EntityCreationScreenType {
     selectedEntity: EntityType;
@@ -14,7 +14,9 @@ export interface EntityCreationScreenType {
     subjects: SubjectInterface[];
     subjectClasses: SchoolClassInterface[];
     rooms: RoomInterface[];
-    searchQuery: string;
-    setSearchQuery: (query: string) => void;
-    isLoading: boolean;
+    searchQuerySubjects: string;
+    setSearchQuerySubjects: (query: string) => void;
+    searchQueryRooms: string;
+    setSearchQueryRooms: (query: string) => void;
+    onItemSelect: (item: any) => void;
 }

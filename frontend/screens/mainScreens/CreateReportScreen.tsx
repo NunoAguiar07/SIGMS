@@ -1,15 +1,23 @@
 import {
     View,
-    Text,
-    TextInput,
     FlatList,
-    TouchableOpacity
 } from 'react-native';
 import {commonStyles} from "../css_styling/common/CommonProps";
 import {createReportStyle} from "../css_styling/createReport/CreateReportStyle";
 import {CreateReportScreenType} from "../types/CreateReportScreenType";
 import {RoomInterface} from "../../types/RoomInterface";
 import {isMobile} from "../../utils/DeviceType";
+import {
+    Card,
+    CenteredContainer,
+    Container, GridColumn, GridRow,
+    IssuesListContainer,
+} from "../css_styling/common/NewContainers";
+import {BodyText, Subtitle} from "../css_styling/common/Typography";
+import {Input, SearchInput} from "../css_styling/common/Inputs";
+import {FlatListContainer, FlatListItem} from "../css_styling/common/FlatList";
+import {Button, ButtonText} from "../css_styling/common/Buttons";
+import {theme} from "../css_styling/common/Theme";
 
 
 export const CreateReportScreen = ({
@@ -25,49 +33,44 @@ export const CreateReportScreen = ({
 } : CreateReportScreenType) => {
     if (!isMobile) {
         return (
-            <View style={createReportStyle.joinClassContainer}>
-                <View style={commonStyles.leftColumn}>
-                    <RoomSearchList
-                        rooms={rooms}
-                        searchQuery={searchQuery}
-                        onSearchChange={onSearchChange}
-                        onRoomSelect={onRoomSelect}
-                    />
-                </View>
-
-            <View style={commonStyles.rightColumn}>
-                {selectedRoom && (
-                    <>
-                        {/* Issues List for Selected Room */}
-                        <View style={createReportStyle.issuesListContainer}>
-                            <Text style={commonStyles.sectionTitle}>
-                                Previous Reports for {selectedRoom.name}
-                            </Text>
-
-                            {issues.length > 0 ? (
-                                issues.map((issue, index) => (
-                                    <View key={issue.id || index} style={createReportStyle.issueItem}>
-                                        <Text style={createReportStyle.issueText}>- {issue.description}</Text>
-                                    </View>
-                                ))
-                            ) : (
-                                <Text style={commonStyles.emptyText}>
-                                    No issues reported for this room.
-                                </Text>
-                            )}
-                        </View>
-
-                        {/* Report Form */}
-                        <RoomReportForm
-                            selectedRoom={selectedRoom}
-                            reportText={reportText}
-                            onReportTextChange={onReportTextChange}
-                            onSubmitReport={onSubmitReport}
+            <Container flex={1} justifyContent="center" padding="md">
+                <GridRow>
+                    <GridColumn widthPercent={50}>
+                        <RoomSearchList
+                            rooms={rooms}
+                            searchQuery={searchQuery}
+                            onSearchChange={onSearchChange}
+                            onRoomSelect={onRoomSelect}
                         />
-                    </>
-                )}
-            </View>
-        </View>
+                    </GridColumn>
+                    {selectedRoom && (
+                        <GridColumn widthPercent={50}>
+                            <GridRow heightPercent={50}>
+                                <IssuesListContainer>
+                                    <Subtitle color={theme.colors.text.black}>Previous Reports for {selectedRoom.name}</Subtitle>
+                                    {issues.length > 0 ? (
+                                        issues.map(issue => (
+                                            <Container padding={"xs"} borderRadius={"small"}>
+                                                <BodyText>- {issue.description}</BodyText>
+                                            </Container>
+                                        ))
+                                    ) : (
+                                        <BodyText>No issues reported for this room.</BodyText>
+                                    )}
+                                </IssuesListContainer>
+                            </GridRow>
+                            <GridRow heightPercent={50}>
+                                <RoomReportForm
+                                        selectedRoom={selectedRoom}
+                                    reportText={reportText}
+                                    onReportTextChange={onReportTextChange}
+                                    onSubmitReport={onSubmitReport}
+                                />
+                            </GridRow>
+                        </GridColumn>
+                    )}
+                </GridRow>
+            </Container>
     );
     } else {
         return (
@@ -109,27 +112,28 @@ export const RoomSearchList = ({
     onSearchChange,
     onRoomSelect
 }: RoomSearchListType) => (
-    <View>
-        <TextInput
-            style={commonStyles.searchSubjectInput}
+    <CenteredContainer style={{ position: 'relative' , zIndex: 10}}>
+        <SearchInput
             placeholder="Search rooms..."
             value={searchQuery}
             onChangeText={onSearchChange}
         />
-        <FlatList
-            data={rooms}
-            keyExtractor={(item) => item.id.toString()}
-            renderItem={({ item }) => (
-                <TouchableOpacity
-                    style={commonStyles.itemSearch}
-                    onPress={() => onRoomSelect(item)}
-                >
-                    <Text style={commonStyles.itemText}>{item.name}</Text>
-                </TouchableOpacity>
-            )}
-            ListEmptyComponent={<Text style={commonStyles.emptyText}>No rooms found</Text>}
-        />
-    </View>
+        {rooms.length > 0 && (
+            <FlatListContainer>
+                <FlatList
+                    data={rooms}
+                    keyExtractor={(item) => item.id.toString()}
+                    renderItem={({ item }) => (
+                        <FlatListItem
+                            onPress={() => onRoomSelect(item)}
+                        >
+                            <BodyText>{item.name}</BodyText>
+                        </FlatListItem>
+                    )}
+                />
+            </FlatListContainer>
+        )}
+    </CenteredContainer>
 );
 
 
@@ -146,22 +150,23 @@ export const RoomReportForm = ({
     onReportTextChange,
     onSubmitReport
 }: RoomReportFormType) => (
-    <View style={createReportStyle.classesSection}>
-        <Text style={commonStyles.sectionTitle}>
-            Report for {selectedRoom.name}
-        </Text>
-        <TextInput
-            style={createReportStyle.reportInput}
-            placeholder="Describe the issue or note here..."
-            multiline
-            value={reportText}
-            onChangeText={onReportTextChange}
-        />
-        <TouchableOpacity
-            style={createReportStyle.joinClassButton}
-            onPress={() => onSubmitReport(selectedRoom.id, reportText)}
-        >
-            <Text style={createReportStyle.joinButtonText}>Submit Report</Text>
-        </TouchableOpacity>
-    </View>
+    <CenteredContainer>
+        <Card shadow="medium" alignItems={"center"} gap="md">
+            <Subtitle color={theme.colors.text.white}>
+                Report for {selectedRoom.name}
+            </Subtitle>
+            <Input
+                placeholder="Describe the issue or note here..."
+                multiline
+                value={reportText}
+                onChangeText={onReportTextChange}
+            />
+            <Button
+                variant="primary"
+                onPress={() => onSubmitReport(selectedRoom.id, reportText)}
+            >
+                <ButtonText>Submit Report</ButtonText>
+            </Button>
+        </Card>
+    </CenteredContainer>
 );

@@ -1,5 +1,5 @@
-import {ActivityIndicator, View} from "react-native";
-import {commonStyles} from "../css_styling/common/CommonProps";
+import {ActivityIndicator} from "react-native";
+import {CenteredContainer} from "../css_styling/common/NewContainers";
 
 /**
  * Const "LoadingPresentation" representing the loading screen when we are loading something.
@@ -7,9 +7,9 @@ import {commonStyles} from "../css_styling/common/CommonProps";
  */
 const LoadingPresentation = () => {
     return (
-        <View style={commonStyles.container}>
+        <CenteredContainer flex={1}>
             <ActivityIndicator size="large" />
-        </View>
+        </CenteredContainer>
     );
 };
 export default LoadingPresentation;

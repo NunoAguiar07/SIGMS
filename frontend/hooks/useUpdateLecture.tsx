@@ -119,6 +119,8 @@ export const useUpdateLecture = () => {
 
             const updatedLectures = lectures.map((lec) =>
                 lec.id === selectedLecture.id ? selectedLecture : lec
+            ).sort((a, b) =>
+                a.schoolClass.subject.name.localeCompare(b.schoolClass.subject.name)
             );
             setLectures(updatedLectures);
 

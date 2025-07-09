@@ -1,7 +1,6 @@
 import ErrorHandler from "../(public)/error";
 import {UpdateLectureScreen} from "../../screens/mainScreens/UpdateLectureScreen";
 import {useUpdateLecture} from "../../hooks/useUpdateLecture";
-import {BackgroundImage} from "../../screens/components/BackgroundImage";
 
 
 const UpdateLecture = () => {
@@ -33,30 +32,28 @@ const UpdateLecture = () => {
     }
 
     return (
-        <BackgroundImage>
-            <UpdateLectureScreen
-                lectures={lectures}
-                selectedLecture={selectedLecture}
-                newSchedule={selectedLecture}
-                onLectureSelect={onLectureSelect}
-                onScheduleChange={onScheduleChange}
-                onSaveSchedule={onSaveSchedule}
-                isSaving={isSaving}
-                rooms={rooms}
-                setSearchQuery={setSearchQuery}
-                searchQuery={searchQuery}
-                selectedRoom={selectedRoom}
-                handleRoomSelect={handleRoomSelect}
-                effectiveFrom={effectiveFrom}
-                setEffectiveFrom={setEffectiveFrom}
-                effectiveUntil={effectiveUntil}
-                setEffectiveUntil={setEffectiveUntil}
-                setEffectiveFromText={setEffectiveFromText}
-                setEffectiveUntilText={setEffectiveUntilText}
-                effectiveFromText={effectiveFromText}
-                effectiveUntilText={effectiveUntilText}
-            />
-        </BackgroundImage>
+        <UpdateLectureScreen
+            lectures={lectures}
+            selectedLecture={selectedLecture}
+            newSchedule={selectedLecture}
+            onLectureSelect={onLectureSelect}
+            onScheduleChange={onScheduleChange}
+            onSaveSchedule={onSaveSchedule}
+            isSaving={isSaving}
+            rooms={rooms}
+            setSearchQuery={setSearchQuery}
+            searchQuery={searchQuery}
+            selectedRoom={selectedRoom}
+            handleRoomSelect={handleRoomSelect}
+            effectiveFrom={effectiveFrom}
+            setEffectiveFrom={setEffectiveFrom}
+            effectiveUntil={effectiveUntil}
+            setEffectiveUntil={setEffectiveUntil}
+            setEffectiveFromText={setEffectiveFromText}
+            setEffectiveUntilText={setEffectiveUntilText}
+            effectiveFromText={effectiveFromText}
+            effectiveUntilText={effectiveUntilText}
+        />
     );
 };
 

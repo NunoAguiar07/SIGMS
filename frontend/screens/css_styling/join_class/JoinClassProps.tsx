@@ -35,6 +35,6 @@ export const joinClassStyles = StyleSheet.create({
     joinClassContainer: {
         flex: 1,
         flexDirection: 'row', // Horizontal layout
-        backgroundColor: '#fef6ef',
+        backgroundColor: 'transparent',
     },
 })

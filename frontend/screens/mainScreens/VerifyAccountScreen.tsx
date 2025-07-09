@@ -1,21 +1,44 @@
-import {Text, TouchableOpacity, View} from "react-native";
+import {Text, TouchableOpacity} from "react-native";
 import {commonStyles} from "../css_styling/common/CommonProps";
 import {VerifyAccountScreenType} from "../types/VerifyAccountScreenType";
+import {Card, CenteredContainer} from "../css_styling/common/NewContainers";
+import {Subtitle, Title} from "../css_styling/common/Typography";
+import {Button, ButtonText} from "../css_styling/common/Buttons";
 
 export const VerifyAccountScreen = ({
     onNavigateToLogin,
     verificationSuccess
 }: VerifyAccountScreenType) => {
     return (
-        <View style={commonStyles.container}>
-            <View style={commonStyles.card}>
+        <CenteredContainer flex={1} justifyContent="center" padding="md">
                 {verificationSuccess ? (
-                    <SuccessState onNavigateToLogin={onNavigateToLogin} />
+                    <Card shadow="medium" alignItems={"center"} gap="md">
+                        <Title>Account Verified</Title>
+                        <Subtitle>You can now close this window and log in to your account.</Subtitle>
+                        <Button
+                            onPress={onNavigateToLogin}
+                            variant="primary"
+                        >
+                            <ButtonText>Login</ButtonText>
+                        </Button>
+                    </Card>
                 ) : (
-                    <FailureState />
+                    <Card shadow="medium" alignItems={"center"} gap="md">
+                        <Title>Verification Failed</Title>
+                        <Subtitle>The verification link is invalid or has expired.</Subtitle>
+                        <Subtitle>Please request a new verification email.</Subtitle>
+                    </Card>
                 )}
-            </View>
-        </View>
+        </CenteredContainer>
+        // <View style={commonStyles.container}>
+        //     <View style={commonStyles.card}>
+        //         {verificationSuccess ? (
+        //             <SuccessState onNavigateToLogin={onNavigateToLogin} />
+        //         ) : (
+        //             <FailureState />
+        //         )}
+        //     </View>
+        // </View>
     );
 };
 

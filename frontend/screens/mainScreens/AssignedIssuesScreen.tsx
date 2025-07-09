@@ -1,12 +1,9 @@
-import {commonStyles} from "../css_styling/common/CommonProps";
-import {assignedIssuesStyle} from "../css_styling/assigned_issues/AssignedIssuesProps";
 import {
     View,
     Text,
-    FlatList,
     TouchableOpacity,
     TextInput,
-    Animated,
+    Animated, ScrollView,
 } from "react-native";
 import {Ionicons} from "@expo/vector-icons";
 import {AssignedIssuesScreenType} from "../types/AssignedIssuesScreenType";
@@ -15,6 +12,18 @@ import {PaginationControls} from "./UnassignedIssuesScreen";
 import {mobileStyles} from "../css_styling/common/MobileProps";
 import {isMobile} from "../../utils/DeviceType";
 import {useSwipeAnimation} from "../../hooks/mobile/useSwipeAnimation";
+import {Card, CenteredContainer, RowContainer} from "../css_styling/common/NewContainers";
+import {Title} from "../css_styling/common/Typography";
+import {
+    CellText,
+    EditableCell,
+    HeaderText,
+    TableColumn,
+    TableContainer,
+    TableHeader,
+    TableRow
+} from "../css_styling/common/Tables";
+import {ActionButton} from "../css_styling/common/Buttons";
 
 export const AssignedIssuesScreen = ({
     issues,
@@ -33,71 +42,109 @@ export const AssignedIssuesScreen = ({
 }: AssignedIssuesScreenType) => {
 
     return (
-        <View style={commonStyles.container}>
-            <Text style={commonStyles.title}>Your Assigned Issues</Text>
+        <CenteredContainer flex={1} padding="md">
+            <Card shadow="medium" alignItems={"center"} gap="md" width={"50%"} height={"80%"}>
+                <Title>Your Assigned Issues</Title>
 
-            {isMobile ? (
-                <MobileAssignedIssuesView
-                    issues={issues}
-                    currentPage={currentPage}
-                    onNext={onNext}
-                    onPrevious={onPrevious}
-                    onFix={onFix}
-                    onEdit={onEdit}
-                    onUpdate={onUpdate}
-                    onUnassigned={onUnassigned}
-                    onCancelEdit={onCancelEdit}
-                    editingId={editingId}
-                    editedDescription={editedDescription}
-                    setEditedDescription={setEditedDescription}
-                    hasNext={hasNext}
-                />
-            ) : (
-                <>
-                    <View style={commonStyles.tableContainer}>
-                        <AssignedIssuesTableHeader />
-                        <FlatList
-                            data={issues}
-                            keyExtractor={(item) => item.id.toString()}
-                            renderItem={({ item }) => (
-                                <AssignedIssueRow
-                                    item={item}
-                                    isEditing={editingId === item.id}
-                                    editedDescription={editedDescription}
-                                    setEditedDescription={setEditedDescription}
-                                    onEdit={onEdit}
-                                    onUpdate={onUpdate}
-                                    onCancelEdit={onCancelEdit}
-                                    onFix={onFix}
-                                    onUnassigned={onUnassigned}
-                                />
-                            )}
-                        />
-                    </View>
+                {isMobile ? (
+                    <MobileAssignedIssuesView
+                        issues={issues}
+                        currentPage={currentPage}
+                        onNext={onNext}
+                        onPrevious={onPrevious}
+                        onFix={onFix}
+                        onEdit={onEdit}
+                        onUpdate={onUpdate}
+                        onUnassigned={onUnassigned}
+                        onCancelEdit={onCancelEdit}
+                        editingId={editingId}
+                        editedDescription={editedDescription}
+                        setEditedDescription={setEditedDescription}
+                        hasNext={hasNext}
+                    />
+                ) : (
+                    <AssignedIssuesTable
+                        issues={issues}
+                        editingId={editingId}
+                        editedDescription={editedDescription}
+                        setEditedDescription={setEditedDescription}
+                        onEdit={onEdit}
+                        onUpdate={onUpdate}
+                        onCancelEdit={onCancelEdit}
+                        onFix={onFix}
+                        onUnassigned={onUnassigned}
+                    />
+                )}
+
+                {!isMobile && (
                     <PaginationControls
                         currentPage={currentPage}
                         onNext={onNext}
                         onPrevious={onPrevious}
                         hasNext={hasNext}
                     />
-                </>
-            )}
-        </View>
+                )}
+            </Card>
+        </CenteredContainer>
     );
 };
+interface AssignedIssuesTableType {
+    issues: IssueReportInterface[];
+    editingId: number | null;
+    editedDescription: string;
+    setEditedDescription: (text: string) => void;
+    onEdit: (issue: IssueReportInterface) => void;
+    onUpdate: (id: number) => void;
+    onCancelEdit: () => void;
+    onFix: (id: number) => void;
+    onUnassigned: (id: number) => void;
+}
 
+export const AssignedIssuesTable = ({
+                                        issues,
+                                        editingId,
+                                        editedDescription,
+                                        setEditedDescription,
+                                        onEdit,
+                                        onUpdate,
+                                        onCancelEdit,
+                                        onFix,
+                                        onUnassigned
+                                    }: AssignedIssuesTableType) => {
+    return (
+        <TableContainer>
+            <AssignedIssuesTableHeader />
+            <ScrollView showsVerticalScrollIndicator={false}>
+                {issues.map((item) => (
+                    <AssignedIssueRow
+                        key={item.id}
+                        item={item}
+                        isEditing={editingId === item.id}
+                        editedDescription={editedDescription}
+                        setEditedDescription={setEditedDescription}
+                        onEdit={onEdit}
+                        onUpdate={onUpdate}
+                        onCancelEdit={onCancelEdit}
+                        onFix={onFix}
+                        onUnassigned={onUnassigned}
+                    />
+                ))}
+            </ScrollView>
+        </TableContainer>
+    );
+};
 export const AssignedIssuesTableHeader = () => (
-    <View style={commonStyles.tableHeader}>
-        <View style={assignedIssuesStyle.roomColumn}>
-            <Text style={commonStyles.headerText}>Room</Text>
-        </View>
-        <View style={assignedIssuesStyle.descriptionColumn}>
-            <Text style={commonStyles.headerText}>Description</Text>
-        </View>
-        <View style={assignedIssuesStyle.actionsColumn}>
-            <Text style={commonStyles.headerText}>Actions</Text>
-        </View>
-    </View>
+    <TableHeader>
+        <TableColumn width={4} first align="left">
+            <HeaderText>Room</HeaderText>
+        </TableColumn>
+        <TableColumn width={6} align="left">
+            <HeaderText>Description</HeaderText>
+        </TableColumn>
+        <TableColumn width={5} last align="center">
+            <HeaderText>Actions</HeaderText>
+        </TableColumn>
+    </TableHeader>
 );
 
 interface AssignedIssueRowType {
@@ -123,15 +170,14 @@ export const AssignedIssueRow = ({
     onFix,
     onUnassigned
 }: AssignedIssueRowType) => (
-    <View style={commonStyles.tableRow}>
-        <View style={assignedIssuesStyle.roomColumn}>
-            <Text style={commonStyles.cellText} numberOfLines={1}>{item.room.name}</Text>
-        </View>
+    <TableRow>
+        <TableColumn width={4} first align="left">
+            <CellText numberOfLines={1}>{item.room.name}</CellText>
+        </TableColumn>
 
-        <View style={assignedIssuesStyle.descriptionColumn}>
+        <TableColumn width={6} align="left">
             {isEditing ? (
-                <TextInput
-                    style={commonStyles.editableCell}
+                <EditableCell
                     value={editedDescription}
                     onChangeText={setEditedDescription}
                     multiline
@@ -140,50 +186,35 @@ export const AssignedIssueRow = ({
                     placeholderTextColor="#999"
                 />
             ) : (
-                <Text style={commonStyles.cellText}>{item.description}</Text>
+                <CellText>{item.description}</CellText>
             )}
-        </View>
+        </TableColumn>
 
-        <View style={assignedIssuesStyle.actionsColumn}>
-            {isEditing ? (
-                <>
-                    <TouchableOpacity
-                        style={[commonStyles.actionButton, commonStyles.saveButton]}
-                        onPress={() => onUpdate(item.id)}
-                    >
-                        <Ionicons name="save" size={16} color="white" />
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        style={[commonStyles.actionButton, commonStyles.cancelButton]}
-                        onPress={onCancelEdit}
-                    >
-                        <Ionicons name="close" size={16} color="white" />
-                    </TouchableOpacity>
-                </>
-            ) : (
-                <>
-                    <TouchableOpacity
-                        style={[commonStyles.actionButton, commonStyles.editButton]}
-                        onPress={() => onEdit(item)}
-                    >
-                        <Ionicons name="create-outline" size={16} color="white" />
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        style={[commonStyles.actionButton, commonStyles.approveButton]}
-                        onPress={() => onFix(item.id)}
-                    >
-                        <Ionicons name="checkmark-done" size={16} color="white" />
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        style={[commonStyles.actionButton, commonStyles.rejectButton]}
-                        onPress={() => onUnassigned(item.id)}
-                    >
-                        <Ionicons name="remove-circle-outline" size={16} color="white" />
-                    </TouchableOpacity>
-                </>
-            )}
-        </View>
-    </View>
+        <TableColumn width={5} last align="center">
+                {isEditing ? (
+                    <RowContainer>
+                        <ActionButton onPress={() => onUpdate(item.id)}>
+                            <Ionicons name="save" size={16} color="white" />
+                        </ActionButton>
+                        <ActionButton onPress={onCancelEdit}>
+                            <Ionicons name="close" size={16} color="white" />
+                        </ActionButton>
+                    </RowContainer>
+                ) : (
+                    <RowContainer>
+                        <ActionButton onPress={() => onEdit(item)}>
+                            <Ionicons name="create-outline" size={16} color="white" />
+                        </ActionButton>
+                        <ActionButton onPress={() => onFix(item.id)}>
+                            <Ionicons name="checkmark-done" size={16} color="white" />
+                        </ActionButton>
+                        <ActionButton onPress={() => onUnassigned(item.id)}>
+                            <Ionicons name="remove-circle-outline" size={16} color="white" />
+                        </ActionButton>
+                    </RowContainer>
+                )}
+        </TableColumn>
+    </TableRow>
 );
 
 const MobileAssignedIssuesView = ({

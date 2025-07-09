@@ -1,5 +1,5 @@
 import {useDebounce} from "use-debounce";
-import {useCallback, useEffect, useState} from "react";
+import {useEffect, useState} from "react";
 import {EntityType} from "../screens/types/EntityCreationScreenType";
 import {ParsedError} from "../types/errors/ParseErrorTypes";
 import {FormCreateEntityValues} from "../types/welcome/FormCreateEntityValues";
@@ -17,79 +17,99 @@ import {createLecture} from "../services/authorized/CreateLecture";
 
 
 export const useAdminEntityCreation = () => {
+    const [skipSearch, setSkipSearch] = useState(false);
     const [selectedEntity, setSelectedEntity] = useState<EntityType>(null);
     const [formValues, setFormValues] = useState<FormCreateEntityValues>({});
     const [error, setError] = useState<ParsedError | null>(null);
     const [subjects, setSubjects] = useState<SubjectInterface[]>([]);
     const [subjectClasses, setSubjectClasses] = useState<SchoolClassInterface[]>([]);
     const [rooms, setRooms] = useState<RoomInterface[]>([]);
-    const [searchQuery, setSearchQuery] = useState('');
-    const [debouncedSearchQuery] = useDebounce(searchQuery, 500);
+    const [searchQuerySubjects, setSearchQuerySubjects] = useState('');
+    const [searchQueryRooms, setSearchQueryRooms] = useState('');
+    const [debouncedSearchQuerySubjects] = useDebounce(searchQuerySubjects, 500);
+    const [debouncedSearchQueryRooms] = useDebounce(searchQueryRooms, 500);
     const [isLoading, setIsLoading] = useState(false);
 
-    const loadSubjects = useCallback(async () => {
-        setIsLoading(true);
+    const handleItemSelect = (item : any) => {
+        setSkipSearch(true)
+        if(selectedEntity === 'Class' || (selectedEntity === 'Lecture' && !formValues.subjectId) ) {
+            setSearchQuerySubjects(item.name)
+            setFormValues(prev => ({ ...prev, subjectId: item.id})); // Update form values
+            setSubjects([])
+        } else if( selectedEntity === 'Lecture' && formValues.subjectId) {
+            setSearchQueryRooms(item.name)
+            setFormValues(prev => ({ ...prev, roomId: item.id})); // Update form values
+            setRooms([])
+        }
+    };
+
+    const loadSubjects = async () => {
         try {
-            const data = await fetchSubjects(debouncedSearchQuery);
+            const data = await fetchSubjects(debouncedSearchQuerySubjects);
             setSubjects(data);
         } catch (err) {
             setError(err as ParsedError);
-        } finally {
-            setIsLoading(false);
         }
-    }, [debouncedSearchQuery]);
+    }
 
-    const loadSubjectClasses = useCallback(async (subjectId: number) => {
-        setIsLoading(true);
+    const loadSubjectClasses = async (subjectId: number) => {
         try {
             const data = await fetchSubjectClasses(subjectId);
             setSubjectClasses(data);
         } catch (err) {
             setError(err as ParsedError);
-        } finally {
-            setIsLoading(false);
         }
-    }, []);
+    }
 
-    const loadRooms = useCallback(async () => {
-        setIsLoading(true);
+    const loadRooms = async () => {
         try {
-            const data = await fetchRooms(debouncedSearchQuery);
+            const data = await fetchRooms(debouncedSearchQueryRooms);
             setRooms(data);
         } catch (err) {
             setError(err as ParsedError);
-        } finally {
-            setIsLoading(false);
         }
-    }, [debouncedSearchQuery]);
+    }
 
     useEffect(() => {
-        if (!selectedEntity) return;
-
-        if (selectedEntity === 'lecture') {
-            if (formValues.subjectId) {
-                return;
-            }
-
-            if (debouncedSearchQuery.trim().length > 0) {
-                loadSubjects();
-            }
-        } else if (selectedEntity === 'class' && debouncedSearchQuery.trim().length > 0) {
+        if (skipSearch) {
+            setSkipSearch(false);
+            return;
+        }
+        if (debouncedSearchQuerySubjects.trim().length > 0 ) {
             loadSubjects();
         }
-    }, [selectedEntity, debouncedSearchQuery, loadSubjects, formValues.subjectId]);
+        if (debouncedSearchQueryRooms.trim().length > 0 ) {
+            loadRooms()
+        }
+    }, [debouncedSearchQuerySubjects, debouncedSearchQueryRooms]);
 
     useEffect(() => {
-        if (selectedEntity === 'lecture' && formValues.subjectId) {
+        if(selectedEntity === 'Lecture' && formValues.subjectId) {
             loadSubjectClasses(formValues.subjectId);
         }
-    }, [selectedEntity, formValues.subjectId, loadSubjectClasses]);
+    }, [formValues.subjectId]);
 
     useEffect(() => {
-        if (selectedEntity === 'lecture' && debouncedSearchQuery.trim().length > 0) {
-            loadRooms();
+        switch (selectedEntity) {
+            case 'Lecture':
+                if (formValues.subjectId) {
+                    setSearchQueryRooms('')
+                    setRooms([]);
+                } else {
+                    setFormValues({ ...formValues, subjectId: null, schoolClassId: null })
+                    setSearchQuerySubjects('')
+                    setSubjects([]);
+                }
+                break;
+            default:
+                setFormValues({ ...formValues, subjectId: null, schoolClassId: null })
+                setSearchQuerySubjects('')
+                setSearchQueryRooms('')
+                setSubjects([]);
+                setSubjectClasses([]);
+                setRooms([]);
         }
-    }, [selectedEntity, debouncedSearchQuery, loadRooms])
+    }, [selectedEntity]);
 
     const handleSubmit = async () => {
         if (!selectedEntity) return;
@@ -97,15 +117,15 @@ export const useAdminEntityCreation = () => {
         try {
             let success = false;
             switch (selectedEntity) {
-                case 'subject':
+                case 'Subject':
                     success = await createSubject(formValues.name || '');
                     break;
-                case 'class':
+                case 'Class':
                     if (formValues.subjectId) {
                         success = await createClass(formValues.name || '', formValues.subjectId);
                     }
                     break;
-                case 'room':
+                case 'Room':
                     if (formValues.name && formValues.capacity && formValues.roomType) {
                         success = await createRoom(
                             formValues.name,
@@ -114,7 +134,7 @@ export const useAdminEntityCreation = () => {
                         );
                     }
                     break;
-                case 'lecture':
+                case 'Lecture':
                     if (formValues.schoolClassId && formValues.roomId && formValues.lectureType &&
                         formValues.weekDay && formValues.startTime && formValues.endTime) {
                         success = await createLecture(
@@ -132,7 +152,8 @@ export const useAdminEntityCreation = () => {
             if (success) {
                 Alert.alert('Success', `Successfully created ${selectedEntity}`);
                 setFormValues({});
-                setSearchQuery('');
+                setSearchQuerySubjects('');
+                setSearchQueryRooms('');
                 setSubjects([]);
                 setSubjectClasses([]);
                 setRooms([]);
@@ -157,9 +178,12 @@ export const useAdminEntityCreation = () => {
         subjects,
         subjectClasses,
         rooms,
-        searchQuery,
-        setSearchQuery,
+        searchQuerySubjects,
+        setSearchQuerySubjects,
+        searchQueryRooms,
+        setSearchQueryRooms,
         isLoading,
         handleSubmit,
+        handleItemSelect
     };
 };

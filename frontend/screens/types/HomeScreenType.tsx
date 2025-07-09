@@ -4,6 +4,7 @@ import {LectureWithTeacher} from "../../types/LectureWithTeacher";
 
 
 export interface HomeScreenType {
+    shouldShowCalendar: boolean;
     onLogout: () => void;
     username: string,
     schedule: LectureWithTeacher[],

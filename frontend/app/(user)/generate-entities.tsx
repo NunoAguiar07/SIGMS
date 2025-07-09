@@ -1,7 +1,7 @@
 import {AdminEntityCreationScreen} from "../../screens/mainScreens/GenerateEntitiesScreen";
 import ErrorHandler from "../(public)/error";
 import {useAdminEntityCreation} from "../../hooks/useAdminEntityCreation";
-import {BackgroundImage} from "../../screens/components/BackgroundImage";
+import LoadingPresentation from "../../screens/auxScreens/LoadingScreen";
 
 
 const AdminEntityCreation = () => {
@@ -14,32 +14,39 @@ const AdminEntityCreation = () => {
         subjects,
         subjectClasses,
         rooms,
-        searchQuery,
-        setSearchQuery,
+        searchQuerySubjects,
+        setSearchQuerySubjects,
+        searchQueryRooms,
+        setSearchQueryRooms,
         isLoading,
         handleSubmit,
+        handleItemSelect
     } = useAdminEntityCreation();
+
+    if(isLoading) {
+        return <LoadingPresentation />;
+    }
 
     if (error) {
         return <ErrorHandler errorStatus={error.status} errorMessage={error.message} />;
     }
 
     return (
-        <BackgroundImage>
-            <AdminEntityCreationScreen
-                selectedEntity={selectedEntity}
-                onEntitySelect={setSelectedEntity}
-                formValues={formValues}
-                setFormValues={setFormValues}
-                onSubmit={handleSubmit}
-                subjects={subjects}
-                subjectClasses={subjectClasses}
-                rooms={rooms}
-                searchQuery={searchQuery}
-                setSearchQuery={setSearchQuery}
-                isLoading={isLoading}
-            />
-        </BackgroundImage>
+        <AdminEntityCreationScreen
+            selectedEntity={selectedEntity}
+            onEntitySelect={setSelectedEntity}
+            formValues={formValues}
+            setFormValues={setFormValues}
+            onSubmit={handleSubmit}
+            subjects={subjects}
+            subjectClasses={subjectClasses}
+            rooms={rooms}
+            searchQuerySubjects={searchQuerySubjects}
+            setSearchQuerySubjects={setSearchQuerySubjects}
+            searchQueryRooms={searchQueryRooms}
+            setSearchQueryRooms={setSearchQueryRooms}
+            onItemSelect={handleItemSelect}
+        />
     );
 };
 

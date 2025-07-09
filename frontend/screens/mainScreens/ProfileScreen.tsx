@@ -1,8 +1,9 @@
-import {profileStyles} from "../css_styling/profile/RectangleProps";
-import {commonStyles} from "../css_styling/common/CommonProps";
 import {ProfileScreenType} from "../types/ProfileScreenType";
-import {Image} from "expo-image";
-import {Text, TouchableOpacity, View} from "react-native";
+import {Card, CenteredContainer} from "../css_styling/common/NewContainers";
+import {ImageComponent, ImageWrapper} from "../css_styling/common/Images";
+import {theme} from "../css_styling/common/Theme";
+import {Title} from "../css_styling/common/Typography";
+import {ProfileInterface} from "../../types/ProfileInterface";
 
 
 export const ProfileScreen = ({
@@ -11,20 +12,22 @@ export const ProfileScreen = ({
     onPickImage
 }: ProfileScreenType) => {
     return (
-            <View style={commonStyles.container}>
-                <View style={commonStyles.card}>
-                    <ProfileImage
-                        imageUri={image}
-                        onPress={onPickImage}
-                    />
-                    <ProfileInfo
-                        name={profile.username}
-                        email={profile.email}
-                        university={profile.university}
-                    />
-                </View>
-            </View>
-        )
+        <CenteredContainer flex={1} >
+            <Card shadow="medium" alignItems={"center"} gap="md">
+                <ProfileImage
+                    imageUri={image}
+                    onPress={onPickImage}
+                />
+                <ProfileInfo
+                    username={profile.username}
+                    email={profile.email}
+                    university={profile.university}
+                    officeRoomName={profile.officeRoomName || ''}
+                    image={profile.image}
+                />
+            </Card>
+        </CenteredContainer>
+    )
 };
 
 interface ProfileImageType {
@@ -33,36 +36,34 @@ interface ProfileImageType {
 }
 
 const ProfileImage = ({ imageUri, onPress }: ProfileImageType) => (
-    <TouchableOpacity onPress={onPress} style={profileStyles.imageWrapper}>
-        <Image
+    <ImageWrapper
+        onPress={onPress}
+        size={120}
+        borderRadius="huge"
+        borderWidth={4}
+        borderColor={theme.colors.primaryDark}
+    >
+        <ImageComponent
+            size={120}
             source={
-                typeof imageUri === 'string' && imageUri.startsWith('data:image/jpeg;base64,')
+                imageUri && imageUri.startsWith('data:image/jpeg;base64,')
                     ? { uri: imageUri }
                     : require('../../assets/default_user_profile.png')
             }
-            style={profileStyles.image}
-            contentFit="cover"
         />
-    </TouchableOpacity>
+    </ImageWrapper>
 );
 
-interface ProfileInfoType {
-    name: string;
-    email: string;
-    university: string;
-}
-
-const ProfileInfo = ({ name, email, university }: ProfileInfoType) => (
-    <View style={profileStyles.infoContainer}>
-        <Text style={profileStyles.name} numberOfLines={1} ellipsizeMode="tail">
-            {name}
-        </Text>
-        <Text style={profileStyles.info} numberOfLines={2} ellipsizeMode="tail">
-            {email}
-        </Text>
-        <Text style={profileStyles.info} numberOfLines={2} ellipsizeMode="tail">
-            {university}
-        </Text>
-    </View>
+const ProfileInfo = ({username, email, university, officeRoomName, image}: ProfileInterface) => (
+    <CenteredContainer>
+        <Title color={theme.colors.text.white}>{username}</Title>
+        <Title color={theme.colors.text.white}>{email}</Title>
+        <Title color={theme.colors.text.white}>{university}</Title>
+        {officeRoomName && (
+            <Title color={theme.colors.text.white}>
+                Office: {officeRoomName}
+            </Title>
+        )}
+    </CenteredContainer>
 );
 

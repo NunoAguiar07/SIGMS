@@ -1,14 +1,25 @@
-import {TextInput, TouchableOpacity, View, Text, ActivityIndicator, FlatList} from "react-native";
+import {TouchableOpacity, View, Text, FlatList} from "react-native";
 import {commonStyles} from "../css_styling/common/CommonProps";
 import {generateEntitiesStyles} from "../css_styling/generateEntities/GenerateEntitiesProps";
-import {Picker} from "@react-native-picker/picker";
-import {EntityCreationScreenType} from "../types/EntityCreationScreenType";
+import {EntityCreationScreenType, EntityType} from "../types/EntityCreationScreenType";
 import {Ionicons} from "@expo/vector-icons";
-import {FormCreateEntityValues} from "../../types/welcome/FormCreateEntityValues";
+import {FormCreateEntityValues, LectureType, RoomType} from "../../types/welcome/FormCreateEntityValues";
 import {SubjectInterface} from "../../types/SubjectInterface";
 import {SchoolClassInterface} from "../../types/SchoolClassInterface";
 import {RoomInterface} from "../../types/RoomInterface";
 import {isMobile} from "../../utils/DeviceType";
+import {
+    Card,
+    CenteredContainer, ColumnContainer,
+    Container,
+    GridColumn,
+    GridRow
+} from "../css_styling/common/NewContainers";
+import {ActionButton, Button, ButtonText} from "../css_styling/common/Buttons";
+import {BodyText, Subtitle} from "../css_styling/common/Typography";
+import {Input, SearchInput} from "../css_styling/common/Inputs";
+import {FlatListContainer, FlatListItem} from "../css_styling/common/FlatList";
+import {PickerContainer, StyledPicker, StyledPickerItem} from "../css_styling/common/Picker";
 
 export const AdminEntityCreationScreen = ({
     selectedEntity,
@@ -19,28 +30,30 @@ export const AdminEntityCreationScreen = ({
     subjects,
     subjectClasses,
     rooms,
-    searchQuery,
-    setSearchQuery,
-    isLoading,
+    searchQuerySubjects,
+    setSearchQuerySubjects,
+    searchQueryRooms,
+    setSearchQueryRooms,
+    onItemSelect
 }: EntityCreationScreenType) => {
     const renderForm = () => {
         switch (selectedEntity) {
-            case 'subject':
+            case 'Subject':
                 return <SubjectForm formValues={formValues} setFormValues={setFormValues} />;
-            case 'class':
+            case 'Class':
                 return (
                     <ClassForm
                         formValues={formValues}
                         setFormValues={setFormValues}
-                        searchQuery={searchQuery}
-                        setSearchQuery={setSearchQuery}
-                        isLoading={isLoading}
+                        searchQuery={searchQuerySubjects}
+                        setSearchQuery={setSearchQuerySubjects}
                         subjects={subjects}
+                        onItemSelect={onItemSelect}
                     />
                 );
-            case 'room':
+            case 'Room':
                 return <RoomForm formValues={formValues} setFormValues={setFormValues} />;
-            case 'lecture':
+            case 'Lecture':
                 return (
                     <LectureForm
                         formValues={formValues}
@@ -48,56 +61,49 @@ export const AdminEntityCreationScreen = ({
                         subjects={subjects}
                         subjectClasses={subjectClasses}
                         rooms={rooms}
-                        searchQuery={searchQuery}
-                        setSearchQuery={setSearchQuery}
-                        isLoading={isLoading}
+                        searchQuerySubjects={searchQuerySubjects}
+                        setSearchQuerySubjects={setSearchQuerySubjects}
+                        searchQueryRooms={searchQueryRooms}
+                        setSearchQueryRooms={setSearchQueryRooms}
+                        onItemSelect={onItemSelect}
+                        onEntitySelect={onEntitySelect}
                     />
                 );
             default:
                 return (
-                    <View style={generateEntitiesStyles.placeholder}>
-                        <Text style={generateEntitiesStyles.placeholderText}>
-                            Select an entity type to add
-                        </Text>
-                    </View>
+                    <Subtitle>Select an entity type to add</Subtitle>
                 );
         }
     };
 
     if (!isMobile) {
         return (
-            <View style={commonStyles.columnsContainer}>
-                <View style={[commonStyles.leftColumn, commonStyles.centerContainer]}>
-                    {['subject', 'class', 'room', 'lecture'].map((entity) => (
-                        <TouchableOpacity
-                            key={entity}
-                            style={[
-                                generateEntitiesStyles.selectButton,
-                                selectedEntity === entity && generateEntitiesStyles.activeButton,
-                            ]}
-                            onPress={() => onEntitySelect(entity as any)}
-                        >
-                            <Text style={commonStyles.buttonText}>
-                                {entity.charAt(0).toUpperCase() + entity.slice(1)}
-                            </Text>
-                        </TouchableOpacity>
-                    ))}
-                </View>
-
-                <View style={commonStyles.rightColumn}>
-                    {renderForm()}
-                    <View style={generateEntitiesStyles.footer}>
-                        {selectedEntity && (
-                            <TouchableOpacity
-                                style={generateEntitiesStyles.selectButton}
-                                onPress={onSubmit}
-                            >
-                                <Text style={commonStyles.buttonText}>Create {selectedEntity}</Text>
-                            </TouchableOpacity>
-                        )}
-                    </View>
-                </View>
-            </View>
+            <Container flex={1} justifyContent="center" padding="md">
+                <GridRow>
+                    <GridColumn widthPercent={50} gap={"md"}>
+                        {['Subject', 'Class', 'Room', 'Lecture'].map((entity) => (
+                            <Button
+                                variant="primary"
+                                key={entity}
+                                size={"large"}
+                                onPress={() => onEntitySelect(entity as EntityType)}
+                                >
+                                    <ButtonText>{entity}</ButtonText>
+                            </Button>
+                        ))}
+                    </GridColumn>
+                    <GridColumn widthPercent={50}>
+                        <Card shadow="medium" alignItems={"center"} gap="md">
+                            {renderForm()}
+                            {selectedEntity && (selectedEntity != 'Lecture' || formValues.subjectId) &&(
+                                <Button variant="primary" onPress={onSubmit}>
+                                    <ButtonText>Create {selectedEntity}</ButtonText>
+                                </Button>
+                            )}
+                        </Card>
+                    </GridColumn>
+                </GridRow>
+            </Container>
         );
     } else {
         return (
@@ -140,15 +146,14 @@ type SubjectFromType = {
 };
 
 export const SubjectForm = ({ formValues, setFormValues }: SubjectFromType) => (
-    <View style={generateEntitiesStyles.formSection}>
-        <Text style={commonStyles.sectionTitle}>Create New Subject</Text>
-        <TextInput
+    <CenteredContainer gap={"md"}>
+        <Subtitle>Create New Subject</Subtitle>
+        <SearchInput
             placeholder="Subject Name"
-            style={generateEntitiesStyles.createInput}
             value={formValues.name || ''}
             onChangeText={(text) => setFormValues({ ...formValues, name: text })}
         />
-    </View>
+    </CenteredContainer>
 );
 
 type ClassFormType = {
@@ -156,55 +161,43 @@ type ClassFormType = {
     setFormValues: (values: FormCreateEntityValues) => void;
     searchQuery: string;
     setSearchQuery: (query: string) => void;
-    isLoading: boolean;
     subjects: SubjectInterface[];
+    onItemSelect: (item: SubjectInterface) => void;
 };
 
-export const ClassForm = ({ formValues, setFormValues, searchQuery, setSearchQuery, isLoading, subjects }: ClassFormType) => (
-    <View style={generateEntitiesStyles.formSection}>
-        <Text style={commonStyles.sectionTitle}>Create New Class</Text>
-        <TextInput
-            placeholder="Class Name"
-            style={generateEntitiesStyles.createInput}
-            value={formValues.name || ''}
-            onChangeText={(text) => setFormValues({ ...formValues, name: text })}
-        />
-
-        <Text style={commonStyles.sectionTitle}>Select Subject:</Text>
-        <TextInput
-            placeholder="Search subjects..."
-            style={commonStyles.searchInput}
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-        />
-
-        {isLoading ? (
-            <ActivityIndicator size="small" style={generateEntitiesStyles.loader} />
-        ) : (
-            <FlatList
-                data={subjects}
-                keyExtractor={(item) => item.id.toString()}
-                style={generateEntitiesStyles.list}
-                renderItem={({ item }) => (
-                    <TouchableOpacity
-                        style={[
-                            generateEntitiesStyles.listItem,
-                            formValues.subjectId === item.id && generateEntitiesStyles.selectedItem,
-                        ]}
-                        onPress={() => setFormValues({ ...formValues, subjectId: item.id })}
-                    >
-                        <Text style={generateEntitiesStyles.listItemText}>{item.name}</Text>
-                    </TouchableOpacity>
-                )}
-                ListEmptyComponent={
-                    <Text style={generateEntitiesStyles.emptyText}>
-                        {searchQuery ? 'No subjects found' : 'No subjects available'}
-                    </Text>
-                }
+export const ClassForm = ({ formValues, setFormValues, searchQuery, setSearchQuery, subjects, onItemSelect }: ClassFormType) => {
+    return (
+        <CenteredContainer gap={"md"} style={{ position: 'relative' , zIndex: 10}}>
+            <Subtitle>Create New Class</Subtitle>
+            <SearchInput
+                placeholder="Class Name"
+                value={formValues.name || ''}
+                onChangeText={(text) => setFormValues({ ...formValues, name: text })}
             />
-        )}
-    </View>
-);
+            <Subtitle>Select Subject:</Subtitle>
+            <SearchInput
+                placeholder="Search subjects..."
+                value={searchQuery}
+                onChangeText={setSearchQuery}
+            />
+            {subjects.length > 0 && (
+                <FlatListContainer>
+                    <FlatList
+                        data={subjects}
+                        keyExtractor={(item) => item.id.toString()}
+                        renderItem={({ item }) => (
+                            <FlatListItem
+                                onPress={() => onItemSelect(item)}
+                            >
+                                <BodyText>{item.name}</BodyText>
+                            </FlatListItem>
+                        )}
+                    />
+                </FlatListContainer>
+            )}
+        </CenteredContainer>
+    );
+}
 
 type RoomFormType = {
     formValues: FormCreateEntityValues;
@@ -212,40 +205,33 @@ type RoomFormType = {
 };
 
 export const RoomForm = ({ formValues, setFormValues }: RoomFormType) => (
-    <View style={generateEntitiesStyles.formSection}>
-        <Text style={commonStyles.sectionTitle}>Create New Room</Text>
-
-        <TextInput
+    <CenteredContainer gap={"md"}>
+        <Subtitle>Create New Room</Subtitle>
+        <SearchInput
             placeholder="Room Name"
-            style={generateEntitiesStyles.createInput}
             value={formValues.name || ''}
             onChangeText={(text) => setFormValues({ ...formValues, name: text })}
         />
-
-        <TextInput
+        <SearchInput
             placeholder="Capacity"
             keyboardType="numeric"
-            style={generateEntitiesStyles.createInput}
             value={formValues.capacity?.toString() || ''}
             onChangeText={(text) => setFormValues({
                 ...formValues,
                 capacity: text ? parseInt(text) : null,
             })}
         />
-
-        <View style={generateEntitiesStyles.pickerContainer}>
-            <Text style={commonStyles.sectionTitle}>Room Type:</Text>
-            <Picker
+        <PickerContainer width="50%">
+            <StyledPicker
                 selectedValue={formValues.roomType}
-                onValueChange={(value) => setFormValues({ ...formValues, roomType: value })}
-                style={generateEntitiesStyles.picker}
+                onValueChange={(value) => setFormValues({ ...formValues, roomType: value as RoomType })}
             >
-                <Picker.Item label="Classroom" value="CLASS" />
-                <Picker.Item label="Study Room" value="STUDY" />
-                <Picker.Item label="Office Room" value="OFFICE" />
-            </Picker>
-        </View>
-    </View>
+                <StyledPickerItem label="Classroom" value="CLASS" />
+                <StyledPickerItem label="Study Room" value="STUDY" />
+                <StyledPickerItem label="Office Room" value="OFFICE" />
+            </StyledPicker>
+        </PickerContainer>
+    </CenteredContainer>
 );
 
 
@@ -255,9 +241,12 @@ type LectureFormType = {
     subjects: SubjectInterface[];
     subjectClasses: SchoolClassInterface[];
     rooms: RoomInterface[];
-    searchQuery: string;
-    setSearchQuery: (query: string) => void;
-    isLoading: boolean;
+    searchQuerySubjects: string;
+    setSearchQuerySubjects: (query: string) => void;
+    searchQueryRooms: string;
+    setSearchQueryRooms: (query: string) => void;
+    onItemSelect: (item: any) => void;
+    onEntitySelect: (entity: EntityType) => void;
 };
 
 export const LectureForm = ({
@@ -266,77 +255,48 @@ export const LectureForm = ({
     subjects,
     subjectClasses,
     rooms,
-    searchQuery,
-    setSearchQuery,
-    isLoading
+    searchQuerySubjects,
+    setSearchQuerySubjects,
+    searchQueryRooms,
+    setSearchQueryRooms,
+    onItemSelect,
+    onEntitySelect
 }: LectureFormType) => {
-    // Data for our main FlatList
-    const renderFormSections = () => {
-        if (!formValues.subjectId) {
-            return (
+    return (
+        <CenteredContainer gap={"md"}>
+            <Subtitle>Create New Lecture</Subtitle>
+
+            {!formValues.subjectId ? (
                 <LectureSubjectSelection
                     subjects={subjects}
-                    searchQuery={searchQuery}
-                    setSearchQuery={setSearchQuery}
-                    isLoading={isLoading}
-                    formValues={formValues}
-                    setFormValues={setFormValues}
+                    searchQuery={searchQuerySubjects}
+                    setSearchQuery={setSearchQuerySubjects}
+                    onItemSelect={onItemSelect}
                 />
-            );
-        }
-
-        return (
-            <>
-                <LectureSelectedSubject
-                    subjects={subjects}
-                    formValues={formValues}
-                    setFormValues={setFormValues}
-                />
-
-                <LectureClassSelection
-                    subjectClasses={subjectClasses}
-                    formValues={formValues}
-                    setFormValues={setFormValues}
-                />
-
-                <LectureRoomSelection
-                    rooms={rooms}
-                    searchQuery={searchQuery}
-                    setSearchQuery={setSearchQuery}
-                    formValues={formValues}
-                    setFormValues={setFormValues}
-                />
-
-                {isMobile ? (
+            ) : (
+                <CenteredContainer gap="md">
+                    <LectureSelectedSubject
+                        subjectName={searchQuerySubjects}
+                        onEntitySelect={onEntitySelect}
+                    />
+                    <LectureClassSelection
+                        subjectClasses={subjectClasses}
+                        formValues={formValues}
+                        setFormValues={setFormValues}
+                    />
+                    <LectureRoomSelection
+                        rooms={rooms}
+                        searchQuery={searchQueryRooms}
+                        setSearchQuery={setSearchQueryRooms}
+                        onItemSelect={onItemSelect}
+                    />
                     <LectureDetailsSelection
                         formValues={formValues}
                         setFormValues={setFormValues}
                     />
-                ) : (
-                    <View style={commonStyles.rightColumn}>
-                        <LectureDetailsSelection
-                            formValues={formValues}
-                            setFormValues={setFormValues}
-                        />
-                    </View>
-                )}
-            </>
-        );
-    };
-
-    return (
-        <View style={generateEntitiesStyles.formSection}>
-            <Text style={commonStyles.sectionTitle}>Create New Lecture</Text>
-
-            <FlatList
-                data={[1]} // Single item to render our form
-                keyExtractor={() => 'lecture-form'}
-                renderItem={() => renderFormSections()}
-                contentContainerStyle={generateEntitiesStyles.scrollContainer}
-                ListHeaderComponent={<Text style={commonStyles.sectionTitle}>Create New Lecture</Text>}
-                keyboardShouldPersistTaps="handled"
-            />
-        </View>
+                </CenteredContainer>
+            )}
+        </CenteredContainer>
     );
 };
 
@@ -344,80 +304,59 @@ const LectureSubjectSelection = ({
     subjects,
     searchQuery,
     setSearchQuery,
-    isLoading,
-    formValues,
-    setFormValues,
+    onItemSelect
 }: {
     subjects: SubjectInterface[];
     searchQuery: string;
     setSearchQuery: (query: string) => void;
-    isLoading: boolean;
-    formValues: FormCreateEntityValues;
-    setFormValues: (values: FormCreateEntityValues) => void;
-}) => (
-    <>
-        <Text style={commonStyles.sectionTitle}>Select Subject:</Text>
-        <TextInput
-            placeholder="Search subjects..."
-            style={generateEntitiesStyles.createInput}
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-        />
-
-        {isLoading ? (
-            <ActivityIndicator size="small" style={generateEntitiesStyles.loader} />
-        ) : (
-            <FlatList
-                data={subjects}
-                keyExtractor={(item) => item.id.toString()}
-                style={generateEntitiesStyles.list}
-                renderItem={({ item }) => (
-                    <TouchableOpacity
-                        style={[
-                            generateEntitiesStyles.listItem,
-                            formValues.subjectId === item.id && generateEntitiesStyles.selectedItem
-                        ]}
-                        onPress={() => {
-                            setFormValues({ ...formValues, subjectId: item.id, schoolClassId: null });
-                            setSearchQuery('');
-                        }}
-                    >
-                        <Text style={generateEntitiesStyles.listItemText}>{item.name}</Text>
-                    </TouchableOpacity>
-                )}
-                ListEmptyComponent={
-                    <Text style={generateEntitiesStyles.emptyText}>
-                        {searchQuery ? 'No subjects found' : 'Search for subjects'}
-                    </Text>
-                }
+    onItemSelect: (item: SubjectInterface) => void;
+}) => {
+    return (
+        <CenteredContainer gap={'md'}>
+            <Subtitle>Select Subject:</Subtitle>
+            <SearchInput
+                placeholder="Search subjects..."
+                value={searchQuery}
+                onChangeText={setSearchQuery}
             />
-        )}
-    </>
-);
+            {subjects.length > 0 && (
+                <FlatListContainer>
+                    <FlatList
+                        data={subjects}
+                        keyExtractor={(item) => item.id.toString()}
+                        renderItem={({item}) => (
+                            <FlatListItem
+                                onPress={() => onItemSelect(item)}
+                            >
+                                <BodyText>{item.name}</BodyText>
+                            </FlatListItem>
+                        )}
+                    />
+                </FlatListContainer>
+            )}
+        </CenteredContainer>
+    );
+}
 
 const LectureSelectedSubject = ({
-    subjects,
-    formValues,
-    setFormValues,
+    subjectName,
+    onEntitySelect
 }: {
-    subjects: SubjectInterface[];
-    formValues: FormCreateEntityValues;
-    setFormValues: (values: FormCreateEntityValues) => void;
+    subjectName: string;
+    onEntitySelect: (entity: EntityType) => void;
 }) => (
-    <>
-        <Text style={commonStyles.sectionTitle}>Selected Subject:</Text>
-        <View style={commonStyles.containerRow}>
-            <Text style={commonStyles.itemText}>
-                {subjects.find((s) => s.id === formValues.subjectId)?.name}
-            </Text>
-            <TouchableOpacity
-                style={[commonStyles.actionButton, commonStyles.editButton]}
-                onPress={() => setFormValues({ ...formValues, subjectId: null, schoolClassId: null })}
+    <CenteredContainer>
+        <Subtitle>Selected Subject:</Subtitle>
+        <ColumnContainer gap={"md"}>
+            <BodyText>{subjectName}</BodyText>
+            <ActionButton
+                variant="primary"
+                onPress={() => onEntitySelect('Lecture')}
             >
                 <Ionicons name="arrow-undo-circle-outline" size={16} color="white" />
-            </TouchableOpacity>
-        </View>
-    </>
+            </ActionButton>
+        </ColumnContainer>
+    </CenteredContainer>
 );
 
 const LectureClassSelection = ({
@@ -429,76 +368,68 @@ const LectureClassSelection = ({
     formValues: FormCreateEntityValues;
     setFormValues: (values: FormCreateEntityValues) => void;
 }) => (
-    <>
-        <Text style={commonStyles.sectionTitle}>Select Class:</Text>
-        <FlatList
-            data={subjectClasses}
-            keyExtractor={(item) => item.id.toString()}
-            style={generateEntitiesStyles.list}
-            renderItem={({ item }) => (
-                <TouchableOpacity
-                    style={[
-                        generateEntitiesStyles.listItem,
-                        formValues.schoolClassId === item.id && generateEntitiesStyles.selectedItem
-                    ]}
-                    onPress={() => setFormValues({ ...formValues, schoolClassId: item.id })}
-                >
-                    <Text style={generateEntitiesStyles.listItemText}>{item.name}</Text>
-                </TouchableOpacity>
-            )}
-            ListEmptyComponent={
-                <Text style={generateEntitiesStyles.emptyText}>
-                    {subjectClasses.length === 0 ? 'No classes found for this subject' : 'Select a class'}
-                </Text>
-            }
-        />
-    </>
+    <CenteredContainer gap={"md"}>
+        <Subtitle>Select Class:</Subtitle>
+        {subjectClasses.length > 0 ? (
+            <FlatList
+                data={subjectClasses}
+                keyExtractor={(item) => item.id.toString()}
+                renderItem={({ item }) => (
+                    <FlatListItem
+                        onPress={() => setFormValues({ ...formValues, schoolClassId: item.id })}
+                        style={{
+                            backgroundColor: item.id === formValues.schoolClassId
+                                ? '#e3f2fd'
+                                : 'transparent'
+                        }}
+                    >
+                        <BodyText>{item.name}</BodyText>
+                    </FlatListItem>
+                )}
+            />
+        ) : (
+            <BodyText>No classes available</BodyText>
+        )}
+    </CenteredContainer>
 );
 
 const LectureRoomSelection = ({
     rooms,
     searchQuery,
     setSearchQuery,
-    formValues,
-    setFormValues
+    onItemSelect
 }: {
     rooms: RoomInterface[];
     searchQuery: string;
     setSearchQuery: (query: string) => void;
-    formValues: FormCreateEntityValues;
-    setFormValues: (values: FormCreateEntityValues) => void;
-}) => (
-    <>
-        <Text style={commonStyles.sectionTitle}>Select Room:</Text>
-        <TextInput
-            placeholder="Search rooms..."
-            style={commonStyles.searchInput}
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-        />
-        <FlatList
-            data={rooms}
-            keyExtractor={(item) => item.id.toString()}
-            style={generateEntitiesStyles.list}
-            renderItem={({ item }) => (
-                <TouchableOpacity
-                    style={[
-                        generateEntitiesStyles.listItem,
-                        formValues.roomId === item.id && generateEntitiesStyles.selectedItem
-                    ]}
-                    onPress={() => setFormValues({ ...formValues, roomId: item.id })}
-                >
-                    <Text style={generateEntitiesStyles.listItemText}>{item.name}</Text>
-                </TouchableOpacity>
+    onItemSelect: (item: RoomInterface) => void;
+}) => {
+    return (
+        <CenteredContainer style={{position: 'relative', zIndex: 10}} gap={"md"}>
+            <Subtitle>Select Room:</Subtitle>
+            <SearchInput
+                placeholder="Search rooms..."
+                value={searchQuery}
+                onChangeText={setSearchQuery}
+            />
+            {rooms.length > 0 && (
+                <FlatListContainer>
+                    <FlatList
+                        data={rooms}
+                        keyExtractor={(item) => item.id.toString()}
+                        renderItem={({item}) => (
+                            <FlatListItem
+                                onPress={() => onItemSelect(item)}
+                            >
+                                <BodyText>{item.name}</BodyText>
+                            </FlatListItem>
+                        )}
+                    />
+                </FlatListContainer>
             )}
-            ListEmptyComponent={
-                <Text style={generateEntitiesStyles.emptyText}>
-                    {searchQuery ? 'No rooms found' : 'Search for rooms'}
-                </Text>
-            }
-        />
-    </>
-);
+        </CenteredContainer>
+    );
+}
 
 const LectureDetailsSelection = ({
     formValues,
@@ -507,53 +438,44 @@ const LectureDetailsSelection = ({
     formValues: FormCreateEntityValues;
     setFormValues: (values: FormCreateEntityValues) => void;
 }) => (
-    <>
-        <View style={generateEntitiesStyles.pickerContainer}>
-            <Text style={commonStyles.sectionTitle}>Lecture Type:</Text>
-            <Picker
+    <CenteredContainer gap={'md'}>
+        <Subtitle>Lecture Type</Subtitle>
+        <PickerContainer width="50%">
+            <StyledPicker
                 selectedValue={formValues.lectureType}
-                onValueChange={(value) => setFormValues({ ...formValues, lectureType: value })}
-                style={generateEntitiesStyles.picker}
+                onValueChange={(value) => setFormValues({ ...formValues, lectureType: value as LectureType})}
             >
-                <Picker.Item label="Theorical" value="THEORETICAL" />
-                <Picker.Item label="Practical" value="PRACTICAL" />
-                <Picker.Item label="Mix" value="THEORETICAL_PRACTICAL" />
-            </Picker>
-        </View>
-
-        <View style={generateEntitiesStyles.pickerContainer}>
-            <Text style={commonStyles.sectionTitle}>Weekday:</Text>
-            <Picker
+                <StyledPickerItem label="Theoretical" value="THEORETICAL" />
+                <StyledPickerItem label="Practical" value="PRACTICAL" />
+                <StyledPickerItem label="Mix" value="THEORETICAL_PRACTICAL" />
+            </StyledPicker>
+        </PickerContainer>
+        <Subtitle>Weekday</Subtitle>
+        <PickerContainer width="50%">
+            <StyledPicker
                 selectedValue={formValues.weekDay}
-                onValueChange={(value) => setFormValues({ ...formValues, weekDay: value })}
-                style={generateEntitiesStyles.picker}
+                onValueChange={(value) => setFormValues({ ...formValues, weekDay: value as number})}
             >
-                <Picker.Item label="Monday" value={1} />
-                <Picker.Item label="Tuesday" value={2} />
-                <Picker.Item label="Wednesday" value={3} />
-                <Picker.Item label="Thursday" value={4} />
-                <Picker.Item label="Friday" value={5} />
-                <Picker.Item label="Saturday" value={6} />
-                <Picker.Item label="Sunday" value={7} />
-            </Picker>
-        </View>
-
-        <View style={generateEntitiesStyles.timeContainer}>
-            <Text style={commonStyles.sectionTitle}>Start Time:</Text>
-            <TextInput
-                placeholder="HH:MM"
-                style={generateEntitiesStyles.timeInput}
-                value={formValues.startTime || ''}
-                onChangeText={(text) => setFormValues({ ...formValues, startTime: text })}
-            />
-
-            <Text style={commonStyles.sectionTitle}>End Time:</Text>
-            <TextInput
-                placeholder="HH:MM"
-                style={generateEntitiesStyles.timeInput}
-                value={formValues.endTime || ''}
-                onChangeText={(text) => setFormValues({ ...formValues, endTime: text })}
-            />
-        </View>
-    </>
+                <StyledPickerItem label="Monday" value={1} />
+                <StyledPickerItem label="Tuesday" value={2} />
+                <StyledPickerItem label="Wednesday" value={3} />
+                <StyledPickerItem label="Thursday" value={4} />
+                <StyledPickerItem label="Friday" value={5} />
+                <StyledPickerItem label="Saturday" value={6} />
+                <StyledPickerItem label="Sunday" value={7} />
+            </StyledPicker>
+        </PickerContainer>
+        <Subtitle>Start Time</Subtitle>
+        <Input
+            placeholder="HH:MM"
+            value={formValues.startTime || ''}
+            onChangeText={(text) => setFormValues({ ...formValues, startTime: text })}
+        />
+        <Subtitle>End Time</Subtitle>
+        <Input
+            placeholder="HH:MM"
+            value={formValues.endTime || ''}
+            onChangeText={(text) => setFormValues({ ...formValues, endTime: text })}
+        />
+    </CenteredContainer>
 );

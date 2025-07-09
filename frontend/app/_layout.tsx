@@ -1,8 +1,13 @@
+import '../screens/css_styling/common/global.css'
+
 import {Stack} from "expo-router";
 import {NotificationProvider} from "../contexts/NotificationContext";
 import {useFontsLoad} from "../hooks/useFontsLoad";
 import LoadingPresentation from "../screens/auxScreens/LoadingScreen";
+import {theme} from "../screens/css_styling/common/Theme";
+import {ThemeProvider} from "styled-components/native";
 import {BackgroundImage} from "../screens/components/BackgroundImage";
+
 
 export default function RootLayout() {
     const fontsLoaded = useFontsLoad();
@@ -10,8 +15,16 @@ export default function RootLayout() {
         return <LoadingPresentation />;
     }
     return (
+        <ThemeProvider theme={theme}>
             <NotificationProvider>
-                <Stack screenOptions={{headerShown: false}}/>
+                <BackgroundImage >
+                    <Stack screenOptions={{
+                        headerShown: false,
+                        contentStyle: { backgroundColor: 'transparent' },
+                    }}
+                    />
+                </BackgroundImage>
             </NotificationProvider>
+        </ThemeProvider>
     );
 }

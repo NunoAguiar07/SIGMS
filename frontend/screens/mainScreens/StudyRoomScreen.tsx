@@ -25,6 +25,28 @@ const StudyRoomScreen = ({studyRooms, forceUpdate}: StudyRoomProps) => {
             </TouchableOpacity>
         </View>
     );
+    // <CenteredContainer flex={1} justifyContent="center" padding="md">
+    //     <Card shadow="medium" alignItems={"center"} gap="md">
+    //         <FlatListContainer position={"static"}>
+    //             <FlatList
+    //                 data={studyRooms}
+    //                 keyExtractor={(item) => item.roomName}
+    //                 renderItem={({ item }) => (
+    //                     <FlatListDisplayItem>
+    //                         <BodyText>Sala {item.roomName}</BodyText>
+    //                         <BodyText>{item.capacity}</BodyText>
+    //                     </FlatListDisplayItem>
+    //                 )}
+    //             />
+    //         </FlatListContainer>
+    //         <Button
+    //             onPress={setUpdate}
+    //             variant="primary"
+    //         >
+    //             <ButtonText>Update</ButtonText>
+    //         </Button>
+    //     </Card>
+    // </CenteredContainer>
 }
 
 function chunkArray<T>(arr: T[], size: number): T[][] {

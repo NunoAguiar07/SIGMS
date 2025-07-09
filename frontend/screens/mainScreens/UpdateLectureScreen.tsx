@@ -1,4 +1,4 @@
-import {ActivityIndicator, FlatList, Text, TextInput, TouchableOpacity, View} from "react-native";
+import {FlatList, Text, TextInput, TouchableOpacity, View} from "react-native";
 import {scheduleLectureStyles} from "../css_styling/lecture/scheduleLectureStyles";
 import {commonStyles} from "../css_styling/common/CommonProps";
 import {Picker} from "@react-native-picker/picker";
@@ -6,6 +6,9 @@ import {RoomInterface} from "../../types/RoomInterface";
 import {Lecture} from "../../types/calendar/Lecture";
 import {isMobile} from "../../utils/DeviceType";
 import {UpdateLectureProps} from "../css_styling/update_lecture/UpdateLectureProps";
+import {Card, Container, GridColumn, GridRow} from "../css_styling/common/NewContainers";
+import {Subtitle} from "../css_styling/common/Typography";
+import {Button, ButtonText} from "../css_styling/common/Buttons";
 
 
 export const UpdateLectureScreen = ({
@@ -25,10 +28,6 @@ export const UpdateLectureScreen = ({
     effectiveFromText,
     effectiveUntilText
 }: UpdateLectureProps) => {
-    const sortedLectures = [...lectures].sort((a, b) =>
-        a.schoolClass.subject.name.localeCompare(b.schoolClass.subject.name)
-    );
-
     const timeOptions = Array.from({ length: 48 }, (_, index) => {
         const hours = String(Math.floor(index / 2)).padStart(2, '0');
         const minutes = index % 2 === 0 ? '00' : '30';
@@ -37,47 +36,83 @@ export const UpdateLectureScreen = ({
 
     if (!isMobile) {
         return (
-            <View style={scheduleLectureStyles.container}>
-                {/* Left Column */}
-                <View style={commonStyles.leftColumn}>
-                    <LectureList
-                        lectures={sortedLectures}
-                        onLectureSelect={onLectureSelect}
-                    />
-                </View>
-
-                {/* Right Column */}
-                <View style={commonStyles.rightColumn}>
-                    {selectedLecture ? (
-                        <UpdateLectureForm
-                            selectedLecture={selectedLecture}
-                            onScheduleChange={onScheduleChange}
-                            rooms={rooms}
-                            searchQuery={searchQuery}
-                            setSearchQuery={setSearchQuery}
-                            selectedRoom={selectedRoom}
-                            handleRoomSelect={handleRoomSelect}
-                            effectiveFromText={effectiveFromText}
-                            effectiveUntilText={effectiveUntilText}
-                            setEffectiveFromText={setEffectiveFromText}
-                            setEffectiveUntilText={setEffectiveUntilText}
-                            timeOptions={timeOptions}
-                            onSaveSchedule={onSaveSchedule}
-                            isSaving={isSaving}
+            <Container flex={1} justifyContent="center" padding="md">
+                <GridRow>
+                    <GridColumn widthPercent={50} gap={"md"}>
+                        <LectureList
+                            lectures={lectures}
+                            onLectureSelect={onLectureSelect}
                         />
-                    ) : (
-                        <Text style={commonStyles.emptyText}>Select a lecture to update schedule</Text>
-                    )}
-                </View>
-            </View>
-        );
+                    </GridColumn>
+                    <GridColumn widthPercent={50}>
+                        <Card shadow="medium" alignItems={"center"} gap="md">
+                            {selectedLecture ? (
+                                <UpdateLectureForm
+                                    selectedLecture={selectedLecture}
+                                    onScheduleChange={onScheduleChange}
+                                    rooms={rooms}
+                                    searchQuery={searchQuery}
+                                    setSearchQuery={setSearchQuery}
+                                    selectedRoom={selectedRoom}
+                                    handleRoomSelect={handleRoomSelect}
+                                    effectiveFromText={effectiveFromText}
+                                    effectiveUntilText={effectiveUntilText}
+                                    setEffectiveFromText={setEffectiveFromText}
+                                    setEffectiveUntilText={setEffectiveUntilText}
+                                    timeOptions={timeOptions}
+                                    onSaveSchedule={onSaveSchedule}
+                                    isSaving={isSaving}
+                                />
+                            ) : (
+                                <Subtitle>Select a lecture to update schedule</Subtitle>
+                            )}
+                        </Card>
+                    </GridColumn>
+                </GridRow>
+            </Container>
+        )
+        // return (
+        //     <View style={scheduleLectureStyles.container}>
+        //         {/* Left Column */}
+        //         <View style={commonStyles.leftColumn}>
+        //             <LectureList
+        //                 lectures={lectures}
+        //                 onLectureSelect={onLectureSelect}
+        //             />
+        //         </View>
+        //
+        //         {/* Right Column */}
+        //         <View style={commonStyles.rightColumn}>
+        //             {selectedLecture ? (
+        //                 <UpdateLectureForm
+        //                     selectedLecture={selectedLecture}
+        //                     onScheduleChange={onScheduleChange}
+        //                     rooms={rooms}
+        //                     searchQuery={searchQuery}
+        //                     setSearchQuery={setSearchQuery}
+        //                     selectedRoom={selectedRoom}
+        //                     handleRoomSelect={handleRoomSelect}
+        //                     effectiveFromText={effectiveFromText}
+        //                     effectiveUntilText={effectiveUntilText}
+        //                     setEffectiveFromText={setEffectiveFromText}
+        //                     setEffectiveUntilText={setEffectiveUntilText}
+        //                     timeOptions={timeOptions}
+        //                     onSaveSchedule={onSaveSchedule}
+        //                     isSaving={isSaving}
+        //                 />
+        //             ) : (
+        //                 <Text style={commonStyles.emptyText}>Select a lecture to update schedule</Text>
+        //             )}
+        //         </View>
+        //     </View>
+        // );
     } else {
         return(
             <View style={scheduleLectureStyles.container}>
                 {!selectedLecture ? (
                     <View style={commonStyles.leftColumn}>
                         <LectureList
-                            lectures={sortedLectures}
+                            lectures={lectures}
                             onLectureSelect={onLectureSelect}
                         />
                     </View>
@@ -113,6 +148,9 @@ export const UpdateLectureScreen = ({
 interface LectureListProps {
     lectures: Lecture[];
     onLectureSelect: (lecture: Lecture) => void;
+    // onGetAllLectures: () => void;
+    // onGetLecturesByClass: (subjectId: number, classId:number) => void;
+    // onGetLecturesByRoom: (roomId: number) => void;
 }
 
 interface WeekdayPickerProps {
@@ -169,8 +207,41 @@ interface UpdateLectureFormProps {
     isSaving: boolean;
 }
 
-// Components.tsx
 export const LectureList = ({ lectures, onLectureSelect }: LectureListProps) => (
+    // <Card shadow="medium" alignItems={"center"} gap="md">
+    //     <GridRow>
+    //         <GridColumn widthPercent={33} gap="md">
+    //             <Subtitle>All Existing Lectures:</Subtitle>
+    //             <Button
+    //                 variant="primary"
+    //                 onPress={() => onGetAllLectures()}
+    //                 style={{ marginBottom: 10 }}
+    //             >
+    //                 <ButtonText>Get</ButtonText>
+    //             </Button>
+    //         </GridColumn>
+    //         <GridColumn widthPercent={33}>
+    //             <Subtitle>Get Lectures By Class:</Subtitle>
+    //             <Button
+    //                 variant="primary"
+    //                 onPress={() => onGetLecturesByClasss()}
+    //                 style={{ marginBottom: 10 }}
+    //             >
+    //                 <ButtonText>Get</ButtonText>
+    //             </Button>
+    //         </GridColumn>
+    //         <GridColumn widthPercent={34}>
+    //             <Subtitle>Get Lectures By Room:</Subtitle>
+    //             <Button
+    //                 variant="primary"
+    //                 onPress={() => onGetLecturesByRoom()}
+    //                 style={{ marginBottom: 10 }}
+    //             >
+    //                 <ButtonText>Get</ButtonText>
+    //             </Button>
+    //         </GridColumn>
+    //     </GridRow>
+    // </Card>
     <>
         <Text style={commonStyles.sectionTitle}>Existing Lectures</Text>
         <FlatList
@@ -296,13 +367,13 @@ export const EffectiveDateInput = ({ label, value, onChangeText, placeholder }: 
 );
 
 export const SaveButton = ({ onPress, isSaving }: SaveButtonProps) => (
-    <TouchableOpacity style={commonStyles.actionButton_2} onPress={onPress}>
-        {isSaving ? (
-            <ActivityIndicator size="small" color="#fff" />
-        ) : (
-            <Text style={commonStyles.buttonText}>Save Schedule</Text>
-        )}
-    </TouchableOpacity>
+    <Button
+        variant="primary"
+        onPress={onPress}
+        disabled={isSaving}
+    >
+        <ButtonText>Save</ButtonText>
+    </Button>
 );
 
 export const UpdateLectureForm = ({

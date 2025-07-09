@@ -99,6 +99,7 @@ export const commonStyles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         flex: 1,
+        backgroundColor: 'transparent',
     },
     topMiddleContainer: {
         alignItems: 'center',
@@ -292,7 +293,7 @@ export const commonStyles = StyleSheet.create({
     columnsContainer: {
         flex: 1,
         flexDirection: 'row', // Horizontal layout
-        backgroundColor: '#ead6bd',
+        backgroundColor: 'transparent',
     },
     input: {
         borderWidth: 1,

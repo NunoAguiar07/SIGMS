@@ -15,7 +15,7 @@ export const useAccessRoles = () => {
     const [hasNext, setHasNext] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<ParsedError | null>(null);
-    const LIMIT = 9;
+    const LIMIT = 7;
     const TIMING = 150000; // 2.5min
 
     const fetchApprovals = async (page: number) => {
@@ -25,6 +25,7 @@ export const useAccessRoles = () => {
         try {
             const data = await fetchPendingApprovals(LIMIT, offset);
             setApprovals(data);
+            console.log(data);
             setHasNext(data.length === LIMIT);
         } catch (err) {
             setError(handleAxiosError(err));

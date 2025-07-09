@@ -2,7 +2,7 @@
 export interface AccessRoleInterface {
     id: number;
     user: {
-        name: string;
+        username: string;
         email: string;
     };
     verificationToken: string;

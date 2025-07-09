@@ -1,10 +1,13 @@
-import {FlatList, Text, TextInput, TouchableOpacity, View} from 'react-native';
-import {commonStyles} from "../css_styling/common/CommonProps";
-import {universityStyles} from "../css_styling/university/UniversityProps";
-import {Picker} from '@react-native-picker/picker';
 import {RegisterScreenType} from "../types/RegisterScreenType";
 import {UniversityInterface} from "../../types/UniversityInterface";
 import {isMobile} from "../../utils/DeviceType";
+import {Button, ButtonsContainer, ButtonText} from "../css_styling/common/Buttons";
+import {Card, CenteredContainer, ColumnContainer, Container} from "../css_styling/common/NewContainers";
+import {Input, SearchInput} from "../css_styling/common/Inputs";
+import {BodyText, Title} from "../css_styling/common/Typography";
+import {PickerContainer, StyledPicker, StyledPickerItem} from "../css_styling/common/Picker";
+import {FlatListContainer, FlatListItem} from "../css_styling/common/FlatList";
+import {FlatList} from "react-native";
 
 export const RegisterScreen = ({
     email,
@@ -23,9 +26,9 @@ export const RegisterScreen = ({
     onNavigateToLogin,
 }: RegisterScreenType) => {
     return (
-        <View style={commonStyles.container}>
-            <View style={commonStyles.card}>
-                <Text style={commonStyles.title}>Register</Text>
+        <CenteredContainer flex={1}>
+            <Card shadow="medium" padding="huge" gap="lg">
+                <Title color="black">Register</Title>
 
                 <AuthFormFields
                     email={email}
@@ -49,8 +52,8 @@ export const RegisterScreen = ({
                     onRegister={onRegister}
                     onNavigateToLogin={onNavigateToLogin}
                 />
-            </View>
-        </View>
+            </Card>
+        </CenteredContainer>
     );
 }
 
@@ -71,31 +74,28 @@ export const AuthFormFields = ({
     onUsernameChange,
     onPasswordChange
 }: AuthFormFieldsType) => (
-    <View style={!isMobile ? commonStyles.inputRow : commonStyles.inputColumn}>
-        <TextInput
-            style={[commonStyles.searchInput, !isMobile ? commonStyles.inputRowItem : commonStyles.inputColumnItem]}
+    <Container flexDirection={isMobile ? 'column' : 'row'} gap="md">
+        <Input
             placeholder="Email"
             value={email}
             onChangeText={onEmailChange}
             autoCapitalize="none"
             keyboardType="email-address"
         />
-        <TextInput
-            style={[commonStyles.searchInput, !isMobile ? commonStyles.inputRowItem : commonStyles.inputColumnItem]}
+        <Input
             placeholder="Username"
             value={username}
             onChangeText={onUsernameChange}
             autoCapitalize="none"
         />
-        <TextInput
-            style={[commonStyles.searchInput, !isMobile ? commonStyles.inputRowItem : commonStyles.inputColumnItem]}
+        <Input
             placeholder="Password"
             value={password}
             onChangeText={onPasswordChange}
             secureTextEntry
             autoCapitalize="none"
         />
-    </View>
+    </Container>
 );
 
 interface RolePickerType {
@@ -104,22 +104,21 @@ interface RolePickerType {
 }
 
 export const RolePicker = ({ role, onRoleChange }: RolePickerType) => (
-    <>
-        <Text style={commonStyles.centerMiddleText}>Select your role:</Text>
-        <View style={commonStyles.pickerContainer}>
-            <Picker
+    <ColumnContainer gap="md">
+        <BodyText textAlign="center">Select your role:</BodyText>
+        <PickerContainer width="50%">
+            <StyledPicker
                 selectedValue={role}
-                onValueChange={onRoleChange}
-                style={commonStyles.picker}
+                onValueChange={(itemValue) => onRoleChange(itemValue as string)}
                 dropdownIconColor="#666"
                 mode="dropdown"
             >
-                <Picker.Item label="Student" value="STUDENT" />
-                <Picker.Item label="Teacher" value="TEACHER" />
-                <Picker.Item label="Technical Services" value="TECHNICAL_SERVICE" />
-            </Picker>
-        </View>
-    </>
+                <StyledPickerItem label="Student" value="STUDENT" />
+                <StyledPickerItem label="Teacher" value="TEACHER" />
+                <StyledPickerItem label="Technical Services" value="TECHNICAL_SERVICE" />
+            </StyledPicker>
+        </PickerContainer>
+    </ColumnContainer>
 );
 
 interface UniversitySearchType {
@@ -135,31 +134,29 @@ export const UniversitySearch = ({
     onSearchChange,
     onUniversitySelect
 }: UniversitySearchType) => (
-    <View style={universityStyles.universitySearchContainer}>
-        <Text style={commonStyles.centerMiddleText}>Search for your university:</Text>
-        <TextInput
-            style={commonStyles.searchInput}
+    <ColumnContainer gap="md" style={{ position: 'relative' , zIndex: 10}}>
+        <BodyText textAlign="center">Search for your university:</BodyText>
+        <SearchInput
             placeholder="Search universities..."
             value={searchQuery}
             onChangeText={onSearchChange}
         />
         {universities.length > 0 && (
-            <View style={universityStyles.universityResultsContainer}>
+            <FlatListContainer>
                 <FlatList
                     data={universities}
                     keyExtractor={(item) => item.id.toString()}
                     renderItem={({ item }) => (
-                        <TouchableOpacity
-                            style={commonStyles.itemSearch}
+                        <FlatListItem
                             onPress={() => onUniversitySelect(item)}
                         >
-                            <Text style={commonStyles.itemText}>{item.name}</Text>
-                        </TouchableOpacity>
+                            <BodyText>{item.name}</BodyText>
+                        </FlatListItem>
                     )}
                 />
-            </View>
+            </FlatListContainer>
         )}
-    </View>
+    </ColumnContainer>
 );
 
 interface AuthButtonsType {
@@ -168,18 +165,20 @@ interface AuthButtonsType {
 }
 
 export const AuthButtons = ({ onRegister, onNavigateToLogin }: AuthButtonsType) => (
-    <View style={commonStyles.buttonsContainer}>
-        <TouchableOpacity
-            style={commonStyles.loginRegisterButton}
+    <ButtonsContainer gap="md" flexDirection={isMobile ? 'column' : 'row'} alignItems="center" justifyContent="center">
+        <Button
+            variant="primary"
             onPress={onRegister}
+            style={isMobile ? { width: '100%' } : { flex: 1 }}
         >
-            <Text style={commonStyles.loginRegisterButtonText}>Register</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-            style={commonStyles.loginRegisterButton}
+            <ButtonText>Register</ButtonText>
+        </Button>
+        <Button
+            variant="primary"
             onPress={onNavigateToLogin}
+            style={isMobile ? { width: '100%' } : { flex: 1 }}
         >
-            <Text style={commonStyles.loginRegisterButtonText}>Go to Login</Text>
-        </TouchableOpacity>
-    </View>
+            <ButtonText>Go to Login</ButtonText>
+        </Button>
+    </ButtonsContainer>
 );

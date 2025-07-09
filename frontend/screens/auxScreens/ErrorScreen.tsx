@@ -1,6 +1,8 @@
-import {Text, TouchableOpacity, View} from "react-native";
-import {commonStyles} from "../css_styling/common/CommonProps";
 import {ErrorScreenType} from "../types/ErrorScreenType";
+import {Card, CenteredContainer} from "../css_styling/common/NewContainers";
+import {Subtitle, Title} from "../css_styling/common/Typography";
+import {Button, ButtonText} from "../css_styling/common/Buttons";
+import {useRouter} from "expo-router";
 
 
 /**
@@ -11,18 +13,66 @@ import {ErrorScreenType} from "../types/ErrorScreenType";
  * @return the error page.
  */
 export const ErrorScreen = ({ errorStatus, errorMessage, goBack } : ErrorScreenType) => {
+    const router = useRouter();
+
+    const handleAction = () => {
+        switch (errorStatus) {
+            case 401:
+                router.replace('/welcome');
+                break;
+            case 404:
+                goBack ? goBack() : router.back();
+                break;
+            case 500:
+                router.reload();
+                break;
+            default:
+                goBack ? goBack() : router.back();
+                break;
+        }
+    };
+
+    const getActionButton = () => {
+        switch (errorStatus) {
+            case 401:
+                return (
+                    <Button variant="primary" onPress={handleAction}>
+                        <ButtonText>Go to Welcome</ButtonText>
+                    </Button>
+                );
+            case 404:
+                return (
+                    <Button variant="primary" onPress={handleAction}>
+                        <ButtonText>Go Back</ButtonText>
+                    </Button>
+                );
+            case 500:
+                return (
+                    <Button variant="primary" onPress={handleAction}>
+                        <ButtonText>Refresh</ButtonText>
+                    </Button>
+                );
+            default:
+                // For other errors, we can show a dismiss button
+                return (
+                    <Button variant="primary" onPress={handleAction}>
+                        <ButtonText>Dismiss</ButtonText>
+                    </Button>
+                );
+        }
+    };
+    if (errorStatus === 400 || errorStatus === 422) {
+        alert(errorMessage);
+        return null;
+    }
+
     return (
-        <View style={commonStyles.container}>
-            <View style={commonStyles.card}>
-                <Text style={[commonStyles.title, { color: '#671b22' }]}>Error {errorStatus}</Text>
-                <Text style={[commonStyles.message, { marginBottom: 32 }]}>{errorMessage}</Text>
-                <TouchableOpacity
-                    style={commonStyles.loginRegisterButton}
-                    onPress={goBack}
-                >
-                    <Text style={commonStyles.loginRegisterButtonText}>Go Back</Text>
-                </TouchableOpacity>
-            </View>
-        </View>
+        <CenteredContainer flex={1} padding={"md"}>
+            <Card shadow="medium" alignItems={"center"} gap="md">
+                <Title>Error {errorStatus}</Title>
+                <Subtitle>{errorMessage}</Subtitle>
+                {getActionButton()}
+            </Card>
+        </CenteredContainer>
     );
 };

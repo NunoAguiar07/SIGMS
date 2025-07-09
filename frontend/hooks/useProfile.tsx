@@ -4,9 +4,12 @@ import {useEffect, useState} from "react";
 import {ProfileInterface} from "../types/ProfileInterface";
 import * as ImagePicker from "expo-image-picker";
 import {requestUpdateProfile} from "../services/authorized/RequestUpdateProfile";
+import {fetchTeacherProfileById} from "../services/authorized/FetchTeacherProfileById";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import {TeacherUser} from "../types/teacher/TeacherUser";
 
 
-export const useProfile = () => {
+export const useProfile = (id:number | undefined) => {
     const [profile, setProfile] = useState<ProfileInterface | null>(null);
     const [error, setError] = useState<ParsedError | null>(null);
     const [loading, setLoading] = useState(true);
@@ -15,19 +18,35 @@ export const useProfile = () => {
     const [updateLoading, setUpdateLoading] = useState(false);
     const [updateError, setUpdateError] = useState<ParsedError | null>(null);
 
-
+    const isTeacherUser = (data: any): data is TeacherUser =>
+        data && data.user && typeof data.user.id === 'number';
 
     useEffect(() => {
         const loadData = async () => {
+            setLoading(true);
             try {
-                const profileData = await fetchProfile();
-                setProfile(profileData);
-                console.log('Profile data loaded:', profileData);
+                const myId = await AsyncStorage.getItem('userId');
+                console.log(id);
+                const profileData = typeof myId === 'string' && +myId !== id && id !== undefined
+                    ? await fetchTeacherProfileById(id)
+                    : await fetchProfile();
+                const filteredProfileData: ProfileInterface = isTeacherUser(profileData)
+                    ? {
+                        username: profileData.user.username,
+                        email: profileData.user.email,
+                        image: profileData.user.image,
+                        university: profileData.user.university,
+                        officeRoomName: profileData.office?.room?.name
+                    }
+                    : profileData;
 
-                if (profileData.image && profileData.image.length > 0) {
-                    setImageUri(`data:image/jpeg;base64,${profileData.image}`);
+                setProfile(filteredProfileData);
+                console.log('Profile data loaded:', filteredProfileData);
+
+                if (filteredProfileData.image && filteredProfileData.image.length > 0) {
+                    setImageUri(`data:image/jpeg;base64,${filteredProfileData.image}`);
                     console.log('imageUri:' + imageUri);
-                    
+
                 } else {
                     setImageUri(null);
                 }
@@ -58,7 +77,6 @@ export const useProfile = () => {
         if (!result.canceled && result.assets[0]) {
             const asset = result.assets[0];
             const base64Image = asset.base64;
-            const uri = asset.uri;
 
             if (base64Image) {
                 const byteCharacters = atob(base64Image);

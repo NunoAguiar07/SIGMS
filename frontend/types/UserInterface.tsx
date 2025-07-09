@@ -1,7 +1,16 @@
 export interface UserInterface {
-    id: number;
-    username: string;
-    email: string;
-    image: number[];
-    university: string;
+    user: {
+        id: number;
+        username: string;
+        email: string;
+        image: number[];
+        university: string;
+    },
+    office? : {
+        room :{
+            id: number;
+            name: string;
+            capacity: number;
+        }
+    }
 }

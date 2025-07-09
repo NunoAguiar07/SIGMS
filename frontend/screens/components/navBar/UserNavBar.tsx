@@ -11,24 +11,39 @@ import {isMobile} from "../../../utils/DeviceType";
 
 export const UserNavBar = () => {
     const [userRole, setUserRole] = useState<UserRole>('STUDENT');
+    const [userId, setUserId] = useState<number | null>(null);
     const [navItems, setNavItems] = useState<NavInterface[]>([]);
     const [drawerOpen, setDrawerOpen] = useState(false);
     const drawerAnim = useRef(new Animated.Value(0)).current;
     const router = useRouter();
 
     useEffect(() => {
-        const fetchUserRole = async () => {
+        const fetchUserRoleAndId = async () => {
             try {
                 const role = await AsyncStorage.getItem('userRole');
                 if (role && Object.keys(NAV_CONFIG).includes(role)) {
                     setUserRole(role as UserRole);
-                    setNavItems(NAV_CONFIG[role as UserRole]);
+
+                    const id = await AsyncStorage.getItem('userId');
+                    const parsedId = id ? +id : null;
+                    setUserId(parsedId);
+
+                    // Generate nav items with dynamic profile route
+                    const baseNavItems = NAV_CONFIG[role as UserRole];
+                    const dynamicNavItems = baseNavItems.map(item => {
+                        if (item.href === '/profile' && parsedId) {
+                            return { ...item, href: `/profile/${parsedId}` };
+                        }
+                        return item;
+                    });
+
+                    setNavItems(dynamicNavItems);
                 }
             } catch (error) {
                 console.error('Failed to fetch user role', error);
             }
         };
-        fetchUserRole();
+        fetchUserRoleAndId();
     }, []);
 
     const toggleDrawer = () => {
