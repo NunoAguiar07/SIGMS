@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: frontend-deployment
+  name: frontend
   namespace: sigms
   labels:
     app: frontend
@@ -42,3 +42,4 @@ spec:
               scheme: HTTPS
             initialDelaySeconds: 5
             periodSeconds: 5
+          
