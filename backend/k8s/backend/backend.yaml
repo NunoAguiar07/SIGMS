@@ -28,7 +28,7 @@ spec:
           terminationMessagePolicy: File
           envFrom:
             - configMapRef:
-                name: backend-config
+                name: backend
             - secretRef:
                 name: sigms-secret-provider
           env:
