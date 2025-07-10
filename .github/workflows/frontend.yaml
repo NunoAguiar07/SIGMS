@@ -42,6 +42,12 @@ jobs:
         platforms: all
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
+    - name: Create certificate files
+      run: |
+        echo "${{ secrets.CRT }}" > frontend/docker/sigms.net.crt
+        echo "${{ secrets.KEY }}" > frontend/docker/sigms.net.key
+        chmod 644 frontend/docker/sigms.net.crt
+        chmod 600 frontend/docker/sigms.net.key
     - name: Build and Push Docker image
       uses: docker/build-push-action@v5
       with:
