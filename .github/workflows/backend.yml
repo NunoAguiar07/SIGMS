@@ -1,10 +1,10 @@
-name: Build and Deploy
+name: Build and Deploy Backend
 
 on:
   push:
     paths:
       - 'backend/**'
-
+  workflow_dispatch:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -53,7 +53,11 @@ jobs:
       uses: google-github-actions/setup-gcloud@v2
       with:
         project_id: rising-city-464516-e8
-
+        
+    - name: Configure Docker to use gcloud as credential helper
+      run: |
+        gcloud auth configure-docker europe-west1-docker.pkg.dev
+        
     - name: Set up QEMU (for cross-platform builds)
       uses: docker/setup-qemu-action@v3
       with:
@@ -65,6 +69,7 @@ jobs:
     - name: Build and Push Docker image
       uses: docker/build-push-action@v5
       with:
+        file: backend/docker/Dockerfile
         context: backend
         push: true
         platforms: linux/amd64, linux/arm64
@@ -78,8 +83,9 @@ jobs:
         project_id: rising-city-464516-e8
 
     - name: Apply Kubernetes manifests
+      working-directory: backend/k8s/backend
       run: |
-        kubectl apply -f deployment.yaml
+        kubectl apply -f backend.yaml
 
     - name: Restart deployment rollout
       run: |

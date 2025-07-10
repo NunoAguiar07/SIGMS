@@ -1,8 +1,9 @@
-name: Build and Deploy
+name: Build and Deploy Frontend
 on:
   push:
     paths:
       - 'frontend/**'
+  workflow_dispatch:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -13,17 +14,18 @@ jobs:
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: '18'
+        node-version: '22'
         cache: 'npm'
+        cache-dependency-path: 'frontend/package-lock.json'
     - name: Install dependencies
+      working-directory: frontend
       run: npm ci
     - name: Setup Expo CLI
+      working-directory: frontend
       run: npm install -g @expo/cli
     - name: Export for web
+      working-directory: frontend
       run: npx expo export --platform web
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v3
-      
     - name: Set up Google Cloud credentials
       uses: google-github-actions/auth@v2
       with:
@@ -32,16 +34,25 @@ jobs:
       uses: google-github-actions/setup-gcloud@v2
       with:
         project_id: rising-city-464516-e8
+    - name: Configure Docker to use gcloud as credential helper
+      run: |
+        gcloud auth configure-docker europe-west1-docker.pkg.dev
     - name: Set up QEMU (for cross-platform builds)
       uses: docker/setup-qemu-action@v3
       with:
         platforms: all
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
+    - name: Create certificate files
+      run: |
+        echo "${{ secrets.CRT }}" > frontend/docker/sigms.net.crt
+        echo "${{ secrets.KEY }}" > frontend/docker/sigms.net.key
+        chmod 644 frontend/docker/sigms.net.crt
+        chmod 600 frontend/docker/sigms.net.key
     - name: Build and Push Docker image
       uses: docker/build-push-action@v5
       with:
-        file: docker/Dockerfile
+        file: frontend/docker/Dockerfile
         context: frontend
         push: true
         platforms: linux/amd64, linux/arm64
@@ -53,8 +64,9 @@ jobs:
         location: europe-west1
         project_id: rising-city-464516-e8
     - name: Apply Kubernetes manifests
+      working-directory: frontend/k8s
       run: |
-        kubectl apply -f deployment.yaml
+        kubectl apply -f frontend.yaml
     - name: Restart deployment rollout
       run: |
         kubectl rollout restart deployment/frontend -n sigms
