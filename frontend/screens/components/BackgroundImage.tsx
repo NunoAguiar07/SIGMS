@@ -5,6 +5,7 @@ interface BackgroundImageProps {
     children: ReactNode;
 }
 
+
 export const BackgroundImage = ({ children }: BackgroundImageProps) => {
     return (
         <StyledBackgroundImage
