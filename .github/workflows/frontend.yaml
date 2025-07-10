@@ -26,8 +26,6 @@ jobs:
     - name: Export for web
       working-directory: frontend
       run: npx expo export --platform web
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v3
     - name: Set up Google Cloud credentials
       uses: google-github-actions/auth@v2
       with:
@@ -36,6 +34,9 @@ jobs:
       uses: google-github-actions/setup-gcloud@v2
       with:
         project_id: rising-city-464516-e8
+    - name: Configure Docker to use gcloud as credential helper
+      run: |
+        gcloud auth configure-docker europe-west1-docker.pkg.dev
     - name: Set up QEMU (for cross-platform builds)
       uses: docker/setup-qemu-action@v3
       with:
