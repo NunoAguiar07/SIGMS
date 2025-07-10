@@ -30,23 +30,6 @@ val applicationHttpClient = HttpClient(OkHttp) {
     }
 }
 
-fun Application.configureSlidingCookieRefresh() {
-    intercept(ApplicationCallPipeline.Plugins) {
-        val token = call.request.cookies["auth_token"]
-        if (token != null) {
-            // Refresh the cookie
-            val refreshedCookie = Cookie(
-                name = "auth_token",
-                value = token,
-                httpOnly = true,
-                maxAge = 60 * 60, // 1 hour
-                path = "/api"
-            )
-            call.response.cookies.append(refreshedCookie)
-        }
-    }
-}
-
 fun main(args: Array<String>) {
     EngineMain.main(args)
 }
@@ -122,7 +105,7 @@ fun Application.module() {
         jwt("auth-jwt") {
             realm = myRealm
             verifier(
-                jwtConfig.buildVerifier()
+                jwtConfig.buildAccessTokenVerifier()
             )
             authHeader { call ->
                 val authHeader = call.request.parseAuthorizationHeader()
@@ -150,8 +133,22 @@ fun Application.module() {
                 call.respond(HttpStatusCode.Unauthorized, "Token expired or invalid")
             }
         }
+        jwt("auth-jwt-refresh") {
+            realm = myRealm
+            verifier(jwtConfig.buildRefreshTokenVerifier())
+            validate { credential ->
+                val userId = credential.payload.getClaim("userId").asInt()
+                if (userId != null) {
+                    UserIdPrincipal(userId.toString())
+                } else {
+                    null
+                }
+            }
+            challenge { _, _ ->
+                call.respond(HttpStatusCode.Unauthorized, "Invalid or expired refresh token")
+            }
+        }
     }
-    configureSlidingCookieRefresh()
     install(WebSockets) {
         pingPeriod = 15.seconds
         timeout = 30.seconds

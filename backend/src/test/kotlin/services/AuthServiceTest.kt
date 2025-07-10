@@ -25,7 +25,8 @@ class AuthServiceTest {
         issuer = "test-issuer",
         audience = "test-audience",
         realm = "test-realm",
-        expirationTime = 3600L * 1000L
+        accessTokenExpiration = 3600L * 1000L, // 1 hour
+        refreshTokenExpiration = 30L * 24L * 3600L * 1000L // 30 days
     )
     private val emailService = MockEmailService()
     private val frontendUrl = "http://localhost:8080"
@@ -112,7 +113,7 @@ class AuthServiceTest {
 
         val result = authService.login("login@isel.pt", "password123!")
         assertTrue(result is Success, "Expected Success")
-        assertTrue(result.value.isNotBlank(), "Token should not be blank")
+        assertNotNull(result.value, "Expected a non-null JWT token")
     }
 
     @Test

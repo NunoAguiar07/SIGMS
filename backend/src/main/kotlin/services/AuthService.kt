@@ -22,7 +22,7 @@ import kotlin.time.ExperimentalTime
 
 typealias RegisterResult = Either<AuthError, Boolean>
 
-typealias LoginResult = Either<AuthError, String>
+typealias LoginResult = Either<AuthError, Pair<String, String>>
 
 typealias PendingRolesResult = Either<AuthError, List<RoleApproval>>
 
@@ -57,8 +57,9 @@ class AuthService(
                     if (user.authProvider == "local") {
                         return@useTransaction failure(AuthError.MicrosoftAccountRequired)
                     }
-                    val token = jwtConfig.generateToken(user.id, Role.STUDENT.name, user.university.id)
-                    success(token)
+                    val accessToken = jwtConfig.generateAccessToken(user.id, Role.STUDENT.name, user.university.id)
+                    val refreshToken = jwtConfig.generateRefreshToken(user.id)
+                    success(Pair(accessToken, refreshToken))
                 } else {
                     val university = repositories.from({universityRepository}){
                         getUniversityByName(universityName)
@@ -68,8 +69,9 @@ class AuthService(
                         createWithoutRole(email, username, "", university, "microsoft")
                     }
                     repositories.from({userRepository}){associateWithRole(newUser, Role.STUDENT)}
-                    val token = jwtConfig.generateToken(newUser.id, Role.STUDENT.name, university.id)
-                    success(token)
+                    val accessToken = jwtConfig.generateAccessToken(newUser.id, Role.STUDENT.name, newUser.university.id)
+                    val refreshToken = jwtConfig.generateRefreshToken(newUser.id)
+                    success(Pair(accessToken, refreshToken))
                 }
             }
         }
@@ -217,8 +219,35 @@ class AuthService(
                 }
                 val role = repositories.from({userRepository}){getRoleById(user.id)}
                     ?: return@useTransaction failure(AuthError.UserNotFound)
-                val token = jwtConfig.generateToken(user.id, role.name, user.university.id)
-                return@useTransaction success(token)
+                val accessToken = jwtConfig.generateAccessToken(user.id, role.name, user.university.id)
+                val refreshToken = jwtConfig.generateRefreshToken(user.id)
+                return@useTransaction success(Pair(accessToken, refreshToken))
+            }
+        }
+    }
+
+    fun refreshToken(refreshToken: String): Either<AuthError, Pair<String, String>> {
+        return runCatching {
+            transactionable.useTransaction {
+                // Verify refresh token
+                val decoded = try {
+                    jwtConfig.buildRefreshTokenVerifier().verify(refreshToken)
+                } catch (e: Exception) {
+                    return@useTransaction failure(AuthError.InvalidRefreshToken)
+                }
+
+                val userId = decoded.getClaim("userId").asInt()
+                val user = repositories.from({ userRepository }) { findById(userId) }
+                    ?: return@useTransaction failure(AuthError.UserNotFound)
+
+                val role = repositories.from({ userRepository }) { getRoleById(userId) }
+                    ?: return@useTransaction failure(AuthError.UserNotFound)
+
+                // Generate new tokens
+                val newAccessToken = jwtConfig.generateAccessToken(userId, role.name, user.university.id)
+                val newRefreshToken = jwtConfig.generateRefreshToken(userId)
+
+                success(Pair(newAccessToken, newRefreshToken))
             }
         }
     }
@@ -245,7 +274,8 @@ class AuthService(
                     return@useTransaction failure(AuthError.RoleApprovedFailed)
                 }
                 repositories.from({userRepository}){associateWithRole(user, Role.STUDENT)}
-                val jwtToken = jwtConfig.generateToken(user.id, Role.STUDENT.name, user.university.id)
+
+                val jwtToken = jwtConfig.generateAccessToken(user.id, Role.STUDENT.name, user.university.id)
                 return@useTransaction success(jwtToken)
             }
         }

@@ -54,7 +54,7 @@ export const useLogin = () => {
         try {
             const deviceType = getDeviceType();
             const loginResult = await requestLogin(email, password, deviceType);
-            if (loginResult.success) {
+            if (loginResult) {
                 await fetchUserInfo();
                 setLoading(false);
                 router.push('/home');

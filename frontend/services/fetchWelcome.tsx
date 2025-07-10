@@ -3,8 +3,6 @@ import {handleAxiosError} from "../utils/HandleAxiosError";
 import {WelcomeData} from "../types/welcome/WelcomeInterfaces";
 import {isMobile} from "../utils/DeviceType";
 
-
-
 export const apiUrl: string =  ((): string => {
     if(__DEV__){
         return !isMobile

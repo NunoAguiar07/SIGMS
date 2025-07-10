@@ -1,15 +1,13 @@
-import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
 import {handleAxiosError} from "../../utils/HandleAxiosError";
-import {apiUrl} from "../fetchWelcome";
-import {ParsedError} from "../../types/errors/ParseErrorTypes";
+import {apiUrl} from "../fetchWelcome"
 import api from "../interceptors/DeviceInterceptor";
 
 export const requestLogin = async (
     email: string,
     password: string,
     deviceType: string
-): Promise<{ success: boolean; error?: ParsedError }> => {
+): Promise<boolean> => {
     try {
         const response = await api.post(
             `${apiUrl}auth/login`,
@@ -25,15 +23,20 @@ export const requestLogin = async (
         );
 
         if (response.status === 200) {
-            const token = response.data.token;
-            if (deviceType !== 'WEB' && token) {
-                await SecureStore.setItemAsync('authToken', token);
+            // Handle both tokens for mobile devices
+            if (deviceType !== 'WEB') {
+                const { accessToken, refreshToken } = response.data;
+                await SecureStore.setItemAsync('authToken', accessToken);
+                await SecureStore.setItemAsync('refreshToken', refreshToken);
             }
-            return { success: true };
-        }else if (response.status === 404) {
-            return { success: false };
+            return true ;
+        } else if (response.status === 404) {
+            return false ;
         }
+
+        // Handle other status codes
+        return false;
     } catch (error) {
-        throw handleAxiosError(error);
+        throw handleAxiosError(error)
     }
 };

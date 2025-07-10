@@ -14,6 +14,7 @@ sealed class AuthError {
     data object TokenValidationFailed : AuthError()
     data object UnauthorizedRole : AuthError()
     data object InvalidCredentials: AuthError()
+    data object InvalidRefreshToken : AuthError()
     data object MicrosoftAccountRequired : AuthError()
     data object MicrosoftLoginRequired : AuthError()
     data object LocalAccountRequired : AuthError()
@@ -65,6 +66,10 @@ sealed class AuthError {
             InvalidCredentials -> Problem.badRequest(
                 title = "Invalid credentials",
                 detail = "Invalid email or password."
+            )
+            InvalidRefreshToken -> Problem.unauthorized(
+                title = "Invalid refresh token",
+                detail = "The provided refresh token is invalid or expired."
             )
             MicrosoftAccountRequired -> Problem.badRequest(
                 title = "Microsoft account required",

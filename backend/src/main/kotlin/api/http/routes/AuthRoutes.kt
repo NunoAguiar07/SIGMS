@@ -9,8 +9,6 @@ import io.ktor.http.*
 import io.ktor.server.application.ApplicationCall
 import io.ktor.server.request.*
 import io.ktor.server.routing.*
-import io.ktor.util.date.GMTDate
-import io.ktor.util.date.plus
 import isel.leic.group25.api.exceptions.RequestError
 import isel.leic.group25.api.exceptions.respondEither
 import isel.leic.group25.api.oauth2.getMicrosoftOrganizationInfo
@@ -29,6 +27,7 @@ fun Route.authRoutes(services: Services, client: HttpClient) {
     route("/auth") {
         registerRoute(services)
         loginRoute(services)
+        refreshTokenRoute(services)
         microsoftLoginRoute(services, client)
         route("/verify-account") {
             accountVerificationRoute(services)
@@ -40,23 +39,53 @@ private suspend fun loginResponse(call: ApplicationCall, result: LoginResult, de
     call.respondEither(
         either = result,
         transformError = { it.toProblem() },
-        transformSuccess = { token ->
+        transformSuccess = { tokens ->
             if(device == "WEB") {
-                val oneMonthFromNow = GMTDate() + (30L * 24 * 60 * 60 * 1000)
-                val cookie = Cookie(
+                val accessCookie = Cookie(
                     name = "auth_token",
-                    value = token,
+                    value = tokens.first,
                     httpOnly = true,
-                    maxAge = 60 * 60,
-                    expires = oneMonthFromNow,
-                    path = "/api"
+                    maxAge = 60 * 60, // 1 hour
+                    secure = true,
+                    path = "/"
                 )
-                call.response.cookies.append(cookie)
+                val refreshCookie = Cookie(
+                    name = "refresh_token",
+                    value = tokens.second,
+                    httpOnly = true,
+                    secure = true,
+                    maxAge = 30 * 24 * 60 * 60, // 30 days
+                    path = "/"
+                )
+                call.response.cookies.append(accessCookie)
+                call.response.cookies.append(refreshCookie)
+                mapOf("success" to true)
             } else {
-                LoginResponse(token)
+                LoginResponse(
+                    accessToken = tokens.first,
+                    refreshToken = tokens.second
+                )
             }
         }
     )
+}
+
+fun Route.refreshTokenRoute(services: Services) {
+    post("/refresh") {
+        val device = call.request.headers["X-Device"]
+            ?: return@post RequestError.MissingHeader("X-Device").toProblem().respond(call)
+
+        val refreshToken = when (device) {
+            "WEB" -> call.request.cookies["refresh_token"]
+            else -> call.request.headers["Authorization"]?.removePrefix("Bearer ")
+        } ?: return@post RequestError.Missing("refresh token").toProblem().respond(call)
+
+        val result = services.from({ authService }) {
+            refreshToken(refreshToken)
+        }
+
+        loginResponse(call, result, device)
+    }
 }
 
 fun Route.microsoftLoginRoute(services: Services, client: HttpClient) {
@@ -81,7 +110,6 @@ fun Route.microsoftLoginRoute(services: Services, client: HttpClient) {
             authenticateWithMicrosoft(userInfo.displayName, userInfo.mail, organizationInfo.displayName)
         }
         loginResponse(call, result, device)
-
     }
 }
 

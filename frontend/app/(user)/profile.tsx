@@ -13,7 +13,7 @@ const Profile = () => {
         updateLoading,
         updateError,
         pickImage,
-    } = useProfile();
+    } = useProfile(undefined);
 
     if (error) {
         return <ErrorHandler errorStatus={error.status} errorMessage={error.message} />;
