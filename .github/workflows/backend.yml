@@ -69,6 +69,7 @@ jobs:
     - name: Build and Push Docker image
       uses: docker/build-push-action@v5
       with:
+        file: backend/docker/Dockerfile
         context: backend
         push: true
         platforms: linux/amd64, linux/arm64
