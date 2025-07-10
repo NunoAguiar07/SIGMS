@@ -47,6 +47,8 @@ jobs:
       run: |
         echo "${{ secrets.CRT }}" > frontend/docker/sigms.net.crt
         echo "${{ secrets.KEY }}" > frontend/docker/sigms.net.key
+        echo "${{ secrets.FRONTEND_ENV}}" > frontend/.env
+        chmod 644 frontend/.env
         chmod 644 frontend/docker/sigms.net.crt
         chmod 600 frontend/docker/sigms.net.key
     - name: Build and Push Docker image
