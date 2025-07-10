@@ -40,10 +40,9 @@ jobs:
       uses: docker/setup-buildx-action@v3
     - name: Build and Push Docker image
       uses: docker/build-push-action@v5
-      working-directory: frontend
       with:
         file: docker/Dockerfile
-        context: .
+        context: frontend
         push: true
         platforms: linux/amd64, linux/arm64
         tags: europe-west1-docker.pkg.dev/rising-city-464516-e8/sigms/frontend:latest
