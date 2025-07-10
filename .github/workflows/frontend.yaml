@@ -64,8 +64,9 @@ jobs:
         location: europe-west1
         project_id: rising-city-464516-e8
     - name: Apply Kubernetes manifests
+      working-directory: frontend/k8s
       run: |
-        kubectl apply -f deployment.yaml
+        kubectl apply -f frontend.yaml
     - name: Restart deployment rollout
       run: |
         kubectl rollout restart deployment/frontend -n sigms
