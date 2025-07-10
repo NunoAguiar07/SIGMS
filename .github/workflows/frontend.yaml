@@ -45,7 +45,7 @@ jobs:
     - name: Build and Push Docker image
       uses: docker/build-push-action@v5
       with:
-        file: docker/Dockerfile
+        file: frontend/docker/Dockerfile
         context: frontend
         push: true
         platforms: linux/amd64, linux/arm64
