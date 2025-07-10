@@ -64,9 +64,8 @@ jobs:
 
     - name: Build and Push Docker image
       uses: docker/build-push-action@v5
-      working-directory: backend
       with:
-        context: .
+        context: backend
         push: true
         platforms: linux/amd64, linux/arm64
         tags: europe-west1-docker.pkg.dev/rising-city-464516-e8/sigms/backend:latest
