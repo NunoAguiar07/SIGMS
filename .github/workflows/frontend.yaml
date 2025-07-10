@@ -23,6 +23,10 @@ jobs:
     - name: Setup Expo CLI
       working-directory: frontend
       run: npm install -g @expo/cli
+    - name: Set up environement variables from secret
+      run : |
+        echo "${{ secrets.FRONTEND_ENV}}" > frontend/.env
+        chmod 644 frontend/.env
     - name: Export for web
       working-directory: frontend
       run: npx expo export --platform web
@@ -47,8 +51,6 @@ jobs:
       run: |
         echo "${{ secrets.CRT }}" > frontend/docker/sigms.net.crt
         echo "${{ secrets.KEY }}" > frontend/docker/sigms.net.key
-        echo "${{ secrets.FRONTEND_ENV}}" > frontend/.env
-        chmod 644 frontend/.env
         chmod 644 frontend/docker/sigms.net.crt
         chmod 600 frontend/docker/sigms.net.key
     - name: Build and Push Docker image
