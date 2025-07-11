@@ -35,7 +35,6 @@ api.interceptors.response.use(
 
             try {
                 if (getDeviceType() === 'WEB') {
-                    console.log("www")
                     // For web, cookies are sent automatically with withCredentials: true
                     await api.post('/auth/refresh');
                 } else {

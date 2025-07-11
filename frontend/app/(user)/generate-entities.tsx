@@ -8,6 +8,7 @@ const AdminEntityCreation = () => {
     const {
         selectedEntity,
         setSelectedEntity,
+        handleEntitySelect,
         formValues,
         setFormValues,
         error,
@@ -35,6 +36,7 @@ const AdminEntityCreation = () => {
         <AdminEntityCreationScreen
             selectedEntity={selectedEntity}
             onEntitySelect={setSelectedEntity}
+            handleEntitySelect={handleEntitySelect}
             formValues={formValues}
             setFormValues={setFormValues}
             onSubmit={handleSubmit}

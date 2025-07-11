@@ -12,7 +12,9 @@
   "dependencies": {
     "@expo/vector-icons": "^14.1.0",
     "@react-native-async-storage/async-storage": "^2.1.2",
+    "@react-native-community/datetimepicker": "^8.4.2",
     "@react-navigation/drawer": "^7.5.1",
+    "@testing-library/react": "^16.3.0",
     "@types/jest": "^30.0.0",
     "axios": "^1.9.0",
     "expo": "~53.0.9",
@@ -43,7 +45,6 @@
     "react-native-screens": "~4.10.0",
     "react-native-web": "^0.20.0",
     "react-router-dom": "^7.5.3",
-    "@testing-library/react": "^16.3.0",
     "styled-components": "^6.1.19",
     "use-debounce": "^10.0.4"
   },

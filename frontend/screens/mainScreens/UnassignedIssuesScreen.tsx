@@ -1,4 +1,4 @@
-import {Animated, ScrollView, Text, TouchableOpacity, View} from "react-native";
+import {Animated, ScrollView, Text, View} from "react-native";
 import {commonStyles} from "../css_styling/common/CommonProps";
 import {Ionicons} from "@expo/vector-icons";
 import {UnassignedIssuesScreenType} from "../types/UnassignedIssuesScreenType";
@@ -6,7 +6,7 @@ import {IssueReportInterface} from "../../types/IssueReportInterface";
 import {mobileStyles} from "../css_styling/common/MobileProps";
 import {isMobile} from "../../utils/DeviceType";
 import {useSwipeAnimation} from "../../hooks/mobile/useSwipeAnimation";
-import {Card, CenteredContainer, PaginationContainer} from "../css_styling/common/NewContainers";
+import {Card, CenteredContainer, PaginationContainer, RowContainer} from "../css_styling/common/NewContainers";
 import {ActionButton, Button, ButtonText} from "../css_styling/common/Buttons";
 import {BodyText, Title} from "../css_styling/common/Typography";
 import {CellText, HeaderText, TableColumn, TableContainer, TableHeader, TableRow} from "../css_styling/common/Tables";
@@ -22,8 +22,6 @@ export const TechnicianUnassignedIssuesScreen = ({
 
     return (
         <CenteredContainer flex={1} padding="md">
-            <Card shadow="medium" alignItems={"center"} gap="md" width={"50%"} height={"80%"}>
-                <Title>Unassigned Room Issues</Title>
 
                 {isMobile ? (
                     <MobileIssueView
@@ -49,7 +47,6 @@ export const TechnicianUnassignedIssuesScreen = ({
                         onPrevious={onPrevious}
                     />
                 )}
-            </Card>
         </CenteredContainer>
     );
 
@@ -95,18 +92,21 @@ interface UnassignedIssuesTableType {
 
 export const UnassignedIssuesTable = ({ issues, onAssign }: UnassignedIssuesTableType) => {
     return (
-        <TableContainer>
-            <UnassignedIssuesTableHeader />
-            <ScrollView showsVerticalScrollIndicator={false}>
-                {issues.map((item) => (
-                    <UnassignedIssueRow
-                        key={item.id}
-                        item={item}
-                        onAssign={onAssign}
-                    />
-                ))}
-            </ScrollView>
-        </TableContainer>
+        <Card shadow="medium" alignItems={"center"} gap="md" width={"50%"} height={"80%"}>
+            <Title>Unassigned Room Issues</Title>
+            <TableContainer>
+                <UnassignedIssuesTableHeader />
+                <ScrollView showsVerticalScrollIndicator={false}>
+                    {issues.map((item) => (
+                        <UnassignedIssueRow
+                            key={item.id}
+                            item={item}
+                            onAssign={onAssign}
+                        />
+                    ))}
+                </ScrollView>
+            </TableContainer>
+        </Card>
     );
 };
 
@@ -207,7 +207,7 @@ const MobileIssueView = ({
     }
 
     return (
-        <View style={mobileStyles.container}>
+        <CenteredContainer flex={1} padding="md">
             <Animated.View
                 style={[
                     mobileStyles.card,
@@ -217,42 +217,69 @@ const MobileIssueView = ({
                 ]}
                 {...panResponder.panHandlers}
             >
-                <View style={mobileStyles.cardContent}>
-                    <Text style={mobileStyles.roomName}>{currentIssue.room.name}</Text>
-
-                    <View style={mobileStyles.detailSection}>
-                        <Text style={mobileStyles.detailLabel}>Description:</Text>
-                        <Text style={mobileStyles.detailValue}>{currentIssue.description}</Text>
-                    </View>
-
-                    <TouchableOpacity
-                        style={mobileStyles.assignButton}
+                <RowContainer>
+                    <BodyText>Name:</BodyText>
+                    <BodyText>{currentIssue.room.name}</BodyText>
+                </RowContainer>
+                <RowContainer>
+                    <BodyText>Description:</BodyText>
+                    <BodyText>{currentIssue.description}</BodyText>
+                </RowContainer>
+                <RowContainer>
+                    <ActionButton
                         onPress={() => onAssign(currentIssue.id)}
                     >
                         <Ionicons name="checkmark" size={20} color="white" />
-                        <Text style={mobileStyles.buttonText}>Assign to Me</Text>
-                    </TouchableOpacity>
-                </View>
+                    </ActionButton>
+                </RowContainer>
             </Animated.View>
-
-            <View style={mobileStyles.paginationDots}>
-                {issues.map((_, index) => (
-                    <View
-                        key={index}
-                        style={[
-                            mobileStyles.dot,
-                            index === currentIndex && mobileStyles.activeDot
-                        ]}
-                    />
-                ))}
-            </View>
-
-            <PaginationControls
-                currentPage={currentPage}
-                hasNext={hasNext}
-                onNext={onNext}
-                onPrevious={onPrevious}
-            />
-        </View>
+        </CenteredContainer>
+        // <View style={mobileStyles.container}>
+        //     <Animated.View
+        //         style={[
+        //             mobileStyles.card,
+        //             {
+        //                 transform: [{ translateX: pan.x }]
+        //             }
+        //         ]}
+        //         {...panResponder.panHandlers}
+        //     >
+        //         <View style={mobileStyles.cardContent}>
+        //             <Text style={mobileStyles.roomName}>{currentIssue.room.name}</Text>
+        //
+        //             <View style={mobileStyles.detailSection}>
+        //                 <Text style={mobileStyles.detailLabel}>Description:</Text>
+        //                 <Text style={mobileStyles.detailValue}>{currentIssue.description}</Text>
+        //             </View>
+        //
+        //             <TouchableOpacity
+        //                 style={mobileStyles.assignButton}
+        //                 onPress={() => onAssign(currentIssue.id)}
+        //             >
+        //                 <Ionicons name="checkmark" size={20} color="white" />
+        //                 <Text style={mobileStyles.buttonText}>Assign to Me</Text>
+        //             </TouchableOpacity>
+        //         </View>
+        //     </Animated.View>
+        //
+        //     <View style={mobileStyles.paginationDots}>
+        //         {issues.map((_, index) => (
+        //             <View
+        //                 key={index}
+        //                 style={[
+        //                     mobileStyles.dot,
+        //                     index === currentIndex && mobileStyles.activeDot
+        //                 ]}
+        //             />
+        //         ))}
+        //     </View>
+        //
+        //     <PaginationControls
+        //         currentPage={currentPage}
+        //         hasNext={hasNext}
+        //         onNext={onNext}
+        //         onPrevious={onPrevious}
+        //     />
+        // </View>
     );
 };

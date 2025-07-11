@@ -22,6 +22,7 @@ export const createLecture = async (
     endTime: string
 ): Promise<boolean> => {
     try {
+        console.log(`Creating lecture for class ID ${schoolClassId}, room ID ${roomId}, type ${type}, weekday ${weekDay}, start time ${startTime}, end time ${endTime}`);
         const response = await api.post('lectures/add', {
             schoolClassId,
             roomId,

@@ -106,7 +106,7 @@ interface RolePickerType {
 export const RolePicker = ({ role, onRoleChange }: RolePickerType) => (
     <ColumnContainer gap="md">
         <BodyText textAlign="center">Select your role:</BodyText>
-        <PickerContainer width="50%">
+        <PickerContainer width="200px">
             <StyledPicker
                 selectedValue={role}
                 onValueChange={(itemValue) => onRoleChange(itemValue as string)}

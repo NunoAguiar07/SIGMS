@@ -5,6 +5,7 @@ import isel.leic.group25.db.entities.rooms.OfficeRoom
 import isel.leic.group25.db.entities.rooms.Room
 import isel.leic.group25.db.entities.rooms.StudyRoom
 import isel.leic.group25.db.entities.timetables.University
+import isel.leic.group25.db.entities.types.RoomType
 import isel.leic.group25.db.entities.users.Teacher
 import isel.leic.group25.db.repositories.rooms.interfaces.RoomRepositoryInterface
 
@@ -27,6 +28,20 @@ class MockRoomRepository : RoomRepositoryInterface {
         return rooms.filter { it.university.id == universityId }
             .drop(offset)
             .take(limit)
+    }
+
+    override fun getAllRoomsByNameByTypeAndUniversityId(
+        universityId: Int,
+        roomPartialName: String,
+        roomType: RoomType,
+        limit: Int,
+        offset: Int
+    ): List<Room> {
+        return rooms.filter {
+            it.university.id == universityId &&
+                    it.name.contains(roomPartialName, ignoreCase = true) &&
+                    classrooms.any { classroom -> classroom.room.id == it.id }
+        }.drop(offset).take(limit)
     }
 
     override fun getAllRoomsByNameAndUniversityId(universityId: Int, roomPartialName: String, limit: Int, offset: Int): List<Room> {

@@ -54,13 +54,18 @@ fun Route.baseRoomRoutes(services: Services) {
         val limit = call.queryParameters["limit"]?.toIntOrNull() ?: 10
         val offset = call.queryParameters["offset"]?.toIntOrNull() ?: 0
         val searchQuery = call.queryParameters["search"]
+        val roomType = call.queryParameters["type"]
         val universityId = call.getUniversityIdFromPrincipal()
             ?: return@get call.respond(HttpStatusCode.Unauthorized)
         if(offset < 0) return@get RequestError.Invalid("offset").toProblem().respond(call)
         if(limit < 1 || limit > 100) return@get RequestError.Invalid("limit").toProblem().respond(call)
+        val newRoomType = roomType?.let { RoomType.fromValue(it.uppercase()) }
+        if(newRoomType != null && RoomType.fromValue(roomType.uppercase()) != RoomType.CLASS) {
+            return@get RequestError.Invalid("type").toProblem().respond(call)
+        }
         val result = services.from({roomService}){
-            if(searchQuery != null){
-                getRoomsByNameAndUniversityId(universityId, searchQuery, limit, offset)
+            if(!searchQuery.isNullOrBlank()) {
+                getRoomsByNameByTypeAndUniversityId(universityId, searchQuery, newRoomType, limit, offset)
             }else {
                 getAllRooms(limit, offset)
             }

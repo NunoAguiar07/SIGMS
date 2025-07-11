@@ -1,6 +1,4 @@
-import {TouchableOpacity, View, Text, FlatList} from "react-native";
-import {commonStyles} from "../css_styling/common/CommonProps";
-import {generateEntitiesStyles} from "../css_styling/generateEntities/GenerateEntitiesProps";
+import {FlatList, ScrollView} from "react-native";
 import {EntityCreationScreenType, EntityType} from "../types/EntityCreationScreenType";
 import {Ionicons} from "@expo/vector-icons";
 import {FormCreateEntityValues, LectureType, RoomType} from "../../types/welcome/FormCreateEntityValues";
@@ -13,17 +11,19 @@ import {
     CenteredContainer, ColumnContainer,
     Container,
     GridColumn,
-    GridRow
+    GridRow, RowContainer
 } from "../css_styling/common/NewContainers";
 import {ActionButton, Button, ButtonText} from "../css_styling/common/Buttons";
 import {BodyText, Subtitle} from "../css_styling/common/Typography";
-import {Input, SearchInput} from "../css_styling/common/Inputs";
+import {SearchInput} from "../css_styling/common/Inputs";
 import {FlatListContainer, FlatListItem} from "../css_styling/common/FlatList";
 import {PickerContainer, StyledPicker, StyledPickerItem} from "../css_styling/common/Picker";
+import {TimePicker} from "./UpdateLectureScreen";
 
 export const AdminEntityCreationScreen = ({
     selectedEntity,
     onEntitySelect,
+    handleEntitySelect,
     formValues,
     setFormValues,
     onSubmit,
@@ -58,6 +58,7 @@ export const AdminEntityCreationScreen = ({
                     <LectureForm
                         formValues={formValues}
                         setFormValues={setFormValues}
+                        handleEntitySelect={handleEntitySelect}
                         subjects={subjects}
                         subjectClasses={subjectClasses}
                         rooms={rooms}
@@ -66,7 +67,6 @@ export const AdminEntityCreationScreen = ({
                         searchQueryRooms={searchQueryRooms}
                         setSearchQueryRooms={setSearchQueryRooms}
                         onItemSelect={onItemSelect}
-                        onEntitySelect={onEntitySelect}
                     />
                 );
             default:
@@ -93,7 +93,7 @@ export const AdminEntityCreationScreen = ({
                         ))}
                     </GridColumn>
                     <GridColumn widthPercent={50}>
-                        <Card shadow="medium" alignItems={"center"} gap="md">
+                        <Card shadow="medium" alignItems={"center"} gap="md" flex={selectedEntity === 'Lecture' && formValues.subjectId ? 1 : undefined}>
                             {renderForm()}
                             {selectedEntity && (selectedEntity != 'Lecture' || formValues.subjectId) &&(
                                 <Button variant="primary" onPress={onSubmit}>
@@ -107,35 +107,32 @@ export const AdminEntityCreationScreen = ({
         );
     } else {
         return (
-            <View style={commonStyles.columnsContainer}>
-                {!selectedEntity ? (
-                    <View style={commonStyles.centerContainer}>
-                        {['subject', 'class', 'room', 'lecture'].map((entity) => (
-                            <TouchableOpacity
+            !selectedEntity ? (
+                <CenteredContainer flex={1} padding="md" gap="md">
+                    <ColumnContainer gap="md">
+                        {['Subject', 'Class', 'Room', 'Lecture'].map((entity) => (
+                            <Button
                                 key={entity}
-                                style={generateEntitiesStyles.selectButton}
-                                onPress={() => onEntitySelect(entity as any)}
+                                variant="primary"
+                                onPress={() => onEntitySelect(entity as EntityType)}
                             >
-                                <Text style={commonStyles.buttonText}>
-                                    {entity.charAt(0).toUpperCase() + entity.slice(1)}
-                                </Text>
-                            </TouchableOpacity>
+                                <ButtonText>{entity}</ButtonText>
+                            </Button>
                         ))}
-                    </View>
-                ) : (
-                    <View style={commonStyles.rightColumn}>
+                    </ColumnContainer>
+                </CenteredContainer>
+            ) : (
+                <CenteredContainer flex={1} padding="md" gap="md">
+                    <Card shadow="medium" alignItems={"center"} gap="md">
                         {renderForm()}
-                        <View style={generateEntitiesStyles.footer}>
-                            <TouchableOpacity
-                                style={generateEntitiesStyles.selectButton}
-                                onPress={onSubmit}
-                            >
-                                <Text style={commonStyles.buttonText}>Create {selectedEntity}</Text>
-                            </TouchableOpacity>
-                        </View>
-                    </View>
-                )}
-            </View>
+                        {selectedEntity && (selectedEntity != 'Lecture' || formValues.subjectId) &&(
+                            <Button variant="primary" onPress={onSubmit}>
+                                <ButtonText>Create {selectedEntity}</ButtonText>
+                            </Button>
+                        )}
+                    </Card>
+                </CenteredContainer>
+            )
         );
     }
 };
@@ -221,7 +218,7 @@ export const RoomForm = ({ formValues, setFormValues }: RoomFormType) => (
                 capacity: text ? parseInt(text) : null,
             })}
         />
-        <PickerContainer width="50%">
+        <PickerContainer width={"200px"}>
             <StyledPicker
                 selectedValue={formValues.roomType}
                 onValueChange={(value) => setFormValues({ ...formValues, roomType: value as RoomType })}
@@ -238,6 +235,7 @@ export const RoomForm = ({ formValues, setFormValues }: RoomFormType) => (
 type LectureFormType = {
     formValues: FormCreateEntityValues;
     setFormValues: (values: FormCreateEntityValues) => void;
+    handleEntitySelect: (entity: EntityType) => void;
     subjects: SubjectInterface[];
     subjectClasses: SchoolClassInterface[];
     rooms: RoomInterface[];
@@ -246,12 +244,12 @@ type LectureFormType = {
     searchQueryRooms: string;
     setSearchQueryRooms: (query: string) => void;
     onItemSelect: (item: any) => void;
-    onEntitySelect: (entity: EntityType) => void;
 };
 
 export const LectureForm = ({
     formValues,
     setFormValues,
+    handleEntitySelect,
     subjects,
     subjectClasses,
     rooms,
@@ -260,12 +258,10 @@ export const LectureForm = ({
     searchQueryRooms,
     setSearchQueryRooms,
     onItemSelect,
-    onEntitySelect
 }: LectureFormType) => {
     return (
-        <CenteredContainer gap={"md"}>
+        <CenteredContainer gap={"md"} flex={formValues.subjectId ? 1 : undefined}>
             <Subtitle>Create New Lecture</Subtitle>
-
             {!formValues.subjectId ? (
                 <LectureSubjectSelection
                     subjects={subjects}
@@ -274,10 +270,10 @@ export const LectureForm = ({
                     onItemSelect={onItemSelect}
                 />
             ) : (
-                <CenteredContainer gap="md">
+                <ScrollView>
                     <LectureSelectedSubject
                         subjectName={searchQuerySubjects}
-                        onEntitySelect={onEntitySelect}
+                        handleEntitySelect={handleEntitySelect}
                     />
                     <LectureClassSelection
                         subjectClasses={subjectClasses}
@@ -294,7 +290,7 @@ export const LectureForm = ({
                         formValues={formValues}
                         setFormValues={setFormValues}
                     />
-                </CenteredContainer>
+                </ScrollView>
             )}
         </CenteredContainer>
     );
@@ -340,22 +336,22 @@ const LectureSubjectSelection = ({
 
 const LectureSelectedSubject = ({
     subjectName,
-    onEntitySelect
+    handleEntitySelect
 }: {
     subjectName: string;
-    onEntitySelect: (entity: EntityType) => void;
+    handleEntitySelect: (entity: EntityType) => void;
 }) => (
-    <CenteredContainer>
+    <CenteredContainer margin={"md"}>
         <Subtitle>Selected Subject:</Subtitle>
-        <ColumnContainer gap={"md"}>
+        <RowContainer gap={"md"}>
             <BodyText>{subjectName}</BodyText>
             <ActionButton
                 variant="primary"
-                onPress={() => onEntitySelect('Lecture')}
+                onPress={() => handleEntitySelect('Lecture')}
             >
                 <Ionicons name="arrow-undo-circle-outline" size={16} color="white" />
             </ActionButton>
-        </ColumnContainer>
+        </RowContainer>
     </CenteredContainer>
 );
 
@@ -368,25 +364,27 @@ const LectureClassSelection = ({
     formValues: FormCreateEntityValues;
     setFormValues: (values: FormCreateEntityValues) => void;
 }) => (
-    <CenteredContainer gap={"md"}>
+    <CenteredContainer gap={"md"} margin={"md"}>
         <Subtitle>Select Class:</Subtitle>
         {subjectClasses.length > 0 ? (
-            <FlatList
-                data={subjectClasses}
-                keyExtractor={(item) => item.id.toString()}
-                renderItem={({ item }) => (
-                    <FlatListItem
-                        onPress={() => setFormValues({ ...formValues, schoolClassId: item.id })}
-                        style={{
-                            backgroundColor: item.id === formValues.schoolClassId
-                                ? '#e3f2fd'
-                                : 'transparent'
-                        }}
-                    >
-                        <BodyText>{item.name}</BodyText>
-                    </FlatListItem>
-                )}
-            />
+            <FlatListContainer position={"static"}>
+                <FlatList
+                    data={subjectClasses}
+                    keyExtractor={(item) => item.id.toString()}
+                    renderItem={({ item }) => (
+                        <FlatListItem
+                            onPress={() => setFormValues({ ...formValues, schoolClassId: item.id })}
+                            style={{
+                                backgroundColor: item.id === formValues.schoolClassId
+                                    ? '#e3f2fd'
+                                    : 'transparent'
+                            }}
+                        >
+                            <BodyText>{item.name}</BodyText>
+                        </FlatListItem>
+                    )}
+                />
+            </FlatListContainer>
         ) : (
             <BodyText>No classes available</BodyText>
         )}
@@ -413,7 +411,7 @@ const LectureRoomSelection = ({
                 onChangeText={setSearchQuery}
             />
             {rooms.length > 0 && (
-                <FlatListContainer>
+                <FlatListContainer position={"absolute"}>
                     <FlatList
                         data={rooms}
                         keyExtractor={(item) => item.id.toString()}
@@ -431,7 +429,7 @@ const LectureRoomSelection = ({
     );
 }
 
-const LectureDetailsSelection = ({
+export const LectureDetailsSelection = ({
     formValues,
     setFormValues
 }: {
@@ -440,7 +438,7 @@ const LectureDetailsSelection = ({
 }) => (
     <CenteredContainer gap={'md'}>
         <Subtitle>Lecture Type</Subtitle>
-        <PickerContainer width="50%">
+        <PickerContainer width="100px">
             <StyledPicker
                 selectedValue={formValues.lectureType}
                 onValueChange={(value) => setFormValues({ ...formValues, lectureType: value as LectureType})}
@@ -451,7 +449,7 @@ const LectureDetailsSelection = ({
             </StyledPicker>
         </PickerContainer>
         <Subtitle>Weekday</Subtitle>
-        <PickerContainer width="50%">
+        <PickerContainer width="200px">
             <StyledPicker
                 selectedValue={formValues.weekDay}
                 onValueChange={(value) => setFormValues({ ...formValues, weekDay: value as number})}
@@ -465,17 +463,18 @@ const LectureDetailsSelection = ({
                 <StyledPickerItem label="Sunday" value={7} />
             </StyledPicker>
         </PickerContainer>
-        <Subtitle>Start Time</Subtitle>
-        <Input
+        <TimePicker
+            label="Start Time"
             placeholder="HH:MM"
-            value={formValues.startTime || ''}
-            onChangeText={(text) => setFormValues({ ...formValues, startTime: text })}
+            selectedValue={formValues.startTime || ''}
+            onValueChange={(text) => setFormValues({ ...formValues, startTime: text })}
+
         />
-        <Subtitle>End Time</Subtitle>
-        <Input
+        <TimePicker
+            label="End Time"
             placeholder="HH:MM"
-            value={formValues.endTime || ''}
-            onChangeText={(text) => setFormValues({ ...formValues, endTime: text })}
+            selectedValue={formValues.endTime || ''}
+            onValueChange={(text) => setFormValues({ ...formValues, endTime: text })}
         />
     </CenteredContainer>
 );

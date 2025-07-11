@@ -5,6 +5,7 @@ import isel.leic.group25.db.entities.rooms.OfficeRoom
 import isel.leic.group25.db.entities.rooms.Room
 import isel.leic.group25.db.entities.rooms.StudyRoom
 import isel.leic.group25.db.entities.timetables.University
+import isel.leic.group25.db.entities.types.RoomType
 import isel.leic.group25.db.entities.users.Teacher
 import isel.leic.group25.db.repositories.rooms.interfaces.RoomRepositoryInterface
 import isel.leic.group25.db.repositories.utils.withDatabase
@@ -13,10 +14,10 @@ import isel.leic.group25.db.tables.Tables.Companion.officeRooms
 import isel.leic.group25.db.tables.Tables.Companion.rooms
 import isel.leic.group25.db.tables.Tables.Companion.studyRooms
 import isel.leic.group25.db.tables.Tables.Companion.teachers
+import isel.leic.group25.db.tables.rooms.Rooms as RoomsTable
+import isel.leic.group25.db.tables.rooms.Classrooms as ClassroomTable
 import org.ktorm.database.Database
-import org.ktorm.dsl.and
-import org.ktorm.dsl.eq
-import org.ktorm.dsl.like
+import org.ktorm.dsl.*
 import org.ktorm.entity.*
 
 class RoomRepository (private val database: Database) : RoomRepositoryInterface {
@@ -46,11 +47,35 @@ class RoomRepository (private val database: Database) : RoomRepositoryInterface 
      */
 
     override fun getAllRoomsByNameAndUniversityId(universityId: Int, roomPartialName: String, limit: Int, offset: Int): List<Room> {
-        return database.rooms.filter {
-            (it.university eq universityId) and
-            (it.name like "%$roomPartialName%")
-        }.drop(offset).take(limit).toList()
+        return database.from(RoomsTable)
+            .select()
+            .where {
+                (RoomsTable.university eq universityId) and (RoomsTable.name like "%$roomPartialName%")
+            }.limit(offset, limit).map { row ->
+                RoomsTable.createEntity(row)
+            }
+
     }
+
+    override fun getAllRoomsByNameByTypeAndUniversityId(
+        universityId: Int,
+        roomPartialName: String,
+        roomType: RoomType,
+        limit: Int,
+        offset: Int
+    ): List<Room> {
+        return database.from(ClassroomTable)
+                .innerJoin(RoomsTable, on = ClassroomTable.id eq RoomsTable.id)
+                .select()
+                .where {
+                    (RoomsTable.university eq universityId) and (RoomsTable.name like "%$roomPartialName%")
+                }
+                .limit(offset, limit).map { row ->
+                    RoomsTable.createEntity(row)
+            }
+    }
+
+
 
     override fun getRoomById(id: Int): Room? = withDatabase {
         return database.rooms.firstOrNull { it.id eq id }

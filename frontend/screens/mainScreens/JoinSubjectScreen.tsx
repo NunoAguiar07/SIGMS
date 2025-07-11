@@ -1,6 +1,4 @@
-import {FlatList, View} from "react-native";
-import {commonStyles} from "../css_styling/common/CommonProps";
-import {joinClassStyles} from "../css_styling/join_class/JoinClassProps";
+import {FlatList} from "react-native";
 import {JoinSubjectScreenType} from "../types/JoinSubjectScreenType";
 import {SubjectInterface} from "../../types/SubjectInterface";
 import {SchoolClassInterface} from "../../types/SchoolClassInterface";
@@ -73,29 +71,46 @@ export const JoinSubjectScreen = ({
         );
     } else {
         return (
-            <View style={joinClassStyles.joinClassContainer}>
+            <CenteredContainer flex={1} padding="md">
                 {!selectedSubject ? (
-                    <View style={commonStyles.leftColumn}>
-                        <SubjectSearchList
-                            subjects={subjects}
-                            searchQuery={searchQuery}
-                            onSearchChange={onSearchChange}
-                            onSubjectSelect={onSubjectSelect}
-                        />
-                        <UserClassList userClasses={userClasses} onLeaveClass={onLeaveClass} />
-                    </View>
+                    <SubjectSearchList
+                        subjects={subjects}
+                        searchQuery={searchQuery}
+                        onSearchChange={onSearchChange}
+                        onSubjectSelect={onSubjectSelect}
+                    />
                 ) : (
-                    <View style={commonStyles.rightColumn}>
-                        <View style={{ flex: 1 }}>
-                            <SelectedSubjectClasses
-                                subject={selectedSubject}
-                                schoolClasses={schoolClasses}
-                                onJoinClass={onJoinClass}
-                            />
-                        </View>
-                    </View>
+                    <SelectedSubjectClasses
+                        subject={selectedSubject}
+                        schoolClasses={schoolClasses}
+                        onJoinClass={onJoinClass}
+                    />
                 )}
-            </View>
+                <UserClassList userClasses={userClasses} onLeaveClass={onLeaveClass} />
+            </CenteredContainer>
+            // <View style={joinClassStyles.joinClassContainer}>
+            //     {!selectedSubject ? (
+            //         <View style={commonStyles.leftColumn}>
+            //             <SubjectSearchList
+            //                 subjects={subjects}
+            //                 searchQuery={searchQuery}
+            //                 onSearchChange={onSearchChange}
+            //                 onSubjectSelect={onSubjectSelect}
+            //             />
+            //             <UserClassList userClasses={userClasses} onLeaveClass={onLeaveClass} />
+            //         </View>
+            //     ) : (
+            //         <View style={commonStyles.rightColumn}>
+            //             <View style={{ flex: 1 }}>
+            //                 <SelectedSubjectClasses
+            //                     subject={selectedSubject}
+            //                     schoolClasses={schoolClasses}
+            //                     onJoinClass={onJoinClass}
+            //                 />
+            //             </View>
+            //         </View>
+            //     )}
+            // </View>
         );
     }
 };

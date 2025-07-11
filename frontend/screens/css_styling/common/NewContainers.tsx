@@ -8,7 +8,7 @@ export interface ContainerProps {
     backgroundColor?: string;
     borderRadius?: keyof Theme['borderRadius'];
     flex?: number;
-    justifyContent?: 'center' | 'flex-start' | 'flex-end' | 'space-between' | 'space-around';
+    justifyContent?: 'center' | 'flex-start' | 'flex-end' | 'space-between' | 'space-around' | 'space-evenly';
     alignItems?: 'center' | 'flex-start' | 'flex-end' | 'stretch';
     flexDirection?: 'row' | 'column';
     width?: string | number;
@@ -28,6 +28,7 @@ export const Container = styled.View<ContainerProps>`
     ${({ width }) => width && `width: ${typeof width === 'number' ? `${width}px` : width};`}
     ${({ height }) => height && `height: ${typeof height === 'number' ? `${height}px` : height};`}
     ${({ gap, theme }) => gap && `gap: ${theme.spacing[gap]}px;`} 
+    
 `;
 
 export const SafeContainer = styled(Container)`

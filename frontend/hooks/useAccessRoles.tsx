@@ -25,7 +25,6 @@ export const useAccessRoles = () => {
         try {
             const data = await fetchPendingApprovals(LIMIT, offset);
             setApprovals(data);
-            console.log(data);
             setHasNext(data.length === LIMIT);
         } catch (err) {
             setError(handleAxiosError(err));

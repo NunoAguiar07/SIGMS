@@ -63,7 +63,7 @@ export const useAdminEntityCreation = () => {
 
     const loadRooms = async () => {
         try {
-            const data = await fetchRooms(debouncedSearchQueryRooms);
+            const data = await fetchRooms(debouncedSearchQueryRooms, 'CLASS');
             setRooms(data);
         } catch (err) {
             setError(err as ParsedError);
@@ -110,6 +110,29 @@ export const useAdminEntityCreation = () => {
                 setRooms([]);
         }
     }, [selectedEntity]);
+
+    const handleEntitySelect = (entityType: EntityType) => {
+        switch (selectedEntity) {
+            case 'Lecture':
+                if (formValues.subjectId) {
+                    setFormValues({ ...formValues, subjectId: null, schoolClassId: null })
+                    setSearchQueryRooms('')
+                    setRooms([]);
+                } else {
+                    setFormValues({ ...formValues, subjectId: null, schoolClassId: null })
+                    setSearchQuerySubjects('')
+                    setSubjects([]);
+                }
+                break;
+            default:
+                setFormValues({ ...formValues, subjectId: null, schoolClassId: null })
+                setSearchQuerySubjects('')
+                setSearchQueryRooms('')
+                setSubjects([]);
+                setSubjectClasses([]);
+                setRooms([]);
+        }
+    }
 
     const handleSubmit = async () => {
         if (!selectedEntity) return;
@@ -173,6 +196,7 @@ export const useAdminEntityCreation = () => {
         selectedEntity,
         setSelectedEntity,
         formValues,
+        handleEntitySelect,
         setFormValues,
         error,
         subjects,

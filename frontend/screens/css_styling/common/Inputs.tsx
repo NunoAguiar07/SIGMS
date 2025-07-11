@@ -11,13 +11,15 @@ export const Input = styled.TextInput<InputProps>`
     border-width: 2px;
     border-color: ${({ hasError, theme }) =>
         hasError ? theme.colors.status.error : theme.colors.border
-};
+    };
+    width: 200px;
     border-radius: ${({ theme }) => theme.borderRadius.medium}px;
     padding: ${({ theme }) => theme.spacing.md}px;
     font-size: ${({ theme }) => theme.fonts.sizes.medium}px;
     background-color: ${({ theme }) => theme.colors.text.white};
     ${({ multiline }) => multiline && `
         min-height: 100px;
+        max-height: 200px;
         text-align-vertical: top;
     `}
 `;

@@ -8,6 +8,7 @@ export type EntityType = 'Subject' | 'Class' | 'Room' | 'Lecture' | null;
 export interface EntityCreationScreenType {
     selectedEntity: EntityType;
     onEntitySelect: (entity: EntityType) => void;
+    handleEntitySelect: (entity: EntityType) => void;
     formValues: FormCreateEntityValues;
     setFormValues: (values: FormCreateEntityValues) => void;
     onSubmit: () => void;

@@ -16,7 +16,7 @@ const BaseListItem = styled.View<StyledFlatListProps>`
 `;
 
 export const FlatListItem = styled(BaseListItem).attrs({
-    as: TouchableOpacity, // Convert to TouchableOpacity while keeping all styles
+    as: TouchableOpacity,
 })`
     &:hover {
         background-color: ${({ theme }) => theme.colors.background.onPrimary};
@@ -41,7 +41,7 @@ export const FlatListContainer = styled.View.attrs<StyledFlatListProps>((props) 
         align-self: stretch; 
     ` : `
         top: 90%;
-        width: 100%;
+        width: 200px;
     `}
     background-color: ${({ theme }) => theme.colors.text.white};
     max-height: 250px;

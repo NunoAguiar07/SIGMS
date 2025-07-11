@@ -7,7 +7,6 @@ import {useLocalSearchParams} from "expo-router";
 
 const Profile = () => {
     const { id } = useLocalSearchParams();
-    console.log(id);
 
     const {
         profile,

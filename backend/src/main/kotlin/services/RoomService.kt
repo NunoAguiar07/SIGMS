@@ -28,9 +28,10 @@ class RoomService (
         }
     }
 
-    fun getRoomsByNameAndUniversityId(
+    fun getRoomsByNameByTypeAndUniversityId(
         universityId: Int,
         roomPartialName: String,
+        roomType: RoomType?,
         limit: Int,
         offset: Int
     ): RoomListResult {
@@ -39,8 +40,14 @@ class RoomService (
                 val university = repositories.from({universityRepository}) {
                     getUniversityById(universityId)
                 } ?: return@useTransaction failure(RoomError.UniversityNotFound)
+                if (roomType == null) {
+                    val rooms = repositories.from({roomRepository}) {
+                        getAllRoomsByNameAndUniversityId(university.id, roomPartialName, limit, offset)
+                    }
+                    return@useTransaction success(rooms)
+                }
                 val rooms = repositories.from({roomRepository}) {
-                    getAllRoomsByNameAndUniversityId(university.id, roomPartialName, limit, offset)
+                    getAllRoomsByNameByTypeAndUniversityId(university.id, roomPartialName, roomType, limit, offset)
                 }
                 return@useTransaction success(rooms)
             }

@@ -26,7 +26,6 @@ export const useProfile = (id:number | undefined) => {
             setLoading(true);
             try {
                 const myId = await AsyncStorage.getItem('userId');
-                console.log(id);
                 const profileData = typeof myId === 'string' && +myId !== id && id !== undefined
                     ? await fetchTeacherProfileById(id)
                     : await fetchProfile();
@@ -41,11 +40,9 @@ export const useProfile = (id:number | undefined) => {
                     : profileData;
 
                 setProfile(filteredProfileData);
-                console.log('Profile data loaded:', filteredProfileData);
 
                 if (filteredProfileData.image && filteredProfileData.image.length > 0) {
                     setImageUri(`data:image/jpeg;base64,${filteredProfileData.image}`);
-                    console.log('imageUri:' + imageUri);
 
                 } else {
                     setImageUri(null);
@@ -103,13 +100,11 @@ export const useProfile = (id:number | undefined) => {
     const updateProfile = async (profileData: Partial<ProfileInterface>) => {
         setUpdateLoading(true);
         try {
-            console.log(profileData);
             const updatedProfile = await requestUpdateProfile(profileData);
             setProfile(updatedProfile);
             if (profileData.image) {
                 setImage(profileData.image);
             }
-            console.log(updatedProfile)
             return updatedProfile;
         } catch (err) {
             setUpdateError(err as ParsedError);

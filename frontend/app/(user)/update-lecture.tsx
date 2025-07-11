@@ -13,18 +13,26 @@ const UpdateLecture = () => {
         error,
         isSaving,
         rooms,
-        setSearchQuery,
-        searchQuery,
+        setSearchQueryRoom,
+        searchQueryRoom,
         selectedRoom,
         handleRoomSelect,
-        effectiveFrom,
-        setEffectiveFrom,
-        effectiveUntil,
-        setEffectiveUntil,
         setEffectiveFromText,
         setEffectiveUntilText,
         effectiveFromText,
-        effectiveUntilText
+        effectiveUntilText,
+        page,
+        lectureFilter,
+        setLectureFilter,
+        subjects,
+        classes,
+        onGetAllLectures,
+        handleOnSubjectSelect,
+        handleClassSelect,
+        searchQuerySubjects,
+        setSearchQuerySubjects,
+        handleNext,
+        handlePrevious
     } = useUpdateLecture();
 
     if (error) {
@@ -35,26 +43,33 @@ const UpdateLecture = () => {
         <UpdateLectureScreen
             lectures={lectures}
             selectedLecture={selectedLecture}
-            newSchedule={selectedLecture}
             onLectureSelect={onLectureSelect}
             onScheduleChange={onScheduleChange}
             onSaveSchedule={onSaveSchedule}
             isSaving={isSaving}
             rooms={rooms}
-            setSearchQuery={setSearchQuery}
-            searchQuery={searchQuery}
+            setSearchQueryRoom={setSearchQueryRoom}
+            searchQueryRoom={searchQueryRoom}
             selectedRoom={selectedRoom}
             handleRoomSelect={handleRoomSelect}
-            effectiveFrom={effectiveFrom}
-            setEffectiveFrom={setEffectiveFrom}
-            effectiveUntil={effectiveUntil}
-            setEffectiveUntil={setEffectiveUntil}
             setEffectiveFromText={setEffectiveFromText}
             setEffectiveUntilText={setEffectiveUntilText}
             effectiveFromText={effectiveFromText}
             effectiveUntilText={effectiveUntilText}
+            page={page}
+            lectureFilter={lectureFilter}
+            setLectureFilter={setLectureFilter}
+            subjects={subjects}
+            classes={classes}
+            onGetAllLectures={onGetAllLectures}
+            handleOnSubjectSelect={handleOnSubjectSelect}
+            handleClassSelect={handleClassSelect}
+            searchQuerySubjects={searchQuerySubjects}
+            setSearchQuerySubjects={setSearchQuerySubjects}
+            handleNext={handleNext}
+            handlePrevious={handlePrevious}
         />
     );
 };
 
-export default UpdateLecture
+export default UpdateLecture;

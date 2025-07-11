@@ -1,14 +1,26 @@
-import {FlatList, Text, TextInput, TouchableOpacity, View} from "react-native";
+import {FlatList, ScrollView, View} from "react-native";
 import {scheduleLectureStyles} from "../css_styling/lecture/scheduleLectureStyles";
 import {commonStyles} from "../css_styling/common/CommonProps";
-import {Picker} from "@react-native-picker/picker";
 import {RoomInterface} from "../../types/RoomInterface";
 import {Lecture} from "../../types/calendar/Lecture";
 import {isMobile} from "../../utils/DeviceType";
 import {UpdateLectureProps} from "../css_styling/update_lecture/UpdateLectureProps";
-import {Card, Container, GridColumn, GridRow} from "../css_styling/common/NewContainers";
-import {Subtitle} from "../css_styling/common/Typography";
+import {
+    Card,
+    CenteredContainer,
+    Container,
+    GridColumn,
+    GridRow
+} from "../css_styling/common/NewContainers";
+import {BodyText, Subtitle} from "../css_styling/common/Typography";
 import {Button, ButtonText} from "../css_styling/common/Buttons";
+import {SubjectInterface} from "../../types/SubjectInterface";
+import {SchoolClassInterface} from "../../types/SchoolClassInterface";
+import {FlatListContainer, FlatListItem} from "../css_styling/common/FlatList";
+import {Input, SearchInput} from "../css_styling/common/Inputs";
+import {PaginationControls} from "./UnassignedIssuesScreen";
+import {PickerContainer, StyledPicker, StyledPickerItem} from "../css_styling/common/Picker";
+import {LectureType} from "../../types/welcome/FormCreateEntityValues";
 
 
 export const UpdateLectureScreen = ({
@@ -19,14 +31,26 @@ export const UpdateLectureScreen = ({
     onSaveSchedule,
     isSaving,
     rooms,
-    setSearchQuery,
-    searchQuery,
+    searchQueryRoom,
+    setSearchQueryRoom,
     selectedRoom,
     handleRoomSelect,
     setEffectiveFromText,
     setEffectiveUntilText,
     effectiveFromText,
-    effectiveUntilText
+    effectiveUntilText,
+    searchQuerySubjects,
+    setSearchQuerySubjects,
+    subjects,
+    onGetAllLectures,
+    handleOnSubjectSelect,
+    handleClassSelect,
+    lectureFilter,
+    classes,
+    setLectureFilter,
+    handleNext,
+    handlePrevious,
+    page
 }: UpdateLectureProps) => {
     const timeOptions = Array.from({ length: 48 }, (_, index) => {
         const hours = String(Math.floor(index / 2)).padStart(2, '0');
@@ -36,37 +60,56 @@ export const UpdateLectureScreen = ({
 
     if (!isMobile) {
         return (
-            <Container flex={1} justifyContent="center" padding="md">
-                <GridRow>
+            <Container flex={1} padding="md">
+                <GridRow flex={1}>
                     <GridColumn widthPercent={50} gap={"md"}>
                         <LectureList
                             lectures={lectures}
                             onLectureSelect={onLectureSelect}
+                            searchQueryRoom={searchQueryRoom}
+                            setSearchQueryRoom={setSearchQueryRoom}
+                            rooms={rooms}
+                            selectedRoom={selectedRoom}
+                            handleRoomSelect={handleRoomSelect}
+                            searchQuerySubjects={searchQuerySubjects}
+                            setSearchQuerySubjects={setSearchQuerySubjects}
+                            subjects={subjects}
+                            handleClassSelect={handleClassSelect}
+                            handleOnSubjectSelect={handleOnSubjectSelect}
+                            onGetAllLectures={onGetAllLectures}
+                            classes={classes}
+                            lectureFilter={lectureFilter}
+                            setLectureFilter={setLectureFilter}
+                            handleNext={handleNext}
+                            handlePrevious={handlePrevious}
+                            page={page}
                         />
                     </GridColumn>
                     <GridColumn widthPercent={50}>
-                        <Card shadow="medium" alignItems={"center"} gap="md">
-                            {selectedLecture ? (
-                                <UpdateLectureForm
-                                    selectedLecture={selectedLecture}
-                                    onScheduleChange={onScheduleChange}
-                                    rooms={rooms}
-                                    searchQuery={searchQuery}
-                                    setSearchQuery={setSearchQuery}
-                                    selectedRoom={selectedRoom}
-                                    handleRoomSelect={handleRoomSelect}
-                                    effectiveFromText={effectiveFromText}
-                                    effectiveUntilText={effectiveUntilText}
-                                    setEffectiveFromText={setEffectiveFromText}
-                                    setEffectiveUntilText={setEffectiveUntilText}
-                                    timeOptions={timeOptions}
-                                    onSaveSchedule={onSaveSchedule}
-                                    isSaving={isSaving}
-                                />
-                            ) : (
-                                <Subtitle>Select a lecture to update schedule</Subtitle>
-                            )}
-                        </Card>
+                        <CenteredContainer flex={1} gap="md" padding="md" >
+                            <Card shadow="medium" alignItems={"center"} gap="md" flex={selectedLecture ? 1: undefined}>
+                                {selectedLecture ? (
+                                    <UpdateLectureForm
+                                        selectedLecture={selectedLecture}
+                                        onScheduleChange={onScheduleChange}
+                                        rooms={rooms}
+                                        searchQuery={searchQueryRoom}
+                                        setSearchQuery={setSearchQueryRoom}
+                                        selectedRoom={selectedRoom}
+                                        handleRoomSelect={handleRoomSelect}
+                                        effectiveFromText={effectiveFromText}
+                                        effectiveUntilText={effectiveUntilText}
+                                        setEffectiveFromText={setEffectiveFromText}
+                                        setEffectiveUntilText={setEffectiveUntilText}
+                                        timeOptions={timeOptions}
+                                        onSaveSchedule={onSaveSchedule}
+                                        isSaving={isSaving}
+                                    />
+                                ) : (
+                                    <Subtitle>Select a lecture to update schedule</Subtitle>
+                                )}
+                            </Card>
+                        </CenteredContainer>
                     </GridColumn>
                 </GridRow>
             </Container>
@@ -114,6 +157,23 @@ export const UpdateLectureScreen = ({
                         <LectureList
                             lectures={lectures}
                             onLectureSelect={onLectureSelect}
+                            searchQueryRoom={searchQueryRoom}
+                            setSearchQueryRoom={setSearchQueryRoom}
+                            rooms={rooms}
+                            selectedRoom={selectedRoom}
+                            handleRoomSelect={handleRoomSelect}
+                            searchQuerySubjects={searchQuerySubjects}
+                            setSearchQuerySubjects={setSearchQuerySubjects}
+                            subjects={subjects}
+                            handleClassSelect={handleClassSelect}
+                            handleOnSubjectSelect={handleOnSubjectSelect}
+                            onGetAllLectures={onGetAllLectures}
+                            classes={classes}
+                            lectureFilter={lectureFilter}
+                            setLectureFilter={setLectureFilter}
+                            handleNext={handleNext}
+                            handlePrevious={handlePrevious}
+                            page={page}
                         />
                     </View>
                 ) : (
@@ -124,8 +184,8 @@ export const UpdateLectureScreen = ({
                             selectedLecture={selectedLecture}
                             onScheduleChange={onScheduleChange}
                             rooms={rooms}
-                            searchQuery={searchQuery}
-                            setSearchQuery={setSearchQuery}
+                            searchQuery={searchQueryRoom}
+                            setSearchQuery={setSearchQueryRoom}
                             selectedRoom={selectedRoom}
                             handleRoomSelect={handleRoomSelect}
                             effectiveFromText={effectiveFromText}
@@ -148,11 +208,24 @@ export const UpdateLectureScreen = ({
 interface LectureListProps {
     lectures: Lecture[];
     onLectureSelect: (lecture: Lecture) => void;
-    // onGetAllLectures: () => void;
-    // onGetLecturesByClass: (subjectId: number, classId:number) => void;
-    // onGetLecturesByRoom: (roomId: number) => void;
+    searchQueryRoom: string;
+    setSearchQueryRoom: (query: string) => void;
+    rooms: RoomInterface[];
+    selectedRoom: RoomInterface | null;
+    handleRoomSelect: (room: RoomInterface) => void;
+    searchQuerySubjects: string;
+    setSearchQuerySubjects: (query: string) => void;
+    subjects: SubjectInterface[];
+    handleClassSelect: (schoolClass: SchoolClassInterface) => void;
+    handleOnSubjectSelect: (subject: SubjectInterface) => void;
+    onGetAllLectures: () => void;
+    classes: SchoolClassInterface[];
+    lectureFilter: 'all' | 'class' | 'room';
+    setLectureFilter: (filter: 'all' | 'class' | 'room') => void;
+    handleNext: () => void;
+    handlePrevious: () => void;
+    page: number;
 }
-
 interface WeekdayPickerProps {
     selectedValue: number;
     onValueChange: (value: number) => void;
@@ -162,32 +235,11 @@ interface LectureTypePickerProps {
     selectedValue: string;
     onValueChange: (value: string) => void;
 }
-
-interface RoomSearchProps {
-    rooms: RoomInterface[];
-    searchQuery: string;
-    setSearchQuery: (query: string) => void;
-    selectedRoom: RoomInterface | null;
-    handleRoomSelect: (room: RoomInterface) => void;
-}
-
 interface TimePickerProps {
     selectedValue: string;
     onValueChange: (value: string) => void;
-    timeOptions: string[];
     label: string;
-}
-
-interface EffectiveDateInputProps {
-    label: string;
-    value: string;
-    onChangeText: (text: string) => void;
-    placeholder: string;
-}
-
-interface SaveButtonProps {
-    onPress: () => void;
-    isSaving: boolean;
+    placeholder: string
 }
 
 interface UpdateLectureFormProps {
@@ -207,173 +259,417 @@ interface UpdateLectureFormProps {
     isSaving: boolean;
 }
 
-export const LectureList = ({ lectures, onLectureSelect }: LectureListProps) => (
-    // <Card shadow="medium" alignItems={"center"} gap="md">
-    //     <GridRow>
-    //         <GridColumn widthPercent={33} gap="md">
-    //             <Subtitle>All Existing Lectures:</Subtitle>
-    //             <Button
-    //                 variant="primary"
-    //                 onPress={() => onGetAllLectures()}
-    //                 style={{ marginBottom: 10 }}
-    //             >
-    //                 <ButtonText>Get</ButtonText>
-    //             </Button>
-    //         </GridColumn>
-    //         <GridColumn widthPercent={33}>
-    //             <Subtitle>Get Lectures By Class:</Subtitle>
-    //             <Button
-    //                 variant="primary"
-    //                 onPress={() => onGetLecturesByClasss()}
-    //                 style={{ marginBottom: 10 }}
-    //             >
-    //                 <ButtonText>Get</ButtonText>
-    //             </Button>
-    //         </GridColumn>
-    //         <GridColumn widthPercent={34}>
-    //             <Subtitle>Get Lectures By Room:</Subtitle>
-    //             <Button
-    //                 variant="primary"
-    //                 onPress={() => onGetLecturesByRoom()}
-    //                 style={{ marginBottom: 10 }}
-    //             >
-    //                 <ButtonText>Get</ButtonText>
-    //             </Button>
-    //         </GridColumn>
-    //     </GridRow>
-    // </Card>
-    <>
-        <Text style={commonStyles.sectionTitle}>Existing Lectures</Text>
-        <FlatList
-            data={lectures}
-            keyExtractor={(item) => item.id.toString()}
-            renderItem={({ item }) => (
-                <TouchableOpacity
-                    style={commonStyles.itemSearch}
-                    onPress={() => onLectureSelect(item)}
-                >
-                    <Text style={commonStyles.itemText}>
-                        {item.schoolClass.subject.name} ({item.type}), {item.schoolClass.name}: {item.room.name} | {item.startTime} ➜ {item.endTime}
-                    </Text>
-                </TouchableOpacity>
-            )}
-            ListEmptyComponent={<Text style={commonStyles.emptyText}>No lectures found</Text>}
-        />
-    </>
+interface FilterButtonsProps {
+    onGetAllLectures: () => void;
+    setLectureFilter: (filter: 'all' | 'class' | 'room') => void;
+    widthPercent: number;
+}
+
+export const FilterButtons = ({
+                                  onGetAllLectures,
+                                  setLectureFilter,
+                                  widthPercent
+                              }: FilterButtonsProps) => (
+    <GridColumn widthPercent={widthPercent} gap={"md"}>
+        <Button variant={'primary'} onPress={onGetAllLectures}>
+            <ButtonText>All Lectures</ButtonText>
+        </Button>
+        <Button variant={'primary'} onPress={() => setLectureFilter('class')}>
+            <ButtonText>By Class</ButtonText>
+        </Button>
+        <Button variant={'primary'} onPress={() => setLectureFilter('room')}>
+            <ButtonText>By Room</ButtonText>
+        </Button>
+    </GridColumn>
 );
 
+// RoomSearchSection.tsx
+interface RoomSearchSectionProps {
+    searchQueryRoom: string;
+    setSearchQueryRoom: (query: string) => void;
+    rooms: RoomInterface[];
+    handleRoomSelect: (room: RoomInterface) => void;
+}
+
+export const RoomSearchSection = ({
+                                      searchQueryRoom,
+                                      setSearchQueryRoom,
+                                      rooms,
+                                      handleRoomSelect
+                                  }: RoomSearchSectionProps) => (
+        <CenteredContainer style={{ position: 'relative', zIndex: 10 }}>
+            <SearchInput
+                placeholder="Search rooms..."
+                value={searchQueryRoom}
+                onChangeText={setSearchQueryRoom}
+            />
+            {rooms.length > 0 && (
+                <FlatListContainer>
+                    <FlatList
+                        data={rooms}
+                        keyExtractor={(item) => item.id.toString()}
+                        renderItem={({ item }) => (
+                            <FlatListItem onPress={() => handleRoomSelect(item)}>
+                                <BodyText>{item.name}</BodyText>
+                            </FlatListItem>
+                        )}
+                    />
+                </FlatListContainer>
+            )}
+        </CenteredContainer>
+);
+
+// SubjectSearchSection.tsx
+interface SubjectSearchSectionProps {
+    searchQuerySubjects: string;
+    setSearchQuerySubjects: (query: string) => void;
+    subjects: SubjectInterface[];
+    handleOnSubjectSelect: (subject: SubjectInterface) => void;
+}
+
+export const SubjectSearchSection = ({
+                                         searchQuerySubjects,
+                                         setSearchQuerySubjects,
+                                         subjects,
+                                         handleOnSubjectSelect
+                                     }: SubjectSearchSectionProps) => (
+        <CenteredContainer style={{ position: 'relative', zIndex: 10 }} gap="md">
+            <SearchInput
+                placeholder="Search subjects..."
+                value={searchQuerySubjects}
+                onChangeText={setSearchQuerySubjects}
+            />
+            {subjects.length > 0 && (
+                <FlatListContainer>
+                    <FlatList
+                        data={subjects}
+                        keyExtractor={(item) => item.id.toString()}
+                        renderItem={({ item }) => (
+                            <FlatListItem onPress={() => handleOnSubjectSelect(item)}>
+                                <BodyText>{item.name}</BodyText>
+                            </FlatListItem>
+                        )}
+                    />
+                </FlatListContainer>
+            )}
+        </CenteredContainer>
+);
+
+// ClassListSection.tsx
+interface ClassListSectionProps {
+    classes: SchoolClassInterface[];
+    handleClassSelect: (schoolClass: SchoolClassInterface) => void;
+}
+
+export const ClassListSection = ({
+    classes,
+    handleClassSelect
+}: ClassListSectionProps) => {
+    if (classes.length === 0) {
+        return (
+            <CenteredContainer gap="md">
+                <Subtitle>No classes available</Subtitle>
+            </CenteredContainer>
+        );
+    }
+
+    return (
+        <CenteredContainer gap="md">
+            <Subtitle>Select Class:</Subtitle>
+            <FlatListContainer>
+                <FlatList
+                    data={classes}
+                    keyExtractor={(item) => item.id.toString()}
+                    renderItem={({item}) => (
+                        <FlatListItem
+                            onPress={() => handleClassSelect(item)}
+                            style={{
+                                paddingVertical: 8,
+                                borderBottomWidth: 1,
+                                borderBottomColor: '#f0f0f0'
+                            }}
+                        >
+                            <BodyText>{item.name}</BodyText>
+                        </FlatListItem>
+                    )}
+                />
+            </FlatListContainer>
+        </CenteredContainer>
+    );
+}
+
+// LecturesListSection.tsx
+interface LecturesListSectionProps {
+    lectures: Lecture[];
+    onLectureSelect: (lecture: Lecture) => void;
+    handleNext: () => void;
+    handlePrevious: () => void;
+    page: number;
+    hasNext: boolean;
+}
+
+export const LecturesListSection = ({
+                                        lectures,
+                                        onLectureSelect,
+                                        handleNext,
+                                        handlePrevious,
+                                        page,
+                                        hasNext
+                                    }: LecturesListSectionProps) => (
+    <Card shadow="medium" alignItems="center" gap="md">
+        <Subtitle>Lectures</Subtitle>
+        {lectures.length > 0 ? (
+            <FlatListContainer position={"static"}>
+                <FlatList
+                    data={lectures}
+                    keyExtractor={(item) => item.id.toString()}
+                    renderItem={({ item }) => (
+                        <FlatListItem onPress={() => onLectureSelect(item)}>
+                            <BodyText>
+                                {item.schoolClass.subject.name} ({item.type}),
+                                {item.schoolClass.name}: {item.room.name} |
+                                {item.startTime} ➜ {item.endTime}
+                            </BodyText>
+                        </FlatListItem>
+                    )}
+                />
+            </FlatListContainer>
+        ) : (
+            <BodyText>No lectures found</BodyText>
+        )}
+        <PaginationControls
+            currentPage={page}
+            hasNext={hasNext}
+            onNext={handleNext}
+            onPrevious={handlePrevious}
+        />
+    </Card>
+);
+
+// Updated LectureList.tsx
+export const LectureList = ({
+                                lectures,
+                                onLectureSelect,
+                                searchQueryRoom,
+                                setSearchQueryRoom,
+                                rooms,
+                                selectedRoom,
+                                handleRoomSelect,
+                                searchQuerySubjects,
+                                setSearchQuerySubjects,
+                                subjects,
+                                handleClassSelect,
+                                handleOnSubjectSelect,
+                                onGetAllLectures,
+                                classes,
+                                lectureFilter,
+                                setLectureFilter,
+                                handleNext,
+                                handlePrevious,
+                                page
+                            }: LectureListProps) => {
+    const getWidthPercent = () => {
+        switch(lectureFilter) {
+            case 'all': return 100;
+            case 'class': return 33;
+            case 'room': return 50;
+            default: return 100;
+        }
+    };
+
+    return (
+        <Container flex={1} gap="md" width={'100%'}>
+            <GridRow flex={1} heightPercent={50}>
+                <FilterButtons
+                    onGetAllLectures={onGetAllLectures}
+                    setLectureFilter={setLectureFilter}
+                    widthPercent={getWidthPercent()}
+                />
+
+                {lectureFilter === 'room' && (
+                    <GridColumn widthPercent={50} gap={"md"}>
+                        <RoomSearchSection
+                            searchQueryRoom={searchQueryRoom}
+                            setSearchQueryRoom={setSearchQueryRoom}
+                            rooms={rooms}
+                            handleRoomSelect={handleRoomSelect}
+                        />
+                    </GridColumn>
+                )}
+
+                {lectureFilter === 'class' && (
+                    <>
+                    <GridColumn widthPercent={33} gap={"md"}>
+                        <SubjectSearchSection
+                            searchQuerySubjects={searchQuerySubjects}
+                            setSearchQuerySubjects={setSearchQuerySubjects}
+                            subjects={subjects}
+                            handleOnSubjectSelect={handleOnSubjectSelect}
+                        />
+                    </GridColumn>
+                    <GridColumn widthPercent={33} gap={"md"}>
+                        <ClassListSection
+                            classes={classes}
+                            handleClassSelect={handleClassSelect}
+                        />
+                    </GridColumn>
+                    </>
+                )}
+            </GridRow>
+
+            <GridRow heightPercent={50} gap={"md"}>
+                <LecturesListSection
+                    lectures={lectures}
+                    onLectureSelect={onLectureSelect}
+                    handleNext={handleNext}
+                    handlePrevious={handlePrevious}
+                    page={page}
+                    hasNext={lectures.length >= 5}
+                />
+            </GridRow>
+        </Container>
+    );
+};
+
 export const WeekdayPicker = ({ selectedValue, onValueChange }: WeekdayPickerProps) => (
-    <>
-        <Text style={commonStyles.inputLabel}>Weekday</Text>
-        <View style={commonStyles.pickerContainer}>
-            <Picker
+    <CenteredContainer gap={'md'}>
+    <Subtitle>Weekday</Subtitle>
+        <PickerContainer width="200px">
+            <StyledPicker
                 selectedValue={selectedValue}
-                onValueChange={onValueChange}
-                style={commonStyles.picker}
+                onValueChange={(value) => onValueChange(value as number)}
             >
-                {[
-                    { label: 'Monday', value: 1 },
-                    { label: 'Tuesday', value: 2 },
-                    { label: 'Wednesday', value: 3 },
-                    { label: 'Thursday', value: 4 },
-                    { label: 'Friday', value: 5 },
-                    { label: 'Saturday', value: 6 },
-                ].map(({ label, value }) => (
-                    <Picker.Item key={value} label={label} value={value} />
-                ))}
-            </Picker>
-        </View>
-    </>
+                <StyledPickerItem label="Monday" value={1} />
+                <StyledPickerItem label="Tuesday" value={2} />
+                <StyledPickerItem label="Wednesday" value={3} />
+                <StyledPickerItem label="Thursday" value={4} />
+                <StyledPickerItem label="Friday" value={5} />
+                <StyledPickerItem label="Saturday" value={6} />
+                <StyledPickerItem label="Sunday" value={7} />
+            </StyledPicker>
+        </PickerContainer>
+    </CenteredContainer>
+    // <>
+    //     <Text style={commonStyles.inputLabel}>Weekday</Text>
+    //     <View style={commonStyles.pickerContainer}>
+    //         <Picker
+    //             selectedValue={selectedValue}
+    //             onValueChange={onValueChange}
+    //             style={commonStyles.picker}
+    //         >
+    //             {[
+    //                 { label: 'Monday', value: 1 },
+    //                 { label: 'Tuesday', value: 2 },
+    //                 { label: 'Wednesday', value: 3 },
+    //                 { label: 'Thursday', value: 4 },
+    //                 { label: 'Friday', value: 5 },
+    //                 { label: 'Saturday', value: 6 },
+    //             ].map(({ label, value }) => (
+    //                 <Picker.Item key={value} label={label} value={value} />
+    //             ))}
+    //         </Picker>
+    //     </View>
+    // </>
 );
 
 export const LectureTypePicker = ({ selectedValue, onValueChange }: LectureTypePickerProps) => (
-    <>
-        <Text style={commonStyles.inputLabel}>Lecture Type</Text>
-        <View style={commonStyles.pickerContainer}>
-            <Picker
+    <CenteredContainer gap={'md'}>
+        <Subtitle>Lecture Type</Subtitle>
+        <PickerContainer width="200px">
+            <StyledPicker
                 selectedValue={selectedValue}
-                onValueChange={onValueChange}
-                style={commonStyles.picker}
+                onValueChange={(value) => onValueChange(value as LectureType)}
             >
-                <Picker.Item label="Theoretical" value="THEORETICAL" />
-                <Picker.Item label="Practical" value="PRACTICAL" />
-                <Picker.Item label="Theoretical-Practical" value="THEORETICAL_PRACTICAL" />
-            </Picker>
-        </View>
-    </>
+                <StyledPickerItem label="Theoretical" value="THEORETICAL" />
+                <StyledPickerItem label="Practical" value="PRACTICAL" />
+                <StyledPickerItem label="Mix" value="THEORETICAL_PRACTICAL" />
+            </StyledPicker>
+        </PickerContainer>
+    </CenteredContainer>
+    // <>
+    //     <Text style={commonStyles.inputLabel}>Lecture Type</Text>
+    //     <View style={commonStyles.pickerContainer}>
+    //         <Picker
+    //             selectedValue={selectedValue}
+    //             onValueChange={onValueChange}
+    //             style={commonStyles.picker}
+    //         >
+    //             <Picker.Item label="Theoretical" value="THEORETICAL" />
+    //             <Picker.Item label="Practical" value="PRACTICAL" />
+    //             <Picker.Item label="Theoretical-Practical" value="THEORETICAL_PRACTICAL" />
+    //         </Picker>
+    //     </View>
+    // </>
 );
 
-export const RoomSearch = ({
-    rooms,
-    searchQuery,
-    setSearchQuery,
-    selectedRoom,
-    handleRoomSelect
-}: RoomSearchProps) => (
-    <>
-        <Text style={commonStyles.inputLabel}>Room</Text>
-        <TextInput
-            style={commonStyles.input}
-            placeholder="Search rooms..."
-            value={searchQuery}
-            onChangeText={setSearchQuery}
+// export const RoomSearch = ({
+//     rooms,
+//     searchQuery,
+//     setSearchQuery,
+//     selectedRoom,
+//     handleRoomSelect
+// }: RoomSearchProps) => (
+//     <CenteredContainer gap={'md'}>
+//         <Subtitle>Room</Subtitle>
+//         <SearchInput
+//             placeholder="Search rooms..."
+//             value={searchQuery}
+//             onChangeText={setSearchQuery}
+//         />
+//         {rooms.length > 0 ? (
+//             <FlatListContainer>
+//                 <FlatList
+//                     data={rooms}
+//                     keyExtractor={(item) => item.id.toString()}
+//                     renderItem={({ item }) => (
+//                         <FlatListItem
+//                             onPress={() => handleRoomSelect(item)}
+//                         >
+//                             <BodyText>{item.name}</BodyText>
+//                         </FlatListItem>
+//                     )}
+//                 />
+//             </FlatListContainer>
+//         ) : (
+//             <BodyText>No rooms found</BodyText>
+//         )}
+//     </CenteredContainer>
+//     // <>
+//     //     <Text style={commonStyles.inputLabel}>Room</Text>
+//     //     <TextInput
+//     //         style={commonStyles.input}
+//     //         placeholder="Search rooms..."
+//     //         value={searchQuery}
+//     //         onChangeText={setSearchQuery}
+//     //     />
+//     //     <FlatList
+//     //         data={rooms}
+//     //         keyExtractor={(item) => item.id.toString()}
+//     //         renderItem={({ item }) => (
+//     //             <TouchableOpacity
+//     //                 style={[
+//     //                     commonStyles.itemSearch,
+//     //                     selectedRoom?.id === item.id && { backgroundColor: '#e5e5e5' }
+//     //                 ]}
+//     //                 onPress={() => handleRoomSelect(item)}
+//     //             >
+//     //                 <Text style={commonStyles.itemText}>{item.name}</Text>
+//     //             </TouchableOpacity>
+//     //         )}
+//     //         ListEmptyComponent={<Text style={commonStyles.emptyText}>No rooms found</Text>}
+//     //     />
+//     // </>
+// );
+
+export const TimePicker = ({ selectedValue, onValueChange, label, placeholder }: TimePickerProps) => (
+    <CenteredContainer gap={'md'}>
+        <Subtitle>{label}</Subtitle>
+        <Input
+            placeholder= {placeholder}
+            value={selectedValue}
+            onChangeText={(text) => onValueChange(text)}
         />
-        <FlatList
-            data={rooms}
-            keyExtractor={(item) => item.id.toString()}
-            renderItem={({ item }) => (
-                <TouchableOpacity
-                    style={[
-                        commonStyles.itemSearch,
-                        selectedRoom?.id === item.id && { backgroundColor: '#e5e5e5' }
-                    ]}
-                    onPress={() => handleRoomSelect(item)}
-                >
-                    <Text style={commonStyles.itemText}>{item.name}</Text>
-                </TouchableOpacity>
-            )}
-            ListEmptyComponent={<Text style={commonStyles.emptyText}>No rooms found</Text>}
-        />
-    </>
-);
-
-export const TimePicker = ({ selectedValue, onValueChange, timeOptions, label }: TimePickerProps) => (
-    <>
-        <Text style={commonStyles.inputLabel}>{label}</Text>
-        <View style={commonStyles.pickerContainer}>
-            <Picker
-                selectedValue={selectedValue}
-                onValueChange={onValueChange}
-                style={commonStyles.picker}
-            >
-                {timeOptions.map((time) => (
-                    <Picker.Item key={time} label={time} value={time} />
-                ))}
-            </Picker>
-        </View>
-    </>
-);
-
-export const EffectiveDateInput = ({ label, value, onChangeText, placeholder }: EffectiveDateInputProps) => (
-    <>
-        <Text style={commonStyles.inputLabel}>{label}</Text>
-        <TextInput
-            style={commonStyles.input}
-            placeholder={placeholder}
-            value={value}
-            onChangeText={onChangeText}
-        />
-    </>
-);
-
-export const SaveButton = ({ onPress, isSaving }: SaveButtonProps) => (
-    <Button
-        variant="primary"
-        onPress={onPress}
-        disabled={isSaving}
-    >
-        <ButtonText>Save</ButtonText>
-    </Button>
+    </CenteredContainer>
 );
 
 export const UpdateLectureForm = ({
@@ -392,57 +688,107 @@ export const UpdateLectureForm = ({
     onSaveSchedule,
     isSaving
 }: UpdateLectureFormProps) => (
-    <View>
-        <Text style={commonStyles.sectionTitle}>
-            Update Schedule for {selectedLecture.schoolClass.subject.name}
-        </Text>
-
-        <WeekdayPicker
-            selectedValue={selectedLecture.weekDay}
-            onValueChange={(value) => onScheduleChange({ weekDay: value })}
-        />
-
-        <LectureTypePicker
-            selectedValue={selectedLecture.type}
-            onValueChange={(itemValue) => onScheduleChange({ type: itemValue })}
-        />
-
-        <RoomSearch
-            rooms={rooms}
-            searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
-            selectedRoom={selectedRoom}
-            handleRoomSelect={handleRoomSelect}
-        />
-
-        <EffectiveDateInput
-            label="Effective From"
-            value={effectiveFromText}
-            onChangeText={setEffectiveFromText}
-            placeholder="YYYY-MM-DD"
-        />
-
-        <EffectiveDateInput
-            label="Effective Until"
-            value={effectiveUntilText}
-            onChangeText={setEffectiveUntilText}
-            placeholder="YYYY-MM-DD"
-        />
-
-        <TimePicker
-            label="New Start Time"
-            selectedValue={selectedLecture.startTime}
-            onValueChange={(itemValue) => onScheduleChange({ startTime: itemValue })}
-            timeOptions={timeOptions}
-        />
-
-        <TimePicker
-            label="New End Time"
-            selectedValue={selectedLecture.endTime}
-            onValueChange={(itemValue) => onScheduleChange({ endTime: itemValue })}
-            timeOptions={timeOptions}
-        />
-
-        <SaveButton onPress={onSaveSchedule} isSaving={isSaving} />
-    </View>
+    <CenteredContainer gap="md" flex={1} >
+        <ScrollView contentContainerStyle={{ gap: 16 }}>
+            <Subtitle>Update schedule:</Subtitle>
+            <WeekdayPicker
+                selectedValue={selectedLecture.weekDay}
+                onValueChange={(value) => onScheduleChange({ weekDay: value })}
+            />
+            <LectureTypePicker
+                selectedValue={selectedLecture.type}
+                onValueChange={(itemValue) => onScheduleChange({ type: itemValue })}
+            />
+            <RoomSearchSection
+                searchQueryRoom={searchQuery}
+                setSearchQueryRoom={setSearchQuery}
+                rooms={rooms}
+                handleRoomSelect={handleRoomSelect}
+            />
+            <TimePicker
+                label="Effective From"
+                placeholder="YYYY-MM-DD"
+                selectedValue={effectiveFromText}
+                onValueChange={setEffectiveFromText}
+            />
+            <TimePicker
+                label="Effective Until"
+                placeholder="YYYY-MM-DD"
+                selectedValue={effectiveUntilText}
+                onValueChange={setEffectiveUntilText}
+            />
+            <TimePicker
+                label="New Start Time"
+                placeholder="HH:MM"
+                selectedValue={selectedLecture.startTime}
+                onValueChange={(itemValue) => onScheduleChange({ startTime: itemValue })}
+            />
+            <TimePicker
+                label="New End Time"
+                placeholder="HH:MM"
+                selectedValue={selectedLecture.endTime}
+                onValueChange={(itemValue) => onScheduleChange({ endTime: itemValue })}
+            />
+        </ScrollView>
+        <Button
+            variant="primary"
+            onPress={onSaveSchedule}
+            disabled={isSaving}
+        >
+            <ButtonText>{isSaving ? 'Saving...' : 'Save Schedule'}</ButtonText>
+        </Button>
+    </CenteredContainer>
+    // <View>
+    //     <Text style={commonStyles.sectionTitle}>
+    //         Update Schedule for {selectedLecture.schoolClass.subject.name}
+    //     </Text>
+    //
+    //     <WeekdayPicker
+    //         selectedValue={selectedLecture.weekDay}
+    //         onValueChange={(value) => onScheduleChange({ weekDay: value })}
+    //     />
+    //
+    //     <LectureTypePicker
+    //         selectedValue={selectedLecture.type}
+    //         onValueChange={(itemValue) => onScheduleChange({ type: itemValue })}
+    //     />
+    //
+    //     <RoomSearch
+    //         rooms={rooms}
+    //         searchQuery={searchQuery}
+    //         setSearchQuery={setSearchQuery}
+    //         selectedRoom={selectedRoom}
+    //         handleRoomSelect={handleRoomSelect}
+    //     />
+    //
+    //     <EffectiveDateInput
+    //         label="Effective From"
+    //         value={effectiveFromText}
+    //         onChangeText={setEffectiveFromText}
+    //         placeholder="YYYY-MM-DD"
+    //     />
+    //
+    //     <EffectiveDateInput
+    //         label="Effective Until"
+    //         value={effectiveUntilText}
+    //         onChangeText={setEffectiveUntilText}
+    //         placeholder="YYYY-MM-DD"
+    //     />
+    //
+    //     <TimePicker
+    //         label="New Start Time"
+    //         selectedValue={selectedLecture.startTime}
+    //         onValueChange={(itemValue) => onScheduleChange({ startTime: itemValue })}
+    //         timeOptions={timeOptions}
+    //     />
+    //
+    //     <TimePicker
+    //         label="New End Time"
+    //         selectedValue={selectedLecture.endTime}
+    //         onValueChange={(itemValue) => onScheduleChange({ endTime: itemValue })}
+    //         timeOptions={timeOptions}
+    //     />
+    //
+    //     <SaveButton onPress={onSaveSchedule} isSaving={isSaving} />
+    // </View>
 );

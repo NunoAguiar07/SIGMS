@@ -7,6 +7,12 @@ import {updateLectureSchedule} from "../services/authorized/RequestUpdateLecture
 import {fetchRooms} from "../services/authorized/FetchRooms";
 import {RoomInterface} from "../types/RoomInterface";
 import {useDebounce} from "use-debounce";
+import {SubjectInterface} from "../types/SubjectInterface";
+import {SchoolClassInterface} from "../types/SchoolClassInterface";
+import {fetchLecturesByClass} from "../services/authorized/FetchLecturesByClass";
+import {fetchSubjects} from "../services/authorized/FetchSubjects";
+import {fetchLecturesByRoom} from "../services/authorized/FetchLecturesByRoom";
+import {fetchSubjectClasses} from "../services/authorized/FetchSubjectClasses";
 
 export const useUpdateLecture = () => {
     const [lectures, setLectures] = useState<Lecture[]>([]);
@@ -16,16 +22,32 @@ export const useUpdateLecture = () => {
     const [effectiveFrom, setEffectiveFrom] = useState<Date | null>(null);
     const [effectiveUntil, setEffectiveUntil] = useState<Date | null>(null);
     const [rooms, setRooms] = useState<RoomInterface[]>([]);
-    const [searchQuery, setSearchQuery] = useState('');
-    const [debouncedSearchQuery] = useDebounce(searchQuery, 500);
+    const [searchQueryRoom, setSearchQueryRoom] = useState('');
+    const [debouncedSearchQueryRoom] = useDebounce(searchQueryRoom, 500);
     const [selectedRoom, setSelectedRoom] = useState<RoomInterface | null>(null);
     const [effectiveFromText, setEffectiveFromText] = useState('');
     const [effectiveUntilText, setEffectiveUntilText] = useState('');
+    const [skipSearch, setSkipSearch] = useState<boolean>(false);
+
+    const [page, setPage] = useState(0);
+    const [lectureFilter, setLectureFilter] = useState<'all' | 'class' | 'room'>('all');
+    const [subjects, setSubjects] = useState<SubjectInterface[]>([]);
+    const [selectedSubject, setSelectedSubject] = useState<SubjectInterface | null>(null);
+    const [classes, setClasses] = useState<SchoolClassInterface[]>([]);
+    const [selectedClass, setSelectedClass] = useState<SchoolClassInterface | null>(null);
+
+    const [searchQuerySubjects, setSearchQuerySubjects] = useState<string>("");
+    const [debouncedSearchQuerySubjects] = useDebounce(searchQuerySubjects, 500);
+
+    const limit = 5;
+
+    const handleNext = () => setPage((prev) => prev + 1);
+    const handlePrevious = () => setPage((prev) => Math.max(prev - 1, 0));
 
 
     useEffect(() => {
-        if (debouncedSearchQuery.trim().length > 0) {
-            fetchRooms(debouncedSearchQuery)
+        if (debouncedSearchQueryRoom.trim().length > 0 && !skipSearch) {
+            fetchRooms(debouncedSearchQueryRoom, 'CLASS')
                 .then((data) => {
                     setRooms(data);
                 }).catch(err => {
@@ -37,8 +59,24 @@ export const useUpdateLecture = () => {
             setRooms([]);
             setSelectedRoom(null);
             setError(null);
+            setSkipSearch(false);
         }
-    }, [debouncedSearchQuery]);
+    }, [debouncedSearchQueryRoom]);
+
+    useEffect(() => {
+        if (debouncedSearchQuerySubjects.trim().length > 0 && !skipSearch) {
+            fetchSubjects(debouncedSearchQuerySubjects)
+                .then((data) => {
+                    setSubjects(data);
+                }).catch(err => {
+                setError(err as ParsedError);
+                setSubjects([]);
+            });
+        } else {
+            setSkipSearch(false)
+            setSubjects([]);
+        }
+    }, [debouncedSearchQuerySubjects]);
 
     useEffect(() => {
         const parsed = new Date(effectiveFromText);
@@ -54,32 +92,118 @@ export const useUpdateLecture = () => {
         }
     }, [effectiveUntilText]);
 
-    const handleRoomSelect = (room: RoomInterface) => {
+    const handleRoomSelect = async (room: RoomInterface) => {
         setSelectedRoom(room);
+        setSkipSearch(true)
+        setSearchQueryRoom(room.name);
+        setRooms([])
+        console.log("Selected Room:", room);
         if (selectedLecture) {
             setSelectedLecture({
                 ...selectedLecture,
                 room,
             });
-        }
-    };
-
-    useEffect(() => {
-        const loadLectures = async () => {
+        } else {
             try {
-                const data = await fetchLectures();
+                setLectureFilter('room');
+                const offset = page * limit;
+                const data = await fetchLecturesByRoom(room.id, limit, offset);
+                console.log("Fetched Lectures by Room:", data);
                 setLectures(data);
             } catch (err) {
                 setError(err as ParsedError);
             }
-        };
-        loadLectures();
-    }, []);
+        }
+    };
+
+    const handleOnSubjectSelect = async (subject: SubjectInterface) => {
+        setSelectedSubject(subject);
+        setSkipSearch(true);
+        setSearchQuerySubjects(subject.name);
+        setClasses([]);
+        setSelectedClass(null);
+        console.log("Selected Subject:", subject);
+        const classes = await fetchSubjectClasses(subject.id)
+        setClasses(classes);
+    }
+
+    const handleClassSelect = async (schoolClass : SchoolClassInterface) => {
+        if (!schoolClass || !selectedSubject) {
+            Alert.alert("Missing Class", "Please select a class to filter lectures.");
+            return;
+        }
+        setSelectedClass(schoolClass);
+        try {
+            setLectureFilter('class');
+            const offset = page * limit;
+            const data = await fetchLecturesByClass(selectedSubject.id, schoolClass.id, limit, offset);
+            console.log("Fetched Lectures by Class:", data);
+            setLectures(data);
+        } catch (err) {
+            setError(err as ParsedError);
+        }
+    }
+
+    const onGetAllLectures = async () => {
+        try {
+            setLectureFilter('all')
+            const offset = page * limit;
+            const data = await fetchLectures(limit, offset);
+            console.log("Fetched Lectures:", data);
+            setLectures(data);
+        } catch (err) {
+            setError(err as ParsedError);
+        }
+    };
+
+    const onGetLecturesByClass = async () => {
+        try {
+            if (!selectedClass || !selectedSubject) {
+                Alert.alert("Missing Class", "Please select a class to filter lectures.");
+                return;
+            }
+            const offset = page * limit;
+            const data = await fetchLecturesByClass(selectedSubject.id, selectedClass.id, limit, offset);
+            console.log("Fetched Lectures by Class:", data);
+            setLectures(data);
+        } catch (err) {
+            setError(err as ParsedError);
+        }
+    }
+
+    const onGetLecturesByRoom = async () => {
+        try {
+            if (!selectedRoom) {
+                Alert.alert("Missing Room", "Please select a room to filter lectures.");
+                return;
+            }
+            const offset = page * limit;
+            const data = await fetchLecturesByRoom(selectedRoom.id, limit, offset);
+            console.log("Fetched Lectures by Room:", data);
+            setLectures(data);
+        } catch (err) {
+            setError(err as ParsedError);
+        }
+    };
 
     const onLectureSelect = (lecture: Lecture) => {
+        setSearchQueryRoom('')
         setSelectedLecture({ ...lecture });
         setSelectedRoom(lecture.room);
     };
+
+    useEffect(() => {
+        setError(null);
+        setSelectedLecture(null);
+        if (lectureFilter === 'all') {
+            onGetAllLectures();
+        } else if (lectureFilter === 'class') {
+            onGetLecturesByClass();
+        } else if (lectureFilter === 'room') {
+            onGetLecturesByRoom();
+        }
+    }, [page]);
+
     const onScheduleChange = (changes: Partial<Lecture>) => {
         if (!selectedLecture) return;
         setSelectedLecture({
@@ -107,6 +231,7 @@ export const useUpdateLecture = () => {
                  effectiveFromDate = effectiveFrom.toISOString()
                  effectiveUntilDate = effectiveUntil.toISOString()
             }
+            console.log("Saving Lecture Schedule:", {selectedLecture, effectiveFromDate, effectiveUntilDate})
             const updated = await updateLectureSchedule(
                 selectedLecture,
                 effectiveFromDate,
@@ -143,8 +268,8 @@ export const useUpdateLecture = () => {
         error,
         isSaving,
         rooms,
-        setSearchQuery,
-        searchQuery,
+        setSearchQueryRoom,
+        searchQueryRoom,
         selectedRoom,
         handleRoomSelect,
         effectiveFrom,
@@ -155,6 +280,18 @@ export const useUpdateLecture = () => {
         setEffectiveFromText,
         effectiveUntilText,
         setEffectiveUntilText,
-
+        page,
+        lectureFilter,
+        setLectureFilter,
+        searchQuerySubjects,
+        setSearchQuerySubjects,
+        debouncedSearchQuerySubjects,
+        subjects,
+        classes,
+        onGetAllLectures,
+        handleOnSubjectSelect,
+        handleClassSelect,
+        handleNext,
+        handlePrevious,
     };
 };

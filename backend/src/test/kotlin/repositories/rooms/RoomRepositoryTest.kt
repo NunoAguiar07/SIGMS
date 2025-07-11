@@ -1,15 +1,11 @@
 package repositories.rooms
 
-import isel.leic.group25.db.entities.rooms.OfficeRoom
 import isel.leic.group25.db.entities.types.Role
-import isel.leic.group25.db.entities.users.Teacher
 import isel.leic.group25.db.entities.users.User
 import isel.leic.group25.db.repositories.ktorm.KtormCommand
 import isel.leic.group25.db.repositories.rooms.RoomRepository
 import isel.leic.group25.db.repositories.timetables.UniversityRepository
 import isel.leic.group25.db.repositories.users.UserRepository
-import isel.leic.group25.db.tables.Tables.Companion.teachers
-import org.ktorm.entity.add
 import repositories.DatabaseTestSetup
 import repositories.DatabaseTestSetup.Companion.database
 import kotlin.test.AfterTest

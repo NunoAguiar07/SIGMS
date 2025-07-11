@@ -7,12 +7,7 @@ import isel.leic.group25.services.errors.RoomError
 import isel.leic.group25.utils.Failure
 import isel.leic.group25.utils.Success
 import mocks.repositories.MockRepositories
-import mocks.repositories.rooms.MockRoomRepository
-import mocks.repositories.timetables.MockUniversityRepository
-import mocks.repositories.utils.MockTransaction
 import org.ktorm.database.Database
-import repositories.DatabaseTestSetup
-import kotlin.test.AfterTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -177,7 +172,7 @@ class RoomServiceTest {
         val room = mockRepositories.from({roomRepository}) {
             createRoom(20, "Unique Room Name", university)
         }
-        val result = roomService.getRoomsByNameAndUniversityId(university.id, "Unique", 10, 0)
+        val result = roomService.getRoomsByNameByTypeAndUniversityId(university.id, "Unique", null,10, 0)
         assertTrue(result is Success)
         assertEquals(1, result.value.size)
         assertEquals(room.id, result.value.first().id)

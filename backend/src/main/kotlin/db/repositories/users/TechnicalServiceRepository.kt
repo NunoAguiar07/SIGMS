@@ -16,11 +16,8 @@ import org.ktorm.dsl.map
 import org.ktorm.dsl.select
 import org.ktorm.dsl.where
 import org.ktorm.entity.any
-import org.ktorm.entity.filter
 import org.ktorm.entity.first
 import org.ktorm.entity.firstOrNull
-import org.ktorm.entity.mapNotNull
-import org.ktorm.entity.toList
 
 class TechnicalServiceRepository(private val database: Database): TechnicalServiceRepositoryInterface {
     override fun findTechnicalServiceById(id: Int): TechnicalService? = withDatabase {
