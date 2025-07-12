@@ -1,10 +1,7 @@
-import {FlatList, ScrollView, View} from "react-native";
-import {scheduleLectureStyles} from "../css_styling/lecture/scheduleLectureStyles";
-import {commonStyles} from "../css_styling/common/CommonProps";
+import {FlatList, ScrollView} from "react-native";
 import {RoomInterface} from "../../types/RoomInterface";
 import {Lecture} from "../../types/calendar/Lecture";
 import {isMobile} from "../../utils/DeviceType";
-import {UpdateLectureProps} from "../css_styling/update_lecture/UpdateLectureProps";
 import {
     Card,
     CenteredContainer,
@@ -106,56 +103,109 @@ export const UpdateLectureScreen = ({
         )
     } else {
         return(
-            <View style={scheduleLectureStyles.container}>
+            <Container flex={1} padding="md">
                 {!selectedLecture ? (
-                    <View style={commonStyles.leftColumn}>
-                        <LectureList
-                            lectures={lectures}
-                            onLectureSelect={onLectureSelect}
-                            searchQueryRoom={searchQueryRoom}
-                            setSearchQueryRoom={setSearchQueryRoom}
-                            rooms={rooms}
-                            handleRoomSelect={handleRoomSelect}
-                            searchQuerySubjects={searchQuerySubjects}
-                            setSearchQuerySubjects={setSearchQuerySubjects}
-                            subjects={subjects}
-                            handleClassSelect={handleClassSelect}
-                            handleOnSubjectSelect={handleOnSubjectSelect}
-                            onGetAllLectures={onGetAllLectures}
-                            classes={classes}
-                            lectureFilter={lectureFilter}
-                            setLectureFilter={setLectureFilter}
-                            handleNext={handleNext}
-                            handlePrevious={handlePrevious}
-                            page={page}
-                        />
-                    </View>
+                    <CenteredContainer flex={1} gap="md" width={'100%'}>
+                        <GridRow heightPercent={50}>
+                            <FilterButtons
+                                onGetAllLectures={onGetAllLectures}
+                                setLectureFilter={setLectureFilter}
+                                widthPercent={100}
+                            />
+                            {lectureFilter === 'room' && (
+                                <RoomSearchSection
+                                    searchQueryRoom={searchQueryRoom}
+                                    setSearchQueryRoom={setSearchQueryRoom}
+                                    rooms={rooms}
+                                    handleRoomSelect={handleRoomSelect}
+                                />
+                            )}
+                            {lectureFilter === 'class' && (
+                                <CenteredContainer gap="md" >
+                                    <SubjectSearchSection
+                                        searchQuerySubjects={searchQuerySubjects}
+                                        setSearchQuerySubjects={setSearchQuerySubjects}
+                                        subjects={subjects}
+                                        handleOnSubjectSelect={handleOnSubjectSelect}
+                                    />
+                                    <ClassListSection
+                                        classes={classes}
+                                        handleClassSelect={handleClassSelect}
+                                    />
+                                </CenteredContainer>
+
+                            )}
+                        </GridRow>
+                        <GridRow heightPercent={50} gap={"md"}>
+                            <CenteredContainer gap="md" flex={1} width={'100%'}>
+                                <LecturesListSection
+                                    lectures={lectures}
+                                    onLectureSelect={onLectureSelect}
+                                    handleNext={handleNext}
+                                    handlePrevious={handlePrevious}
+                                    page={page}
+                                    hasNext={lectures.length >= 5}
+                                />
+                            </CenteredContainer>
+                        </GridRow>
+                    </CenteredContainer>
                 ) : (
-                    <View style={commonStyles.rightColumn}>
-                        <FlatList
-                            data={[1]} // Single item to wrap our content
-                            renderItem={() => <UpdateLectureForm
-                            selectedLecture={selectedLecture}
-                            onScheduleChange={onScheduleChange}
-                            rooms={rooms}
-                            searchQuery={searchQueryRoom}
-                            setSearchQuery={setSearchQueryRoom}
-                            handleRoomSelect={handleRoomSelect}
-                            effectiveFromText={effectiveFromText}
-                            effectiveUntilText={effectiveUntilText}
-                            setEffectiveFromText={setEffectiveFromText}
-                            setEffectiveUntilText={setEffectiveUntilText}
-                            onSaveSchedule={onSaveSchedule}
-                            isSaving={isSaving}
-                            />}
-                            keyExtractor={() => 'update-lecture-form'}
-                        />
-                    </View>
-                ) }
-            </View>
+                    <CenteredContainer flex={1} gap="md" padding="md" >
+                        <Card shadow="medium" alignItems={"center"} gap="md" flex={selectedLecture ? 1: undefined}>
+                            {selectedLecture ? (
+                                <UpdateLectureForm
+                                    selectedLecture={selectedLecture}
+                                    onScheduleChange={onScheduleChange}
+                                    rooms={rooms}
+                                    searchQuery={searchQueryRoom}
+                                    setSearchQuery={setSearchQueryRoom}
+                                    handleRoomSelect={handleRoomSelect}
+                                    effectiveFromText={effectiveFromText}
+                                    effectiveUntilText={effectiveUntilText}
+                                    setEffectiveFromText={setEffectiveFromText}
+                                    setEffectiveUntilText={setEffectiveUntilText}
+                                    onSaveSchedule={onSaveSchedule}
+                                    isSaving={isSaving}
+                                />
+                            ) : (
+                                <Subtitle>Select a lecture to update schedule</Subtitle>
+                            )}
+                        </Card>
+                    </CenteredContainer>
+                )}
+            </Container>
         )
     }
 };
+
+interface UpdateLectureProps {
+    lectures: Lecture[];
+    selectedLecture: Lecture | null;
+    onLectureSelect: (lecture: Lecture) => void;
+    onScheduleChange: (changes: Partial<Lecture>) => void;
+    onSaveSchedule: () => void;
+    isSaving: boolean;
+    rooms: RoomInterface[];
+    searchQueryRoom: string;
+    setSearchQueryRoom: (query: string) => void;
+    handleRoomSelect: (room: RoomInterface) => void;
+    setEffectiveFromText: (text: string) => void;
+    setEffectiveUntilText: (text: string) => void;
+    effectiveFromText: string;
+    effectiveUntilText: string;
+    searchQuerySubjects: string;
+    setSearchQuerySubjects: (query: string) => void;
+    subjects: SubjectInterface[];
+    onGetAllLectures: () => void;
+    handleOnSubjectSelect: (subject: SubjectInterface) => void;
+    handleClassSelect: (schoolClass: SchoolClassInterface) => void;
+    classes: SchoolClassInterface[];
+    lectureFilter: 'all' | 'class' | 'room';
+    setLectureFilter: (filter: 'all' | 'class' | 'room') => void;
+    handleNext: () => void;
+    handlePrevious: () => void;
+    page: number;
+}
 
 interface LectureListProps {
     lectures: Lecture[];
@@ -219,7 +269,7 @@ export const FilterButtons = ({
                                   setLectureFilter,
                                   widthPercent
                               }: FilterButtonsProps) => (
-    <GridColumn widthPercent={widthPercent} gap={"md"}>
+    <CenteredContainer flex={1} width={`${widthPercent}%`} gap="md">
         <Button variant={'primary'} onPress={onGetAllLectures}>
             <ButtonText>All Lectures</ButtonText>
         </Button>
@@ -229,7 +279,7 @@ export const FilterButtons = ({
         <Button variant={'primary'} onPress={() => setLectureFilter('room')}>
             <ButtonText>By Room</ButtonText>
         </Button>
-    </GridColumn>
+    </CenteredContainer>
 );
 
 // RoomSearchSection.tsx
@@ -395,27 +445,26 @@ export const LecturesListSection = ({
     </Card>
 );
 
-// Updated LectureList.tsx
 export const LectureList = ({
-                                lectures,
-                                onLectureSelect,
-                                searchQueryRoom,
-                                setSearchQueryRoom,
-                                rooms,
-                                handleRoomSelect,
-                                searchQuerySubjects,
-                                setSearchQuerySubjects,
-                                subjects,
-                                handleClassSelect,
-                                handleOnSubjectSelect,
-                                onGetAllLectures,
-                                classes,
-                                lectureFilter,
-                                setLectureFilter,
-                                handleNext,
-                                handlePrevious,
-                                page
-                            }: LectureListProps) => {
+    lectures,
+    onLectureSelect,
+    searchQueryRoom,
+    setSearchQueryRoom,
+    rooms,
+    handleRoomSelect,
+    searchQuerySubjects,
+    setSearchQuerySubjects,
+    subjects,
+    handleClassSelect,
+    handleOnSubjectSelect,
+    onGetAllLectures,
+    classes,
+    lectureFilter,
+    setLectureFilter,
+    handleNext,
+    handlePrevious,
+    page
+}: LectureListProps) => {
     const getWidthPercent = () => {
         switch(lectureFilter) {
             case 'all': return 100;
@@ -589,5 +638,13 @@ export const UpdateLectureForm = ({
         >
             <ButtonText>{isSaving ? 'Saving...' : 'Save Schedule'}</ButtonText>
         </Button>
+        {isMobile && (
+            <Button
+                variant="primary"
+                onPress={() => onScheduleChange({})}
+            >
+                <ButtonText>Clear Changes</ButtonText>
+            </Button>
+        )}
     </CenteredContainer>
 );

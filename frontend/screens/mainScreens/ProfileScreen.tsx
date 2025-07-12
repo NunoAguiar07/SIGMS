@@ -4,6 +4,7 @@ import {ImageComponent, ImageWrapper} from "../css_styling/common/Images";
 import {theme} from "../css_styling/common/Theme";
 import {Title} from "../css_styling/common/Typography";
 import {ProfileInterface} from "../../types/ProfileInterface";
+import {isMobile} from "../../utils/DeviceType";
 
 
 export const ProfileScreen = ({
@@ -56,13 +57,28 @@ const ProfileImage = ({ imageUri, onPress }: ProfileImageType) => (
 
 const ProfileInfo = ({username, email, university, officeRoomName, image}: ProfileInterface) => (
     <CenteredContainer>
-        <Title color={theme.colors.text.white}>{username}</Title>
-        <Title color={theme.colors.text.white}>{email}</Title>
-        <Title color={theme.colors.text.white}>{university}</Title>
-        {officeRoomName && (
-            <Title color={theme.colors.text.white}>
-                Office: {officeRoomName}
-            </Title>
+        { !isMobile ? (
+            <CenteredContainer>
+                <Title color={theme.colors.text.white}>{username}</Title>
+                <Title color={theme.colors.text.white}>{email}</Title>
+                <Title color={theme.colors.text.white}>{university}</Title>
+                {officeRoomName && (
+                    <Title color={theme.colors.text.white}>
+                        Office: {officeRoomName}
+                    </Title>
+                )}
+            </CenteredContainer>
+        ):(
+            <CenteredContainer>
+                <Title color={theme.colors.text.black}>{username}</Title>
+                <Title color={theme.colors.text.black}>{email}</Title>
+                <Title color={theme.colors.text.black}>{university}</Title>
+                {officeRoomName && (
+                    <Title color={theme.colors.text.black}>
+                        Office: {officeRoomName}
+                    </Title>
+                )}
+            </CenteredContainer>
         )}
     </CenteredContainer>
 );
