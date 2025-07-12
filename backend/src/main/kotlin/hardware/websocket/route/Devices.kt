@@ -72,7 +72,7 @@ object Devices: WebsocketRoute {
         val json = Json.encodeToString(event)
         connection.send(json)
         deviceList.remove(device)
-        deviceList.add(device)
+        deviceList.add(device.copy(roomId = roomId))
         return true
     }
 }

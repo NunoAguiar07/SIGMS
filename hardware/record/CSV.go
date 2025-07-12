@@ -44,11 +44,7 @@ func (cm *CSVManager) CreateCSVFile() error {
 }
 
 func (cm *CSVManager) WriteEntry(count int) error {
-	if err := cm.CreateCSVFile(); err != nil {
-		return err
-	}
-
-	file, err := os.OpenFile(cm.filename, os.O_WRONLY|os.O_APPEND, 0644)
+	file, err := os.OpenFile(cm.filename+".csv", os.O_WRONLY|os.O_APPEND, 0644)
 	if err != nil {
 		return fmt.Errorf("error opening file: %w", err)
 	}
