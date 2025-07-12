@@ -7,6 +7,7 @@ import {requestUpdateProfile} from "../services/authorized/RequestUpdateProfile"
 import {fetchTeacherProfileById} from "../services/authorized/FetchTeacherProfileById";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {TeacherUser} from "../types/teacher/TeacherUser";
+import {useAlert} from "./notifications/useAlert";
 
 
 export const useProfile = (id:number | undefined) => {
@@ -17,6 +18,8 @@ export const useProfile = (id:number | undefined) => {
     const [imageUri, setImageUri] = useState<string | null>(null);
     const [updateLoading, setUpdateLoading] = useState(false);
     const [updateError, setUpdateError] = useState<ParsedError | null>(null);
+
+    const showAlert = useAlert();
 
     const isTeacherUser = (data: any): data is TeacherUser =>
         data && data.user && typeof data.user.id === 'number';
@@ -57,9 +60,15 @@ export const useProfile = (id:number | undefined) => {
     }, [imageUri]);
 
     const pickImage = async () => {
+        const myId = await AsyncStorage.getItem('userId');
+        const profileData = typeof myId === 'string' && +myId !== id
+        if( profileData) {
+            showAlert('Denied','You cannot change the profile image of another user!');
+            return;
+        }
         const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
         if (!permissionResult.granted) {
-            alert('Permission to access media library is required!');
+            showAlert('Permission Denied', 'You need to grant permission to access the media library.');
             return;
         }
 
@@ -89,7 +98,6 @@ export const useProfile = (id:number | undefined) => {
                     setImage(byteArray);
                     setImageUri(`data:image/jpeg;base64,${base64Image}`);
                 } catch (err) {
-                    console.error('Image update failed', err);
                     setImage(profile?.image || null);
                     setImageUri(profile?.image ? `data:image/jpeg;base64,${profile.image}` : null);
                 }

@@ -5,6 +5,7 @@ interface InputProps {
     theme: Theme;
     hasError?: boolean;
     multiline?: boolean;
+    width?: string;
 }
 
 export const Input = styled.TextInput<InputProps>`
@@ -12,7 +13,7 @@ export const Input = styled.TextInput<InputProps>`
     border-color: ${({ hasError, theme }) =>
         hasError ? theme.colors.status.error : theme.colors.border
     };
-    width: 200px;
+    width: ${({ width }) => width || '200px'};
     border-radius: ${({ theme }) => theme.borderRadius.medium}px;
     padding: ${({ theme }) => theme.spacing.md}px;
     font-size: ${({ theme }) => theme.fonts.sizes.medium}px;

@@ -8,12 +8,12 @@ import {fetchSubjects} from "../services/authorized/FetchSubjects";
 import {createSubject} from "../services/authorized/CreateSubjectRequest";
 import {createClass} from "../services/authorized/CreateClassRequest";
 import {createRoom} from "../services/authorized/CreateRoomSubject";
-import {Alert} from "react-native";
 import {SchoolClassInterface} from "../types/SchoolClassInterface";
 import {fetchSubjectClasses} from "../services/authorized/FetchSubjectClasses";
 import {RoomInterface} from "../types/RoomInterface";
 import {fetchRooms} from "../services/authorized/FetchRooms";
 import {createLecture} from "../services/authorized/CreateLecture";
+import {useAlert} from "./notifications/useAlert";
 
 
 export const useAdminEntityCreation = () => {
@@ -29,6 +29,8 @@ export const useAdminEntityCreation = () => {
     const [debouncedSearchQuerySubjects] = useDebounce(searchQuerySubjects, 500);
     const [debouncedSearchQueryRooms] = useDebounce(searchQueryRooms, 500);
     const [isLoading, setIsLoading] = useState(false);
+
+    const showAlert = useAlert()
 
     const handleItemSelect = (item : any) => {
         setSkipSearch(true)
@@ -173,7 +175,7 @@ export const useAdminEntityCreation = () => {
             }
 
             if (success) {
-                Alert.alert('Success', `Successfully created ${selectedEntity}`);
+                showAlert('Success', `Successfully created ${selectedEntity}`);
                 setFormValues({});
                 setSearchQuerySubjects('');
                 setSearchQueryRooms('');
@@ -182,11 +184,10 @@ export const useAdminEntityCreation = () => {
                 setRooms([]);
                 setSelectedEntity(null);
             } else {
-                Alert.alert('Error', `Failed to create ${selectedEntity}`);
+                showAlert('Error', `Failed to create ${selectedEntity}`);
             }
         } catch (err) {
             setError(err as ParsedError);
-            Alert.alert('Error', `Failed to create ${selectedEntity}`);
         } finally {
             setIsLoading(false);
         }

@@ -4,8 +4,8 @@ import {fetchPendingApprovals} from "../services/authorized/FetchPendingApproval
 import {handleAxiosError} from "../utils/HandleAxiosError";
 import {useFocusEffect} from "expo-router";
 import {requestProcessApproval} from "../services/authorized/RequestProcessApproval";
-import {Alert} from "react-native";
 import {ParsedError} from "../types/errors/ParseErrorTypes";
+import {useAlert} from "./notifications/useAlert";
 
 
 
@@ -17,6 +17,8 @@ export const useAccessRoles = () => {
     const [error, setError] = useState<ParsedError | null>(null);
     const LIMIT = 7;
     const TIMING = 150000; // 2.5min
+
+    const showAlert = useAlert()
 
     const fetchApprovals = async (page: number) => {
         setIsLoading(true);
@@ -51,12 +53,11 @@ export const useAccessRoles = () => {
         try {
             const success = await requestProcessApproval(approval.verificationToken, true);
             if (success) {
-                Alert.alert('Success', 'User has been approved');
+                showAlert('Success', 'User has been approved');
                 fetchApprovals(currentPage);
             }
         } catch (err) {
             setError(handleAxiosError(err));
-            Alert.alert('Error', 'Failed to approve user');
         }
     };
 
@@ -67,12 +68,11 @@ export const useAccessRoles = () => {
         try {
             const success = await requestProcessApproval(approval.verificationToken, false);
             if (success) {
-                Alert.alert('Success', 'User has been rejected');
+                showAlert('Success', 'User has been rejected');
                 fetchApprovals(currentPage);
             }
         } catch (err) {
             setError(handleAxiosError(err));
-            Alert.alert('Error', 'Failed to reject user');
         }
     };
 

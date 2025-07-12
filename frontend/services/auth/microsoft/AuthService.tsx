@@ -44,7 +44,6 @@ export const AuthService = {
 
             return response.data;
         } catch (error) {
-            console.error('Backend authentication failed:', error);
             throw handleAxiosError(error);
         }
     },

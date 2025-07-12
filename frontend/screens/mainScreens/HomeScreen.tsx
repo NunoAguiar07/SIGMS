@@ -12,14 +12,11 @@ export const HomeScreen = ({ shouldShowCalendar, onLogout, username, schedule, n
     if (isMobile) {
         return (
             <ScreenContainer backgroundColor={"transparent"}>
-                {/* Header Section */}
                 <Container style={{ marginBottom: 24}}>
                     <Logo />
                     <Title>A tua sala de aula, mais simples.</Title>
                     <Title>Bem vindo, {username}</Title>
                 </Container>
-
-                {/* Logout Button */}
                 <Button variant="primary" onPress={onLogout} style={{ marginTop: 16 }}>
                     <ButtonText>Logout</ButtonText>
                 </Button>

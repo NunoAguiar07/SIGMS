@@ -1,25 +1,27 @@
 import React from "react";
-import { Modal, TouchableOpacity, View, Text } from "react-native";
-import {welcomeStyles} from "../../css_styling/welcome/WelcomeProps";
 import {FooterType} from "../../types/FooterType";
+import {StyledModal} from "../../css_styling/common/Modal";
+import {Card, CenteredContainer} from "../../css_styling/common/NewContainers";
+import {BodyText, Subtitle} from "../../css_styling/common/Typography";
+import {ActionButton} from "../../css_styling/common/Buttons";
+import {Ionicons} from "@expo/vector-icons";
 
 export const About = ({ onClose }: FooterType) => (
-    <Modal visible={true} animationType="fade" transparent={true} onRequestClose={onClose}>
-        <View style={welcomeStyles.modalOverlay}>
-            <View style={welcomeStyles.modalContent}>
-                <TouchableOpacity style={welcomeStyles.closeButton} onPress={onClose}>
-                    <Text style={welcomeStyles.closeButtonText}>×</Text>
-                </TouchableOpacity>
-
-                <Text style={welcomeStyles.title}>About SIGMS</Text>
-                <Text>This app was made by:</Text>
-                <View style={{ marginVertical: 8 }}>
-                    <Text>- Nuno Aguiar</Text>
-                    <Text>- Tomás Martinho</Text>
-                    <Text>- Felipe Alvarez</Text>
-                </View>
-                <Text>Now we need to write a bit more!!</Text>
-            </View>
-        </View>
-    </Modal>
+    <StyledModal visible={true} animationType="fade" transparent={true} onRequestClose={onClose}>
+        <CenteredContainer flex={1} justifyContent="center" padding="md">
+            <Card shadow="medium" alignItems={"center"} gap="md">
+                <Subtitle>About SIGMS</Subtitle>
+                <BodyText>This app was made by:</BodyText>
+                <BodyText>- Nuno Aguiar</BodyText>
+                <BodyText>- Tomás Martinho</BodyText>
+                <BodyText>- Felipe Alvarez</BodyText>
+                <ActionButton
+                    variant="primary"
+                    onPress={onClose}
+                >
+                    <Ionicons name={"close"} size={24} color="white" />
+                </ActionButton>
+            </Card>
+        </CenteredContainer>
+    </StyledModal>
 );

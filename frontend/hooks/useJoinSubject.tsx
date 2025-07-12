@@ -3,12 +3,12 @@ import {SubjectInterface} from "../types/SubjectInterface";
 import {SchoolClassInterface} from "../types/SchoolClassInterface";
 import {useDebounce} from "use-debounce";
 import {ParsedError} from "../types/errors/ParseErrorTypes";
-import {Alert} from "react-native";
 import {fetchSubjects} from "../services/authorized/FetchSubjects";
 import {fetchSubjectClasses} from "../services/authorized/FetchSubjectClasses";
 import {joinClass} from "../services/authorized/RequestJoinClass";
 import {fetchUserClasses} from "../services/authorized/FetchUserClasses";
 import {leaveClass} from "../services/authorized/RequestLeaveClass";
+import {useAlert} from "./notifications/useAlert";
 
 
 export const useJoinSubject = () => {
@@ -21,6 +21,8 @@ export const useJoinSubject = () => {
     const [error, setError] = useState<ParsedError | null>(null);
     const [userClasses, setUserClasses] = useState<SchoolClassInterface[]>([]);
     const [initialLoading, setInitialLoading] = useState<boolean>(true);
+
+    const showAlert = useAlert()
 
     useEffect(() => {
         if (debouncedSearchQuery.trim().length > 0) {
@@ -69,13 +71,12 @@ export const useJoinSubject = () => {
                 setSelectedSubject(null);
                 setSchoolClasses([]);
                 await fetchAndUpdateUserClasses();
-                Alert.alert("Success", "You have joined the class successfully!");
+                showAlert("Success", "You have joined the class successfully!");
             } else {
-                Alert.alert("Error", "Failed to join the class. Please try again.");
+                showAlert("Error", "Failed to join the class. Please try again.");
             }
         } catch (err) {
             setError(err as ParsedError);
-            Alert.alert("Error", "Something went wrong while joining the class.");
         }
     };
 
@@ -84,13 +85,12 @@ export const useJoinSubject = () => {
             const success = await leaveClass(subjectId, classId)
             if (success) {
                 await fetchAndUpdateUserClasses();
-                Alert.alert("Success", "You have left the class successfully!")
+                showAlert("Success", "You have left the class successfully!");
             } else {
-                Alert.alert("Error", "Failed to leave the class. Please try again.")
+                showAlert("Error", "Failed to join the class. Please try again.");
             }
          } catch (err) {
             setError(err as ParsedError);
-            Alert.alert("Error", "Something went wrong while leaving the class.");
          }
 
     }

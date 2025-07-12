@@ -49,40 +49,6 @@ export const TechnicianUnassignedIssuesScreen = ({
                 )}
         </CenteredContainer>
     );
-
-        // <View style={commonStyles.container}>
-        //     <Text style={commonStyles.title}>Unassigned Room Issues</Text>
-        //
-        //     {isMobile ? (
-        //         <MobileIssueView
-        //             issues={issues}
-        //             onAssign={onAssign}
-        //             currentPage={currentPage}
-        //             onNext={onNext}
-        //             onPrevious={onPrevious}
-        //             hasNext={hasNext}
-        //         />
-        //     ) : (
-        //         <>
-        //             <View style={commonStyles.tableContainer}>
-        //                 <TableHeader />
-        //                 <FlatList
-        //                     data={issues}
-        //                     keyExtractor={(item) => item.id.toString()}
-        //                     renderItem={({ item }) => (
-        //                         <IssueRow item={item} onAssign={onAssign} />
-        //                     )}
-        //                 />
-        //             </View>
-        //             <PaginationControls
-        //                 currentPage={currentPage}
-        //                 hasNext={hasNext}
-        //                 onNext={onNext}
-        //                 onPrevious={onPrevious}
-        //             />
-        //         </>
-        //     )}
-        // </View>
 };
 
 interface UnassignedIssuesTableType {
@@ -234,52 +200,5 @@ const MobileIssueView = ({
                 </RowContainer>
             </Animated.View>
         </CenteredContainer>
-        // <View style={mobileStyles.container}>
-        //     <Animated.View
-        //         style={[
-        //             mobileStyles.card,
-        //             {
-        //                 transform: [{ translateX: pan.x }]
-        //             }
-        //         ]}
-        //         {...panResponder.panHandlers}
-        //     >
-        //         <View style={mobileStyles.cardContent}>
-        //             <Text style={mobileStyles.roomName}>{currentIssue.room.name}</Text>
-        //
-        //             <View style={mobileStyles.detailSection}>
-        //                 <Text style={mobileStyles.detailLabel}>Description:</Text>
-        //                 <Text style={mobileStyles.detailValue}>{currentIssue.description}</Text>
-        //             </View>
-        //
-        //             <TouchableOpacity
-        //                 style={mobileStyles.assignButton}
-        //                 onPress={() => onAssign(currentIssue.id)}
-        //             >
-        //                 <Ionicons name="checkmark" size={20} color="white" />
-        //                 <Text style={mobileStyles.buttonText}>Assign to Me</Text>
-        //             </TouchableOpacity>
-        //         </View>
-        //     </Animated.View>
-        //
-        //     <View style={mobileStyles.paginationDots}>
-        //         {issues.map((_, index) => (
-        //             <View
-        //                 key={index}
-        //                 style={[
-        //                     mobileStyles.dot,
-        //                     index === currentIndex && mobileStyles.activeDot
-        //                 ]}
-        //             />
-        //         ))}
-        //     </View>
-        //
-        //     <PaginationControls
-        //         currentPage={currentPage}
-        //         hasNext={hasNext}
-        //         onNext={onNext}
-        //         onPrevious={onPrevious}
-        //     />
-        // </View>
     );
 };

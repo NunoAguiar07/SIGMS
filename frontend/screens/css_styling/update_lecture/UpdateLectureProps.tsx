@@ -14,7 +14,6 @@ export interface UpdateLectureProps {
     rooms: RoomInterface[];
     searchQueryRoom: string;
     setSearchQueryRoom: (query: string) => void;
-    selectedRoom: RoomInterface | null;
     handleRoomSelect: (room: RoomInterface) => void;
     setEffectiveFromText: (text: string) => void;
     setEffectiveUntilText: (text: string) => void;

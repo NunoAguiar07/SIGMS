@@ -50,41 +50,6 @@ export const AccessRolesScreen = ({
                 />
             )}
         </CenteredContainer>
-        // <View style={[
-        //     commonStyles.container,
-        //     isMobile && { padding: 0 }
-        // ]}>
-        //     <Text style={[commonStyles.title, isMobile && { marginBottom: 16 }]}>
-        //         Pending Approvals
-        //     </Text>
-        //
-        //     {isMobile ? (
-        //         <AccessRoleMobileView
-        //             approvals={approvals}
-        //             onApprove={onApprove}
-        //             onReject={onReject}
-        //             currentPage={currentPage}
-        //             hasNext={hasNext}
-        //             onNext={onNext}
-        //             onPrevious={onPrevious}
-        //         />
-        //     ) : (
-        //         <AccessRoleTable
-        //             approvals={approvals}
-        //             onApprove={onApprove}
-        //             onReject={onReject}
-        //         />
-        //     )}
-        //
-        //     {!isMobile && (
-        //         <PaginationControls
-        //             currentPage={currentPage}
-        //             hasNext={hasNext}
-        //             onNext={onNext}
-        //             onPrevious={onPrevious}
-        //         />
-        //     )}
-        // </View>
     );
 };
 
@@ -166,38 +131,6 @@ export const AccessRoleRow = ({ item, onApprove, onReject }: AccessRoleRowType) 
         </RowContainer>
         </TableColumn>
     </TableRow>
-    // <View style={commonStyles.tableRow}>
-    //     <View style={accessRoleStyles.nameColumn}>
-    //         <Text style={commonStyles.cellText} numberOfLines={1}>{item.user.name}</Text>
-    //     </View>
-    //     <View style={accessRoleStyles.emailColumn}>
-    //         <Text style={commonStyles.cellText} numberOfLines={1}>{item.user.email}</Text>
-    //     </View>
-    //     <View style={accessRoleStyles.roleColumn}>
-    //         <Text style={commonStyles.cellText}>{item.requestedRole}</Text>
-    //     </View>
-    //     <View style={accessRoleStyles.dateColumn}>
-    //         <Text style={commonStyles.cellText}>
-    //             {new Date(item.createdAt).toLocaleDateString()}
-    //         </Text>
-    //     </View>
-    //     <View style={accessRoleStyles.actionsColumn}>
-    //         <View style={[accessRoleStyles.actionsCell, accessRoleStyles.actionsColumn]}>
-    //             <TouchableOpacity
-    //                 style={[commonStyles.actionButton, commonStyles.approveButton]}
-    //                 onPress={() => onApprove(item.id)}
-    //             >
-    //                 <Ionicons name="checkmark" size={16} color="white" />
-    //             </TouchableOpacity>
-    //             <TouchableOpacity
-    //                 style={[commonStyles.actionButton, commonStyles.rejectButton]}
-    //                 onPress={() => onReject(item.id)}
-    //             >
-    //                 <Ionicons name="close" size={16} color="white" />
-    //             </TouchableOpacity>
-    //         </View>
-    //     </View>
-    // </View>
 );
 
 export const AccessRoleMobileView = ({
@@ -225,9 +158,6 @@ export const AccessRoleMobileView = ({
             <CenteredContainer flex={1} padding="md">
                 <BodyText>No pending approvals</BodyText>
             </CenteredContainer>
-            // <View style={mobileStyles.container}>
-            //     <Text style={mobileStyles.emptyText}>No pending approvals</Text>
-            // </View>
         );
     }
 
@@ -274,66 +204,5 @@ export const AccessRoleMobileView = ({
                 </RowContainer>
             </Animated.View>
         </CenteredContainer>
-        // <View style={mobileStyles.container}>
-        //     <Animated.View
-        //         style={[
-        //             mobileStyles.card,
-        //             {
-        //                 transform: [{ translateX: pan.x }]
-        //             }
-        //         ]}
-        //         {...panResponder.panHandlers}
-        //     >
-        //         <View style={mobileStyles.cardContent}>
-        //             <Text style={mobileStyles.name}>{currentUser.user.username}</Text>
-        //
-        //             <View style={mobileStyles.detailRow}>
-        //                 <Text style={mobileStyles.detailLabel}>Email:</Text>
-        //                 <Text style={mobileStyles.detailValue}>{currentUser.user.email}</Text>
-        //             </View>
-        //
-        //             <View style={mobileStyles.detailRow}>
-        //                 <Text style={mobileStyles.detailLabel}>Requested Role:</Text>
-        //                 <Text style={mobileStyles.detailValue}>{currentUser.requestedRole}</Text>
-        //             </View>
-        //
-        //             <View style={mobileStyles.detailRow}>
-        //                 <Text style={mobileStyles.detailLabel}>Request Date:</Text>
-        //                 <Text style={mobileStyles.detailValue}>
-        //                     {new Date(currentUser.createdAt).toLocaleDateString()}
-        //                 </Text>
-        //             </View>
-        //
-        //             <View style={mobileStyles.actionButtons}>
-        //                 <TouchableOpacity
-        //                     style={[mobileStyles.actionButton, mobileStyles.approveButton]}
-        //                     onPress={() => onApprove(currentUser.id)}
-        //                 >
-        //                     <Ionicons name="checkmark" size={20} color="white" />
-        //                     <Text style={mobileStyles.buttonText}>Approve</Text>
-        //                 </TouchableOpacity>
-        //                 <TouchableOpacity
-        //                     style={[mobileStyles.actionButton, mobileStyles.rejectButton]}
-        //                     onPress={() => onReject(currentUser.id)}
-        //                 >
-        //                     <Ionicons name="close" size={20} color="white" />
-        //                     <Text style={mobileStyles.buttonText}>Reject</Text>
-        //                 </TouchableOpacity>
-        //             </View>
-        //         </View>
-        //     </Animated.View>
-        //
-        //     <View style={mobileStyles.paginationDots}>
-        //         {approvals.map((_, index) => (
-        //             <View
-        //                 key={index}
-        //                 style={[
-        //                     mobileStyles.dot,
-        //                     index === currentIndex && mobileStyles.activeDot
-        //                 ]}
-        //             />
-        //         ))}
-        //     </View>
-        // </View>
     );
 };

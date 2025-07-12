@@ -29,7 +29,6 @@ export const updateLectureSchedule = async ( lecture : Lecture, effectiveFrom :s
         );
         return response.status === 200;
     } catch (error) {
-        console.log(error);
         throw handleAxiosError(error);
     }
 }

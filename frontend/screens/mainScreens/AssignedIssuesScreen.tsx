@@ -244,9 +244,6 @@ const MobileAssignedIssuesView = ({
             <CenteredContainer flex={1} justifyContent="center" alignItems="center">
                 <BodyText>No assigned issues</BodyText>
             </CenteredContainer>
-            // <View style={mobileStyles.container}>
-            //     <Text style={mobileStyles.emptyText}>No assigned issues</Text>
-            // </View>
         );
     }
 
@@ -304,104 +301,5 @@ const MobileAssignedIssuesView = ({
                 )}
             </Animated.View>
         </CenteredContainer>
-        // <View style={mobileStyles.container}>
-        //     <Animated.View
-        //         style={[
-        //             mobileStyles.card,
-        //             {
-        //                 transform: [{ translateX: pan.x }]
-        //             }
-        //         ]}
-        //         {...panResponder.panHandlers}
-        //     >
-        //         <View style={mobileStyles.cardContent}>
-        //             <Text style={mobileStyles.roomName}>{currentIssue.room.name}</Text>
-        //
-        //             <View style={mobileStyles.detailSection}>
-        //                 <Text style={mobileStyles.detailLabel}>Description:</Text>
-        //                 {isEditing ? (
-        //                     <TextInput
-        //                         style={mobileStyles.descriptionInput}
-        //                         value={editedDescription}
-        //                         onChangeText={setEditedDescription}
-        //                         multiline
-        //                         autoFocus
-        //                         placeholder="Enter issue description"
-        //                         placeholderTextColor="#999"
-        //                     />
-        //                 ) : (
-        //                     <Text style={mobileStyles.detailValue}>{currentIssue.description}</Text>
-        //                 )}
-        //             </View>
-        //
-        //             <View style={mobileStyles.detailSection}>
-        //                 <Text style={mobileStyles.detailLabel}>Status:</Text>
-        //                 <Text style={mobileStyles.detailValue}>Assigned</Text>
-        //             </View>
-        //
-        //             {isEditing ? (
-        //                 <View style={mobileStyles.editActions}>
-        //                     <TouchableOpacity
-        //                         style={[mobileStyles.actionButton, mobileStyles.saveButton]}
-        //                         onPress={() => onUpdate(currentIssue.id)}
-        //                     >
-        //                         <Ionicons name="save" size={20} color="white" />
-        //                         <Text style={mobileStyles.buttonText}>Save</Text>
-        //                     </TouchableOpacity>
-        //                     <TouchableOpacity
-        //                         style={[mobileStyles.actionButton, mobileStyles.cancelButton]}
-        //                         onPress={onCancelEdit}
-        //                     >
-        //                         <Ionicons name="close" size={20} color="white" />
-        //                         <Text style={mobileStyles.buttonText}>Cancel</Text>
-        //                     </TouchableOpacity>
-        //                 </View>
-        //             ) : (
-        //                 <View style={mobileStyles.actions}>
-        //                     <TouchableOpacity
-        //                         style={[mobileStyles.actionButton, mobileStyles.editButton]}
-        //                         onPress={() => onEdit(currentIssue)}
-        //                     >
-        //                         <Ionicons name="create-outline" size={20} color="white" />
-        //                         <Text style={mobileStyles.buttonText}>Edit</Text>
-        //                     </TouchableOpacity>
-        //                     <TouchableOpacity
-        //                         style={[mobileStyles.actionButton, mobileStyles.fixButton]}
-        //                         onPress={() => onFix(currentIssue.id)}
-        //                     >
-        //                         <Ionicons name="checkmark-done" size={20} color="white" />
-        //                         <Text style={mobileStyles.buttonText}>Mark Fixed</Text>
-        //                     </TouchableOpacity>
-        //                     <TouchableOpacity
-        //                         style={[mobileStyles.actionButton, mobileStyles.unassignButton]}
-        //                         onPress={() => onUnassigned(currentIssue.id)}
-        //                     >
-        //                         <Ionicons name="remove-circle-outline" size={20} color="white" />
-        //                         <Text style={mobileStyles.buttonText}>Unassign</Text>
-        //                     </TouchableOpacity>
-        //                 </View>
-        //             )}
-        //         </View>
-        //     </Animated.View>
-        //
-        //     <View style={mobileStyles.paginationDots}>
-        //         {issues.map((_, index) => (
-        //             <View
-        //                 key={index}
-        //                 style={[
-        //                     mobileStyles.dot,
-        //                     index === currentIndex && mobileStyles.activeDot
-        //                 ]}
-        //             />
-        //         ))}
-        //     </View>
-        //
-        //     <PaginationControls
-        //         currentPage={currentPage}
-        //         onNext={onNext}
-        //         onPrevious={onPrevious}
-        //         hasNext={hasNext}
-        //     />
-        // </View>
     );
 };

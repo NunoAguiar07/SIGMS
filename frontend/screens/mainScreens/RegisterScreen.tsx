@@ -137,12 +137,13 @@ export const UniversitySearch = ({
     <ColumnContainer gap="md" style={{ position: 'relative' , zIndex: 10}}>
         <BodyText textAlign="center">Search for your university:</BodyText>
         <SearchInput
+            width={"100%"}
             placeholder="Search universities..."
             value={searchQuery}
             onChangeText={onSearchChange}
         />
         {universities.length > 0 && (
-            <FlatListContainer>
+            <FlatListContainer width={"100%"}>
                 <FlatList
                     data={universities}
                     keyExtractor={(item) => item.id.toString()}

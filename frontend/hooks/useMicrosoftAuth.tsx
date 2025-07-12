@@ -28,7 +28,6 @@ export const useMicrosoftAuth = () => {
                 await WebBrowser.coolDownAsync();
             }
         } catch (err) {
-            console.error('Prompt error:', err);
             setError(err as ParsedError);
         }
     };

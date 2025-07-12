@@ -56,12 +56,12 @@ export const useLogin = () => {
             const loginResult = await requestLogin(email, password, deviceType);
             if (loginResult) {
                 await fetchUserInfo();
-                setLoading(false);
                 router.push('/home');
             }
         } catch (error) {
-            setLoading(false);
             setError(error as ParsedError);
+        } finally {
+            setLoading(false);
         }
     };
 

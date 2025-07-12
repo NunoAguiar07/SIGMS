@@ -11,6 +11,8 @@ import {BackgroundImage} from "../screens/components/BackgroundImage";
 
 export default function RootLayout() {
     const fontsLoaded = useFontsLoad();
+
+
     if (!fontsLoaded) {
         return <LoadingPresentation />;
     }

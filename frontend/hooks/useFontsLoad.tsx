@@ -7,8 +7,5 @@ export const useFontsLoad = () => {
         'RobotoCondensed-Black': require('../assets/fonts/roboto/RobotoCondensed-Black.ttf'),
         'RobotoCondensed-Bold': require('../assets/fonts/roboto/RobotoCondensed-Bold.ttf')
     })
-    if(error){
-        console.log(error)
-    }
     return fontsLoaded;
 };

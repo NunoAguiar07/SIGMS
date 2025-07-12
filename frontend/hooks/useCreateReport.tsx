@@ -3,9 +3,9 @@ import {RoomInterface} from "../types/RoomInterface";
 import {useDebounce} from "use-debounce";
 import {fetchRooms} from "../services/authorized/FetchRooms";
 import {CreateIssueReportRequest} from "../services/authorized/CreateIssueReport";
-import {Alert} from "react-native";
 import {ParsedError} from "../types/errors/ParseErrorTypes";
 import {fetchIssueReportsByRoom} from "../services/authorized/FetchIssueReportsByRoom";
+import {useAlert} from "./notifications/useAlert";
 
 
 export const useCreateReport = () => {
@@ -18,6 +18,8 @@ export const useCreateReport = () => {
     const [issues, setIssues] = useState<any[]>([]);
 
     const issueCache = useRef<{ [roomId: number]: any[] }>({});
+
+    const showAlert = useAlert()
 
     useEffect(() => {
         if (debouncedSearchQuery.trim().length > 0) {
@@ -50,17 +52,19 @@ export const useCreateReport = () => {
     };
 
     const handleSubmitReport = async (roomId: number, description: string) => {
-        const submit = CreateIssueReportRequest(roomId, description);
-        const success = await submit;
-
-        if (success) {
-            Alert.alert('Success', 'Report submitted successfully!');
-            setSelectedRoom(null);
-            setReportText('');
-            delete issueCache.current[roomId];
-            await getIssuesForRoom(roomId);
-        } else {
-            Alert.alert('Error', 'Failed to submit the report. Please try again.');
+        try {
+            const success = await CreateIssueReportRequest(roomId, description);
+            if (success) {
+                showAlert('Success', 'Issue report created successfully');
+                setSelectedRoom(null);
+                setReportText('');
+                delete issueCache.current[roomId];
+                await getIssuesForRoom(roomId);
+            } else {
+                showAlert('Error', 'Failed to create issue report');
+            }
+        } catch (err) {
+            setError(err as ParsedError);
         }
     };
 
@@ -75,7 +79,7 @@ export const useCreateReport = () => {
             issueCache.current[roomId] = fetchedIssues;
             setIssues(fetchedIssues);
         } catch (err) {
-            Alert.alert('Error', 'Failed to fetch reports for the selected room.');
+            setError(error as ParsedError);
         }
     };
 

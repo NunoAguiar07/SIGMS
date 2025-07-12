@@ -41,7 +41,6 @@ export const useUnassignedIssues = () => {
             }
         } catch (err) {
             setError(err as ParsedError);
-            Alert.alert("Error", "Failed to assign the issue.");
         }
     };
 

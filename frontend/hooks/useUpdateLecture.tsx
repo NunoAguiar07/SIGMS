@@ -2,7 +2,6 @@ import {useEffect, useState} from "react";
 import {Lecture} from "../types/calendar/Lecture";
 import {ParsedError} from "../types/errors/ParseErrorTypes";
 import {fetchLectures} from "../services/authorized/FetchLectures";
-import {Alert} from "react-native";
 import {updateLectureSchedule} from "../services/authorized/RequestUpdateLecture";
 import {fetchRooms} from "../services/authorized/FetchRooms";
 import {RoomInterface} from "../types/RoomInterface";
@@ -13,6 +12,7 @@ import {fetchLecturesByClass} from "../services/authorized/FetchLecturesByClass"
 import {fetchSubjects} from "../services/authorized/FetchSubjects";
 import {fetchLecturesByRoom} from "../services/authorized/FetchLecturesByRoom";
 import {fetchSubjectClasses} from "../services/authorized/FetchSubjectClasses";
+import {useAlert} from "./notifications/useAlert";
 
 export const useUpdateLecture = () => {
     const [lectures, setLectures] = useState<Lecture[]>([]);
@@ -40,6 +40,8 @@ export const useUpdateLecture = () => {
     const [debouncedSearchQuerySubjects] = useDebounce(searchQuerySubjects, 500);
 
     const limit = 5;
+
+    const showAlert = useAlert();
 
     const handleNext = () => setPage((prev) => prev + 1);
     const handlePrevious = () => setPage((prev) => Math.max(prev - 1, 0));
@@ -97,7 +99,6 @@ export const useUpdateLecture = () => {
         setSkipSearch(true)
         setSearchQueryRoom(room.name);
         setRooms([])
-        console.log("Selected Room:", room);
         if (selectedLecture) {
             setSelectedLecture({
                 ...selectedLecture,
@@ -108,7 +109,6 @@ export const useUpdateLecture = () => {
                 setLectureFilter('room');
                 const offset = page * limit;
                 const data = await fetchLecturesByRoom(room.id, limit, offset);
-                console.log("Fetched Lectures by Room:", data);
                 setLectures(data);
             } catch (err) {
                 setError(err as ParsedError);
@@ -122,14 +122,13 @@ export const useUpdateLecture = () => {
         setSearchQuerySubjects(subject.name);
         setClasses([]);
         setSelectedClass(null);
-        console.log("Selected Subject:", subject);
         const classes = await fetchSubjectClasses(subject.id)
         setClasses(classes);
     }
 
     const handleClassSelect = async (schoolClass : SchoolClassInterface) => {
         if (!schoolClass || !selectedSubject) {
-            Alert.alert("Missing Class", "Please select a class to filter lectures.");
+            showAlert("Missing Class", "Please select a class to filter lectures.");
             return;
         }
         setSelectedClass(schoolClass);
@@ -137,7 +136,6 @@ export const useUpdateLecture = () => {
             setLectureFilter('class');
             const offset = page * limit;
             const data = await fetchLecturesByClass(selectedSubject.id, schoolClass.id, limit, offset);
-            console.log("Fetched Lectures by Class:", data);
             setLectures(data);
         } catch (err) {
             setError(err as ParsedError);
@@ -149,7 +147,6 @@ export const useUpdateLecture = () => {
             setLectureFilter('all')
             const offset = page * limit;
             const data = await fetchLectures(limit, offset);
-            console.log("Fetched Lectures:", data);
             setLectures(data);
         } catch (err) {
             setError(err as ParsedError);
@@ -159,12 +156,11 @@ export const useUpdateLecture = () => {
     const onGetLecturesByClass = async () => {
         try {
             if (!selectedClass || !selectedSubject) {
-                Alert.alert("Missing Class", "Please select a class to filter lectures.");
+                showAlert("Missing Class", "Please select a class to filter lectures.");
                 return;
             }
             const offset = page * limit;
             const data = await fetchLecturesByClass(selectedSubject.id, selectedClass.id, limit, offset);
-            console.log("Fetched Lectures by Class:", data);
             setLectures(data);
         } catch (err) {
             setError(err as ParsedError);
@@ -174,12 +170,11 @@ export const useUpdateLecture = () => {
     const onGetLecturesByRoom = async () => {
         try {
             if (!selectedRoom) {
-                Alert.alert("Missing Room", "Please select a room to filter lectures.");
+                showAlert("Missing Room", "Please select a room to filter lectures.");
                 return;
             }
             const offset = page * limit;
             const data = await fetchLecturesByRoom(selectedRoom.id, limit, offset);
-            console.log("Fetched Lectures by Room:", data);
             setLectures(data);
         } catch (err) {
             setError(err as ParsedError);
@@ -216,7 +211,7 @@ export const useUpdateLecture = () => {
         let effectiveFromDate: string | null = null;
         let effectiveUntilDate: string | null = null;
         if (!selectedLecture) {
-            Alert.alert("Missing Information", "Please select a lecture and both dates.");
+            showAlert("Missing Schedule", "Please select a class to filter lectures.");
             return;
         }
 
@@ -224,35 +219,30 @@ export const useUpdateLecture = () => {
         try {
 
             if (effectiveFrom != null && effectiveUntil != null && ( effectiveFrom >= effectiveUntil)) {
-                Alert.alert("Invalid Dates", "Effective From date must be before Effective Until date.");
+                showAlert("Invalid Dates", "Effective From date must be before Effective Until date.");
                 return;
             }
             if (effectiveFrom && effectiveUntil) {
                  effectiveFromDate = effectiveFrom.toISOString()
                  effectiveUntilDate = effectiveUntil.toISOString()
             }
-            console.log("Saving Lecture Schedule:", {selectedLecture, effectiveFromDate, effectiveUntilDate})
             const updated = await updateLectureSchedule(
                 selectedLecture,
                 effectiveFromDate,
                 effectiveUntilDate
             );
 
-            if (!updated) {
-                throw new Error("Update failed.");
+            if(updated) {
+                const updatedLectures = lectures.map((lec) =>
+                    lec.id === selectedLecture.id ? selectedLecture : lec
+                ).sort((a, b) =>
+                    a.schoolClass.subject.name.localeCompare(b.schoolClass.subject.name)
+                );
+                setLectures(updatedLectures);
+                showAlert("Success", "Lecture schedule updated successfully.");
             }
-
-            const updatedLectures = lectures.map((lec) =>
-                lec.id === selectedLecture.id ? selectedLecture : lec
-            ).sort((a, b) =>
-                a.schoolClass.subject.name.localeCompare(b.schoolClass.subject.name)
-            );
-            setLectures(updatedLectures);
-
-            Alert.alert("Success", "Lecture schedule updated successfully.");
         } catch (err) {
             setError(err as ParsedError);
-            Alert.alert("Error", "Failed to save the lecture schedule.");
         } finally {
             setIsSaving(false);
         }

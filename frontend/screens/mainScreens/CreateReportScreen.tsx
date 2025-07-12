@@ -43,18 +43,10 @@ export const CreateReportScreen = ({
                     {selectedRoom && (
                         <GridColumn widthPercent={50}>
                             <GridRow heightPercent={50}>
-                                <IssuesListContainer>
-                                    <Subtitle color={theme.colors.text.black}>Previous Reports for {selectedRoom.name}</Subtitle>
-                                    {issues.length > 0 ? (
-                                        issues.map(issue => (
-                                            <Container padding={"xs"} borderRadius={"small"}>
-                                                <BodyText>- {issue.description}</BodyText>
-                                            </Container>
-                                        ))
-                                    ) : (
-                                        <BodyText>No issues reported for this room.</BodyText>
-                                    )}
-                                </IssuesListContainer>
+                                <IssuesList
+                                    selectedRoom={selectedRoom}
+                                    issues={issues}
+                                />
                             </GridRow>
                             <GridRow heightPercent={50}>
                                 <RoomReportForm
@@ -88,27 +80,6 @@ export const CreateReportScreen = ({
                     />
                 )}
             </CenteredContainer>
-            // <View style={createReportStyle.joinClassContainer}>
-            //     {!selectedRoom ? (
-            //         <View style={commonStyles.leftColumn}>
-            //             <RoomSearchList
-            //                 rooms={rooms}
-            //                 searchQuery={searchQuery}
-            //                 onSearchChange={onSearchChange}
-            //                 onRoomSelect={onRoomSelect}
-            //             />
-            //         </View>
-            //     ) : (
-            //         <View style={commonStyles.rightColumn}>
-            //             <RoomReportForm
-            //                 selectedRoom={selectedRoom}
-            //                 reportText={reportText}
-            //                 onReportTextChange={onReportTextChange}
-            //                 onSubmitReport={onSubmitReport}
-            //             />
-            //         </View>
-            //     )}
-            // </View>
         );
     }
 };
@@ -184,3 +155,29 @@ export const RoomReportForm = ({
         </Card>
     </CenteredContainer>
 );
+
+interface IssuesListProps {
+    selectedRoom: RoomInterface;
+    issues: Array<{
+        description: string;
+    }>;
+}
+
+export const IssuesList = ({ selectedRoom, issues }: IssuesListProps) => {
+    return (
+        <IssuesListContainer>
+            <Subtitle color={theme.colors.text.black}>
+                Previous Reports for {selectedRoom.name}
+            </Subtitle>
+            {issues.length > 0 ? (
+                issues.map((issue, index) => (
+                    <Container key={`issue-${index}`} padding={"xs"} borderRadius={"small"}>
+                        <BodyText>- {issue.description}</BodyText>
+                    </Container>
+                ))
+            ) : (
+                <BodyText>No issues reported for this room.</BodyText>
+            )}
+        </IssuesListContainer>
+    );
+};

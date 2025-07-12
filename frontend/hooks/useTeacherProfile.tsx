@@ -14,7 +14,6 @@ export const useTeacherProfile = (teacherId: number) => {
                 const response = await fetchTeacherProfileById(teacherId);
                 setProfile(response);
             } catch (err) {
-                console.error("Error:", err);
                 setError(err as ParsedError);
             } finally {
                 setLoading(false);

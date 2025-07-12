@@ -102,7 +102,7 @@ const CalendarScreen = ({ schedule, onClickProfile, onClickRoom }: CalendarScree
 
     return (
         <CenteredContainer width={"100%"} flex={1}>
-            <Card shadow="medium" gap="md" width={"60%"} flex={1} height={"90%"}>
+            <Card shadow="medium" gap="md" width={"60%"} flex={1} height={"80%"}>
                 <ScrollView>
                     <DaySection day="Monday"  events={getEventsForDay("MONDAY")} onClickProfile={onClickProfile} onClickRoom={onClickRoom} />
                     <DaySection day="Tuesday"  events={getEventsForDay("TUESDAY")} onClickProfile={onClickProfile} onClickRoom={onClickRoom} />

@@ -33,7 +33,6 @@ export const UpdateLectureScreen = ({
     rooms,
     searchQueryRoom,
     setSearchQueryRoom,
-    selectedRoom,
     handleRoomSelect,
     setEffectiveFromText,
     setEffectiveUntilText,
@@ -52,12 +51,6 @@ export const UpdateLectureScreen = ({
     handlePrevious,
     page
 }: UpdateLectureProps) => {
-    const timeOptions = Array.from({ length: 48 }, (_, index) => {
-        const hours = String(Math.floor(index / 2)).padStart(2, '0');
-        const minutes = index % 2 === 0 ? '00' : '30';
-        return `${hours}:${minutes}`;
-    });
-
     if (!isMobile) {
         return (
             <Container flex={1} padding="md">
@@ -69,7 +62,6 @@ export const UpdateLectureScreen = ({
                             searchQueryRoom={searchQueryRoom}
                             setSearchQueryRoom={setSearchQueryRoom}
                             rooms={rooms}
-                            selectedRoom={selectedRoom}
                             handleRoomSelect={handleRoomSelect}
                             searchQuerySubjects={searchQuerySubjects}
                             setSearchQuerySubjects={setSearchQuerySubjects}
@@ -95,13 +87,11 @@ export const UpdateLectureScreen = ({
                                         rooms={rooms}
                                         searchQuery={searchQueryRoom}
                                         setSearchQuery={setSearchQueryRoom}
-                                        selectedRoom={selectedRoom}
                                         handleRoomSelect={handleRoomSelect}
                                         effectiveFromText={effectiveFromText}
                                         effectiveUntilText={effectiveUntilText}
                                         setEffectiveFromText={setEffectiveFromText}
                                         setEffectiveUntilText={setEffectiveUntilText}
-                                        timeOptions={timeOptions}
                                         onSaveSchedule={onSaveSchedule}
                                         isSaving={isSaving}
                                     />
@@ -114,41 +104,6 @@ export const UpdateLectureScreen = ({
                 </GridRow>
             </Container>
         )
-        // return (
-        //     <View style={scheduleLectureStyles.container}>
-        //         {/* Left Column */}
-        //         <View style={commonStyles.leftColumn}>
-        //             <LectureList
-        //                 lectures={lectures}
-        //                 onLectureSelect={onLectureSelect}
-        //             />
-        //         </View>
-        //
-        //         {/* Right Column */}
-        //         <View style={commonStyles.rightColumn}>
-        //             {selectedLecture ? (
-        //                 <UpdateLectureForm
-        //                     selectedLecture={selectedLecture}
-        //                     onScheduleChange={onScheduleChange}
-        //                     rooms={rooms}
-        //                     searchQuery={searchQuery}
-        //                     setSearchQuery={setSearchQuery}
-        //                     selectedRoom={selectedRoom}
-        //                     handleRoomSelect={handleRoomSelect}
-        //                     effectiveFromText={effectiveFromText}
-        //                     effectiveUntilText={effectiveUntilText}
-        //                     setEffectiveFromText={setEffectiveFromText}
-        //                     setEffectiveUntilText={setEffectiveUntilText}
-        //                     timeOptions={timeOptions}
-        //                     onSaveSchedule={onSaveSchedule}
-        //                     isSaving={isSaving}
-        //                 />
-        //             ) : (
-        //                 <Text style={commonStyles.emptyText}>Select a lecture to update schedule</Text>
-        //             )}
-        //         </View>
-        //     </View>
-        // );
     } else {
         return(
             <View style={scheduleLectureStyles.container}>
@@ -160,7 +115,6 @@ export const UpdateLectureScreen = ({
                             searchQueryRoom={searchQueryRoom}
                             setSearchQueryRoom={setSearchQueryRoom}
                             rooms={rooms}
-                            selectedRoom={selectedRoom}
                             handleRoomSelect={handleRoomSelect}
                             searchQuerySubjects={searchQuerySubjects}
                             setSearchQuerySubjects={setSearchQuerySubjects}
@@ -186,13 +140,11 @@ export const UpdateLectureScreen = ({
                             rooms={rooms}
                             searchQuery={searchQueryRoom}
                             setSearchQuery={setSearchQueryRoom}
-                            selectedRoom={selectedRoom}
                             handleRoomSelect={handleRoomSelect}
                             effectiveFromText={effectiveFromText}
                             effectiveUntilText={effectiveUntilText}
                             setEffectiveFromText={setEffectiveFromText}
                             setEffectiveUntilText={setEffectiveUntilText}
-                            timeOptions={timeOptions}
                             onSaveSchedule={onSaveSchedule}
                             isSaving={isSaving}
                             />}
@@ -211,7 +163,6 @@ interface LectureListProps {
     searchQueryRoom: string;
     setSearchQueryRoom: (query: string) => void;
     rooms: RoomInterface[];
-    selectedRoom: RoomInterface | null;
     handleRoomSelect: (room: RoomInterface) => void;
     searchQuerySubjects: string;
     setSearchQuerySubjects: (query: string) => void;
@@ -248,13 +199,11 @@ interface UpdateLectureFormProps {
     rooms: RoomInterface[];
     searchQuery: string;
     setSearchQuery: (query: string) => void;
-    selectedRoom: RoomInterface | null;
     handleRoomSelect: (room: RoomInterface) => void;
     effectiveFromText: string;
     effectiveUntilText: string;
     setEffectiveFromText: (text: string) => void;
     setEffectiveUntilText: (text: string) => void;
-    timeOptions: string[];
     onSaveSchedule: () => void;
     isSaving: boolean;
 }
@@ -453,7 +402,6 @@ export const LectureList = ({
                                 searchQueryRoom,
                                 setSearchQueryRoom,
                                 rooms,
-                                selectedRoom,
                                 handleRoomSelect,
                                 searchQuerySubjects,
                                 setSearchQuerySubjects,
@@ -549,27 +497,6 @@ export const WeekdayPicker = ({ selectedValue, onValueChange }: WeekdayPickerPro
             </StyledPicker>
         </PickerContainer>
     </CenteredContainer>
-    // <>
-    //     <Text style={commonStyles.inputLabel}>Weekday</Text>
-    //     <View style={commonStyles.pickerContainer}>
-    //         <Picker
-    //             selectedValue={selectedValue}
-    //             onValueChange={onValueChange}
-    //             style={commonStyles.picker}
-    //         >
-    //             {[
-    //                 { label: 'Monday', value: 1 },
-    //                 { label: 'Tuesday', value: 2 },
-    //                 { label: 'Wednesday', value: 3 },
-    //                 { label: 'Thursday', value: 4 },
-    //                 { label: 'Friday', value: 5 },
-    //                 { label: 'Saturday', value: 6 },
-    //             ].map(({ label, value }) => (
-    //                 <Picker.Item key={value} label={label} value={value} />
-    //             ))}
-    //         </Picker>
-    //     </View>
-    // </>
 );
 
 export const LectureTypePicker = ({ selectedValue, onValueChange }: LectureTypePickerProps) => (
@@ -586,80 +513,7 @@ export const LectureTypePicker = ({ selectedValue, onValueChange }: LectureTypeP
             </StyledPicker>
         </PickerContainer>
     </CenteredContainer>
-    // <>
-    //     <Text style={commonStyles.inputLabel}>Lecture Type</Text>
-    //     <View style={commonStyles.pickerContainer}>
-    //         <Picker
-    //             selectedValue={selectedValue}
-    //             onValueChange={onValueChange}
-    //             style={commonStyles.picker}
-    //         >
-    //             <Picker.Item label="Theoretical" value="THEORETICAL" />
-    //             <Picker.Item label="Practical" value="PRACTICAL" />
-    //             <Picker.Item label="Theoretical-Practical" value="THEORETICAL_PRACTICAL" />
-    //         </Picker>
-    //     </View>
-    // </>
 );
-
-// export const RoomSearch = ({
-//     rooms,
-//     searchQuery,
-//     setSearchQuery,
-//     selectedRoom,
-//     handleRoomSelect
-// }: RoomSearchProps) => (
-//     <CenteredContainer gap={'md'}>
-//         <Subtitle>Room</Subtitle>
-//         <SearchInput
-//             placeholder="Search rooms..."
-//             value={searchQuery}
-//             onChangeText={setSearchQuery}
-//         />
-//         {rooms.length > 0 ? (
-//             <FlatListContainer>
-//                 <FlatList
-//                     data={rooms}
-//                     keyExtractor={(item) => item.id.toString()}
-//                     renderItem={({ item }) => (
-//                         <FlatListItem
-//                             onPress={() => handleRoomSelect(item)}
-//                         >
-//                             <BodyText>{item.name}</BodyText>
-//                         </FlatListItem>
-//                     )}
-//                 />
-//             </FlatListContainer>
-//         ) : (
-//             <BodyText>No rooms found</BodyText>
-//         )}
-//     </CenteredContainer>
-//     // <>
-//     //     <Text style={commonStyles.inputLabel}>Room</Text>
-//     //     <TextInput
-//     //         style={commonStyles.input}
-//     //         placeholder="Search rooms..."
-//     //         value={searchQuery}
-//     //         onChangeText={setSearchQuery}
-//     //     />
-//     //     <FlatList
-//     //         data={rooms}
-//     //         keyExtractor={(item) => item.id.toString()}
-//     //         renderItem={({ item }) => (
-//     //             <TouchableOpacity
-//     //                 style={[
-//     //                     commonStyles.itemSearch,
-//     //                     selectedRoom?.id === item.id && { backgroundColor: '#e5e5e5' }
-//     //                 ]}
-//     //                 onPress={() => handleRoomSelect(item)}
-//     //             >
-//     //                 <Text style={commonStyles.itemText}>{item.name}</Text>
-//     //             </TouchableOpacity>
-//     //         )}
-//     //         ListEmptyComponent={<Text style={commonStyles.emptyText}>No rooms found</Text>}
-//     //     />
-//     // </>
-// );
 
 export const TimePicker = ({ selectedValue, onValueChange, label, placeholder }: TimePickerProps) => (
     <CenteredContainer gap={'md'}>
@@ -678,13 +532,11 @@ export const UpdateLectureForm = ({
     rooms,
     searchQuery,
     setSearchQuery,
-    selectedRoom,
     handleRoomSelect,
     effectiveFromText,
     effectiveUntilText,
     setEffectiveFromText,
     setEffectiveUntilText,
-    timeOptions,
     onSaveSchedule,
     isSaving
 }: UpdateLectureFormProps) => (
@@ -738,57 +590,4 @@ export const UpdateLectureForm = ({
             <ButtonText>{isSaving ? 'Saving...' : 'Save Schedule'}</ButtonText>
         </Button>
     </CenteredContainer>
-    // <View>
-    //     <Text style={commonStyles.sectionTitle}>
-    //         Update Schedule for {selectedLecture.schoolClass.subject.name}
-    //     </Text>
-    //
-    //     <WeekdayPicker
-    //         selectedValue={selectedLecture.weekDay}
-    //         onValueChange={(value) => onScheduleChange({ weekDay: value })}
-    //     />
-    //
-    //     <LectureTypePicker
-    //         selectedValue={selectedLecture.type}
-    //         onValueChange={(itemValue) => onScheduleChange({ type: itemValue })}
-    //     />
-    //
-    //     <RoomSearch
-    //         rooms={rooms}
-    //         searchQuery={searchQuery}
-    //         setSearchQuery={setSearchQuery}
-    //         selectedRoom={selectedRoom}
-    //         handleRoomSelect={handleRoomSelect}
-    //     />
-    //
-    //     <EffectiveDateInput
-    //         label="Effective From"
-    //         value={effectiveFromText}
-    //         onChangeText={setEffectiveFromText}
-    //         placeholder="YYYY-MM-DD"
-    //     />
-    //
-    //     <EffectiveDateInput
-    //         label="Effective Until"
-    //         value={effectiveUntilText}
-    //         onChangeText={setEffectiveUntilText}
-    //         placeholder="YYYY-MM-DD"
-    //     />
-    //
-    //     <TimePicker
-    //         label="New Start Time"
-    //         selectedValue={selectedLecture.startTime}
-    //         onValueChange={(itemValue) => onScheduleChange({ startTime: itemValue })}
-    //         timeOptions={timeOptions}
-    //     />
-    //
-    //     <TimePicker
-    //         label="New End Time"
-    //         selectedValue={selectedLecture.endTime}
-    //         onValueChange={(itemValue) => onScheduleChange({ endTime: itemValue })}
-    //         timeOptions={timeOptions}
-    //     />
-    //
-    //     <SaveButton onPress={onSaveSchedule} isSaving={isSaving} />
-    // </View>
 );

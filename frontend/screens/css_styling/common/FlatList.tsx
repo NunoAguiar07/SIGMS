@@ -5,6 +5,7 @@ import {Theme} from "./Theme";
 interface StyledFlatListProps {
     theme: Theme;
     position?: 'absolute' | 'relative' | 'static';
+    width?: string;
 }
 
 const BaseListItem = styled.View<StyledFlatListProps>`
@@ -34,14 +35,14 @@ export const FlatListDisplayItem = styled(BaseListItem)`
 
 export const FlatListContainer = styled.View.attrs<StyledFlatListProps>((props) => ({
     position: props.position || 'absolute',
+    width: props.width || (props.position === 'static' ? 'auto' : '200px'),
 }))<StyledFlatListProps>`
     position: ${({ position }) => position};
+    width: ${({ width }) => width};
     ${({ position }) => position === 'static' ? `
-        width: auto;
         align-self: stretch; 
     ` : `
         top: 90%;
-        width: 200px;
     `}
     background-color: ${({ theme }) => theme.colors.text.white};
     max-height: 250px;
