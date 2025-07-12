@@ -15,6 +15,7 @@ class SmtpEmailService(private val config: EmailConfig) : EmailService {
                 hostName = config.host
                 setSmtpPort(config.port)
                 setAuthenticator(DefaultAuthenticator(config.username, config.password))
+                isStartTLSEnabled = true
                 isSSLOnConnect = config.useSsl
                 setFrom(config.from)
                 subject = "New Role Approval Request"
@@ -42,6 +43,7 @@ class SmtpEmailService(private val config: EmailConfig) : EmailService {
                 hostName = config.host
                 setSmtpPort(config.port)
                 setAuthenticator(DefaultAuthenticator(config.username, config.password))
+                isStartTLSEnabled = true
                 isSSLOnConnect = config.useSsl
                 setFrom(config.from)
                 subject = if (isApproved) "Your Account Has Been Approved" else "Your Account Request Was Declined"
@@ -102,6 +104,7 @@ class SmtpEmailService(private val config: EmailConfig) : EmailService {
                 hostName = config.host
                 setSmtpPort(config.port)
                 setAuthenticator(DefaultAuthenticator(config.username, config.password))
+                isStartTLSEnabled = true
                 isSSLOnConnect = config.useSsl
                 setFrom(config.from)
                 subject = "Change in schedule for your ${lecture.schoolClass.subject.name} lecture"

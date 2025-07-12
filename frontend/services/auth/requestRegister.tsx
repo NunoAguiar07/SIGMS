@@ -19,7 +19,6 @@ export const requestRegister = async (
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                validateStatus: () => true,
             }
         );
         return response.status === 201 ? response.data.message : undefined;

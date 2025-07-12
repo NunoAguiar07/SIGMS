@@ -24,15 +24,17 @@ export const useStudyRooms = () => {
 
     const forceUpdate = async () => {
         try {
-           await updateStudyRoomCapacity()
+            await updateStudyRoomCapacity()
         } catch (err) {
             setError(err as ParsedError)
         }
     }
 
     useFocusEffect(useCallback(() => {
-            forceUpdate()
-            loadStudyRooms()
+        forceUpdate()
+        loadStudyRooms()
+        const interval = setInterval(loadStudyRooms, 10000)
+        return () => clearInterval(interval)
         }, [updateStudyRooms])
     )
 

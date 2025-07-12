@@ -17,11 +17,9 @@ export const requestLogin = async (
                     'Content-Type': 'application/json',
                     'X-Device': deviceType,
                 },
-                validateStatus: () => true,
                 withCredentials: true,
             }
         );
-
         if (response.status === 200) {
             // Handle both tokens for mobile devices
             if (deviceType !== 'WEB') {

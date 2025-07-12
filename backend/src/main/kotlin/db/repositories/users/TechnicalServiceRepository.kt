@@ -39,9 +39,7 @@ class TechnicalServiceRepository(private val database: Database): TechnicalServi
             .select(TechnicalServices.columns)
             .where { Users.university eq universityId }
             .map { row ->
-                TechnicalService{
-                    user = database.users.first{ it.id eq row[TechnicalServices.user]!!}
-                }
+                TechnicalServices.createEntity(row)
             }
     }
 }

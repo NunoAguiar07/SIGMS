@@ -13,7 +13,7 @@ export const setUpPushNotifications = async () => {
             name: 'The default channel for notifications of the SIGMS app',
             importance: Notifications.AndroidImportance.DEFAULT,
             vibrationPattern: [250, 0, 250, 0],
-            lightColor: '#FF231F7C',
+            lightColor: '#671b22',
         });
     }
     const { status: existingStatus } = await Notifications.getPermissionsAsync()

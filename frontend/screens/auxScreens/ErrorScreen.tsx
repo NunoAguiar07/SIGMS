@@ -2,7 +2,7 @@ import {ErrorScreenType} from "../types/ErrorScreenType";
 import {Card, CenteredContainer} from "../css_styling/common/NewContainers";
 import {Subtitle, Title} from "../css_styling/common/Typography";
 import {Button, ButtonText} from "../css_styling/common/Buttons";
-import {useRouter} from "expo-router";
+import {usePathname, useRouter} from "expo-router";
 
 
 /**
@@ -12,9 +12,9 @@ import {useRouter} from "expo-router";
  * @param goBack represent the button/function to do when we want to go back before the error.
  * @return the error page.
  */
-export const ErrorScreen = ({ errorStatus, errorMessage, goBack } : ErrorScreenType) => {
+export const ErrorScreen = ({errorStatus, errorMessage, goBack } : ErrorScreenType) => {
     const router = useRouter();
-
+    const path = usePathname()
     const handleAction = () => {
         switch (errorStatus) {
             case 401:
@@ -27,7 +27,7 @@ export const ErrorScreen = ({ errorStatus, errorMessage, goBack } : ErrorScreenT
                 router.reload();
                 break;
             default:
-                goBack ? goBack() : router.back();
+                router.replace(path);
                 break;
         }
     };
@@ -61,10 +61,6 @@ export const ErrorScreen = ({ errorStatus, errorMessage, goBack } : ErrorScreenT
                 );
         }
     };
-    if (errorStatus === 400 || errorStatus === 422) {
-        alert(errorMessage);
-        return null;
-    }
 
     return (
         <CenteredContainer flex={1} padding={"md"}>
