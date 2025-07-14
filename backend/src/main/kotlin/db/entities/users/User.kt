@@ -36,7 +36,6 @@ sealed interface User: Entity<User> {
 
         fun hashPassword(password: String): String {
             return try {
-                // need to review the values at a later date
                 argon2.hash(10, 65536, 1, password.toCharArray())
             } finally {
                 // Wipe sensitive data from memory

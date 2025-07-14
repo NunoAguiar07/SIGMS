@@ -356,7 +356,9 @@ VALUES
     ('teacher3@example.com', 'teacher3', 'hashed_password', 'local', (SELECT id FROM UNIVERSITY WHERE university_name = 'Instituto Superior de Engenharia de Lisboa')),
     ('teacher4@example.com', 'teacher4', 'hashed_password', 'local', (SELECT id FROM UNIVERSITY WHERE university_name = 'Instituto Superior de Engenharia de Lisboa')),
     ('teacher5@example.com', 'teacher5', 'hashed_password', 'local', (SELECT id FROM UNIVERSITY WHERE university_name = 'Instituto Superior de Engenharia de Lisboa')),
-    ('teacher6@example.com', 'teacher6', 'hashed_password', 'local', (SELECT id FROM UNIVERSITY WHERE university_name = 'Instituto Superior de Engenharia de Lisboa'))
+    ('teacher6@example.com', 'teacher6', 'hashed_password', 'local', (SELECT id FROM UNIVERSITY WHERE university_name = 'Instituto Superior de Engenharia de Lisboa')),
+    ('teacher7@example.com', 'teacher7', '$argon2id$v=19$m=65536,t=10,p=1$eZVzlw07wQTuWdt7QCCxBw$HPjI9u1HhCei8lkWbESS6G6q+Cgbp0GMxNNGT8Y0GZY', 'local', (SELECT id FROM UNIVERSITY WHERE university_name = 'Instituto Superior de Engenharia de Lisboa'))
+
 ON CONFLICT (email) DO NOTHING;
 
 -- Insert office rooms for teachers
@@ -367,7 +369,8 @@ VALUES
     ('Office_Teacher3', 1, (SELECT id FROM UNIVERSITY WHERE university_name = 'Instituto Superior de Engenharia de Lisboa')),
     ('Office_Teacher4', 1, (SELECT id FROM UNIVERSITY WHERE university_name = 'Instituto Superior de Engenharia de Lisboa')),
     ('Office_Teacher5', 1, (SELECT id FROM UNIVERSITY WHERE university_name = 'Instituto Superior de Engenharia de Lisboa')),
-    ('Office_Teacher6', 1, (SELECT id FROM UNIVERSITY WHERE university_name = 'Instituto Superior de Engenharia de Lisboa'))
+    ('Office_Teacher6', 1, (SELECT id FROM UNIVERSITY WHERE university_name = 'Instituto Superior de Engenharia de Lisboa')),
+    ('Office_Teacher7', 1, (SELECT id FROM UNIVERSITY WHERE university_name = 'Instituto Superior de Engenharia de Lisboa'))
 ON CONFLICT (room_name, university_id) DO NOTHING;
 
 
@@ -380,7 +383,8 @@ WHERE room_name IN (
                     'Office_Teacher3',
                     'Office_Teacher4',
                     'Office_Teacher5',
-                   'Office_Teacher6'
+                    'Office_Teacher6',
+                    'Office_Teacher7'
     )
 ON CONFLICT DO NOTHING;
 
@@ -409,7 +413,12 @@ VALUES
     (
         (SELECT id FROM USERS WHERE email = 'teacher6@example.com'),
         (SELECT id FROM ROOM WHERE room_name = 'Office_Teacher6')
+    ),
+    (
+        (SELECT id FROM USERS WHERE email = 'teacher7@example.com'),
+        (SELECT id FROM ROOM WHERE room_name = 'Office_Teacher7')
     )
+
 
 ON CONFLICT (user_id) DO NOTHING;
 

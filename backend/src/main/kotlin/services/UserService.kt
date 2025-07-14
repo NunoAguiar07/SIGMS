@@ -55,9 +55,6 @@ class UserService(private val repositories: Repositories,
                     user.username = username
                 }
                 if (image != null) {
-                    println("Image type: ${image::class.qualifiedName}")
-                    println("Image size: ${image.size}")
-                    println("Image content (first 10 bytes): ${image.take(10).joinToString()}")
                     user.profileImage = image
                 }
                 val rowsChanged = repositories.from({userRepository}){update(user)}

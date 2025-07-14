@@ -17,8 +17,6 @@ typealias UserClassCreated = Either<UserClassError, Boolean>
 
 typealias UserClassDeleted = Either<UserClassError, Boolean>
 
-typealias UserLectureListResult = Either<UserClassError, List<Lecture>>
-
 typealias UserLectureWithTeacherListResult = Either<UserClassError, List<Pair<Lecture, List<Teacher>>>>
 
 typealias UserClassListResult = Either<UserClassError, List<Class>>
@@ -209,7 +207,6 @@ class UserClassService(
     }
 
     private fun teacherSchedule(user: User, limit: Int, offset: Int): Either<UserClassError, List<Pair<Lecture, List<Teacher>>>> {
-        // Fetch classes where the user is a teacher
         val classes = repositories.from({ classRepository }) {
             findClassesByTeacherId(user.id)
         }
