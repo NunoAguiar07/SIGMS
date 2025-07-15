@@ -63,7 +63,6 @@ export const AdminEntityDeletionScreen = ({
                         subjects={subjects}
                         subjectClasses={subjectClasses}
                         selectedSubject={selectedSubject}
-                        selectedClass={selectedClass}
                         searchQuery={searchQuerySubjects}
                         onSearchChange={onSearchQuerySubjectsChange}
                         onSubjectSelect={onSubjectSelect}
@@ -83,14 +82,12 @@ export const AdminEntityDeletionScreen = ({
                 return (
                     <LectureSelection
                         lectures={lectures}
-                        selectedLecture={selectedLecture}
                         lectureFilter={lectureFilter}
                         onLectureFilterChange={onLectureFilterChange}
                         onLectureSelect={onLectureSelect}
                         subjects={subjects}
                         subjectClasses={subjectClasses}
                         selectedSubject={selectedSubject}
-                        selectedClass={selectedClass}
                         searchQuerySubjects={searchQuerySubjects}
                         onSearchQuerySubjectsChange={onSearchQuerySubjectsChange}
                         onSubjectSelect={onSubjectSelect}
@@ -332,7 +329,6 @@ const LectureSelection = ({
                               subjects,
                               subjectClasses,
                               selectedSubject,
-                              selectedClass,
                               searchQuerySubjects,
                               onSearchQuerySubjectsChange,
                               onSubjectSelect,
@@ -351,7 +347,6 @@ const LectureSelection = ({
     subjects: SubjectInterface[];
     subjectClasses: SchoolClassInterface[];
     selectedSubject: SubjectInterface | null;
-    selectedClass: SchoolClassInterface | null;
     searchQuerySubjects: string;
     onSearchQuerySubjectsChange: (query: string) => void;
     onSubjectSelect: (subject: SubjectInterface) => void;
@@ -392,7 +387,6 @@ const LectureSelection = ({
                         subjects={subjects}
                         subjectClasses={subjectClasses}
                         selectedSubject={selectedSubject}
-                        selectedClass={selectedClass}
                         searchQuery={searchQuerySubjects}
                         onSearchChange={onSearchQuerySubjectsChange}
                         onSubjectSelect={onSubjectSelect}
