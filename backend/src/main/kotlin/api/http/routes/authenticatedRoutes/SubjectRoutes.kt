@@ -224,6 +224,23 @@ fun Route.classManagementRoutes(services: Services) {
                 }
             )
         }
+        withRole(Role.ADMIN){
+            delete("/delete") {
+                val classId = call.parameters["classId"]
+                if(classId.isNullOrBlank()) return@delete RequestError.Missing("classId").toProblem().respond(call)
+                if(classId.toIntOrNull() == null) return@delete RequestError.Invalid("classId").toProblem().respond(call)
+                val result = services.from({classService}){
+                    deleteClass(classId.toInt())
+                }
+                call.respondEither(
+                    either = result,
+                    transformError = { error -> error.toProblem() },
+                    transformSuccess = {
+                        HttpStatusCode.NoContent
+                    }
+                )
+            }
+        }
     }
 }
 

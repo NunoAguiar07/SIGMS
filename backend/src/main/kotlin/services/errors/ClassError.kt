@@ -6,6 +6,7 @@ sealed class ClassError {
     data object ClassNotFound : ClassError()
     data object ClassAlreadyExists : ClassError()
     data object ClassChangesFailed : ClassError()
+    data object ClassDeletionFailed : ClassError()
     data object SubjectNotFound : ClassError()
     data class ConnectionDbError(val message: String?) : ClassError()
 
@@ -26,6 +27,10 @@ sealed class ClassError {
             SubjectNotFound -> Problem.notFound(
                 title = "Subject not found",
                 detail = "The subject with the given ID was not found."
+            )
+            ClassDeletionFailed -> Problem.internalServerError(
+                title = "Class deletion failed",
+                detail = "Failed to delete the class."
             )
             is ConnectionDbError -> Problem.internalServerError(
                 title = "Database Connection Error",

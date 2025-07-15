@@ -70,4 +70,20 @@ class ClassService(private val repositories: Repositories,
         }
     }
 
+    fun deleteClass(id: Int): DeleteClassResult {
+        return runCatching {
+            transactionable.useTransaction {
+                val schoolClass = repositories.from({classRepository}){findClassById(id)}
+                    ?: return@useTransaction failure(ClassError.ClassNotFound)
+
+                val deleted = repositories.from({classRepository}){deleteClass(schoolClass)}
+                if (deleted) {
+                    return@useTransaction success(true)
+                } else {
+                    return@useTransaction failure(ClassError.ClassDeletionFailed)
+                }
+            }
+        }
+    }
+
 }

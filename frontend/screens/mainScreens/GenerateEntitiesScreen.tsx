@@ -96,9 +96,14 @@ export const AdminEntityCreationScreen = ({
                         <Card shadow="medium" alignItems={"center"} gap="md" flex={selectedEntity === 'Lecture' && formValues.subjectId ? 1 : undefined}>
                             {renderForm()}
                             {selectedEntity && (selectedEntity != 'Lecture' || formValues.subjectId) &&(
-                                <Button variant="primary" onPress={onSubmit}>
-                                    <ButtonText>Create {selectedEntity}</ButtonText>
-                                </Button>
+                                <RowContainer gap={"md"} >
+                                    <Button variant="primary" onPress={onSubmit}>
+                                        <ButtonText>Create {selectedEntity}</ButtonText>
+                                    </Button>
+                                    <Button variant="primary" onPress={() => onEntitySelect(null)}>
+                                        <ButtonText>Back</ButtonText>
+                                    </Button>
+                                </RowContainer>
                             )}
                         </Card>
                     </GridColumn>
@@ -126,9 +131,14 @@ export const AdminEntityCreationScreen = ({
                     <Card shadow="medium" alignItems={"center"} gap="md">
                         {renderForm()}
                         {selectedEntity && (selectedEntity != 'Lecture' || formValues.subjectId) &&(
-                            <Button variant="primary" onPress={onSubmit}>
-                                <ButtonText>Create {selectedEntity}</ButtonText>
-                            </Button>
+                            <ColumnContainer gap={"md"}>
+                                <Button variant="primary" onPress={onSubmit}>
+                                    <ButtonText>Create {selectedEntity}</ButtonText>
+                                </Button>
+                                <Button variant="primary" onPress={() => onEntitySelect(null)}>
+                                    <ButtonText>Back</ButtonText>
+                                </Button>
+                            </ColumnContainer>
                         )}
                     </Card>
                 </CenteredContainer>

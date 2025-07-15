@@ -108,27 +108,6 @@ export const SubjectSearchList = ({
             </FlatListContainer>
         )}
     </CenteredContainer>
-    // <View>
-    //     <TextInput
-    //         style={commonStyles.searchSubjectInput}
-    //         placeholder="Search subjects..."
-    //         value={searchQuery}
-    //         onChangeText={onSearchChange}
-    //     />
-    //     <FlatList
-    //         data={subjects}
-    //         keyExtractor={(item) => item.id.toString()}
-    //         renderItem={({ item }) => (
-    //             <TouchableOpacity
-    //                 style={commonStyles.itemSearch}
-    //                 onPress={() => onSubjectSelect(item)}
-    //             >
-    //                 <Text style={commonStyles.itemText}>{item.name}</Text>
-    //             </TouchableOpacity>
-    //         )}
-    //         ListEmptyComponent={<Text style={commonStyles.emptyText}>No subjects found</Text>}
-    //     />
-    // </View>
 );
 
 interface UserClassListType {
@@ -164,25 +143,6 @@ export const UserClassList = ({ userClasses, onLeaveClass }: UserClassListType) 
             )}
         </Card>
     </CenteredContainer>
-
-    // <View style={{ flex: 1, width: '100%' }}>
-    //     <Text style={commonStyles.sectionTitle}>Your Classes</Text>
-    //     {userClasses.length > 0 ? (
-    //         userClasses.map((cls) => (
-    //             <View key={cls.id} style={joinClassStyles.classItem}>
-    //                 <Text>{cls.subject.name} : {cls.name}</Text>
-    //                 <TouchableOpacity
-    //                     style={joinClassStyles.joinClassButton}
-    //                     onPress={() => onLeaveClass(cls.subject.id, cls.id)}
-    //                 >
-    //                     <Text style={joinClassStyles.joinButtonText}>Leave</Text>
-    //                 </TouchableOpacity>
-    //             </View>
-    //         ))
-    //     ) : (
-    //         <Text style={commonStyles.emptyText}>You haven't joined any classes yet.</Text>
-    //     )}
-    // </View>
 );
 
 interface SelectedSubjectClassesType {
@@ -223,31 +183,4 @@ export const SelectedSubjectClasses = ({
             )}
         </Card>
     </CenteredContainer>
-    // <View style={joinClassStyles.classesSection}>
-    //     <Text style={commonStyles.sectionTitle}>
-    //         Classes for {subject.name}
-    //     </Text>
-    //     {schoolClasses.length <= 0 ? (
-    //         <ActivityIndicator size="small" />
-    //     ) : (
-    //         <FlatList
-    //             data={schoolClasses}
-    //             keyExtractor={(item) => item.id.toString()}
-    //             renderItem={({ item }) => (
-    //                 <View style={joinClassStyles.classItem}>
-    //                     <Text style={commonStyles.itemText}>{item.name}</Text>
-    //                     <TouchableOpacity
-    //                         style={joinClassStyles.joinClassButton}
-    //                         onPress={() => onJoinClass(subject.id, item.id)}
-    //                     >
-    //                         <Text style={joinClassStyles.joinButtonText}>Join Class</Text>
-    //                     </TouchableOpacity>
-    //                 </View>
-    //             )}
-    //             ListEmptyComponent={
-    //                 <Text style={commonStyles.emptyText}>No classes available</Text>
-    //             }
-    //         />
-    //     )}
-    // </View>
 );

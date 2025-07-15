@@ -282,7 +282,6 @@ export const FilterButtons = ({
     </CenteredContainer>
 );
 
-// RoomSearchSection.tsx
 interface RoomSearchSectionProps {
     searchQueryRoom: string;
     setSearchQueryRoom: (query: string) => void;
@@ -318,7 +317,6 @@ export const RoomSearchSection = ({
         </CenteredContainer>
 );
 
-// SubjectSearchSection.tsx
 interface SubjectSearchSectionProps {
     searchQuerySubjects: string;
     setSearchQuerySubjects: (query: string) => void;
@@ -354,7 +352,7 @@ export const SubjectSearchSection = ({
         </CenteredContainer>
 );
 
-// ClassListSection.tsx
+
 interface ClassListSectionProps {
     classes: SchoolClassInterface[];
     handleClassSelect: (schoolClass: SchoolClassInterface) => void;
@@ -375,7 +373,7 @@ export const ClassListSection = ({
     return (
         <CenteredContainer gap="md">
             <Subtitle>Select Class:</Subtitle>
-            <FlatListContainer>
+            <FlatListContainer position={"static"}>
                 <FlatList
                     data={classes}
                     keyExtractor={(item) => item.id.toString()}
@@ -397,7 +395,6 @@ export const ClassListSection = ({
     );
 }
 
-// LecturesListSection.tsx
 interface LecturesListSectionProps {
     lectures: Lecture[];
     onLectureSelect: (lecture: Lecture) => void;

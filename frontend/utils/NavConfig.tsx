@@ -31,6 +31,7 @@ export const NAV_CONFIG: RoleNavConfig = {
         { href: '/access-roles', iconName: 'shield-checkmark-outline', label: 'Approvals' },
         { href: '/issue-reports/create', iconName: 'school-outline', label: 'Create Issue' },
         { href: '/generate-entities', iconName: 'add-circle-outline', label: 'Add Entities' },
+        { href: '/delete-entities', iconName: 'remove-circle-outline', label: 'Delete Entities' },
         { href: '/profile', iconName: 'person-outline', label: 'Profile' },
         { href: '/update-lecture', iconName: 'bar-chart-outline', label: 'Update Lecture' },
     ],
