@@ -22,25 +22,49 @@ export const useProfile = (id:number | undefined) => {
     const showAlert = useAlert();
 
     const isTeacherUser = (data: any): data is TeacherUser =>
-        data && data.user && typeof data.user.id === 'number';
+        data.user && data.user.email && data.user.email.includes('@teacher');
 
     useEffect(() => {
         const loadData = async () => {
             setLoading(true);
             try {
                 const myId = await AsyncStorage.getItem('userId');
-                const profileData = typeof myId === 'string' && +myId !== id && id !== undefined
+                const checkTeacherAsStudent = typeof myId === 'string' && +myId !== id && id !== undefined
                     ? await fetchTeacherProfileById(id)
                     : await fetchProfile();
-                const filteredProfileData: ProfileInterface = isTeacherUser(profileData)
-                    ? {
-                        username: profileData.user.username,
-                        email: profileData.user.email,
-                        image: profileData.user.image,
-                        university: profileData.user.university,
-                        officeRoomName: profileData.office?.room?.name
-                    }
-                    : profileData;
+
+                let profileData: ProfileInterface | TeacherUser;
+                let filteredProfileData: ProfileInterface;
+                if (checkTeacherAsStudent
+                    && "email" in checkTeacherAsStudent && checkTeacherAsStudent.email && checkTeacherAsStudent.email.includes('@teacher')
+                    && id !== undefined && id !== null) {
+                    profileData = await fetchTeacherProfileById(id);
+                    console.log('Teacher profile fetched:', profileData);
+                    filteredProfileData =
+                         {
+                            username: profileData.user.username,
+                            email: profileData.user.email,
+                            image: profileData.user.image,
+                            university: profileData.user.university,
+                            officeRoomName: profileData.office?.room?.name
+                        }
+                } else {
+                    console.log('User profile fetched:', checkTeacherAsStudent);
+                   if (isTeacherUser(checkTeacherAsStudent)) {
+                       console.log('verifying teacher as student');
+                        profileData = checkTeacherAsStudent;
+                        filteredProfileData = {
+                            username: profileData.user.username,
+                            email: profileData.user.email,
+                            image: profileData.user.image,
+                            university: profileData.user.university,
+                            officeRoomName: profileData.office?.room?.name
+                        };
+                    }else {
+                          console.log('verifying user profile');
+                       filteredProfileData = checkTeacherAsStudent as ProfileInterface;
+                   }
+                }
 
                 setProfile(filteredProfileData);
 

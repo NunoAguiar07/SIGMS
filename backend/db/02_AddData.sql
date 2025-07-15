@@ -351,13 +351,13 @@ VALUES (
 
 INSERT INTO USERS (email, username, password, auth_provider, university_id)
 VALUES
-    ('teacher1@example.com', 'teacher1', 'hashed_password', 'local', (SELECT id FROM UNIVERSITY WHERE university_name = 'Instituto Superior de Engenharia de Lisboa')),
-    ('teacher2@example.com', 'teacher2', 'hashed_password', 'local', (SELECT id FROM UNIVERSITY WHERE university_name = 'Instituto Superior de Engenharia de Lisboa')),
-    ('teacher3@example.com', 'teacher3', 'hashed_password', 'local', (SELECT id FROM UNIVERSITY WHERE university_name = 'Instituto Superior de Engenharia de Lisboa')),
-    ('teacher4@example.com', 'teacher4', 'hashed_password', 'local', (SELECT id FROM UNIVERSITY WHERE university_name = 'Instituto Superior de Engenharia de Lisboa')),
-    ('teacher5@example.com', 'teacher5', 'hashed_password', 'local', (SELECT id FROM UNIVERSITY WHERE university_name = 'Instituto Superior de Engenharia de Lisboa')),
-    ('teacher6@example.com', 'teacher6', 'hashed_password', 'local', (SELECT id FROM UNIVERSITY WHERE university_name = 'Instituto Superior de Engenharia de Lisboa')),
-    ('teacher7@example.com', 'teacher7', '$argon2id$v=19$m=65536,t=10,p=1$eZVzlw07wQTuWdt7QCCxBw$HPjI9u1HhCei8lkWbESS6G6q+Cgbp0GMxNNGT8Y0GZY', 'local', (SELECT id FROM UNIVERSITY WHERE university_name = 'Instituto Superior de Engenharia de Lisboa'))
+    ('teacher1@teacher.com', 'teacher1', 'hashed_password', 'local', (SELECT id FROM UNIVERSITY WHERE university_name = 'Instituto Superior de Engenharia de Lisboa')),
+    ('teacher2@teacher.com', 'teacher2', 'hashed_password', 'local', (SELECT id FROM UNIVERSITY WHERE university_name = 'Instituto Superior de Engenharia de Lisboa')),
+    ('teacher3@teacher.com', 'teacher3', 'hashed_password', 'local', (SELECT id FROM UNIVERSITY WHERE university_name = 'Instituto Superior de Engenharia de Lisboa')),
+    ('teacher4@teacher.com', 'teacher4', 'hashed_password', 'local', (SELECT id FROM UNIVERSITY WHERE university_name = 'Instituto Superior de Engenharia de Lisboa')),
+    ('teacher5@teacher.com', 'teacher5', 'hashed_password', 'local', (SELECT id FROM UNIVERSITY WHERE university_name = 'Instituto Superior de Engenharia de Lisboa')),
+    ('teacher6@teacher.com', 'teacher6', 'hashed_password', 'local', (SELECT id FROM UNIVERSITY WHERE university_name = 'Instituto Superior de Engenharia de Lisboa')),
+    ('teacher7@teacher.com', 'teacher7', '$argon2id$v=19$m=65536,t=10,p=1$eZVzlw07wQTuWdt7QCCxBw$HPjI9u1HhCei8lkWbESS6G6q+Cgbp0GMxNNGT8Y0GZY', 'local', (SELECT id FROM UNIVERSITY WHERE university_name = 'Instituto Superior de Engenharia de Lisboa'))
 
 ON CONFLICT (email) DO NOTHING;
 
@@ -391,31 +391,31 @@ ON CONFLICT DO NOTHING;
 INSERT INTO TEACHER (user_id, office_id)
 VALUES
     (
-        (SELECT id FROM USERS WHERE email = 'teacher1@example.com'),
+        (SELECT id FROM USERS WHERE email = 'teacher1@teacher.com'),
         (SELECT id FROM ROOM WHERE room_name = 'Office_Teacher1')
     ),
     (
-        (SELECT id FROM USERS WHERE email = 'teacher2@example.com'),
+        (SELECT id FROM USERS WHERE email = 'teacher2@teacher.com'),
         (SELECT id FROM ROOM WHERE room_name = 'Office_Teacher2')
     ),
     (
-        (SELECT id FROM USERS WHERE email = 'teacher3@example.com'),
+        (SELECT id FROM USERS WHERE email = 'teacher3@teacher.com'),
         (SELECT id FROM ROOM WHERE room_name = 'Office_Teacher3')
     ),
     (
-        (SELECT id FROM USERS WHERE email = 'teacher4@example.com'),
+        (SELECT id FROM USERS WHERE email = 'teacher4@teacher.com'),
         (SELECT id FROM ROOM WHERE room_name = 'Office_Teacher4')
     ),
     (
-        (SELECT id FROM USERS WHERE email = 'teacher5@example.com'),
+        (SELECT id FROM USERS WHERE email = 'teacher5@teacher.com'),
         (SELECT id FROM ROOM WHERE room_name = 'Office_Teacher5')
     ),
     (
-        (SELECT id FROM USERS WHERE email = 'teacher6@example.com'),
+        (SELECT id FROM USERS WHERE email = 'teacher6@teacher.com'),
         (SELECT id FROM ROOM WHERE room_name = 'Office_Teacher6')
     ),
     (
-        (SELECT id FROM USERS WHERE email = 'teacher7@example.com'),
+        (SELECT id FROM USERS WHERE email = 'teacher7@teacher.com'),
         (SELECT id FROM ROOM WHERE room_name = 'Office_Teacher7')
     )
 
@@ -428,7 +428,7 @@ ON CONFLICT (user_id) DO NOTHING;
 INSERT INTO TEACH (teacher_id, class_id)
 SELECT t.user_id, c.id
 FROM TEACHER t, CLASS c
-WHERE t.user_id = (SELECT id FROM USERS WHERE email = 'teacher1@example.com')
+WHERE t.user_id = (SELECT id FROM USERS WHERE email = 'teacher1@teacher.com')
   AND c.subject_id = (SELECT id FROM SUBJECT WHERE subject_name = 'Calculus')
   AND c.class_name IN ('T1', 'T2')
 ON CONFLICT DO NOTHING;
@@ -436,7 +436,7 @@ ON CONFLICT DO NOTHING;
 INSERT INTO TEACH (teacher_id, class_id)
 SELECT t.user_id, c.id
 FROM TEACHER t, CLASS c
-WHERE t.user_id = (SELECT id FROM USERS WHERE email = 'teacher6@example.com')
+WHERE t.user_id = (SELECT id FROM USERS WHERE email = 'teacher6@teacher.com')
   AND c.subject_id = (SELECT id FROM SUBJECT WHERE subject_name = 'Calculus')
   AND c.class_name IN ('T1', 'T2')
 ON CONFLICT DO NOTHING;
@@ -445,7 +445,7 @@ ON CONFLICT DO NOTHING;
 INSERT INTO TEACH (teacher_id, class_id)
 SELECT t.user_id, c.id
 FROM TEACHER t, CLASS c
-WHERE t.user_id = (SELECT id FROM USERS WHERE email = 'teacher2@example.com')
+WHERE t.user_id = (SELECT id FROM USERS WHERE email = 'teacher2@teacher.com')
   AND (
     (c.subject_id = (SELECT id FROM SUBJECT WHERE subject_name = 'Linear Algebra') AND c.class_name = 'T1') OR
     (c.subject_id = (SELECT id FROM SUBJECT WHERE subject_name = 'Physics') AND c.class_name = 'T2')
@@ -456,7 +456,7 @@ ON CONFLICT DO NOTHING;
 INSERT INTO TEACH (teacher_id, class_id)
 SELECT t.user_id, c.id
 FROM TEACHER t, CLASS c
-WHERE t.user_id = (SELECT id FROM USERS WHERE email = 'teacher3@example.com')
+WHERE t.user_id = (SELECT id FROM USERS WHERE email = 'teacher3@teacher.com')
   AND c.subject_id = (SELECT id FROM SUBJECT WHERE subject_name = 'Programming Fundamentals')
   AND c.class_name IN ('T1', 'T3')
 ON CONFLICT DO NOTHING;
@@ -465,7 +465,7 @@ ON CONFLICT DO NOTHING;
 INSERT INTO TEACH (teacher_id, class_id)
 SELECT t.user_id, c.id
 FROM TEACHER t, CLASS c
-WHERE t.user_id = (SELECT id FROM USERS WHERE email = 'teacher4@example.com')
+WHERE t.user_id = (SELECT id FROM USERS WHERE email = 'teacher4@teacher.com')
   AND (
     (c.subject_id = (SELECT id FROM SUBJECT WHERE subject_name = 'Operating Systems') AND c.class_name = 'T2') OR
     (c.subject_id = (SELECT id FROM SUBJECT WHERE subject_name = 'Database Systems') AND c.class_name = 'T2')
@@ -476,7 +476,7 @@ ON CONFLICT DO NOTHING;
 INSERT INTO TEACH (teacher_id, class_id)
 SELECT t.user_id, c.id
 FROM TEACHER t, CLASS c
-WHERE t.user_id = (SELECT id FROM USERS WHERE email = 'teacher5@example.com')
+WHERE t.user_id = (SELECT id FROM USERS WHERE email = 'teacher5@teacher.com')
   AND (
     (c.subject_id = (SELECT id FROM SUBJECT WHERE subject_name = 'Artificial Intelligence') AND c.class_name = 'T1') OR
     (c.subject_id = (SELECT id FROM SUBJECT WHERE subject_name = 'Distributed Systems') AND c.class_name = 'T2')
