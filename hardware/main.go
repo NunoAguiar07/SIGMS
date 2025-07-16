@@ -9,7 +9,7 @@ import (
 )
 
 const interval = 5 * 60
-const url = "ws://localhost:8080/ws/hardware"
+const url = "ws://sigms.net/api/ws/hardware"
 
 func main() {
 	conn, err := websocket.EstablishConnection(url)

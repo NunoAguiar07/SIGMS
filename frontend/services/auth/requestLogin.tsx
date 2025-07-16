@@ -2,6 +2,7 @@ import * as SecureStore from 'expo-secure-store';
 import {handleAxiosError} from "../../utils/HandleAxiosError";
 import {apiUrl} from "../fetchWelcome"
 import api from "../interceptors/DeviceInterceptor";
+import {pushToken} from "../notifications/PushToken";
 
 export const requestLogin = async (
     email: string,
@@ -26,6 +27,7 @@ export const requestLogin = async (
                 const { accessToken, refreshToken } = response.data;
                 await SecureStore.setItemAsync('authToken', accessToken);
                 await SecureStore.setItemAsync('refreshToken', refreshToken);
+                await pushToken()
             }
             return true ;
         } else if (response.status === 404) {

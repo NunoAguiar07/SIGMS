@@ -5,6 +5,7 @@ import {AuthService} from '../services/auth/microsoft/AuthService';
 import {ParsedError} from "../types/errors/ParseErrorTypes";
 import {fetchUserInfo} from "../services/authorized/FetchUserInfo";
 import {isMobile} from "../utils/DeviceType";
+import {pushToken} from "../services/notifications/PushToken";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -44,6 +45,7 @@ export const useMicrosoftAuth = () => {
                     );
                     await AuthService.authenticateWithBackend(accessToken);
                     await fetchUserInfo();
+                    await pushToken()
                     router.push('/home');
                 } catch (error) {
                     setError(error as ParsedError);

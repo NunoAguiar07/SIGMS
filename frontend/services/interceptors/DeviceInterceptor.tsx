@@ -3,6 +3,7 @@ import {getDeviceType} from "../../utils/DeviceType";
 import * as SecureStore from 'expo-secure-store';
 import {apiUrl} from "../fetchWelcome";
 import ErrorHandler from "../../app/(public)/error";
+import {router} from "expo-router";
 
 
 const api = axios.create({
@@ -28,9 +29,8 @@ api.interceptors.response.use(
     response => response,
     async (error) => {
         const originalRequest = error.config;
-
-        // Only handle 401 errors and avoid infinite loops
-        if (error.response?.status === 401 && !originalRequest._retry) {
+        const url = originalRequest.url;
+        if (error.response?.status === 401 && !originalRequest._retry && url !== "/auth/refresh") {
             originalRequest._retry = true;
 
             try {
@@ -52,11 +52,9 @@ api.interceptors.response.use(
                             'Authorization': `Bearer ${refreshToken}`
                         }
                     });
-
                     // Store new tokens
                     await SecureStore.setItemAsync('authToken', response.data.accessToken);
                     await SecureStore.setItemAsync('refreshToken', response.data.refreshToken);
-
                     // Update the original request with new token
                     originalRequest.headers['Authorization'] = `Bearer ${response.data.accessToken}`;
                 }
@@ -64,12 +62,11 @@ api.interceptors.response.use(
                 // Retry the original request
                 return api(originalRequest);
             } catch (refreshError) {
-                console.log(refreshError);
                 // Refresh failed - clear tokens and redirect to login
                 await SecureStore.deleteItemAsync('authToken');
                 await SecureStore.deleteItemAsync('refreshToken');
                 // Redirect to login or show login modal
-                window.location.href = '/login'; // Or your navigation method
+                router.push('login')
                 return Promise.reject(refreshError);
             }
         }

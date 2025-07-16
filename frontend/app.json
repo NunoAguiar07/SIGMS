@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "SIGMS",
-    "slug": "SIGMS",
+    "slug": "frontendFinal",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -24,7 +24,11 @@
         "foregroundImage": "./assets/adaptive_icon.png",
         "backgroundColor": "#ffffff"
       },
+      "googleServicesFile": "./google-services.json",
       "edgeToEdgeEnabled": false,
+      "permissions": [
+        "android.permission.INTERNET, android.permission.ACCESS_NETWORK_STATE"
+      ],
       "package": "com.toms223.frontendFinal"
     },
     "scheme": "frontendFinal",
@@ -56,6 +60,14 @@
           "sounds": [],
           "enableBackgroundRemoteNotifications": false
         }
+      ],
+      [
+      "expo-build-properties",
+      {
+        "android": {
+          "usesCleartextTraffic": true
+        }
+      }
       ]
     ],
     "extra": {
