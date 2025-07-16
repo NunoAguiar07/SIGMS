@@ -34,6 +34,7 @@ export const NAV_CONFIG: RoleNavConfig = {
         { href: '/delete-entities', iconName: 'remove-circle-outline', label: 'Delete Entities' },
         { href: '/profile', iconName: 'person-outline', label: 'Profile' },
         { href: '/update-lecture', iconName: 'bar-chart-outline', label: 'Update Lecture' },
+        { href: '/teacher-management', iconName: 'people-outline', label: 'Teacher Management' },
     ],
     TECHNICAL_SERVICE: [
         { href: '/home', iconName: 'home-outline', label: 'Home' },
