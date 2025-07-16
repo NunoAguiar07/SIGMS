@@ -54,6 +54,23 @@ class RoomService (
         }
     }
 
+    fun getAllRoomsByUniversityIdAndType(
+        universityId: Int,
+        roomType: RoomType,
+        limit: Int,
+        offset: Int
+    ): RoomListResult {
+        return runCatching {
+            transactionable.useTransaction {
+                val university = repositories.from({universityRepository}) { getUniversityById(universityId) } ?: return@useTransaction failure(RoomError.UniversityNotFound)
+                val rooms = repositories.from({roomRepository}) {
+                    getAllRoomsByUniversityIdAndType(university.id, roomType, limit, offset)
+                }
+                return@useTransaction success(rooms)
+            }
+        }
+    }
+
     fun getAllRooms(limit: Int, offset: Int): RoomListResult {
         return runCatching {
             transactionable.useTransaction {

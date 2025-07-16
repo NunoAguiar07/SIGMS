@@ -114,6 +114,21 @@ class UserClassService(
         }
     }
 
+    fun getAllTeachersByUniversityId(universityId: Int, limit: Int, offset: Int): Either<UserClassError, List<Teacher>> {
+        return runCatching {
+            transactionable.useTransaction {
+                val teachers = repositories.from({teacherRepository}) {
+                    universityTeachers(universityId)
+                }
+                if (teachers.isEmpty()) {
+                    return@useTransaction success(emptyList())
+                }
+                return@useTransaction success(teachers.sortedBy { it.user.username }.take(limit).drop(offset))
+            }
+        }
+    }
+
+
     private fun enrollStudent(userId: Int, schoolClass: Class): Either<UserClassError, Boolean>{
         val student = repositories.from({studentRepository}){findStudentById(userId)}
             ?: return failure(UserClassError.UserNotFound)
@@ -216,12 +231,10 @@ class UserClassService(
         }
 
         val lectureTeacherPairs = classes.flatMap { classEntity ->
-            // Fetch teachers of the class
             val teachers = repositories.from({ teacherRepository }) {
                 findTeachersByClassId(classEntity.id)
             }
 
-            // Fetch lectures of the class with pagination
             repositories.from({ lectureRepository }) {
                 getLecturesByClass(classEntity.id, limit, offset)
             }.map { lecture ->

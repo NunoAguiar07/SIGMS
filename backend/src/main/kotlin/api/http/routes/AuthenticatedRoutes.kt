@@ -29,6 +29,7 @@ fun Route.authenticatedRoutes(
         issueReportRoutes(services)
         assessRoleRoutes(services)
         profileRoutes(services)
+        teacherRoutes(services)
         subjectRoutes(services)
         roomRoutes(services)
         lectureRoutes(services)

@@ -11,12 +11,17 @@ sealed class UserClassError {
     data object UserNotInClass : UserClassError()
     data object UserAlreadyInClass : UserClassError()
     data object UserAlreadyInSubject : UserClassError()
+    data object NoTeachersFound : UserClassError()
     data class ConnectionDbError(val message: String?) : UserClassError()
 
     fun toProblem() : Problem = when (this) {
         UserNotFound -> Problem.notFound(
             title = "User not found",
             detail = "The user with the given ID was not found."
+        )
+        NoTeachersFound -> Problem.notFound(
+            title = "No teachers found",
+            detail = "No teachers were found for the specified university."
         )
         ClassNotFound -> Problem.notFound(
             title = "Class not found",

@@ -45,6 +45,9 @@ class MockTeacherRepository : TeacherRepositoryInterface {
             teachers.map { it.teacher }
         }
     }
+    override fun universityTeachers(universityId: Int): List<Teacher> {
+        return teachers.filter { it.user.university.id == universityId }
+    }
 
     fun clear() {
         teachers.clear()

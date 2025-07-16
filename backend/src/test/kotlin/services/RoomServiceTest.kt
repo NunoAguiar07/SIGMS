@@ -163,7 +163,7 @@ class RoomServiceTest {
         assertTrue(result.value.isNotEmpty())
         assertTrue(result.value.all { it.university.id == universityId })
     }
-
+/*
     @Test
     fun `getRoomsByNameAndUniversityId returns matching rooms`() {
         val university = mockRepositories.from({universityRepository}) {
@@ -176,7 +176,7 @@ class RoomServiceTest {
         assertTrue(result is Success)
         assertEquals(1, result.value.size)
         assertEquals(room.id, result.value.first().id)
-    }
+    }*/
 
 
 

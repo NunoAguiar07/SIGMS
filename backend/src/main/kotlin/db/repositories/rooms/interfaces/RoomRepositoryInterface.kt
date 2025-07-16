@@ -14,6 +14,7 @@ interface RoomRepositoryInterface {
     fun getAllRoomsByUniversityId(universityId: Int, limit: Int, offset: Int): List<Room>
     fun getAllRoomsByNameAndUniversityId(universityId: Int, roomPartialName: String, limit: Int, offset: Int): List<Room>
     fun getAllRoomsByNameByTypeAndUniversityId(universityId: Int, roomPartialName: String, roomType: RoomType, limit: Int, offset: Int): List<Room>
+    fun getAllRoomsByUniversityIdAndType(universityId: Int, roomType: RoomType, limit: Int, offset: Int): List<Room>
     fun getRoomById(id: Int): Room?
     fun getOfficeRoomById(id: Int): OfficeRoom?
     fun getClassRoomById(id: Int): Classroom?

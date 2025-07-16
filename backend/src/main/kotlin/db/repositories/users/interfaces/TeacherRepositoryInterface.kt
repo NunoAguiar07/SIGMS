@@ -11,4 +11,6 @@ interface TeacherRepositoryInterface {
     fun isTeacher(user: User): Boolean
 
     fun findTeachersByClassId(classId: Int): List<Teacher>
+
+    fun universityTeachers(universityId: Int): List<Teacher>
 }

@@ -9,10 +9,8 @@ import isel.leic.group25.db.tables.Tables.Companion.teaches
 import isel.leic.group25.db.tables.Tables.Companion.users
 import org.ktorm.database.Database
 import org.ktorm.dsl.eq
-import org.ktorm.entity.any
-import org.ktorm.entity.filter
-import org.ktorm.entity.firstOrNull
-import org.ktorm.entity.map
+import org.ktorm.dsl.inList
+import org.ktorm.entity.*
 
 class TeacherRepository(private val database: Database): TeacherRepositoryInterface {
     override fun findTeacherById(id: Int): Teacher? = withDatabase {
@@ -36,5 +34,15 @@ class TeacherRepository(private val database: Database): TeacherRepositoryInterf
             teachers.map { it.teacher }
         }
     }
+
+    override fun universityTeachers(universityId: Int): List<Teacher> {
+        val universityUsers = withDatabase {
+            database.users.filter { it.university eq universityId }
+        }
+        return withDatabase {
+            database.teachers.filter { it.user inList universityUsers.map { it.id } }.toList()
+        }
+    }
+
 
 }

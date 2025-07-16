@@ -44,6 +44,23 @@ class MockRoomRepository : RoomRepositoryInterface {
         }.drop(offset).take(limit)
     }
 
+    override fun getAllRoomsByUniversityIdAndType(
+        universityId: Int,
+        roomType: RoomType,
+        limit: Int,
+        offset: Int
+    ): List<Room> {
+        return when (roomType) {
+            RoomType.CLASS -> classrooms.filter { it.room.university.id == universityId }
+                .map { it.room }.drop(offset).take(limit)
+            RoomType.OFFICE -> officeRooms.filter { it.room.university.id == universityId }
+                .map { it.room }.drop(offset).take(limit)
+            RoomType.STUDY -> studyRooms.filter { it.room.university.id == universityId }
+                .map { it.room }.drop(offset).take(limit)
+            else -> emptyList()
+        }
+    }
+
     override fun getAllRoomsByNameAndUniversityId(universityId: Int, roomPartialName: String, limit: Int, offset: Int): List<Room> {
         return rooms.filter {
             it.university.id == universityId && it.name.contains(roomPartialName, ignoreCase = true)

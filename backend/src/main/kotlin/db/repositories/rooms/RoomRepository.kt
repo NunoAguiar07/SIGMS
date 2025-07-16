@@ -14,6 +14,8 @@ import isel.leic.group25.db.tables.Tables.Companion.officeRooms
 import isel.leic.group25.db.tables.Tables.Companion.rooms
 import isel.leic.group25.db.tables.Tables.Companion.studyRooms
 import isel.leic.group25.db.tables.Tables.Companion.teachers
+import isel.leic.group25.db.tables.rooms.OfficeRooms
+import isel.leic.group25.db.tables.rooms.StudyRooms
 import isel.leic.group25.db.tables.rooms.Rooms as RoomsTable
 import isel.leic.group25.db.tables.rooms.Classrooms as ClassroomTable
 import org.ktorm.database.Database
@@ -37,14 +39,6 @@ class RoomRepository (private val database: Database) : RoomRepositoryInterface 
     override fun getAllRoomsByUniversityId(universityId: Int, limit: Int, offset: Int): List<Room> {
         return database.rooms.filter { it.university eq universityId }.drop(offset).take(limit).toList()
     }
-    /*
-    override fun getSubjectsByNameAndUniversityId(universityId: Int, subjectPartialName: String, limit: Int, offset: Int): List<Subject> {
-        return database.subjects.filter {
-            (it.university eq universityId) and
-            (it.name like "%$subjectPartialName%")
-        }.drop(offset).take(limit).toList()
-    }
-     */
 
     override fun getAllRoomsByNameAndUniversityId(universityId: Int, roomPartialName: String, limit: Int, offset: Int): List<Room> {
         return database.from(RoomsTable)
@@ -57,6 +51,80 @@ class RoomRepository (private val database: Database) : RoomRepositoryInterface 
 
     }
 
+
+    override fun getAllRoomsByNameByTypeAndUniversityId(
+        universityId: Int,
+        roomPartialName: String,
+        roomType: RoomType,
+        limit: Int,
+        offset: Int
+    ): List<Room> {
+        val query = when (roomType) {
+            RoomType.CLASS -> database
+                .from(ClassroomTable)
+                .innerJoin(RoomsTable, on = ClassroomTable.id eq RoomsTable.id)
+                .select()
+                .where {
+                    (RoomsTable.university eq universityId) and
+                            (RoomsTable.name like "%$roomPartialName%")
+                }
+
+            RoomType.STUDY -> database
+                .from(StudyRooms)
+                .innerJoin(RoomsTable, on = StudyRooms.id eq RoomsTable.id)
+                .select()
+                .where {
+                    (RoomsTable.university eq universityId) and
+                            (RoomsTable.name like "%$roomPartialName%")
+                }
+
+            RoomType.OFFICE -> database
+                .from(OfficeRooms)
+                .innerJoin(RoomsTable, on = OfficeRooms.id eq RoomsTable.id)
+                .select()
+                .where {
+                    (RoomsTable.university eq universityId) and
+                            (RoomsTable.name like "%$roomPartialName%")
+                }
+        }
+
+        return query
+            .limit(offset, limit)
+            .map { row -> RoomsTable.createEntity(row) }
+    }
+
+    override fun getAllRoomsByUniversityIdAndType(
+        universityId: Int,
+        roomType: RoomType,
+        limit: Int,
+        offset: Int
+    ): List<Room> {
+        val query = when (roomType) {
+            RoomType.CLASS -> database
+                .from(ClassroomTable)
+                .innerJoin(RoomsTable, on = ClassroomTable.id eq RoomsTable.id)
+                .select()
+                .where { RoomsTable.university eq universityId }
+
+            RoomType.STUDY -> database
+                .from(StudyRooms)
+                .innerJoin(RoomsTable, on = StudyRooms.id eq RoomsTable.id)
+                .select()
+                .where { RoomsTable.university eq universityId }
+
+            RoomType.OFFICE -> database
+                .from(OfficeRooms)
+                .innerJoin(RoomsTable, on = OfficeRooms.id eq RoomsTable.id)
+                .select()
+                .where { RoomsTable.university eq universityId }
+        }
+
+        return query
+            .limit(offset, limit)
+            .map { row -> RoomsTable.createEntity(row) }
+    }
+
+    /*
     override fun getAllRoomsByNameByTypeAndUniversityId(
         universityId: Int,
         roomPartialName: String,
@@ -73,7 +141,7 @@ class RoomRepository (private val database: Database) : RoomRepositoryInterface 
                 .limit(offset, limit).map { row ->
                     RoomsTable.createEntity(row)
             }
-    }
+    }*/
 
 
 

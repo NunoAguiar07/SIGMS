@@ -60,13 +60,18 @@ fun Route.baseRoomRoutes(services: Services) {
         if(offset < 0) return@get RequestError.Invalid("offset").toProblem().respond(call)
         if(limit < 1 || limit > 100) return@get RequestError.Invalid("limit").toProblem().respond(call)
         val newRoomType = roomType?.let { RoomType.fromValue(it.uppercase()) }
-        if(newRoomType != null && RoomType.fromValue(roomType.uppercase()) != RoomType.CLASS) {
+        if (roomType != null && newRoomType !in listOf(RoomType.CLASS, RoomType.OFFICE, RoomType.STUDY)) {
             return@get RequestError.Invalid("type").toProblem().respond(call)
         }
+
         val result = services.from({roomService}){
             if(!searchQuery.isNullOrBlank()) {
                 getRoomsByNameByTypeAndUniversityId(universityId, searchQuery, newRoomType, limit, offset)
-            }else {
+            }
+            else if (newRoomType != null) {
+                getAllRoomsByUniversityIdAndType(universityId, newRoomType, limit, offset)
+            }
+            else {
                 getAllRooms(limit, offset)
             }
         }
