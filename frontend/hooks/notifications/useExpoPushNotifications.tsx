@@ -1,8 +1,7 @@
 import * as ExpoNotifications from "expo-notifications";
-import {useEffect, useRef, useState} from "react";
+import {useEffect, useState} from "react";
 import {Notification} from "../../types/notifications/Notification";
 import {setUpPushNotifications} from "../../services/notifications/PushNotifications";
-import {pushToken} from "../../services/notifications/PushToken";
 import {router} from "expo-router";
 
 export const useExpoPushNotifications = () => {
