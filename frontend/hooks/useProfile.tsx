@@ -8,6 +8,8 @@ import {fetchTeacherProfileById} from "../services/authorized/FetchTeacherProfil
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {TeacherUser} from "../types/teacher/TeacherUser";
 import {useAlert} from "./notifications/useAlert";
+import * as ImageManipulator from 'expo-image-manipulator';
+
 
 
 export const useProfile = (id:number | undefined) => {
@@ -18,7 +20,7 @@ export const useProfile = (id:number | undefined) => {
     const [imageUri, setImageUri] = useState<string | null>(null);
     const [updateLoading, setUpdateLoading] = useState(false);
     const [updateError, setUpdateError] = useState<ParsedError | null>(null);
-
+    const MAX_IMAGE_SIZE_BYTES = 512000; // 500KB
     const showAlert = useAlert();
 
     const isTeacherUser = (data: any): data is TeacherUser =>
@@ -85,11 +87,13 @@ export const useProfile = (id:number | undefined) => {
 
     const pickImage = async () => {
         const myId = await AsyncStorage.getItem('userId');
-        const profileData = typeof myId === 'string' && +myId !== id
-        if( profileData) {
-            showAlert('Denied','You cannot change the profile image of another user!');
+        const isViewingOtherUser = typeof myId === 'string' && +myId !== id;
+
+        if (isViewingOtherUser) {
+            showAlert('Denied', 'You cannot change the profile image of another user!');
             return;
         }
+
         const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
         if (!permissionResult.granted) {
             showAlert('Permission Denied', 'You need to grant permission to access the media library.');
@@ -101,30 +105,44 @@ export const useProfile = (id:number | undefined) => {
             allowsEditing: true,
             aspect: [1, 1],
             quality: 1,
-            base64: true,
         });
 
         if (!result.canceled && result.assets[0]) {
             const asset = result.assets[0];
-            const base64Image = asset.base64;
 
-            if (base64Image) {
-                const byteCharacters = atob(base64Image);
-                const byteNumbers = Array.from(byteCharacters, c => c.charCodeAt(0));
-                const byteArray = Array.from(byteNumbers);
+            const manipulated = await ImageManipulator.manipulateAsync(
+                asset.uri,
+                [{ resize: { width: 256 } }],
+                { compress: 0.15, base64: true }
+            );
 
-                try {
-                    await updateProfile({
-                        image: byteArray,
-                        username: profile?.username
-                    });
+            const base64Image = manipulated.base64;
+            if (!base64Image) {
+                showAlert('Error', 'Failed to read image data.');
+                return;
+            }
 
-                    setImage(byteArray);
-                    setImageUri(`data:image/jpeg;base64,${base64Image}`);
-                } catch (err) {
-                    setImage(profile?.image || null);
-                    setImageUri(profile?.image ? `data:image/jpeg;base64,${profile.image}` : null);
-                }
+            const byteCharacters = atob(base64Image);
+            const byteNumbers = Array.from(byteCharacters, c => c.charCodeAt(0));
+            const byteArray = Array.from(byteNumbers);
+
+            if (byteArray.length > MAX_IMAGE_SIZE_BYTES) {
+                showAlert('Image too large', 'Please choose an image smaller than 500KB.');
+                return;
+            }
+
+            try {
+                await updateProfile({
+                    image: byteArray,
+                    username: profile?.username
+                });
+
+                setImage(byteArray);
+                setImageUri(`data:image/jpeg;base64,${base64Image}`);
+            } catch (err) {
+                showAlert('Update failed', 'Could not update your profile image.');
+                setImage(profile?.image || null);
+                setImageUri(profile?.image ? `data:image/jpeg;base64,${profile.image}` : null);
             }
         }
     };
