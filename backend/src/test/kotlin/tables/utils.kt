@@ -39,7 +39,6 @@ import kotlin.time.Duration
 
 class TestDatabaseHelper {
     companion object {
-        // Constants for test data
         private const val TEST_UNIVERSITY_NAME = "Test University"
         private const val TEST_EMAIL_PREFIX = "testuser"
         private const val TEST_EMAIL_DOMAIN = "@test.edu"
@@ -48,16 +47,14 @@ class TestDatabaseHelper {
         private const val TEST_ROOM_NAME = "Test Room"
     }
 
-    // Database connection properties
     private val dataSource: DataSource = JdbcDataSource().apply {
         setURL("jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;MODE=PostgreSQL")
         user = "sa"
         password = ""
     }
-    val connection: Connection = dataSource.connection
+    private val connection: Connection = dataSource.connection
     val database: Database = Database.connect(dataSource)
 
-    // Test data cache
     private lateinit var testUniversity: University
     private val testRooms = mutableMapOf<String, Room>()
     private val testUsers = mutableMapOf<String, User>()
@@ -227,8 +224,6 @@ class TestDatabaseHelper {
             DELETE FROM UNIVERSITY;
         """))
     }
-
-    // Helper methods for creating test data
 
     fun createUniversity(name: String = TEST_UNIVERSITY_NAME): University {
         return University {

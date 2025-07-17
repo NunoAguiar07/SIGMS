@@ -4,10 +4,6 @@ import isel.leic.group25.db.entities.timetables.Class
 import isel.leic.group25.db.entities.timetables.Subject
 import isel.leic.group25.db.entities.users.*
 import isel.leic.group25.db.repositories.timetables.interfaces.ClassRepositoryInterface
-import isel.leic.group25.db.tables.Tables.Companion.classes
-import org.ktorm.dsl.and
-import org.ktorm.dsl.eq
-import org.ktorm.entity.firstOrNull
 
 class MockClassRepository : ClassRepositoryInterface {
     private val classes = mutableListOf<Class>()
@@ -43,7 +39,7 @@ class MockClassRepository : ClassRepositoryInterface {
             this.name = name
             this.subject = subject
         }
-        newClass.set("id", classes.size + 1)
+        newClass["id"] = classes.size + 1
         classes.add(newClass)
         return newClass
     }

@@ -38,7 +38,6 @@ sealed interface User: Entity<User> {
             return try {
                 argon2.hash(10, 65536, 1, password.toCharArray())
             } finally {
-                // Wipe sensitive data from memory
                 argon2.wipeArray(password.toCharArray())
             }
         }

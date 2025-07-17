@@ -7,28 +7,21 @@ import isel.leic.group25.services.errors.AuthError
 import isel.leic.group25.utils.Failure
 import isel.leic.group25.utils.Success
 import mocks.repositories.MockRepositories
-import mocks.repositories.timetables.MockUniversityRepository
 import mocks.repositories.users.MockUserRepository
-import mocks.repositories.utils.MockTransaction
 import org.ktorm.database.Database
-import repositories.DatabaseTestSetup
-import kotlin.test.AfterTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class UserServiceTest {
-    // Test database setup
-    val mockDB = Database.connect(
+    private val mockDB = Database.connect(
         url = "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1",
         user = "root",
         password = ""
     )
     private val mockRepositories = MockRepositories(mockDB)
-
     private val userService = UserService(mockRepositories, mockRepositories.ktormCommand)
 
-    // Helper function to create a test user
     private fun createTestUser(role: Role = Role.STUDENT): User {
         return mockRepositories.ktormCommand.useTransaction {
             val newUniversity = mockRepositories.from({universityRepository}){
@@ -164,7 +157,6 @@ class UserServiceTest {
         assertTrue(result is Success)
         assertTrue(result.value)
 
-        // Verify deletion
         val getResult = userService.getUserById(user.id)
         assertTrue(getResult is Failure)
         assertEquals(AuthError.UserNotFound, getResult.value)
@@ -176,6 +168,4 @@ class UserServiceTest {
         assertTrue(result is Failure)
         assertEquals(AuthError.UserNotFound, result.value)
     }
-
-
 }

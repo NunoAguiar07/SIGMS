@@ -27,7 +27,6 @@ class SubjectRepository(private val database: Database): SubjectRepositoryInterf
         }.drop(offset).take(limit).toList()
     }
 
-
     override fun findSubjectById(id: Int): Subject? = withDatabase {
         return database.subjects.firstOrNull { it.id eq id }
     }

@@ -51,7 +51,7 @@ class ClassTableTest {
         val rows = database.classes.update(newClass)
 
         assertEquals(1, rows, "Should update exactly one row")
-        val updatedClass = database.classes.firstOrNull() { it.id eq newClass.id }
+        val updatedClass = database.classes.firstOrNull { it.id eq newClass.id }
         assertNotNull(updatedClass, "Class should exist after update")
         assertEquals("51N", updatedClass.name)
     }

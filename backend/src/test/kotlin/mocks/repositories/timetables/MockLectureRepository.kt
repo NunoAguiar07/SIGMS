@@ -97,10 +97,9 @@ class MockLectureRepository : LectureRepositoryInterface {
         return lectures.removeIf { it.id == id }
     }
 
-    @OptIn(ExperimentalTime::class)
+
     override fun deleteLectureChange(id: Int): Boolean {
         val change = lectureChanges.firstOrNull { it.lecture.id == id } ?: return false
-        // Restore original values
         val lecture = lectures.first { it.id == id }
         lecture.apply {
             classroom = change.originalClassroom

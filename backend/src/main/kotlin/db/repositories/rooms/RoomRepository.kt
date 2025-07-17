@@ -124,27 +124,6 @@ class RoomRepository (private val database: Database) : RoomRepositoryInterface 
             .map { row -> RoomsTable.createEntity(row) }
     }
 
-    /*
-    override fun getAllRoomsByNameByTypeAndUniversityId(
-        universityId: Int,
-        roomPartialName: String,
-        roomType: RoomType,
-        limit: Int,
-        offset: Int
-    ): List<Room> {
-        return database.from(ClassroomTable)
-                .innerJoin(RoomsTable, on = ClassroomTable.id eq RoomsTable.id)
-                .select()
-                .where {
-                    (RoomsTable.university eq universityId) and (RoomsTable.name like "%$roomPartialName%")
-                }
-                .limit(offset, limit).map { row ->
-                    RoomsTable.createEntity(row)
-            }
-    }*/
-
-
-
     override fun getRoomById(id: Int): Room? = withDatabase {
         return database.rooms.firstOrNull { it.id eq id }
     }

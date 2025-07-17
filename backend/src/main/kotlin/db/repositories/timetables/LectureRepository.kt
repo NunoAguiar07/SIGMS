@@ -160,15 +160,12 @@ class LectureRepository(private val database: Database) : LectureRepositoryInter
         currentLecture: Lecture?
     ): Boolean = withDatabase {
         return when {
-            // Case 1: Permanent change (check all lectures and all changes)
             isPermanentChange(effectiveFrom, effectiveUntil) ->
                 hasPermanentChangeConflict(newRoomId, newWeekDay, newStartTime, newEndTime, currentLecture)
 
-            // Case 2: Immediate change until end date (check current lectures and future changes)
             isImmediateChange(effectiveFrom) ->
                 hasImmediateChangeConflict(newRoomId, newWeekDay, newStartTime, newEndTime, effectiveUntil!!, currentLecture)
 
-            // Case 3: Scheduled change (check current lectures and overlapping changes)
             else ->
                 hasScheduledChangeConflict(newRoomId, newWeekDay, newStartTime, newEndTime, effectiveFrom!!, effectiveUntil!!, currentLecture)
         }
@@ -263,14 +260,12 @@ class LectureRepository(private val database: Database) : LectureRepositoryInter
         newEndTime: Duration,
         currentLecture: Lecture?
     ): Boolean = withDatabase {
-        // Check conflicts with existing lectures
         val lectureConflict = database.lectures.any { lecture ->
             (isDifferentLecture(lecture.id, currentLecture?.id ?: -1)) and
                     isSameRoomAndDay(lecture, newRoomId, newWeekDay) and
                     hasTimeOverlap(newStartTime, newEndTime, lecture.startTime, lecture.endTime)
         }
 
-        // Check conflicts with all scheduled changes
         val changeConflict = database.lectureChanges.any { change ->
             isDifferentLecture(change.lectureId, currentLecture?.id ?: -1) and
                     isSameRoomAndDay(change, newRoomId, newWeekDay) and
@@ -289,14 +284,12 @@ class LectureRepository(private val database: Database) : LectureRepositoryInter
         changeEndDate: Instant,
         currentLecture: Lecture?
     ): Boolean = withDatabase {
-        // Check conflicts with existing lectures
         val lectureConflict = database.lectures.any { lecture ->
             isDifferentLecture(lecture.id, currentLecture?.id ?: -1) and
                     isSameRoomAndDay(lecture, newRoomId, newWeekDay) and
                     hasTimeOverlap(newStartTime, newEndTime, lecture.startTime, lecture.endTime)
         }
 
-        // Check conflicts with changes that extend beyond our end date
         val changeConflict = database.lectureChanges.any { change ->
             isDifferentLecture(change.lectureId, currentLecture?.id ?: -1) and
                     isSameRoomAndDay(change, newRoomId, newWeekDay) and
@@ -317,14 +310,12 @@ class LectureRepository(private val database: Database) : LectureRepositoryInter
         changeEndDate: Instant,
         currentLecture: Lecture?
     ): Boolean = withDatabase {
-        // Check conflicts with existing lectures
         val lectureConflict = database.lectures.any { lecture ->
             isDifferentLecture(lecture.id, currentLecture?.id ?: -1) and
                     isSameRoomAndDay(lecture, newRoomId, newWeekDay) and
                     hasTimeOverlap(newStartTime, newEndTime, lecture.startTime, lecture.endTime)
         }
 
-        // Check conflicts with overlapping scheduled changes
         val changeConflict = database.lectureChanges.any { change ->
             isDifferentLecture(change.lectureId, currentLecture?.id ?: -1) and
                     isSameRoomAndDay(change, newRoomId, newWeekDay) and
@@ -335,7 +326,6 @@ class LectureRepository(private val database: Database) : LectureRepositoryInter
         return lectureConflict || changeConflict
     }
 
-    // Helper functions
     private fun isDifferentLecture(lectureId: ColumnDeclaring<Int>, currentLectureId: Int): ColumnDeclaring<Boolean> {
         return (lectureId neq currentLectureId)
     }

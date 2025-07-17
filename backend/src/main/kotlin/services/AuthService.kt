@@ -243,7 +243,6 @@ class AuthService(
                 val role = repositories.from({ userRepository }) { getRoleById(userId) }
                     ?: return@useTransaction failure(AuthError.UserNotFound)
 
-                // Generate new tokens
                 val newAccessToken = jwtConfig.generateAccessToken(userId, role.name, user.university.id)
                 val newRefreshToken = jwtConfig.generateRefreshToken(userId)
 

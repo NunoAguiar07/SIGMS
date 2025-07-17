@@ -6,9 +6,6 @@ import isel.leic.group25.services.errors.SubjectError
 import isel.leic.group25.utils.Failure
 import isel.leic.group25.utils.Success
 import mocks.repositories.MockRepositories
-import mocks.repositories.timetables.MockSubjectRepository
-import mocks.repositories.timetables.MockUniversityRepository
-import mocks.repositories.utils.MockTransaction
 import org.ktorm.database.Database
 import repositories.DatabaseTestSetup
 import kotlin.test.AfterTest
@@ -17,16 +14,14 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class SubjectServiceTest {
-    val mockDB = Database.connect(
+    private val mockDB = Database.connect(
         url = "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1",
         user = "root",
         password = ""
     )
     private val mockRepositories = MockRepositories(mockDB)
-
     private val subjectService = SubjectService(mockRepositories, mockRepositories.ktormCommand)
 
-    // Helper function to create test subjects
     private fun createTestSubjects(count: Int = 1): List<Subject> {
         return mockRepositories.ktormCommand.useTransaction {
             (1..count).map { i ->
@@ -172,7 +167,4 @@ class SubjectServiceTest {
         assertTrue(result is Failure)
         assertEquals(SubjectError.UniversityNotFound, result.value)
     }
-
-
-
 }
