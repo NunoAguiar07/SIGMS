@@ -5,10 +5,6 @@ import isel.leic.group25.db.entities.users.Teacher
 import isel.leic.group25.db.entities.users.User
 import isel.leic.group25.db.repositories.users.interfaces.TeacherRepositoryInterface
 import isel.leic.group25.db.repositories.utils.withDatabase
-import isel.leic.group25.db.tables.Tables.Companion.teaches
-import org.ktorm.dsl.eq
-import org.ktorm.entity.filter
-import org.ktorm.entity.map
 
 class MockTeacherRepository : TeacherRepositoryInterface {
     private val teachers = mutableListOf<Teacher>()
@@ -16,7 +12,6 @@ class MockTeacherRepository : TeacherRepositoryInterface {
     private val teaches = mutableListOf<Teach>()
 
 
-    // Test setup helper
     fun addMockTeacher(user: User): Teacher {
         val teacher = Teacher { this.user = user }
         teachers.add(teacher)

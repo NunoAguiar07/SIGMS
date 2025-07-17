@@ -137,11 +137,6 @@ class UserClassService(
             }) {
             return failure(UserClassError.UserAlreadyInClass)
         }
-//        if (repositories.from({classRepository}){
-//                checkStudentInSubject(student.user.id, schoolClass.subject.id)
-//            }) {
-//            return failure(UserClassError.UserAlreadyInSubject)
-//        }
         val linked = repositories.from({classRepository}){
             addStudentToClass(student, schoolClass)
         }

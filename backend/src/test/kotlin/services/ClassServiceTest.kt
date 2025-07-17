@@ -7,17 +7,13 @@ import isel.leic.group25.services.errors.ClassError
 import isel.leic.group25.utils.Failure
 import isel.leic.group25.utils.Success
 import mocks.repositories.MockRepositories
-import mocks.repositories.timetables.MockClassRepository
-import mocks.repositories.timetables.MockSubjectRepository
-import mocks.repositories.timetables.MockUniversityRepository
-import mocks.repositories.utils.MockTransaction
 import org.ktorm.database.Database
-import repositories.DatabaseTestSetup
+
 import kotlin.test.*
 
 
 class ClassServiceTest {
-    val mockDB = Database.connect(
+    private val mockDB = Database.connect(
         url = "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1",
         user = "root",
         password = ""
@@ -28,7 +24,6 @@ class ClassServiceTest {
         mockRepositories.ktormCommand
     )
 
-    // Helper function to create test subjects
     private fun createTestSubjects(count: Int = 1): List<Subject> {
         return mockRepositories.ktormCommand.useTransaction {
             (1..count).map { i ->
@@ -49,6 +44,7 @@ class ClassServiceTest {
             }
         }
     }
+
 
     @Test
     fun `getAllClassesFromSubject returns classes with default parameters`() {
@@ -144,6 +140,4 @@ class ClassServiceTest {
         val result2 = classService.createClass("Shared Name", subjects[1].id)
         assertTrue(result2 is Success)
     }
-
-
 }

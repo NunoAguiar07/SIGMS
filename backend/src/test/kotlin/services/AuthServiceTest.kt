@@ -67,7 +67,6 @@ class AuthServiceTest {
             }
         }
 
-        // Register first time
         authService.register(
             email = "student@isel.pt",
             username = "student",
@@ -76,7 +75,6 @@ class AuthServiceTest {
             universityId = university.id
         )
 
-        // Attempt second registration
         val result = authService.register(
             email = "student@isel.pt",
             username = "student2",

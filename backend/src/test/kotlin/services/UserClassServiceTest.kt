@@ -5,8 +5,6 @@ import isel.leic.group25.db.entities.timetables.Subject
 import isel.leic.group25.db.entities.types.ClassType
 import isel.leic.group25.db.entities.types.Role
 import isel.leic.group25.db.entities.types.WeekDay
-import isel.leic.group25.db.entities.users.Student
-import isel.leic.group25.db.entities.users.Teacher
 import isel.leic.group25.db.entities.users.User
 import isel.leic.group25.services.UserClassService
 import isel.leic.group25.services.errors.UserClassError
@@ -14,19 +12,16 @@ import isel.leic.group25.utils.Failure
 import isel.leic.group25.utils.Success
 import isel.leic.group25.utils.hoursAndMinutesToDuration
 import mocks.repositories.MockRepositories
-import mocks.repositories.rooms.MockRoomRepository
 import mocks.repositories.timetables.MockClassRepository
 import mocks.repositories.timetables.MockLectureRepository
-import mocks.repositories.timetables.MockUniversityRepository
 import mocks.repositories.users.MockStudentRepository
 import mocks.repositories.users.MockTeacherRepository
 import mocks.repositories.users.MockUserRepository
-import mocks.repositories.utils.MockTransaction
 import org.ktorm.database.Database
 import kotlin.test.*
 
 class UserClassServiceTest {
-    val mockDB = Database.connect(
+    private val mockDB = Database.connect(
         url = "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1",
         user = "root",
         password = ""
@@ -79,17 +74,13 @@ class UserClassServiceTest {
         mockRepositories.from({lectureRepository as MockLectureRepository}){clear()}
     }
 
-    // --- Existing tests omitted for brevity ---
-
     @Test
     fun `removeUserFromClass should succeed for existing teacher`() {
         val teacherUser = createTestUser(Role.TEACHER)
         val testClass = createTestClass()
 
-        // Add teacher first
         service.addUserToClass(teacherUser.id, testClass.id, Role.TEACHER)
 
-        // Then remove
         val result = service.removeUserFromClass(teacherUser.id, testClass.id, Role.TEACHER)
 
         assertTrue(result is Success)
@@ -115,7 +106,7 @@ class UserClassServiceTest {
         val user = createTestUser(Role.STUDENT)
         val testClass = createTestClass()
 
-        val result = service.addUserToClass(user.id, testClass.id, Role.ADMIN)  // Assuming ADMIN is invalid for addUserToClass
+        val result = service.addUserToClass(user.id, testClass.id, Role.ADMIN)
 
         assertTrue(result is Failure)
         assertEquals(UserClassError.InvalidRole, result.value)
@@ -126,7 +117,7 @@ class UserClassServiceTest {
         val user = createTestUser(Role.STUDENT)
         val testClass = createTestClass()
 
-        val result = service.removeUserFromClass(user.id, testClass.id, Role.ADMIN)  // Assuming ADMIN invalid for removal
+        val result = service.removeUserFromClass(user.id, testClass.id, Role.ADMIN)
 
         assertTrue(result is Failure)
         assertEquals(UserClassError.InvalidRole, result.value)
@@ -188,7 +179,6 @@ class UserClassServiceTest {
             )
         }
 
-        // Add student to class
         service.addUserToClass(studentUser.id, testClass.id, Role.STUDENT)
 
         val result = service.getScheduleByUserId(studentUser.id, Role.STUDENT, 10, 0)
@@ -241,7 +231,6 @@ class UserClassServiceTest {
             )
         }
 
-        // Assign teacher to class
         service.addUserToClass(teacherUser.id, testClass.id, Role.TEACHER)
 
         val result = service.getScheduleByUserId(teacherUser.id, Role.TEACHER, 10, 0)

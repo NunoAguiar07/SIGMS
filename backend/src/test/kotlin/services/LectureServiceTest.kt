@@ -15,7 +15,7 @@ import kotlin.time.Duration.Companion.hours
 import kotlin.time.ExperimentalTime
 
 class LectureServiceTest {
-    val mockDB = Database.connect(
+    private val mockDB = Database.connect(
         url = "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1",
         user = "root",
         password = ""
@@ -31,7 +31,6 @@ class LectureServiceTest {
 
     @Test
     fun `getAllLectures should return list of lectures`() {
-        // Setup test data
         val university = mockRepositories.from({universityRepository}){
             createUniversity("Test University")
         }
@@ -59,7 +58,6 @@ class LectureServiceTest {
             )
         }
 
-        // Test
         val result = lectureService.getAllLectures(10, 0)
         assertTrue(result is Success, "Should return success")
         assertEquals(1, result.value.size, "Should return one lecture")
@@ -67,7 +65,6 @@ class LectureServiceTest {
 
     @Test
     fun `getLectureById should return lecture when found`() {
-        // Setup test data
         val university = mockRepositories.from({universityRepository}){
             createUniversity("Test University")
         }
@@ -95,7 +92,6 @@ class LectureServiceTest {
             )
         }
 
-        // Test
         val result = lectureService.getLectureById(lecture.id)
         assertTrue(result is Success, "Should return success")
         assertEquals(lecture.id, result.value.id, "Should return correct lecture")
@@ -110,7 +106,6 @@ class LectureServiceTest {
 
     @Test
     fun `createLecture should create new lecture with valid data`() {
-        // Setup test data
         val university = mockRepositories.from({universityRepository}){
             createUniversity("Test University")
         }
@@ -158,7 +153,6 @@ class LectureServiceTest {
 
     @Test
     fun `createLecture should return LectureTimeConflict when conflicting lecture exists`() {
-        // Setup test data
         val university = mockRepositories.from({universityRepository}){
             createUniversity("Test University")
         }
@@ -186,7 +180,6 @@ class LectureServiceTest {
             )
         }
 
-        // Try to create conflicting lecture
         val result = lectureService.createLecture(
             schoolClassId = schoolClass.id,
             roomId = room.id,
@@ -202,7 +195,6 @@ class LectureServiceTest {
 
     @Test
     fun `createLecture should return InvalidLectureRoom when room not found`() {
-        // Setup test data
         val university = mockRepositories.from({universityRepository}){
             createUniversity("Test University")
         }
@@ -228,7 +220,6 @@ class LectureServiceTest {
 
     @Test
     fun `createLecture should return InvalidLectureClass when class not found`() {
-        // Setup test data
         val university = mockRepositories.from({universityRepository}){
             createUniversity("Test University")
         }
@@ -252,7 +243,6 @@ class LectureServiceTest {
 
     @Test
     fun `getLecturesByRoom should return lectures for given room`() {
-        // Setup test data
         val university = mockRepositories.from({universityRepository}){
             createUniversity("Test University")
         }
@@ -275,7 +265,6 @@ class LectureServiceTest {
         assertNotNull(classroom1, "Classroom should be created")
         assertNotNull(classroom2, "Classroom should be created")
 
-        // Create lectures in different rooms
         mockRepositories.from({lectureRepository}){
             createLecture(
                 schoolClass = schoolClass,
@@ -296,7 +285,6 @@ class LectureServiceTest {
                 endTime = 11.hours
             )
         }
-        // Test
         val result = lectureService.getLecturesByRoom(room1.id, 10, 0)
         assertTrue(result is Success, "Should return success")
         assertEquals(1, result.value.size, "Should return one lecture")
@@ -304,7 +292,6 @@ class LectureServiceTest {
 
     @Test
     fun `getLecturesByClass should return lectures for given class`() {
-        // Setup test data
         val university = mockRepositories.from({universityRepository}){
             createUniversity("Test University")
         }
@@ -328,7 +315,6 @@ class LectureServiceTest {
         }
         assertNotNull(classroom, "Classroom should be created")
 
-        // Create lectures for different classes
         mockRepositories.from({lectureRepository}){
             createLecture(
                 schoolClass = schoolClass1,
@@ -350,7 +336,6 @@ class LectureServiceTest {
             )
         }
 
-        // Test
         val result = lectureService.getLecturesByClass(schoolClass1.id, 10, 0)
         assertTrue(result is Success, "Should return success")
         assertEquals(1, result.value.size, "Should return one lecture")
@@ -365,7 +350,6 @@ class LectureServiceTest {
 
     @Test
     fun `getLecturesByType should return lectures of given type`() {
-        // Setup test data
         val university = mockRepositories.from({universityRepository}){
             createUniversity("Test University")
         }
@@ -382,7 +366,6 @@ class LectureServiceTest {
         val classroom = mockRepositories.from({roomRepository}){getClassRoomById(room.id)}
         assertNotNull(classroom, "Classroom should be created")
 
-        // Create lectures of different types
         mockRepositories.from({lectureRepository}){
             createLecture(
                 schoolClass = schoolClass,
@@ -404,7 +387,6 @@ class LectureServiceTest {
             )
         }
 
-        // Test
         val result = lectureService.getLecturesByType(ClassType.THEORETICAL)
         assertTrue(result is Success, "Should return success")
         assertEquals(1, result.value.size, "Should return one lecture")
@@ -413,7 +395,6 @@ class LectureServiceTest {
 
     @Test
     fun `deleteLecture should return true when lecture is deleted`() {
-        // Setup test data
         val university = mockRepositories.from({universityRepository}){
             createUniversity("Test University")
         }
@@ -441,7 +422,6 @@ class LectureServiceTest {
             )
         }
 
-        // Test
         val result = lectureService.deleteLecture(lecture.id)
         assertTrue(result is Success, "Should return success")
         assertTrue(result.value, "Should return true when lecture is deleted")
@@ -458,7 +438,6 @@ class LectureServiceTest {
     @OptIn(ExperimentalTime::class)
     @Test
     fun `updateLecture should create permanent change when from and until are null`() {
-        // Setup test data
         val university = mockRepositories.from({universityRepository}){
             createUniversity("Test University")
         }
@@ -493,7 +472,6 @@ class LectureServiceTest {
             )
         }
 
-        // Test
         val result = lectureService.updateLecture(
             lectureId = lecture.id,
             newRoomId = room2.id,
@@ -506,7 +484,6 @@ class LectureServiceTest {
         )
 
         assertTrue(result is Success, "Should return success")
-        // Check that change was created
         val updatedLecture = mockRepositories.from({lectureRepository}){
             getLectureById(lecture.id)
         }
@@ -520,7 +497,6 @@ class LectureServiceTest {
     @OptIn(ExperimentalTime::class)
     @Test
     fun `updateLecture should create temporary change when from is null`() {
-        // Setup test data
         val university = mockRepositories.from({universityRepository}){
             createUniversity("Test University")
         }
@@ -557,7 +533,6 @@ class LectureServiceTest {
 
         val currentDate = Clock.System.now().plus(1.hours)
 
-        // Test
         val result = lectureService.updateLecture(
             lectureId = lecture.id,
             newRoomId = room2.id,
@@ -570,7 +545,6 @@ class LectureServiceTest {
         )
 
         assertTrue(result is Success, "Should return success")
-        // Check that change was created
         val updatedLecture = mockRepositories.from({lectureRepository}){
             getLectureById(lecture.id)
         }
@@ -603,7 +577,6 @@ class LectureServiceTest {
     @OptIn(ExperimentalTime::class)
     @Test
     fun `updateLecture should return InvalidLectureRoom when new room not found`() {
-        // Setup test data
         val university = mockRepositories.from({universityRepository}){
             createUniversity("Test University")
         }
@@ -649,7 +622,6 @@ class LectureServiceTest {
     @OptIn(ExperimentalTime::class)
     @Test
     fun `updateLecture should return InvalidLectureDate when start time is after end time`() {
-        // Setup
         val university = mockRepositories.from({universityRepository}) {
             createUniversity("Test University")
         }
@@ -675,7 +647,6 @@ class LectureServiceTest {
             )
         }
 
-        // Act
         val result = lectureService.updateLecture(
             lectureId = lecture.id,
             newRoomId = room.id,
@@ -687,7 +658,6 @@ class LectureServiceTest {
             effectiveUntil = null
         )
 
-        // Assert
         assertTrue(result is Failure, "Should return failure")
         assertEquals(LectureError.InvalidLectureDate, result.value, "Should return InvalidLectureDate error")
     }
@@ -695,7 +665,6 @@ class LectureServiceTest {
     @OptIn(ExperimentalTime::class)
     @Test
     fun `updateLecture should return InvalidLectureUntilDate when effectiveUntil is in the past`() {
-        // Setup
         val university = mockRepositories.from({universityRepository}) {
             createUniversity("Test University")
         }
@@ -723,7 +692,6 @@ class LectureServiceTest {
 
         val past = Clock.System.now().minus(1.hours)
 
-        // Act
         val result = lectureService.updateLecture(
             lectureId = lecture.id,
             newRoomId = room.id,
@@ -735,12 +703,7 @@ class LectureServiceTest {
             effectiveUntil = past
         )
 
-        // Assert
         assertTrue(result is Failure, "Should return failure")
         assertEquals(LectureError.InvalidLectureUntilDate, result.value, "Should return InvalidLectureUntilDate error")
     }
-
-
-
-
 }
