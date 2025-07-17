@@ -2,7 +2,6 @@ import * as ExpoNotifications from "expo-notifications";
 import {useEffect, useState} from "react";
 import {Notification} from "../../types/notifications/Notification";
 import {setUpPushNotifications} from "../../services/notifications/PushNotifications";
-import {pushToken} from "../../services/notifications/PushToken";
 import {router} from "expo-router";
 
 export const useExpoPushNotifications = () => {
@@ -17,7 +16,6 @@ export const useExpoPushNotifications = () => {
     });
     useEffect(() => {
         setUpPushNotifications()
-        const pushTokenSubscription = ExpoNotifications.addPushTokenListener(pushToken);
         const receiveNotificationSubscription = ExpoNotifications.addNotificationReceivedListener(expoNotification => {
             const title = expoNotification.request.content.title as string
             const body = expoNotification.request.content.body as string
@@ -35,7 +33,6 @@ export const useExpoPushNotifications = () => {
         return () => {
             receiveNotificationSubscription.remove()
             responseReceiveNotificationSubscription.remove()
-            pushTokenSubscription.remove()
         };
     }, []);
 

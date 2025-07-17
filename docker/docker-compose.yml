@@ -42,6 +42,7 @@ services:
       dockerfile: ./docker/Dockerfile
     ports:
       - "443:443"
+      - "80:80"
     networks:
       - sigms-network
     depends_on:

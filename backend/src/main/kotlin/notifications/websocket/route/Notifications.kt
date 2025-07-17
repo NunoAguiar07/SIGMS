@@ -63,11 +63,12 @@ object Notifications: WebsocketRoute {
         val notification = notifiable.toNotification()
         ExpoNotifications.sendNotificationToUsers(users, notification)
         users.forEach { id ->
-            logger.info("Sending Notification - $notifiable - to user: $id")
             val userConnection = usersConnections.firstOrNull { it.userId == id }
             if(userConnection == null) {
+                logger.info("Saving Notification - $notifiable - for user: $id")
                 notificationDLQ.computeIfAbsent(id){ mutableListOf() }.add(notification)
             } else {
+                logger.info("Sending Notification - $notifiable - to user: $id")
                 userConnection.sendNotification(notification)
             }
         }

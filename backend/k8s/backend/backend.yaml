@@ -15,8 +15,8 @@ spec:
     spec:
       serviceAccountName: secrets-account
       containers:
-        - image: europe-west1-docker.pkg.dev/rising-city-464516-e8/sigms/backend
-          imagePullPolicy: IfNotPresent
+        - image: europe-west1-docker.pkg.dev/rising-city-464516-e8/sigms/backend:latest
+          imagePullPolicy: Always
           name: backend
           ports:
             - containerPort: 8080

@@ -1,15 +1,19 @@
-import axios from "axios";
+import axios, {AxiosError} from "axios";
 import {handleAxiosError} from "../utils/HandleAxiosError";
 import {WelcomeData} from "../types/welcome/WelcomeInterfaces";
-import {isMobile} from "../utils/DeviceType";
+import {Platform} from "react-native";
 
 export const apiUrl: string =  ((): string => {
     if(__DEV__){
-        return !isMobile
+        return Platform.OS === "web"
             ? 'https://localhost/api/'
             : 'http://10.0.2.2:8080/api/';
     } else {
-        return process.env.EXPO_PUBLIC_API_URL
+        console.log(Platform.OS)
+        return Platform.OS === "web"
+            ? process.env.EXPO_PUBLIC_API_URL || ''
+            : 'http://sigms.net/api/'
+
     }
 })()
 /**

@@ -24,7 +24,7 @@ export const ErrorScreen = ({errorStatus, errorMessage, goBack } : ErrorScreenTy
                 goBack ? goBack() : router.back();
                 break;
             case 500:
-                router.reload();
+                router.replace(path);
                 break;
             default:
                 router.replace(path);

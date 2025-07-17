@@ -1,40 +1,99 @@
-# SIGMS
+# SIGMS - Sistema Inteligente de Gestão e Monitorização de Salas
 
-This project was created using the [Ktor Project Generator](https://start.ktor.io).
+## Overview
+SIGMS is an intelligent system designed to manage and monitor classroom spaces in academic environments. It provides real-time information about room availability, incident reporting, and schedule changes through a mobile/web application. The system also includes a hardware component using Raspberry Pi to estimate room occupancy via Wi-Fi probe requests.
 
-Here are some useful links to get you started:
+## Key Features
+- **Real-time room status monitoring** (available, occupied, under maintenance)
+- **Incident reporting system** for technical issues (projectors, power outlets, etc.)
+- **Schedule change notifications** for students and faculty
+- **Occupancy estimation** using Wi-Fi probe requests (IEEE 802.11 protocol)
+- **Multi-platform access** (web, iOS, Android)
+- **Role-based access control** (students, professors, maintenance staff, administrators)
+- **Centralized communication platform**
 
-- [Ktor Documentation](https://ktor.io/docs/home.html)
-- [Ktor GitHub page](https://github.com/ktorio/ktor)
-- The [Ktor Slack chat](https://app.slack.com/client/T09229ZC6/C0A974TJ9). You'll need
-  to [request an invite](https://surveys.jetbrains.com/s3/kotlin-slack-sign-up) to join.
+## System Architecture
+The system consists of three main components:
 
-## Features
+### 1. Frontend (Mobile/Web Application)
+- Built with React Native, TypeScript, and Expo
+- Cross-platform compatibility (iOS, Android, Web)
+- Modular component-based architecture
 
-Here's a list of features included in this project:
+### 2. Backend
+- Kotlin with Ktor framework
+- PostgreSQL database with Ktorm ORM
+- RESTful API with WebSocket support for real-time updates
+- Hybrid authentication (JWT + OAuth 2.0 with Microsoft Entra ID)
 
-| Name                                               | Description                                                 |
-| ----------------------------------------------------|------------------------------------------------------------- |
-| [Routing](https://start.ktor.io/p/routing-default) | Allows to define structured routes and associated handlers. |
+### 3. Embedded System
+- Raspberry Pi with custom Go application
+- Wi-Fi packet capture and processing (tshark)
+- Occupancy estimation using EWMA (Exponential Weighted Moving Average)
+- WebSocket communication with backend
 
-## Building & Running
+## Technical Specifications
+| Component          | Technology/Standard               |
+|--------------------|-----------------------------------|
+| Authentication     | OAuth 2.0 + JWT                   |
+| Database           | PostgreSQL                        |
+| Real-time Comm     | WebSockets                        |
+| Security           | HTTPS, CSRF protection, CORS      |
+| Deployment         | Kubernetes on GCP                 |
 
-To build or run the project, use one of the following tasks:
+## Installation & Deployment
+```bash
+# Backend
+- JDK 23 (OpenJDK)
+- Gradle build
+- Containerized with Docker (multi-architecture)
 
-| Task                          | Description                                                          |
-| -------------------------------|---------------------------------------------------------------------- |
-| `./gradlew test`              | Run the tests                                                        |
-| `./gradlew build`             | Build everything                                                     |
-| `buildFatJar`                 | Build an executable JAR of the server with all dependencies included |
-| `buildImage`                  | Build the docker image to use with the fat JAR                       |
-| `publishImageToLocalRegistry` | Publish the docker image locally                                     |
-| `run`                         | Run the server                                                       |
-| `runDocker`                   | Run using the local docker image                                     |
+# Frontend
+- Node.js 22
+- Nginx server with SSL/TLS
+- Automated deployment via GitHub Actions
 
-If the server starts successfully, you'll see the following output:
+# Database
+- PostgreSQL container with persistent volume
+- Automatic maintenance tasks
 
-```
-2024-12-04 14:32:45.584 [main] INFO  Application - Application started in 0.303 seconds.
-2024-12-04 14:32:45.682 [main] INFO  Application - Responding at http://0.0.0.0:8080
-```
+## Usage Guide
 
+### Students
+- View class schedules  
+- Check room availability  
+- Report classroom issues  
+- Monitor study room occupancy  
+
+### Professors
+- Manage class schedules  
+- Announce schedule changes  
+- Access office hours information  
+
+### Maintenance Staff
+- Receive and resolve incident reports  
+- Monitor room conditions  
+
+### Administrators
+- Manage user roles and approvals  
+- Configure system settings  
+- Access usage statistics  
+
+## Future Work
+- [ ] Enhanced occupancy estimation with Bluetooth  
+- [ ] Offline mode for mobile app  
+- [ ] Integration with calendar systems (Google Calendar, Outlook)  
+- [ ] Advanced analytics dashboard  
+- [ ] Multi-language support  
+- [ ] CA-signed SSL certificates  
+
+## Contributors
+| Role               | Name             |
+|--------------------|------------------|
+| Developer          | Tomás Martinho   |
+| Developer          | Felipe Alvarez   |
+| Developer          | Nuno Aguiar      |
+| Project Advisor    | Nuno Leite       |
+
+**Institution**: Instituto Superior de Engenharia de Lisboa  
+**Date**: July 2025  

@@ -6,6 +6,7 @@ import {getDeviceType} from "../../../utils/DeviceType";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as SecureStore from 'expo-secure-store';
 import {handleAxiosError} from "../../../utils/HandleAxiosError";
+import {pushToken} from "../../notifications/PushToken";
 
 const discovery = {
     authorizationEndpoint: 'https://login.microsoftonline.com/common/oauth2/v2.0/authorize',
@@ -40,6 +41,7 @@ export const AuthService = {
             );
             if (getDeviceType() !== 'WEB' && response.data.token) {
                 await SecureStore.setItemAsync('authToken', response.data.token);
+                await pushToken()
             }
 
             return response.data;
