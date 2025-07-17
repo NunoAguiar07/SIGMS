@@ -29,9 +29,18 @@
       "permissions": [
         "android.permission.INTERNET, android.permission.ACCESS_NETWORK_STATE"
       ],
-      "package": "com.toms223.frontendFinal"
+      "package": "com.toms223.frontendFinal",
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "category": ["DEFAULT", "BROWSABLE"],
+          "data": {
+            "scheme": "frontendfinal"
+          }
+        }
+      ]
     },
-    "scheme": "frontendFinal",
+    "scheme": "frontendfinal",
     "web": {
       "favicon": "./assets/favicon.png",
       "bundler": "metro"

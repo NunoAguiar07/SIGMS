@@ -66,7 +66,7 @@ api.interceptors.response.use(
                 await SecureStore.deleteItemAsync('authToken');
                 await SecureStore.deleteItemAsync('refreshToken');
                 // Redirect to login or show login modal
-                router.push('login')
+                router.push('/auth/login')
                 return Promise.reject(refreshError);
             }
         }
