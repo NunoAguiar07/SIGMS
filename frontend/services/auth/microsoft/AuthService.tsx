@@ -1,5 +1,5 @@
 import * as AuthSession from 'expo-auth-session';
-import {AuthConfig, BackendAuthResponse} from "../../../types/auth/microsoft/authMicrosoftTypes";
+import {AuthConfig, BackendAuthResponse, TokenResponse} from "../../../types/auth/microsoft/authMicrosoftTypes";
 import axios from "axios";
 import {apiUrl} from "../../fetchWelcome";
 import {getDeviceType} from "../../../utils/DeviceType";
@@ -17,7 +17,7 @@ const authConfig: AuthConfig = {
     clientId: process.env.EXPO_PUBLIC_MICROSOFT_CLIENT_ID || '',
     scopes: ['openid', 'profile', 'email', 'offline_access', 'https://graph.microsoft.com/User.Read'],
     redirectUri: AuthSession.makeRedirectUri({
-        scheme: 'frontendFinal',
+        scheme: 'frontendfinal',
         path: 'welcome'
     }),
     responseType: AuthSession.ResponseType.Code,
@@ -25,9 +25,10 @@ const authConfig: AuthConfig = {
 };
 
 export const AuthService = {
-    async authenticateWithBackend(accessToken: string): Promise<BackendAuthResponse> {
+    async authenticateWithBackend(accessToken: string): Promise<TokenResponse> {
         try {
-            const response = await axios.post<BackendAuthResponse>(
+
+            const response = await axios.post<TokenResponse>(
                 `${apiUrl}auth/microsoft`,
                 {},
                 {
@@ -39,8 +40,8 @@ export const AuthService = {
                     }
                 }
             );
-            if (getDeviceType() !== 'WEB' && response.data.token) {
-                await SecureStore.setItemAsync('authToken', response.data.token);
+            if (getDeviceType() !== 'WEB' && response.data.accessToken) {
+                await SecureStore.setItemAsync('authToken', response.data.accessToken);
                 await pushToken()
             }
 
