@@ -95,5 +95,5 @@ The system consists of three main components:
 | Developer          | Nuno Aguiar      |
 | Project Advisor    | Nuno Leite       |
 
-**Institution**: Instituto Superior de Engenharia de Lisboa  
-**Date**: July 2025  
+##Institution: Instituto Superior de Engenharia de Lisboa  
+##Date: July 2025  
