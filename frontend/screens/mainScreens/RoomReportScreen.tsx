@@ -5,20 +5,16 @@ import {Subtitle} from "../css_styling/common/Typography";
 
 
 export const RoomReportsScreen = ({ reports, room }: RoomReportsScreenType) => {
-    if(room != null) return (
-        <IssuesList selectedRoom={room} issues={reports}>
-        </IssuesList>
-    );
     return (
         <CenteredContainer flex={1}>
-            <Card shadow="medium" padding="huge" gap="lg">
-                {room != null && reports.length > 0 ? (
-                    <IssuesList selectedRoom={room} issues={reports}>
-                    </IssuesList>
-                    ):(
-                      <Subtitle>No room selected</Subtitle>
-                )}
-            </Card>
+            {room != null ? (
+                <IssuesList selectedRoom={room} issues={reports}>
+                </IssuesList>
+                ):(
+                <Card shadow="medium" padding="huge" gap="lg">
+                  <Subtitle>No room selected</Subtitle>
+                </Card>
+            )}
         </CenteredContainer>
     );
 };

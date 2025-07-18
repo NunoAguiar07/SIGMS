@@ -21,6 +21,8 @@ const Register = () => {
         handleUniversitySelect,
         handleRegister,
         handleNavigateToLogin,
+        passwordValidation,
+        isFormValid
     } = useRegister();
 
     if (loading) return <LoadingPresentation />;
@@ -42,6 +44,8 @@ const Register = () => {
             onUniversitySelect={handleUniversitySelect}
             onRegister={handleRegister}
             onNavigateToLogin={handleNavigateToLogin}
+            passwordValidation={passwordValidation}
+            isFormValid={isFormValid}
         />
     );
 };

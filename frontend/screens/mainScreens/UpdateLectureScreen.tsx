@@ -113,12 +113,14 @@ export const UpdateLectureScreen = ({
                                 widthPercent={100}
                             />
                             {lectureFilter === 'room' && (
-                                <RoomSearchSection
-                                    searchQueryRoom={searchQueryRoom}
-                                    setSearchQueryRoom={setSearchQueryRoom}
-                                    rooms={rooms}
-                                    handleRoomSelect={handleRoomSelect}
-                                />
+                                <CenteredContainer gap="md" >
+                                    <RoomSearchSection
+                                        searchQueryRoom={searchQueryRoom}
+                                        setSearchQueryRoom={setSearchQueryRoom}
+                                        rooms={rooms}
+                                        handleRoomSelect={handleRoomSelect}
+                                    />
+                                </CenteredContainer>
                             )}
                             {lectureFilter === 'class' && (
                                 <CenteredContainer gap="md" >
@@ -290,11 +292,11 @@ interface RoomSearchSectionProps {
 }
 
 export const RoomSearchSection = ({
-                                      searchQueryRoom,
-                                      setSearchQueryRoom,
-                                      rooms,
-                                      handleRoomSelect
-                                  }: RoomSearchSectionProps) => (
+    searchQueryRoom,
+    setSearchQueryRoom,
+    rooms,
+    handleRoomSelect
+}: RoomSearchSectionProps) => (
         <CenteredContainer style={{ position: 'relative', zIndex: 10 }}>
             <SearchInput
                 placeholder="Search rooms..."
@@ -325,11 +327,11 @@ interface SubjectSearchSectionProps {
 }
 
 export const SubjectSearchSection = ({
-                                         searchQuerySubjects,
-                                         setSearchQuerySubjects,
-                                         subjects,
-                                         handleOnSubjectSelect
-                                     }: SubjectSearchSectionProps) => (
+    searchQuerySubjects,
+    setSearchQuerySubjects,
+    subjects,
+    handleOnSubjectSelect
+}: SubjectSearchSectionProps) => (
         <CenteredContainer style={{ position: 'relative', zIndex: 10 }} gap="md">
             <SearchInput
                 placeholder="Search subjects..."
@@ -373,7 +375,7 @@ export const ClassListSection = ({
     return (
         <CenteredContainer gap="md">
             <Subtitle>Select Class:</Subtitle>
-            <FlatListContainer position={"static"}>
+            <FlatListContainer position={"static"} width={"50%"}>
                 <FlatList
                     data={classes}
                     keyExtractor={(item) => item.id.toString()}
@@ -405,13 +407,13 @@ interface LecturesListSectionProps {
 }
 
 export const LecturesListSection = ({
-                                        lectures,
-                                        onLectureSelect,
-                                        handleNext,
-                                        handlePrevious,
-                                        page,
-                                        hasNext
-                                    }: LecturesListSectionProps) => (
+    lectures,
+    onLectureSelect,
+    handleNext,
+    handlePrevious,
+    page,
+    hasNext
+}: LecturesListSectionProps) => (
     <Card shadow="medium" alignItems="center" gap="md">
         <Subtitle>Lectures</Subtitle>
         {lectures.length > 0 ? (

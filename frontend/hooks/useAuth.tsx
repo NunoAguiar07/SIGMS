@@ -97,6 +97,26 @@ export const useRegister = () => {
 
     const [debouncedSearchQuery] = useDebounce(searchQuery, 500);
 
+    const validatePassword = (password: string) => {
+        return {
+            minLength: password.length >= 8,
+            hasUppercase: /[A-Z]/.test(password),
+            hasLowercase: /[a-z]/.test(password),
+            hasNumber: /\d/.test(password),
+            hasSpecialChar: /[!@#$%^&*()_,.?":{}|<>]/.test(password)
+        };
+    };
+
+    const passwordValidation = validatePassword(password);
+    const isPasswordValid = Object.values(passwordValidation).every(Boolean);
+
+    // Check if all form fields are valid
+    const isFormValid = email.trim() !== '' &&
+        username.trim() !== '' &&
+        isPasswordValid &&
+        role !== '' &&
+        selectedUniversity !== null;
+
     useEffect(() => {
         if (skipSearch) {
             setSkipSearch(false);
@@ -117,11 +137,16 @@ export const useRegister = () => {
         }
     }, [debouncedSearchQuery]);
 
-    const handleUniversitySelect = (university: UniversityInterface) => {
+    const handleUniversitySelect = (university: UniversityInterface | null) => {
         setSelectedUniversity(university);
-        setUniversityId(university.id);
-        setSkipSearch(true);
-        setSearchQuery(university.name);
+        if (university) {
+            setUniversityId(university.id);
+            setSkipSearch(true);
+            setSearchQuery(university.name);
+        } else {
+            setUniversityId(0);
+            setSearchQuery('');
+        }
         setUniversities([]);
     };
 
@@ -166,6 +191,8 @@ export const useRegister = () => {
         handleUniversitySelect,
         handleRegister,
         handleNavigateToLogin,
+        passwordValidation,
+        isFormValid,
     };
 };
 

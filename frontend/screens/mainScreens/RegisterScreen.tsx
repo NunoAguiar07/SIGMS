@@ -2,12 +2,13 @@ import {RegisterScreenType} from "../types/RegisterScreenType";
 import {UniversityInterface} from "../../types/UniversityInterface";
 import {isMobile} from "../../utils/DeviceType";
 import {Button, ButtonsContainer, ButtonText} from "../css_styling/common/Buttons";
-import {Card, CenteredContainer, ColumnContainer, Container} from "../css_styling/common/NewContainers";
+import {Card, CenteredContainer, ColumnContainer, RowContainer} from "../css_styling/common/NewContainers";
 import {Input, SearchInput} from "../css_styling/common/Inputs";
 import {BodyText, Title} from "../css_styling/common/Typography";
 import {PickerContainer, StyledPicker, StyledPickerItem} from "../css_styling/common/Picker";
 import {FlatListContainer, FlatListItem} from "../css_styling/common/FlatList";
 import {FlatList} from "react-native";
+import {router} from "expo-router";
 
 export const RegisterScreen = ({
     email,
@@ -24,10 +25,12 @@ export const RegisterScreen = ({
     onUniversitySelect,
     onRegister,
     onNavigateToLogin,
+    passwordValidation,
+    isFormValid
 }: RegisterScreenType) => {
     return (
         <CenteredContainer flex={1}>
-            <Card shadow="medium" padding="huge" gap="lg">
+            <Card shadow="medium" padding="md" gap="md" height={"90%"}  flex={1}>
                 <Title color="black">Register</Title>
 
                 <AuthFormFields
@@ -37,6 +40,10 @@ export const RegisterScreen = ({
                     onEmailChange={onEmailChange}
                     onUsernameChange={onUsernameChange}
                     onPasswordChange={onPasswordChange}
+                />
+
+                <PasswordRequirements
+                    validation={passwordValidation}
                 />
 
                 <RolePicker role={role} onRoleChange={onRoleChange} />
@@ -51,11 +58,54 @@ export const RegisterScreen = ({
                 <AuthButtons
                     onRegister={onRegister}
                     onNavigateToLogin={onNavigateToLogin}
+                    isRegisterDisabled={!isFormValid}
                 />
             </Card>
         </CenteredContainer>
     );
 }
+
+interface PasswordRequirementsType {
+    validation: {
+        minLength: boolean;
+        hasUppercase: boolean;
+        hasLowercase: boolean;
+        hasNumber: boolean;
+        hasSpecialChar: boolean;
+    };
+}
+
+export const PasswordRequirements = ({validation }: PasswordRequirementsType) => {
+    const requirements = [
+        { key: 'minLength', text: 'At least 8 characters', met: validation.minLength },
+        { key: 'hasUppercase', text: 'One uppercase letter', met: validation.hasUppercase },
+        { key: 'hasLowercase', text: 'One lowercase letter', met: validation.hasLowercase },
+        { key: 'hasNumber', text: 'One number', met: validation.hasNumber },
+        { key: 'hasSpecialChar', text: 'One special character', met: validation.hasSpecialChar }
+    ];
+
+    return (
+        <ColumnContainer gap="sm">
+            <BodyText textAlign="center" family="bold">Password Requirements:</BodyText>
+            {requirements.map((req) => (
+                <RowContainer key={req.key} gap="sm" alignItems="center">
+                    <BodyText
+                        color={req.met ? 'green' : 'red'}
+                        family={req.met ? 'bold' : 'regular'}
+                    >
+                        {req.met ? '✓' : '✗'}
+                    </BodyText>
+                    <BodyText
+                        color={req.met ? 'green' : 'red'}
+                        style={req.met ? { textDecorationLine: 'line-through' } : {}}
+                    >
+                        {req.text}
+                    </BodyText>
+                </RowContainer>
+            ))}
+        </ColumnContainer>
+    );
+};
 
 interface AuthFormFieldsType {
     email: string;
@@ -74,7 +124,7 @@ export const AuthFormFields = ({
     onUsernameChange,
     onPasswordChange
 }: AuthFormFieldsType) => (
-    <Container flexDirection={isMobile ? 'column' : 'row'} gap="md">
+    <CenteredContainer flexDirection={isMobile ? 'column' : 'row'} gap="md">
         <Input
             placeholder="Email"
             value={email}
@@ -95,7 +145,7 @@ export const AuthFormFields = ({
             secureTextEntry
             autoCapitalize="none"
         />
-    </Container>
+    </CenteredContainer>
 );
 
 interface RolePickerType {
@@ -105,7 +155,7 @@ interface RolePickerType {
 
 export const RolePicker = ({ role, onRoleChange }: RolePickerType) => (
     <ColumnContainer gap="md">
-        <BodyText textAlign="center">Select your role:</BodyText>
+        <BodyText textAlign="center" family="bold">Select your role:</BodyText>
         <PickerContainer width="200px">
             <StyledPicker
                 selectedValue={role}
@@ -135,7 +185,7 @@ export const UniversitySearch = ({
     onUniversitySelect
 }: UniversitySearchType) => (
     <ColumnContainer gap="md" style={{ position: 'relative' , zIndex: 10}}>
-        <BodyText textAlign="center">Search for your university:</BodyText>
+        <BodyText textAlign="center" family="bold">Search for your university:</BodyText>
         <SearchInput
             width={"100%"}
             placeholder="Search universities..."
@@ -163,23 +213,29 @@ export const UniversitySearch = ({
 interface AuthButtonsType {
     onRegister: () => void;
     onNavigateToLogin: () => void;
+    isRegisterDisabled: boolean;
 }
 
-export const AuthButtons = ({ onRegister, onNavigateToLogin }: AuthButtonsType) => (
+export const AuthButtons = ({ onRegister, onNavigateToLogin, isRegisterDisabled }: AuthButtonsType) => (
     <ButtonsContainer gap="md" flexDirection={isMobile ? 'column' : 'row'} alignItems="center" justifyContent="center">
         <Button
             variant="primary"
             onPress={onRegister}
-            style={isMobile ? { width: '100%' } : { flex: 1 }}
+            disabled={isRegisterDisabled}
         >
             <ButtonText>Register</ButtonText>
         </Button>
         <Button
             variant="primary"
             onPress={onNavigateToLogin}
-            style={isMobile ? { width: '100%' } : { flex: 1 }}
         >
             <ButtonText>Go to Login</ButtonText>
+        </Button>
+        <Button
+            variant="primary"
+            onPress={() => router.push('/welcome')}
+        >
+            <ButtonText>Go Back</ButtonText>
         </Button>
     </ButtonsContainer>
 );

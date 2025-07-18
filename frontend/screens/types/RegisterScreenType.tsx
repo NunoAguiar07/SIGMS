@@ -16,4 +16,12 @@ export interface RegisterScreenType {
     onUniversitySelect: (university: UniversityInterface) => void;
     onRegister: () => void;
     onNavigateToLogin: () => void;
+    passwordValidation: {
+        minLength: boolean;
+        hasUppercase: boolean;
+        hasLowercase: boolean;
+        hasNumber: boolean;
+        hasSpecialChar: boolean;
+    };
+    isFormValid: boolean;
 }
