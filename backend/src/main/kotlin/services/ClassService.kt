@@ -6,6 +6,7 @@ import isel.leic.group25.utils.failure
 import isel.leic.group25.utils.success
 import isel.leic.group25.db.entities.timetables.Class
 import isel.leic.group25.db.repositories.Repositories
+import isel.leic.group25.db.repositories.interfaces.IsolationLevel
 import isel.leic.group25.db.repositories.interfaces.Transactionable
 import java.sql.SQLException
 
@@ -72,7 +73,7 @@ class ClassService(private val repositories: Repositories,
 
     fun deleteClass(id: Int): DeleteClassResult {
         return runCatching {
-            transactionable.useTransaction {
+            transactionable.useTransaction(IsolationLevel.SERIALIZABLE) {
                 val schoolClass = repositories.from({classRepository}){findClassById(id)}
                     ?: return@useTransaction failure(ClassError.ClassNotFound)
 

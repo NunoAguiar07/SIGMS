@@ -4,6 +4,7 @@ import isel.leic.group25.db.entities.types.Role
 import isel.leic.group25.db.entities.users.Teacher
 import isel.leic.group25.db.entities.users.User
 import isel.leic.group25.db.repositories.Repositories
+import isel.leic.group25.db.repositories.interfaces.IsolationLevel
 import isel.leic.group25.db.repositories.interfaces.Transactionable
 import isel.leic.group25.services.errors.AuthError
 import isel.leic.group25.utils.Either
@@ -48,7 +49,7 @@ class UserService(private val repositories: Repositories,
 
     fun updateUser(id: Int, username: String?, image: ByteArray?): UserResult {
         return runCatching {
-            transactionable.useTransaction {
+            transactionable.useTransaction(IsolationLevel.SERIALIZABLE) {
                 val user = repositories.from({userRepository}){findById(id)}
                     ?: return@useTransaction failure(AuthError.UserNotFound)
                 if (username != null) {
@@ -115,7 +116,7 @@ class UserService(private val repositories: Repositories,
     }
     fun deleteUser(id: Int): DeleteUserResult {
         return runCatching {
-            transactionable.useTransaction {
+            transactionable.useTransaction(IsolationLevel.SERIALIZABLE) {
                 repositories.from({userRepository}){findById(id)}
                     ?: return@useTransaction failure(AuthError.UserNotFound)
                 val deleted = repositories.from({userRepository}){delete(id)}

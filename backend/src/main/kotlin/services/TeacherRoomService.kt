@@ -2,6 +2,7 @@ package isel.leic.group25.services
 
 import isel.leic.group25.db.entities.users.Teacher
 import isel.leic.group25.db.repositories.Repositories
+import isel.leic.group25.db.repositories.interfaces.IsolationLevel
 import isel.leic.group25.db.repositories.interfaces.Transactionable
 import isel.leic.group25.services.errors.TeacherRoomError
 import isel.leic.group25.utils.Either
@@ -44,7 +45,7 @@ class TeacherRoomService (
 
     fun removeTeacherFromRoom(teacherId: Int, officeId: Int) : RemoveTeacherRoomResult {
         return runCatching {
-            transactionable.useTransaction {
+            transactionable.useTransaction(IsolationLevel.SERIALIZABLE) {
                 val teacher = repositories.from({teacherRepository}) {
                     findTeacherById(teacherId)
                 } ?: return@useTransaction failure(TeacherRoomError.TeacherNotFound)

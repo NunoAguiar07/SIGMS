@@ -139,7 +139,7 @@ class LectureService(
         lectureId: Int
     ): DeleteLectureResult {
         return runCatching {
-            transactionable.useTransaction {
+            transactionable.useTransaction(IsolationLevel.SERIALIZABLE) {
                 val lecture = repositories.from({lectureRepository}){getLectureById(lectureId)}
                         ?: return@useTransaction failure(LectureError.LectureNotFound)
                 if (repositories.from({lectureRepository}){deleteLecture(lecture.id)}) {

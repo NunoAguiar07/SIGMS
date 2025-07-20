@@ -2,6 +2,7 @@ package isel.leic.group25.services
 
 import isel.leic.group25.db.entities.issues.IssueReport
 import isel.leic.group25.db.repositories.Repositories
+import isel.leic.group25.db.repositories.interfaces.IsolationLevel
 import isel.leic.group25.db.repositories.interfaces.Transactionable
 import isel.leic.group25.services.errors.IssueReportError
 import isel.leic.group25.utils.Either
@@ -129,7 +130,7 @@ class IssuesReportService(private val repositories: Repositories,
 
     fun deleteIssueReport(id: Int): IssueReportDeletionResult {
         return runCatching {
-            transactionable.useTransaction {
+            transactionable.useTransaction(IsolationLevel.SERIALIZABLE) {
                 repositories.from({issueReportRepository}){
                     getIssueReportById(id)
                 } ?: return@useTransaction failure(IssueReportError.InvalidIssueReportId)
@@ -141,7 +142,7 @@ class IssuesReportService(private val repositories: Repositories,
 
     fun updateIssueReport(id: Int, description: String): IssueReportUpdateResult {
         return runCatching {
-            transactionable.useTransaction {
+            transactionable.useTransaction(IsolationLevel.SERIALIZABLE) {
                 val report = repositories.from({issueReportRepository}){getIssueReportById(id)}
                     ?: return@useTransaction failure(IssueReportError.InvalidIssueReportId)
                 val updatedIssue = repositories.from({issueReportRepository}){
