@@ -24,7 +24,9 @@ export const useProfile = (id:number | undefined) => {
     const showAlert = useAlert();
 
     const isTeacherUser = (data: any): data is TeacherUser =>
-        data.user && data.user.email && data.user.email.includes('@teacher');
+        data.user && data.user.email;
+
+
 
     useEffect(() => {
         const loadData = async () => {
@@ -34,14 +36,11 @@ export const useProfile = (id:number | undefined) => {
                 const checkTeacherAsStudent = typeof myId === 'string' && +myId !== id && id !== undefined
                     ? await fetchTeacherProfileById(id)
                     : await fetchProfile();
-
+                const isTeacherProfile = await AsyncStorage.getItem('userRole') == 'TEACHER'
                 let profileData: ProfileInterface | TeacherUser;
                 let filteredProfileData: ProfileInterface;
-                if (checkTeacherAsStudent
-                    && "email" in checkTeacherAsStudent && checkTeacherAsStudent.email && checkTeacherAsStudent.email.includes('@teacher')
-                    && id !== undefined && id !== null) {
+                if ( isTeacherProfile && id !== undefined) {
                     profileData = await fetchTeacherProfileById(id);
-                    console.log('Teacher profile fetched:', profileData);
                     filteredProfileData =
                          {
                             username: profileData.user.username,
@@ -51,7 +50,6 @@ export const useProfile = (id:number | undefined) => {
                             officeRoomName: profileData.office?.room?.name
                         }
                 } else {
-                    console.log('User profile fetched:', checkTeacherAsStudent);
                    if (isTeacherUser(checkTeacherAsStudent)) {
                        console.log('verifying teacher as student');
                         profileData = checkTeacherAsStudent;
@@ -63,7 +61,6 @@ export const useProfile = (id:number | undefined) => {
                             officeRoomName: profileData.office?.room?.name
                         };
                     }else {
-                          console.log('verifying user profile');
                        filteredProfileData = checkTeacherAsStudent as ProfileInterface;
                    }
                 }
