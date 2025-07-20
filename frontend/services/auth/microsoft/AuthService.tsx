@@ -1,9 +1,8 @@
 import * as AuthSession from 'expo-auth-session';
-import {AuthConfig, BackendAuthResponse, TokenResponse} from "../../../types/auth/microsoft/authMicrosoftTypes";
+import {AuthConfig, TokenResponse} from "../../../types/auth/microsoft/authMicrosoftTypes";
 import axios from "axios";
 import {apiUrl} from "../../fetchWelcome";
 import {getDeviceType} from "../../../utils/DeviceType";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as SecureStore from 'expo-secure-store';
 import {handleAxiosError} from "../../../utils/HandleAxiosError";
 import {pushToken} from "../../notifications/PushToken";
@@ -66,8 +65,8 @@ export const AuthService = {
                 discovery
             );
 
-            if (tokenResponse.refreshToken) {
-                await AsyncStorage.setItem('refreshToken', tokenResponse.refreshToken);
+            if (tokenResponse.refreshToken && getDeviceType() !== "WEB") {
+                await SecureStore.setItemAsync('refreshToken', tokenResponse.refreshToken);
             }
 
             return tokenResponse.accessToken;
