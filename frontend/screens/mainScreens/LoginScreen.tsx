@@ -4,6 +4,7 @@ import {Title} from "../css_styling/common/Typography";
 import {Button, ButtonsContainer, ButtonText} from "../css_styling/common/Buttons";
 import {Input} from "../css_styling/common/Inputs";
 import {router} from "expo-router";
+import {styles} from "../css_styling/calendar/Props";
 
 
 export const LoginScreen = ({ email, password, onEmailChange, onPasswordChange, onLogin, onNavigateToRegister } : LoginScreenType) => (
@@ -24,6 +25,7 @@ export const LoginScreen = ({ email, password, onEmailChange, onPasswordChange, 
                 onChangeText={onPasswordChange}
                 secureTextEntry
                 placeholderTextColor="#666"
+                style={{ color: '#666' }}
             />
             <ButtonsContainer gap="md">
                 <Button

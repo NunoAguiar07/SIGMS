@@ -2,7 +2,7 @@ import {ProfileScreenType} from "../types/ProfileScreenType";
 import {Card, CenteredContainer} from "../css_styling/common/NewContainers";
 import {ImageComponent, ImageWrapper} from "../css_styling/common/Images";
 import {theme} from "../css_styling/common/Theme";
-import {Title} from "../css_styling/common/Typography";
+import {Subtitle, Title} from "../css_styling/common/Typography";
 import {ProfileInterface} from "../../types/ProfileInterface";
 import {isMobile} from "../../utils/DeviceType";
 
@@ -70,9 +70,9 @@ const ProfileInfo = ({username, email, university, officeRoomName, image}: Profi
             </CenteredContainer>
         ):(
             <CenteredContainer>
-                <Title color={theme.colors.text.black}>{username}</Title>
-                <Title color={theme.colors.text.black}>{email}</Title>
-                <Title color={theme.colors.text.black}>{university}</Title>
+                <Subtitle color={theme.colors.text.black}>{username}</Subtitle>
+                <Subtitle color={theme.colors.text.black}>{email}</Subtitle>
+                <Subtitle color={theme.colors.text.black}>{university}</Subtitle>
                 {officeRoomName && (
                     <Title color={theme.colors.text.black}>
                         Office: {officeRoomName}

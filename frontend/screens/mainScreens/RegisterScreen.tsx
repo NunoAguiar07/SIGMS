@@ -129,12 +129,14 @@ export const AuthFormFields = ({
             onChangeText={onEmailChange}
             autoCapitalize="none"
             keyboardType="email-address"
+            placeholderTextColor="#666"
         />
         <Input
             placeholder="Username"
             value={username}
             onChangeText={onUsernameChange}
             autoCapitalize="none"
+            placeholderTextColor="#666"
         />
         <Input
             placeholder="Password"
@@ -142,6 +144,7 @@ export const AuthFormFields = ({
             onChangeText={onPasswordChange}
             secureTextEntry
             autoCapitalize="none"
+            placeholderTextColor="#666"
         />
     </CenteredContainer>
 );
@@ -188,6 +191,7 @@ export const UniversitySearch = ({
             placeholder="Search universities..."
             value={searchQuery}
             onChangeText={onSearchChange}
+            placeholderTextColor="#666"
         />
         {universities.length > 0 && (
             <FlatListContainer>
