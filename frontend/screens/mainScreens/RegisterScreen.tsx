@@ -8,7 +8,6 @@ import {BodyText, Title} from "../css_styling/common/Typography";
 import {PickerContainer, StyledPicker, StyledPickerItem} from "../css_styling/common/Picker";
 import {FlatListContainer, FlatListItem} from "../css_styling/common/FlatList";
 import {FlatList} from "react-native";
-import {router} from "expo-router";
 
 export const RegisterScreen = ({
     email,
@@ -30,7 +29,7 @@ export const RegisterScreen = ({
 }: RegisterScreenType) => {
     return (
         <CenteredContainer flex={1}>
-            <Card shadow="medium" padding="md" gap="md" height={"90%"}  flex={1}>
+            <Card shadow="medium" padding="sm" gap="md" height={"90%"}>
                 <Title color="black">Register</Title>
 
                 <AuthFormFields
@@ -54,7 +53,6 @@ export const RegisterScreen = ({
                     onSearchChange={onSearchChange}
                     onUniversitySelect={onUniversitySelect}
                 />
-
                 <AuthButtons
                     onRegister={onRegister}
                     onNavigateToLogin={onNavigateToLogin}
@@ -184,16 +182,15 @@ export const UniversitySearch = ({
     onSearchChange,
     onUniversitySelect
 }: UniversitySearchType) => (
-    <ColumnContainer gap="md" style={{ position: 'relative' , zIndex: 10}}>
+    <ColumnContainer gap="md" style={{ position: 'relative' , zIndex: 10}} justifyContent="center" alignItems="center">
         <BodyText textAlign="center" family="bold">Search for your university:</BodyText>
         <SearchInput
-            width={"100%"}
             placeholder="Search universities..."
             value={searchQuery}
             onChangeText={onSearchChange}
         />
         {universities.length > 0 && (
-            <FlatListContainer width={"100%"}>
+            <FlatListContainer>
                 <FlatList
                     data={universities}
                     keyExtractor={(item) => item.id.toString()}
@@ -217,7 +214,7 @@ interface AuthButtonsType {
 }
 
 export const AuthButtons = ({ onRegister, onNavigateToLogin, isRegisterDisabled }: AuthButtonsType) => (
-    <ButtonsContainer gap="md" flexDirection={isMobile ? 'column' : 'row'} alignItems="center" justifyContent="center">
+    <ButtonsContainer gap="sm" flexDirection={'row'}>
         <Button
             variant="primary"
             onPress={onRegister}
@@ -230,12 +227,6 @@ export const AuthButtons = ({ onRegister, onNavigateToLogin, isRegisterDisabled 
             onPress={onNavigateToLogin}
         >
             <ButtonText>Go to Login</ButtonText>
-        </Button>
-        <Button
-            variant="primary"
-            onPress={() => router.push('/welcome')}
-        >
-            <ButtonText>Go Back</ButtonText>
         </Button>
     </ButtonsContainer>
 );

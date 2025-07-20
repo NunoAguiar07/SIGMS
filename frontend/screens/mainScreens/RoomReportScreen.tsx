@@ -12,7 +12,7 @@ export const RoomReportsScreen = ({ reports, room }: RoomReportsScreenType) => {
                 </IssuesList>
                 ):(
                 <Card shadow="medium" padding="huge" gap="lg">
-                  <Subtitle>No room selected</Subtitle>
+                  <Subtitle>No reports for this room</Subtitle>
                 </Card>
             )}
         </CenteredContainer>

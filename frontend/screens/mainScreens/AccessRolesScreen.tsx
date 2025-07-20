@@ -1,6 +1,5 @@
 import {Animated, ScrollView} from "react-native";
 import {Ionicons} from "@expo/vector-icons";
-import {mobileStyles} from "../css_styling/common/MobileProps";
 import {AccessRoleScreenType} from "../types/AccessRoleScreenType";
 import {PaginationControls} from "./UnassignedIssuesScreen";
 import {AccessRoleInterface} from "../../types/AccessRoleInterface";
@@ -165,43 +164,44 @@ export const AccessRoleMobileView = ({
         <CenteredContainer flex={1} padding="md">
             <Animated.View
                 style={[
-                    mobileStyles.card,
                     {
                         transform: [{ translateX: pan.x }]
                     }
                 ]}
                 {...panResponder.panHandlers}
             >
-                <RowContainer>
-                    <BodyText>Name:</BodyText>
-                    <BodyText>{currentUser.user.username}</BodyText>
-                </RowContainer>
-                <RowContainer>
-                    <BodyText>Email:</BodyText>
-                    <BodyText>{currentUser.user.email}</BodyText>
-                </RowContainer>
-                <RowContainer>
-                    <BodyText>Requested Role:</BodyText>
-                    <BodyText>{currentUser.requestedRole}</BodyText>
-                </RowContainer>
-                <RowContainer>
-                    <BodyText>Request Date:</BodyText>
-                    <BodyText>{new Date(currentUser.createdAt).toLocaleDateString()}</BodyText>
-                </RowContainer>
-                <RowContainer justifyContent={"center"}>
-                    <ActionButton
-                        onPress={() => onApprove(currentUser.id)}
-                        variant="success"
-                    >
-                        <Ionicons name="checkmark" size={20} color="white" />
-                    </ActionButton>
-                    <ActionButton
-                        onPress={() => onReject(currentUser.id)}
-                        variant="error"
-                    >
-                        <Ionicons name="close" size={20} color="white" />
-                    </ActionButton>
-                </RowContainer>
+                <Card shadow="medium" alignItems={"center"} gap="md">
+                    <RowContainer>
+                        <BodyText>Name: </BodyText>
+                        <BodyText>{currentUser.user.username}</BodyText>
+                    </RowContainer>
+                    <RowContainer>
+                        <BodyText>Email: </BodyText>
+                        <BodyText>{currentUser.user.email}</BodyText>
+                    </RowContainer>
+                    <RowContainer>
+                        <BodyText>Requested Role: </BodyText>
+                        <BodyText>{currentUser.requestedRole}</BodyText>
+                    </RowContainer>
+                    <RowContainer>
+                        <BodyText>Request Date: </BodyText>
+                        <BodyText>{new Date(currentUser.createdAt).toLocaleDateString()}</BodyText>
+                    </RowContainer>
+                    <RowContainer justifyContent={"center"}>
+                        <ActionButton
+                            onPress={() => onApprove(currentUser.id)}
+                            variant="success"
+                        >
+                            <Ionicons name="checkmark" size={20} color="white" />
+                        </ActionButton>
+                        <ActionButton
+                            onPress={() => onReject(currentUser.id)}
+                            variant="error"
+                        >
+                            <Ionicons name="close" size={20} color="white" />
+                        </ActionButton>
+                    </RowContainer>
+                </Card>
             </Animated.View>
         </CenteredContainer>
     );

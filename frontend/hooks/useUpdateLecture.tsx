@@ -260,7 +260,6 @@ export const useUpdateLecture = () => {
         rooms,
         setSearchQueryRoom,
         searchQueryRoom,
-        selectedRoom,
         handleRoomSelect,
         effectiveFrom,
         setEffectiveFrom,

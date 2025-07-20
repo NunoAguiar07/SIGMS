@@ -11,20 +11,20 @@ import {Ionicons} from "@expo/vector-icons";
 
 
 const CalendarScreen = ({
-                            onClickProfile,
-                            onClickRoom,
-                            getEventsForDay,
-                            getCurrentDay,
-                            selectedDay,
-                            setSelectedDay,
-                            daysOrder,
-                            navigateDay
-                        }: CalendarScreenType) => {
+    onClickProfile,
+    onClickRoom,
+    getEventsForDay,
+    getCurrentDay,
+    selectedDay,
+    setSelectedDay,
+    daysOrder,
+    navigateDay
+}: CalendarScreenType) => {
 
     if (isMobile) {
         return (
             <CenteredContainer flex={1}>
-                <Card shadow="medium" gap="md" width={"90%"} height={"75%"} justifyContent={"space-between"} >
+                <Card shadow="medium" gap="md" width={"90%"} height={"75%"} justifyContent={"space-between"}>
                     <CenteredContainer>
                         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{padding: 10}} >
                             <RowContainer gap="sm" height={"100%"} alignItems="center">
@@ -44,7 +44,7 @@ const CalendarScreen = ({
                         </ScrollView>
                     </CenteredContainer>
                     {getEventsForDay(selectedDay).length === 0 ? (
-                        <Subtitle>No events for today</Subtitle>
+                        <Subtitle>No events for this day</Subtitle>
                     ): (
                         <DaySection
                             day={selectedDay}
