@@ -29,7 +29,7 @@ export const RegisterScreen = ({
 }: RegisterScreenType) => {
     return (
         <CenteredContainer flex={1}>
-            <Card shadow="medium" padding="sm" gap="md" >
+            <Card shadow="medium" padding="sm" gap="md">
                 <Title color="black">Register</Title>
 
                 <AuthFormFields
@@ -185,12 +185,13 @@ export const UniversitySearch = ({
     <ColumnContainer gap="md" style={{ position: 'relative' , zIndex: 10}} justifyContent="center" alignItems="center">
         <BodyText textAlign="center" family="bold">Search for your university:</BodyText>
         <SearchInput
+            width="100%"
             placeholder="Search universities..."
             value={searchQuery}
             onChangeText={onSearchChange}
         />
         {universities.length > 0 && (
-            <FlatListContainer>
+            <FlatListContainer width="100%">
                 <FlatList
                     data={universities}
                     keyExtractor={(item) => item.id.toString()}
