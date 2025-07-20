@@ -3,6 +3,7 @@ package isel.leic.group25.services
 import isel.leic.group25.db.entities.rooms.Room
 import isel.leic.group25.db.entities.types.RoomType
 import isel.leic.group25.db.repositories.Repositories
+import isel.leic.group25.db.repositories.interfaces.IsolationLevel
 import isel.leic.group25.db.repositories.interfaces.Transactionable
 import isel.leic.group25.services.errors.RoomError
 import isel.leic.group25.utils.Either
@@ -151,7 +152,7 @@ class RoomService (
     }
     fun deleteRoom(id: Int): DeleteRoomResult {
         return runCatching {
-            transactionable.useTransaction {
+            transactionable.useTransaction(IsolationLevel.SERIALIZABLE) {
                 val room = repositories.from({roomRepository}){getRoomById(id)}
                     ?: return@useTransaction failure(RoomError.RoomNotFound)
                 if (repositories.from({roomRepository}){deleteRoom(room.id)}) {
@@ -164,7 +165,7 @@ class RoomService (
 
     fun updateRoom(id: Int, name: String, capacity: Int): RoomResult {
         return runCatching {
-            transactionable.useTransaction {
+            transactionable.useTransaction(IsolationLevel.SERIALIZABLE) {
                 val room = repositories.from({roomRepository}){getRoomById(id)}
                     ?: return@useTransaction failure(RoomError.RoomNotFound)
                 val updatedRoom = repositories.from({roomRepository}){updateRoom(room, name, capacity)}

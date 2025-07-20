@@ -2,6 +2,7 @@ package isel.leic.group25.services
 
 import isel.leic.group25.db.entities.timetables.Subject
 import isel.leic.group25.db.repositories.Repositories
+import isel.leic.group25.db.repositories.interfaces.IsolationLevel
 import isel.leic.group25.db.repositories.interfaces.Transactionable
 import isel.leic.group25.services.errors.SubjectError
 import isel.leic.group25.utils.Either
@@ -99,7 +100,7 @@ class SubjectService(
 
     fun deleteSubject(id: Int): DeleteSubjectResult {
         return runCatching {
-            transactionable.useTransaction {
+            transactionable.useTransaction(IsolationLevel.SERIALIZABLE) {
                 val subject = repositories.from({subjectRepository}) {findSubjectById(id)}
                     ?: return@useTransaction failure(SubjectError.SubjectNotFound)
                 val deleted = repositories.from({subjectRepository}) {

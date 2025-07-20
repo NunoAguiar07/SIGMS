@@ -6,6 +6,7 @@ import isel.leic.group25.db.entities.types.Role
 import isel.leic.group25.db.entities.users.Teacher
 import isel.leic.group25.db.entities.users.User
 import isel.leic.group25.db.repositories.Repositories
+import isel.leic.group25.db.repositories.interfaces.IsolationLevel
 import isel.leic.group25.db.repositories.interfaces.Transactionable
 import isel.leic.group25.services.errors.UserClassError
 import isel.leic.group25.utils.Either
@@ -76,7 +77,7 @@ class UserClassService(
 
     fun removeUserFromClass(userId: Int, classId: Int, role:Role): UserClassDeleted {
         return runCatching {
-            transactionable.useTransaction {
+            transactionable.useTransaction(IsolationLevel.SERIALIZABLE) {
                 val user = repositories.from({userRepository}){
                     findById(userId)
                 } ?: return@useTransaction failure(UserClassError.UserNotFound)
