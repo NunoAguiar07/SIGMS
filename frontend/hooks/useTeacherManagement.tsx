@@ -24,7 +24,7 @@ export const useTeacherManagement = () => {
     const [selectedTeacherId, setSelectedTeacherId] = useState<number | null>(null);
     const [isRoomsLoading, setIsRoomsLoading] = useState(false);
 
-    const LIMIT = 10;
+    const LIMIT = 7;
     const showAlert = useAlert();
 
     const fetchTeachersHook = async (page: number) => {
