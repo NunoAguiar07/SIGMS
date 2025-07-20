@@ -29,7 +29,7 @@ export const RegisterScreen = ({
 }: RegisterScreenType) => {
     return (
         <CenteredContainer flex={1}>
-            <Card shadow="medium" padding="sm" gap="md" height={"90%"}>
+            <Card shadow="medium" padding="sm" gap="md" >
                 <Title color="black">Register</Title>
 
                 <AuthFormFields
@@ -214,7 +214,7 @@ interface AuthButtonsType {
 }
 
 export const AuthButtons = ({ onRegister, onNavigateToLogin, isRegisterDisabled }: AuthButtonsType) => (
-    <ButtonsContainer gap="sm" flexDirection={'row'}>
+    <ButtonsContainer gap="sm" flexDirection={'row'} justifyContent="center">
         <Button
             variant="primary"
             onPress={onRegister}
