@@ -11,7 +11,7 @@ data:
   EMAIL_PORT: "587"
   EMAIL_USE_SSL: "false"
   EMAIL_USERNAME: "smtp@mailtrap.io"
-  FRONTEND_URL: "sigms.net"
+  FRONTEND_URL: "https://sigms.net"
   JWT_AUDIENCE: "http://sigms.net/"
   JWT_ISSUER: "http://sigms.net/"
   JWT_REALM: "Access to isel.leic.group25"

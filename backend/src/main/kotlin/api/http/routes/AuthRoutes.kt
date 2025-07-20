@@ -8,6 +8,7 @@ import io.ktor.client.*
 import io.ktor.http.*
 import io.ktor.server.application.ApplicationCall
 import io.ktor.server.request.*
+import io.ktor.server.response.respond
 import io.ktor.server.routing.*
 import isel.leic.group25.api.exceptions.RequestError
 import isel.leic.group25.api.exceptions.respondEither
@@ -32,6 +33,7 @@ fun Route.authRoutes(services: Services, client: HttpClient) {
         route("/verify-account") {
             accountVerificationRoute(services)
         }
+        logout()
     }
 }
 
@@ -47,7 +49,8 @@ private suspend fun loginResponse(call: ApplicationCall, result: LoginResult, de
                     httpOnly = true,
                     maxAge = 60 * 60, // 1 hour
                     secure = true,
-                    path = "/"
+                    path = "/",
+                    extensions = mapOf("SameSite" to "Strict")
                 )
                 val refreshCookie = Cookie(
                     name = "refresh_token",
@@ -194,5 +197,31 @@ fun Route.accountVerificationRoute(services: Services) {
                 HttpStatusCode.NoContent
             }
         )
+    }
+}
+
+fun Route.logout() {
+    post("/logout") {
+        call.response.cookies.append(
+            Cookie(
+                name = "auth_token",
+                value = "", // Can be empty since maxAge=0 will expire it
+                httpOnly = true,
+                maxAge = 0, // This expires the cookie immediately
+                secure = true,
+                path = "/"
+            )
+        )
+        call.response.cookies.append(
+            Cookie(
+                name = "refresh_token",
+                value = "", // Can be empty since maxAge=0 will expire it
+                httpOnly = true,
+                secure = true,
+                maxAge = 0, // This expires the cookie immediately
+                path = "/"
+            )
+        )
+        call.respond(HttpStatusCode.OK)
     }
 }

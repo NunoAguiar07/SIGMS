@@ -1,4 +1,4 @@
-import axios, {AxiosError} from "axios";
+import axios from "axios";
 import {handleAxiosError} from "../utils/HandleAxiosError";
 import {WelcomeData} from "../types/welcome/WelcomeInterfaces";
 import {Platform} from "react-native";
@@ -13,7 +13,6 @@ export const apiUrl: string =  ((): string => {
         return Platform.OS === "web"
             ? process.env.EXPO_PUBLIC_API_URL || ''
             : 'http://sigms.net/api/'
-
     }
 })()
 /**

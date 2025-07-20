@@ -13,11 +13,10 @@ const requestLogout = async () => {
         if (deviceType !== 'WEB') {
             await SecureStore.deleteItemAsync('authToken');
             await SecureStore.deleteItemAsync('refreshToken');
-        }else {
+        }else{
             await AsyncStorage.removeItem('refreshToken');
             await AsyncStorage.multiRemove(['userId', 'universityId', 'userRole']);
         }
-
         Alert.alert('Logged out', 'You have been logged out.');
         router.replace('/welcome');
     } catch (error) {
