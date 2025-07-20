@@ -3,7 +3,6 @@ import styled from "styled-components/native";
 import {Theme} from "./Theme";
 import {Container} from "./NewContainers";
 import {isMobile} from "../../../utils/DeviceType";
-import DateTimePicker from "@react-native-community/datetimepicker";
 
 interface StyledPickerProps {
     theme: Theme;
@@ -34,28 +33,4 @@ export const StyledPickerItem = styled(Picker.Item)<StyledPickerProps>`
 export const PickerContainer = styled(Container)`
     background-color: ${({ theme }) => theme.colors.background.transparent};
     align-self: center; 
-`;
-
-interface StyledDateTimePickerProps {
-    theme: Theme;
-    mode?: 'date' | 'time' | 'datetime';
-    display?: 'default' | 'spinner' | 'clock' | 'calendar';
-    hasError?: boolean;
-}
-
-export const StyledDateTimePicker = styled(DateTimePicker).attrs<StyledDateTimePickerProps>(
-    ({ theme, mode = 'datetime', display = isMobile ? 'spinner' : 'default' }) => ({
-        mode,
-        display,
-        textColor: theme.colors.text.black, // Android only
-        // Add other platform-specific attrs as needed
-    })
-)<StyledDateTimePickerProps>`
-  width: 100%;
-  ${({ hasError, theme }) =>
-    hasError &&
-    `
-    border: 2px solid ${theme.colors.status.error};
-    border-radius: ${theme.borderRadius.medium}px;
-  `}
 `;
