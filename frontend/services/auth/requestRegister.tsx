@@ -23,7 +23,7 @@ export const requestRegister = async (
 
         );
         if (response.status === 201) {
-            return response.data.token;
+            return response.data.message;
         }
         return undefined;
 
