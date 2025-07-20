@@ -31,12 +31,10 @@ describe("requestRegister", () => {
         universityId: 42,
     };
 
-    it("returns message on 201 Created", async () => {
-        const mockMessage = "Registration successful";
-
-        mock
-            .onPost(`${apiUrl}auth/register`, testPayload)
-            .reply(201, { message: mockMessage });
+    it("returns token on 201 Created", async () => {
+        const mockToken = "test-token-123";
+        mock.onPost(`${apiUrl}auth/register`, testPayload)
+            .reply(201, { token: mockToken });
 
         const result = await requestRegister(
             testPayload.email,
@@ -46,7 +44,7 @@ describe("requestRegister", () => {
             testPayload.universityId
         );
 
-        expect(result).toBe(mockMessage);
+        expect(result).toBe(mockToken);
     });
 
     it("returns undefined for non-201 status", async () => {
@@ -54,16 +52,20 @@ describe("requestRegister", () => {
             .onPost(`${apiUrl}auth/register`, testPayload)
             .reply(400, { error: "Bad Request" });
 
-        const result = await requestRegister(
-            testPayload.email,
-            testPayload.username,
-            testPayload.password,
-            testPayload.role,
-            testPayload.universityId
-        );
+       await expect(
+            requestRegister(
+                testPayload.email,
+                testPayload.username,
+                testPayload.password,
+                testPayload.role,
+                testPayload.universityId
+            )
+        ).rejects.toMatchObject({
+            status: 400,
+            message: "Request failed with status code 400",
+        });
+       });
 
-        expect(result).toBeUndefined();
-    });
 
     it("throws parsed error on network failure", async () => {
         mock.onPost(`${apiUrl}auth/register`).networkError();

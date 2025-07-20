@@ -32,8 +32,8 @@ describe("pushToken after login", () => {
     it("logs in and posts the Expo push token successfully", async () => {
         // Mock login
         mock.onPost(`${apiUrl}auth/login`).reply(200, { token: "fake-jwt-token" });
-        const loginResult = await requestLogin("user@example.com", "password123", "web");
-        expect(loginResult.success).toBe(true);
+        const loginResult = await requestLogin("user@example.com", "password123", "WEB");
+        expect(loginResult).toBe(true);
 
         // @ts-ignore
         (Notifications.getExpoPushTokenAsync as jest.Mock).mockResolvedValue({data: "ExponentPushToken[fake-token]",});
@@ -50,7 +50,7 @@ describe("pushToken after login", () => {
 
     it("throws parsed error on network failure", async () => {
         mock.onPost(`${apiUrl}auth/login`).reply(200, { token: "fake-jwt-token" });
-        await requestLogin("user@example.com", "password123", "web");
+        await requestLogin("user@example.com", "password123", "WEB");
         // @ts-ignore
         (Notifications.getExpoPushTokenAsync as jest.Mock).mockResolvedValue({data: "ExponentPushToken[fake-token]",});
 

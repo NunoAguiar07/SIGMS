@@ -30,7 +30,7 @@ describe("fetchRooms after login", () => {
     it("logs in and fetches rooms without search query", async () => {
         const email = "user@example.com";
         const password = "userpass";
-        const deviceType = "web";
+        const deviceType = "WEB";
         const token = "fake-jwt-token";
 
         const mockedRooms: RoomInterface[] = [
@@ -41,7 +41,7 @@ describe("fetchRooms after login", () => {
         // Mock login
         mock.onPost(`${apiUrl}auth/login`).reply(200, { token });
         const loginResponse = await requestLogin(email, password, deviceType);
-        expect(loginResponse.success).toBe(true);
+        expect(loginResponse).toBe(true);
 
         // Mock fetch without search query
         mock.onGet("rooms").reply(200, { data: mockedRooms });
@@ -53,13 +53,13 @@ describe("fetchRooms after login", () => {
     it("logs in and fetches rooms with search query", async () => {
         const email = "user@example.com";
         const password = "userpass";
-        const deviceType = "web";
+        const deviceType = "WEB";
         const token = "fake-jwt-token";
 
-        const searchQuery = "Room B";
+        const searchQuery = "RoomB";
 
         const mockedRooms: RoomInterface[] = [
-            { id: 2, name: "Room B", capacity: 30 },
+            { id: 2, name: "RoomB", capacity: 30 },
         ];
 
         // Mock login
@@ -78,7 +78,7 @@ describe("fetchRooms after login", () => {
     it("logs in but fetch fails with network error", async () => {
         const email = "fail@example.com";
         const password = "wrongpass";
-        const deviceType = "web";
+        const deviceType = "WEB";
 
         // Mock login
         mock.onPost(`${apiUrl}auth/login`).reply(200, { token: "fake-jwt-token" });
@@ -96,7 +96,7 @@ describe("fetchRooms after login", () => {
     it("returns empty array if response status is not 200", async () => {
         const email = "user@example.com";
         const password = "userpass";
-        const deviceType = "web";
+        const deviceType = "WEB";
         const token = "fake-jwt-token";
 
         // Mock login

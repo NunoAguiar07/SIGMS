@@ -28,7 +28,7 @@ describe("fetchSubjectClasses after login", () => {
     it("logs in and successfully fetches classes for a subject", async () => {
         const email = "user@example.com";
         const password = "userpass";
-        const deviceType = "web";
+        const deviceType = "WEB";
         const token = "fake-jwt-token";
         const subjectId = 123;
 
@@ -54,7 +54,7 @@ describe("fetchSubjectClasses after login", () => {
         // Mock login
         mock.onPost(`${apiUrl}auth/login`).reply(200, { token });
         const loginResponse = await requestLogin(email, password, deviceType);
-        expect(loginResponse.success).toBe(true);
+        expect(loginResponse).toBe(true);
 
         // Mock fetch
         mock
@@ -68,7 +68,7 @@ describe("fetchSubjectClasses after login", () => {
     it("logs in but fails to fetch classes", async () => {
         const email = "fail@example.com";
         const password = "wrongpass";
-        const deviceType = "web";
+        const deviceType = "WEB";
         const subjectId = 456;
 
         // Mock login

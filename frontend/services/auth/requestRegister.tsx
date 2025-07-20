@@ -20,8 +20,13 @@ export const requestRegister = async (
                     'Content-Type': 'application/json',
                 },
             }
+
         );
-        return response.status === 201 ? response.data.message : undefined;
+        if (response.status === 201) {
+            return response.data.token;
+        }
+        return undefined;
+
     } catch (error) {
         throw handleAxiosError(error);
     }

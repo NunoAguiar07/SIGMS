@@ -30,7 +30,7 @@ describe("createRoom after login", () => {
     it("logs in and successfully creates a room", async () => {
         const email = "admin@example.com";
         const password = "admin123";
-        const deviceType = "web";
+        const deviceType = "WEB";
         const token = "fake-jwt-token";
 
         const roomData = {
@@ -42,7 +42,7 @@ describe("createRoom after login", () => {
         // Mock login
         mock.onPost(`${apiUrl}auth/login`).reply(200, { token });
         const loginResponse = await requestLogin(email, password, deviceType);
-        expect(loginResponse.success).toBe(true);
+        expect(loginResponse).toBe(true);
 
         // Mock room creation success
         mock.onPost("/rooms/add", roomData).reply(201);
@@ -54,7 +54,7 @@ describe("createRoom after login", () => {
     it("logs in but fails to create a room", async () => {
         const email = "admin2@example.com";
         const password = "adminfail";
-        const deviceType = "web";
+        const deviceType = "WEB";
 
         const roomData = {
             name: "Room B2",

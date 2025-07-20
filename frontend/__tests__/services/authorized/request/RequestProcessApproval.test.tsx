@@ -30,13 +30,13 @@ describe("requestProcessApproval after login", () => {
     it("logs in and successfully approves a process (204)", async () => {
         const email = "approver@example.com";
         const password = "securePass";
-        const deviceType = "web";
+        const deviceType = "WEB";
         const token = "approval-token-123";
 
         // Mock login
         mock.onPost(`${apiUrl}auth/login`).reply(200, { token: "fake-jwt-token" });
         const loginResult = await requestLogin(email, password, deviceType);
-        expect(loginResult.success).toBe(true);
+        expect(loginResult).toBe(true);
 
         // Mock approval request
         mock
@@ -51,7 +51,7 @@ describe("requestProcessApproval after login", () => {
         const token = "rejection-token-456";
 
         mock.onPost(`${apiUrl}auth/login`).reply(200, { token: "fake-jwt-token" });
-        await requestLogin("user@example.com", "pass", "web");
+        await requestLogin("user@example.com", "pass", "WEB");
 
         mock
             .onPut(`assess-roles/validate?token=${token}&status=REJECTED`)
@@ -65,11 +65,11 @@ describe("requestProcessApproval after login", () => {
         const token = "invalid-token";
 
         mock.onPost(`${apiUrl}auth/login`).reply(200, { token: "fake-jwt-token" });
-        await requestLogin("user@example.com", "pass", "web");
+        await requestLogin("user@example.com", "pass", "WEB");
 
         mock
             .onPut(`assess-roles/validate?token=${token}&status=APPROVED`)
-            .reply(200); // wrong status
+            .reply(200);
 
         const result = await requestProcessApproval(token, true);
         expect(result).toBe(false);
@@ -79,7 +79,7 @@ describe("requestProcessApproval after login", () => {
         const token = "network-fail-token";
 
         mock.onPost(`${apiUrl}auth/login`).reply(200, { token: "fake-jwt-token" });
-        await requestLogin("user@example.com", "pass", "web");
+        await requestLogin("user@example.com", "pass", "WEB");
 
         mock
             .onPut(`assess-roles/validate?token=${token}&status=APPROVED`)

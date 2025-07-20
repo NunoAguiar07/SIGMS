@@ -30,13 +30,13 @@ describe("requestFixIssue after login", () => {
     it("logs in and successfully fixes the issue (204 No Content)", async () => {
         const email = "tech@example.com";
         const password = "pass123";
-        const deviceType = "web";
+        const deviceType = "WEB";
         const issueId = 321;
 
         // Mock login
         mock.onPost(`${apiUrl}auth/login`).reply(200, { token: "fake-jwt-token" });
         const loginResult = await requestLogin(email, password, deviceType);
-        expect(loginResult.success).toBe(true);
+        expect(loginResult).toBe(true);
 
         // Mock delete request
         mock.onDelete(`issue-reports/${issueId}/delete`).reply(204);
@@ -49,7 +49,7 @@ describe("requestFixIssue after login", () => {
         const issueId = 123;
 
         mock.onPost(`${apiUrl}auth/login`).reply(200, { token: "fake-jwt-token" });
-        await requestLogin("test@example.com", "testpass", "web");
+        await requestLogin("test@example.com", "testpass", "WEB");
 
         mock.onDelete(`issue-reports/${issueId}/delete`).reply(200); // Wrong status
 
@@ -61,7 +61,7 @@ describe("requestFixIssue after login", () => {
         const issueId = 456;
 
         mock.onPost(`${apiUrl}auth/login`).reply(200, { token: "fake-jwt-token" });
-        await requestLogin("test@example.com", "testpass", "web");
+        await requestLogin("test@example.com", "testpass", "WEB");
 
         mock.onDelete(`issue-reports/${issueId}/delete`).networkError();
 

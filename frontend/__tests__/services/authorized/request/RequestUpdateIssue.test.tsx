@@ -30,14 +30,14 @@ describe("requestUpdateIssue after login", () => {
     it("logs in and successfully updates an issue (200)", async () => {
         const email = "user@example.com";
         const password = "testpass";
-        const deviceType = "web";
+        const deviceType = "WEB";
         const issueId = 123;
         const newDescription = "Updated issue description";
 
         // Mock login
         mock.onPost(`${apiUrl}auth/login`).reply(200, { token: "fake-jwt-token" });
         const loginResult = await requestLogin(email, password, deviceType);
-        expect(loginResult.success).toBe(true);
+        expect(loginResult).toBe(true);
 
         // Mock issue update
         mock
@@ -53,7 +53,7 @@ describe("requestUpdateIssue after login", () => {
         const description = "Should not succeed";
 
         mock.onPost(`${apiUrl}auth/login`).reply(200, { token: "fake-jwt-token" });
-        await requestLogin("user@example.com", "pass", "web");
+        await requestLogin("user@example.com", "pass", "WEB");
 
         mock
             .onPut(`issue-reports/${issueId}/update`, { description })
@@ -68,7 +68,7 @@ describe("requestUpdateIssue after login", () => {
         const description = "This will error";
 
         mock.onPost(`${apiUrl}auth/login`).reply(200, { token: "fake-jwt-token" });
-        await requestLogin("user@example.com", "pass", "web");
+        await requestLogin("user@example.com", "pass", "WEB");
 
         mock
             .onPut(`issue-reports/${issueId}/update`, { description })

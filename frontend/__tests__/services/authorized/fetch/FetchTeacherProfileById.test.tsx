@@ -28,7 +28,7 @@ describe("fetchTeacherProfileById after login", () => {
     it("logs in and successfully fetches teacher profile", async () => {
         const email = "user@example.com";
         const password = "userpass";
-        const deviceType = "web";
+        const deviceType = "WEB";
         const token = "fake-jwt-token";
         const teacherId = 123;
 
@@ -51,7 +51,7 @@ describe("fetchTeacherProfileById after login", () => {
 
         mock.onPost(`${apiUrl}auth/login`).reply(200, { token });
         const loginResponse = await requestLogin(email, password, deviceType);
-        expect(loginResponse.success).toBe(true);
+        expect(loginResponse).toBe(true);
 
         mock.onGet(`/profile/${encodeURIComponent(teacherId)}`).reply(200, mockedTeacherProfile);
 
@@ -62,7 +62,7 @@ describe("fetchTeacherProfileById after login", () => {
     it("logs in but fails to fetch teacher profile", async () => {
         const email = "fail@example.com";
         const password = "wrongpass";
-        const deviceType = "web";
+        const deviceType = "WEB";
         const teacherId = 999;
 
         mock.onPost(`${apiUrl}auth/login`).reply(200, { token: "fake-jwt-token" });

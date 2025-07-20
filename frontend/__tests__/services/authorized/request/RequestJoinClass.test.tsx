@@ -30,7 +30,7 @@ describe("joinClass after login", () => {
     it("logs in and successfully joins a class (204)", async () => {
         const email = "student@example.com";
         const password = "mypassword";
-        const deviceType = "web";
+        const deviceType = "WEB";
         const token = "fake-jwt-token";
         const subjectId = 10;
         const classId = 20;
@@ -38,7 +38,7 @@ describe("joinClass after login", () => {
         // Mock login
         mock.onPost(`${apiUrl}auth/login`).reply(200, { token });
         const login = await requestLogin(email, password, deviceType);
-        expect(login.success).toBe(true);
+        expect(login).toBe(true);
 
         // Mock successful join
         mock
@@ -54,7 +54,7 @@ describe("joinClass after login", () => {
         const classId = 21;
 
         mock.onPost(`${apiUrl}auth/login`).reply(200, { token: "fake-jwt-token" });
-        await requestLogin("user@example.com", "pass", "web");
+        await requestLogin("user@example.com", "pass", "WEB");
 
         mock
             .onPost(`/subjects/${subjectId}/classes/${classId}/users/add`)
@@ -69,7 +69,7 @@ describe("joinClass after login", () => {
         const classId = 22;
 
         mock.onPost(`${apiUrl}auth/login`).reply(200, { token: "fake-jwt-token" });
-        await requestLogin("user@example.com", "pass", "web");
+        await requestLogin("user@example.com", "pass", "WEB");
 
         mock
             .onPost(`/subjects/${subjectId}/classes/${classId}/users/add`)

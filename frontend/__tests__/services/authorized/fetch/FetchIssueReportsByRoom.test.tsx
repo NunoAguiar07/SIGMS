@@ -38,7 +38,7 @@ describe("fetchIssueReportsByRoom after login", () => {
     it("logs in and successfully fetches issues for a room", async () => {
         const email = "user@example.com";
         const password = "validpass";
-        const deviceType = "web";
+        const deviceType = "WEB";
         const token = "fake-jwt-token";
 
         const roomId = 200;
@@ -62,7 +62,7 @@ describe("fetchIssueReportsByRoom after login", () => {
         // Mock login
         mock.onPost(`${apiUrl}auth/login`).reply(200, { token });
         const loginResponse = await requestLogin(email, password, deviceType);
-        expect(loginResponse.success).toBe(true);
+        expect(loginResponse).toBe(true);
 
         // Mock room issue fetch
         mock
@@ -76,7 +76,7 @@ describe("fetchIssueReportsByRoom after login", () => {
     it("logs in but fails to fetch room issues", async () => {
         const email = "failuser@example.com";
         const password = "wrongpass";
-        const deviceType = "web";
+        const deviceType = "WEB";
         const roomId = 300;
 
         // Mock login

@@ -30,7 +30,7 @@ describe("leaveClass after login", () => {
     it("logs in and successfully leaves a class (204)", async () => {
         const email = "student@example.com";
         const password = "password123";
-        const deviceType = "web";
+        const deviceType = "WEB";
         const token = "fake-jwt-token";
         const subjectId = 7;
         const classId = 13;
@@ -38,7 +38,7 @@ describe("leaveClass after login", () => {
         // Mock login
         mock.onPost(`${apiUrl}auth/login`).reply(200, { token });
         const loginResult = await requestLogin(email, password, deviceType);
-        expect(loginResult.success).toBe(true);
+        expect(loginResult).toBe(true);
 
         // Mock successful leave
         mock
@@ -54,7 +54,7 @@ describe("leaveClass after login", () => {
         const classId = 14;
 
         mock.onPost(`${apiUrl}auth/login`).reply(200, { token: "fake-jwt-token" });
-        await requestLogin("user@example.com", "pass", "web");
+        await requestLogin("user@example.com", "pass", "WEB");
 
         mock
             .onDelete(`/subjects/${subjectId}/classes/${classId}/users/remove`)
@@ -69,7 +69,7 @@ describe("leaveClass after login", () => {
         const classId = 15;
 
         mock.onPost(`${apiUrl}auth/login`).reply(200, { token: "fake-jwt-token" });
-        await requestLogin("user@example.com", "pass", "web");
+        await requestLogin("user@example.com", "pass", "WEB");
 
         mock
             .onDelete(`/subjects/${subjectId}/classes/${classId}/users/remove`)

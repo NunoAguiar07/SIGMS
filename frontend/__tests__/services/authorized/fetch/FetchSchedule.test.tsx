@@ -28,7 +28,7 @@ describe("fetchSchedule after login", () => {
     it("logs in and successfully fetches schedule data", async () => {
         const email = "user@example.com";
         const password = "userpass";
-        const deviceType = "web";
+        const deviceType = "WEB";
         const token = "fake-jwt-token";
 
         const mockedSchedule: ScheduleApiResponse = {
@@ -73,7 +73,7 @@ describe("fetchSchedule after login", () => {
 
         mock.onPost(`${apiUrl}auth/login`).reply(200, { token });
         const loginResponse = await requestLogin(email, password, deviceType);
-        expect(loginResponse.success).toBe(true);
+        expect(loginResponse).toBe(true);
 
         mock.onGet("/schedule").reply(200, mockedSchedule);
 
@@ -84,7 +84,7 @@ describe("fetchSchedule after login", () => {
     it("logs in but fails to fetch schedule data", async () => {
         const email = "fail@example.com";
         const password = "wrongpass";
-        const deviceType = "web";
+        const deviceType = "WEB";
 
         mock.onPost(`${apiUrl}auth/login`).reply(200, { token: "fake-jwt-token" });
         await requestLogin(email, password, deviceType);

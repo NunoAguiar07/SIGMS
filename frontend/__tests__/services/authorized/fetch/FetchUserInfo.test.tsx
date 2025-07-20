@@ -37,7 +37,7 @@ describe("fetchUserInfo after login", () => {
     it("logs in and fetches user info successfully", async () => {
         const email = "test@example.com";
         const password = "testpass";
-        const deviceType = "web";
+        const deviceType = "WEB";
         const token = "fake-jwt-token";
 
         const mockedUserInfo: UserInfo = {
@@ -49,7 +49,7 @@ describe("fetchUserInfo after login", () => {
         // Mock login
         mock.onPost(`${apiUrl}auth/login`).reply(200, { token });
         const loginResult = await requestLogin(email, password, deviceType);
-        expect(loginResult.success).toBe(true);
+        expect(loginResult).toBe(true);
 
         // Mock user info fetch
         mock.onGet("userInfo").reply(200, mockedUserInfo);
@@ -67,7 +67,7 @@ describe("fetchUserInfo after login", () => {
     it("fails to fetch user info and throws parsed error", async () => {
         const email = "fail@example.com";
         const password = "wrongpass";
-        const deviceType = "web";
+        const deviceType = "WEB";
 
         // Mock login
         mock.onPost(`${apiUrl}auth/login`).reply(200, { token: "fake-jwt-token" });
