@@ -28,13 +28,13 @@ describe("requestUpdateProfile after login", () => {
     it("logs in and updates only the image successfully", async () => {
         const email = "user@example.com";
         const password = "password123";
-        const deviceType = "web";
+        const deviceType = "WEB";
         const updatedImage = [255, 0, 255, 128]; // example image byte array
 
         // Mock login endpoint
         mock.onPost(`${apiUrl}auth/login`).reply(200, { token: "fake-jwt-token" });
         const loginResult = await requestLogin(email, password, deviceType);
-        expect(loginResult.success).toBe(true);
+        expect(loginResult).toBe(true);
 
         // Mock profile update endpoint returning full updated profile
         const updatedProfile = {
@@ -51,7 +51,7 @@ describe("requestUpdateProfile after login", () => {
 
     it("throws parsed error on network failure", async () => {
         mock.onPost(`${apiUrl}auth/login`).reply(200, { token: "fake-jwt-token" });
-        await requestLogin("user@example.com", "password123", "web");
+        await requestLogin("user@example.com", "password123", "WEB");
 
         mock.onPut("/profile/update").networkError();
 

@@ -30,14 +30,14 @@ describe("requestAssignTechnicianToIssue after login", () => {
     it("logs in and successfully assigns technician to issue", async () => {
         const email = "tech@example.com";
         const password = "password";
-        const deviceType = "web";
+        const deviceType = "WEB";
         const token = "fake-jwt-token";
         const issueId = 101;
 
         // Mock login
         mock.onPost(`${apiUrl}auth/login`).reply(200, { token });
         const login = await requestLogin(email, password, deviceType);
-        expect(login.success).toBe(true);
+        expect(login).toBe(true);
 
         // Mock technician assignment
         mock.onPut(`/issue-reports/${issueId}/assign`).reply(200);
@@ -49,7 +49,7 @@ describe("requestAssignTechnicianToIssue after login", () => {
     it("logs in but fails to assign technician due to network error", async () => {
         const email = "fail@example.com";
         const password = "badpass";
-        const deviceType = "web";
+        const deviceType = "WEB";
         const issueId = 202;
 
         // Mock login
@@ -68,7 +68,7 @@ describe("requestAssignTechnicianToIssue after login", () => {
     it("returns false if response is not 200", async () => {
         const email = "user@example.com";
         const password = "pass";
-        const deviceType = "web";
+        const deviceType = "WEB";
         const issueId = 303;
 
         // Mock login

@@ -30,7 +30,7 @@ describe("createLecture after login", () => {
     it("logs in and successfully creates a lecture", async () => {
         const email = "teacher@example.com";
         const password = "secure123";
-        const deviceType = "web";
+        const deviceType = "WEB";
         const token = "fake-jwt-token";
 
         const lectureData = {
@@ -46,7 +46,7 @@ describe("createLecture after login", () => {
         mock.onPost(`${apiUrl}auth/login`).reply(200, { token });
 
         const loginResponse = await requestLogin(email, password, deviceType);
-        expect(loginResponse.success).toBe(true);
+        expect(loginResponse).toBe(true);
 
         // Mock successful lecture creation
         mock.onPost("lectures/add", lectureData).reply(201);
@@ -66,7 +66,7 @@ describe("createLecture after login", () => {
     it("logs in but fails to create a lecture", async () => {
         const email = "fail@example.com";
         const password = "wrongpass";
-        const deviceType = "web";
+        const deviceType = "WEB";
 
         const lectureData = {
             schoolClassId: 11,

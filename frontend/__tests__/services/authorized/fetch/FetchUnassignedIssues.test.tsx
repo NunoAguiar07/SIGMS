@@ -28,7 +28,7 @@ describe("fetchUnassignedIssues after login", () => {
     it("logs in and successfully fetches unassigned issues", async () => {
         const email = "user@example.com";
         const password = "userpass";
-        const deviceType = "web";
+        const deviceType = "WEB";
         const token = "fake-jwt-token";
         const limit = 10;
         const offset = 0;
@@ -52,7 +52,7 @@ describe("fetchUnassignedIssues after login", () => {
 
         mock.onPost(`${apiUrl}auth/login`).reply(200, { token });
         const loginResponse = await requestLogin(email, password, deviceType);
-        expect(loginResponse.success).toBe(true);
+        expect(loginResponse).toBe(true);
 
         mock
             .onGet(`/issue-reports?limit=${limit}&offset=${offset}&unassigned=true`)
@@ -65,7 +65,7 @@ describe("fetchUnassignedIssues after login", () => {
     it("logs in but fails to fetch unassigned issues", async () => {
         const email = "fail@example.com";
         const password = "wrongpass";
-        const deviceType = "web";
+        const deviceType = "WEB";
         const limit = 10;
         const offset = 0;
 

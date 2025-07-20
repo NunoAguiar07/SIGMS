@@ -29,7 +29,7 @@ describe("createSubject after login", () => {
     it("logs in and successfully creates a subject", async () => {
         const email = "prof@example.com";
         const password = "pass123";
-        const deviceType = "web";
+        const deviceType = "WEB";
         const token = "fake-jwt-token";
         const subjectName = "Mathematics";
 
@@ -37,7 +37,7 @@ describe("createSubject after login", () => {
         mock.onPost(`${apiUrl}auth/login`).reply(200, { token });
 
         const loginResponse = await requestLogin(email, password, deviceType);
-        expect(loginResponse.success).toBe(true);
+        expect(loginResponse).toBe(true);
 
         // Mock subject creation success
         mock.onPost("/subjects/add", { name: subjectName }).reply(201);
@@ -49,7 +49,7 @@ describe("createSubject after login", () => {
     it("logs in but fails to create a subject", async () => {
         const email = "prof2@example.com";
         const password = "wrongpass";
-        const deviceType = "web";
+        const deviceType = "WEB";
         const subjectName = "Physics";
 
         // Mock login

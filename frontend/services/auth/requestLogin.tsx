@@ -22,20 +22,15 @@ export const requestLogin = async (
             }
         );
         if (response.status === 200) {
-            // Handle both tokens for mobile devices
             if (deviceType !== 'WEB') {
-                const { accessToken, refreshToken } = response.data;
+                const {accessToken, refreshToken} = response.data;
                 await SecureStore.setItemAsync('authToken', accessToken);
                 await SecureStore.setItemAsync('refreshToken', refreshToken);
                 await pushToken()
             }
-            return true ;
-        } else if (response.status === 404) {
-            return false ;
+            return true;
         }
-
-        // Handle other status codes
-        return false;
+        return false
     } catch (error) {
         throw handleAxiosError(error)
     }

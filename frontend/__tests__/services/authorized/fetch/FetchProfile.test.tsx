@@ -30,7 +30,7 @@ describe("fetchProfile after login", () => {
     it("logs in and successfully fetches profile data", async () => {
         const email = "user@example.com";
         const password = "userpass";
-        const deviceType = "web";
+        const deviceType = "WEB";
         const token = "fake-jwt-token";
 
         const mockedProfile: ProfileInterface = {
@@ -43,7 +43,7 @@ describe("fetchProfile after login", () => {
         // Mock login
         mock.onPost(`${apiUrl}auth/login`).reply(200, { token });
         const loginResponse = await requestLogin(email, password, deviceType);
-        expect(loginResponse.success).toBe(true);
+        expect(loginResponse).toBe(true);
 
         // Mock profile fetch
         mock.onGet("/profile").reply(200, mockedProfile);
@@ -55,7 +55,7 @@ describe("fetchProfile after login", () => {
     it("logs in but fails to fetch profile data", async () => {
         const email = "fail@example.com";
         const password = "wrongpass";
-        const deviceType = "web";
+        const deviceType = "WEB";
 
         // Mock login
         mock.onPost(`${apiUrl}auth/login`).reply(200, { token: "fake-jwt-token" });

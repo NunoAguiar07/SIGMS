@@ -29,7 +29,7 @@ describe("CreateIssueReportRequest after login", () => {
     it("logs in and creates an issue report successfully", async () => {
         const email = "test@example.com";
         const password = "password123";
-        const deviceType = "web";
+        const deviceType = "WEB";
         const token = "fake-jwt-token";
         const roomId = 123;
         const description = "Air conditioner not working";
@@ -38,7 +38,7 @@ describe("CreateIssueReportRequest after login", () => {
         mock.onPost(`${apiUrl}auth/login`).reply(200, { token });
 
         const loginResponse = await requestLogin(email, password, deviceType);
-        expect(loginResponse.success).toBe(true);
+        expect(loginResponse).toBe(true);
 
         // Mock issue report creation
         mock.onPost(`rooms/${roomId}/issues/add`, { description }).reply(201);
@@ -50,7 +50,7 @@ describe("CreateIssueReportRequest after login", () => {
     it("logs in but fails to create an issue report", async () => {
         const email = "test2@example.com";
         const password = "wrongpass";
-        const deviceType = "web";
+        const deviceType = "WEB";
         const roomId = 456;
         const description = "Lights are flickering";
 

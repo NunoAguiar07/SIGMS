@@ -30,7 +30,7 @@ describe("fetchLectures after login", () => {
     it("logs in and successfully fetches lectures", async () => {
         const email = "user@example.com";
         const password = "testpass";
-        const deviceType = "web";
+        const deviceType = "WEB";
         const token = "fake-jwt-token";
 
         const mockedLectures: Lecture[] = [
@@ -77,7 +77,7 @@ describe("fetchLectures after login", () => {
         // Mock login
         mock.onPost(`${apiUrl}auth/login`).reply(200, { token });
         const loginResponse = await requestLogin(email, password, deviceType);
-        expect(loginResponse.success).toBe(true);
+        expect(loginResponse).toBe(true);
 
         // Mock lectures fetch
         mock.onGet("/lectures").reply(200, { data: mockedLectures });
@@ -89,7 +89,7 @@ describe("fetchLectures after login", () => {
     it("logs in but fails to fetch lectures", async () => {
         const email = "error@example.com";
         const password = "wrongpass";
-        const deviceType = "web";
+        const deviceType = "WEB";
 
         // Mock login
         mock.onPost(`${apiUrl}auth/login`).reply(200, { token: "fake-jwt-token" });

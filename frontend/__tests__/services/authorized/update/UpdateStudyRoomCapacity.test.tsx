@@ -27,8 +27,8 @@ describe("updateStudyRoomCapacity after login", () => {
 
     it("logs in and updates study room capacity successfully", async () => {
         mock.onPost(`${apiUrl}auth/login`).reply(200, { token: "fake-jwt-token" });
-        const loginResult = await requestLogin("user@example.com", "password123", "web");
-        expect(loginResult.success).toBe(true);
+        const loginResult = await requestLogin("user@example.com", "password123", "WEB");
+        expect(loginResult).toBe(true);
 
         mock.onPut("/devices/update", { withCredentials: true }).reply(200);
 
@@ -37,7 +37,7 @@ describe("updateStudyRoomCapacity after login", () => {
 
     it("throws parsed error on network failure", async () => {
         mock.onPost(`${apiUrl}auth/login`).reply(200, { token: "fake-jwt-token" });
-        await requestLogin("user@example.com", "password123", "web");
+        await requestLogin("user@example.com", "password123", "WEB");
 
         mock.onPut("/devices/update").networkError();
 

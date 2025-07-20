@@ -30,14 +30,14 @@ describe("createClass after login", () => {
     it("logs in and creates a class successfully", async () => {
         const email = "test@example.com";
         const password = "password123";
-        const deviceType = "web";
+        const deviceType = "WEB";
         const token = "fake-jwt-token";
         const subjectId = 42;
         const className = "New Class";
 
         mock.onPost(`${apiUrl}auth/login`).reply(200, { token });
         const loginResponse = await requestLogin(email, password, deviceType);
-        expect(loginResponse.success).toBe(true);
+        expect(loginResponse).toBe(true);
 
         mock.onPost(`subjects/${subjectId}/classes/add`, { name: className }).reply(201);
 

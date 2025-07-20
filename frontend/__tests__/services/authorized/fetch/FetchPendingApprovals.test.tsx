@@ -30,7 +30,7 @@ describe("fetchPendingApprovals after login", () => {
     it("logs in and successfully fetches pending approvals", async () => {
         const email = "admin@example.com";
         const password = "adminpass";
-        const deviceType = "web";
+        const deviceType = "WEB";
         const token = "fake-jwt-token";
 
         const limit = 10;
@@ -40,7 +40,7 @@ describe("fetchPendingApprovals after login", () => {
             {
                 id: 1,
                 user: {
-                    name: "Alice Admin",
+                    username: "Alice Admin",
                     email: "alice@example.com",
                 },
                 verificationToken: "token123",
@@ -50,7 +50,7 @@ describe("fetchPendingApprovals after login", () => {
             {
                 id: 2,
                 user: {
-                    name: "Bob User",
+                    username: "Bob User",
                     email: "bob@example.com",
                 },
                 verificationToken: "token456",
@@ -62,7 +62,7 @@ describe("fetchPendingApprovals after login", () => {
         // Mock login
         mock.onPost(`${apiUrl}auth/login`).reply(200, { token });
         const loginResponse = await requestLogin(email, password, deviceType);
-        expect(loginResponse.success).toBe(true);
+        expect(loginResponse).toBe(true);
 
         // Mock fetch pending approvals
         mock
@@ -76,7 +76,7 @@ describe("fetchPendingApprovals after login", () => {
     it("logs in but fails to fetch pending approvals", async () => {
         const email = "fail@example.com";
         const password = "wrongpass";
-        const deviceType = "web";
+        const deviceType = "WEB";
 
         const limit = 5;
         const offset = 10;

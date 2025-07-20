@@ -30,13 +30,13 @@ describe("requestUnassignFromIssue after login", () => {
     it("logs in and successfully unassigns from an issue (204)", async () => {
         const email = "tech@example.com";
         const password = "securePass";
-        const deviceType = "web";
+        const deviceType = "WEB";
         const issueId = 101;
 
         // Mock login
         mock.onPost(`${apiUrl}auth/login`).reply(200, { token: "fake-jwt-token" });
         const loginResult = await requestLogin(email, password, deviceType);
-        expect(loginResult.success).toBe(true);
+        expect(loginResult).toBe(true);
 
         // Mock unassignment
         mock
@@ -51,7 +51,7 @@ describe("requestUnassignFromIssue after login", () => {
         const issueId = 102;
 
         mock.onPost(`${apiUrl}auth/login`).reply(200, { token: "fake-jwt-token" });
-        await requestLogin("user@example.com", "pass", "web");
+        await requestLogin("user@example.com", "pass", "WEB");
 
         mock
             .onPut(`issue-reports/${issueId}/unassign`)
@@ -65,7 +65,7 @@ describe("requestUnassignFromIssue after login", () => {
         const issueId = 103;
 
         mock.onPost(`${apiUrl}auth/login`).reply(200, { token: "fake-jwt-token" });
-        await requestLogin("user@example.com", "pass", "web");
+        await requestLogin("user@example.com", "pass", "WEB");
 
         mock
             .onPut(`issue-reports/${issueId}/unassign`)

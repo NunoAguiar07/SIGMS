@@ -32,7 +32,7 @@ describe("fetchAssignedIssues after login", () => {
     it("logs in and successfully fetches assigned issues", async () => {
         const email = "tech@example.com";
         const password = "techpass";
-        const deviceType = "web";
+        const deviceType = "WEB";
         const token = "fake-jwt-token";
 
         const limit = 5;
@@ -57,7 +57,7 @@ describe("fetchAssignedIssues after login", () => {
         // Mock login
         mock.onPost(`${apiUrl}auth/login`).reply(200, { token });
         const loginResponse = await requestLogin(email, password, deviceType);
-        expect(loginResponse.success).toBe(true);
+        expect(loginResponse).toBe(true);
 
         // Mock issue fetch
         mock
@@ -71,7 +71,7 @@ describe("fetchAssignedIssues after login", () => {
     it("logs in but fails to fetch assigned issues", async () => {
         const email = "failuser@example.com";
         const password = "failpass";
-        const deviceType = "web";
+        const deviceType = "WEB";
 
         const limit = 10;
         const offset = 5;

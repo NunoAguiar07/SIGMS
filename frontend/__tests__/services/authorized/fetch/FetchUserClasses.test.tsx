@@ -28,7 +28,7 @@ describe("fetchUserClasses after login", () => {
     it("logs in and successfully fetches user's classes", async () => {
         const email = "user@example.com";
         const password = "userpass";
-        const deviceType = "web";
+        const deviceType = "WEB";
         const token = "fake-jwt-token";
 
         const mockedClasses: SchoolClassInterface[] = [
@@ -53,7 +53,7 @@ describe("fetchUserClasses after login", () => {
         // Mock login
         mock.onPost(`${apiUrl}auth/login`).reply(200, { token });
         const loginResponse = await requestLogin(email, password, deviceType);
-        expect(loginResponse.success).toBe(true);
+        expect(loginResponse).toBe(true);
 
         // Mock fetchUserClasses
         mock.onGet("/userClasses").reply(200, { data: mockedClasses });
@@ -65,7 +65,7 @@ describe("fetchUserClasses after login", () => {
     it("logs in but fails to fetch user's classes", async () => {
         const email = "fail@example.com";
         const password = "wrongpass";
-        const deviceType = "web";
+        const deviceType = "WEB";
 
         // Mock login
         mock.onPost(`${apiUrl}auth/login`).reply(200, { token: "fake-jwt-token" });

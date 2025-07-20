@@ -49,8 +49,8 @@ describe("updateLectureSchedule after login", () => {
 
     it("logs in and successfully updates a lecture schedule (200)", async () => {
         mock.onPost(`${apiUrl}auth/login`).reply(200, { token: "fake-jwt-token" });
-        const loginResult = await requestLogin("user@example.com", "pass", "web");
-        expect(loginResult.success).toBe(true);
+        const loginResult = await requestLogin("user@example.com", "pass", "WEB");
+        expect(loginResult).toBe(true);
 
         mock
             .onPut(`lectures/${lecture.id}/update`, {
@@ -70,7 +70,7 @@ describe("updateLectureSchedule after login", () => {
 
     it("returns false if response status is not 200", async () => {
         mock.onPost(`${apiUrl}auth/login`).reply(200, { token: "fake-jwt-token" });
-        await requestLogin("user@example.com", "pass", "web");
+        await requestLogin("user@example.com", "pass", "WEB");
 
         mock
             .onPut(`lectures/${lecture.id}/update`)
@@ -82,7 +82,7 @@ describe("updateLectureSchedule after login", () => {
 
     it("throws parsed error on network failure", async () => {
         mock.onPost(`${apiUrl}auth/login`).reply(200, { token: "fake-jwt-token" });
-        await requestLogin("user@example.com", "pass", "web");
+        await requestLogin("user@example.com", "pass", "WEB");
 
         mock
             .onPut(`lectures/${lecture.id}/update`)

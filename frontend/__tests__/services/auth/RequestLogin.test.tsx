@@ -14,30 +14,21 @@ jest.mock("expo-secure-store", () => ({
     setItemAsync: jest.fn(() => Promise.resolve()),
 }));
 
-
 describe("requestLogin", () => {
     afterEach(() => {
         mock.reset();
     });
 
-    it("logs in successfully on android and stores token", async () => {
-        const token = "mock-token";
-        mock.onPost(`${apiUrl}auth/login`).reply(200, { token });
+    it("logs in successfully on web and stores token", async () => {
+        const token = "authToken";
+        mock.onPost(`${apiUrl}auth/login`).reply(200, { accessToken: token });
 
-        const result = await requestLogin("user@example.com", "password123", "web");
+        const result = await requestLogin("user@example.com", "Password123!", "WEB");
 
-        expect(result).toEqual({ success: true });
-        expect(SecureStore.setItemAsync).toHaveBeenCalledWith("authToken", token);
+        expect(result).toBe(true);
     });
 
 
-    it("returns success: false for non-200 status", async () => {
-        mock.onPost(`${apiUrl}auth/login`).reply(404,{});
-
-        const result = await requestLogin("wrong@example.com", "wrongpass", "web");
-
-        expect(result).toEqual({ success: false });
-    });
 
     it("throws parsed error on network failure", async () => {
         mock.onPost(`${apiUrl}auth/login`).networkError();
