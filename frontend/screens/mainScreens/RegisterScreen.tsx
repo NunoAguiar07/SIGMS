@@ -29,7 +29,7 @@ export const RegisterScreen = ({
 }: RegisterScreenType) => {
     return (
         <CenteredContainer flex={1}>
-            <Card shadow="medium" padding="sm" gap="md" >
+            <Card shadow="medium" padding="sm" gap="md">
                 <Title color="black">Register</Title>
 
                 <AuthFormFields
