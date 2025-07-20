@@ -33,7 +33,10 @@
       "intentFilters": [
         {
           "action": "VIEW",
-          "category": ["DEFAULT", "BROWSABLE"],
+          "category": [
+            "DEFAULT",
+            "BROWSABLE"
+          ],
           "data": {
             "scheme": "frontendfinal"
           }
@@ -71,13 +74,14 @@
         }
       ],
       [
-      "expo-build-properties",
-      {
-        "android": {
-          "usesCleartextTraffic": true
+        "expo-build-properties",
+        {
+          "android": {
+            "usesCleartextTraffic": true
+          }
         }
-      }
-      ]
+      ],
+      "expo-web-browser"
     ],
     "extra": {
       "router": {},

@@ -185,13 +185,12 @@ export const UniversitySearch = ({
     <ColumnContainer gap="md" style={{ position: 'relative' , zIndex: 10}} justifyContent="center" alignItems="center">
         <BodyText textAlign="center" family="bold">Search for your university:</BodyText>
         <SearchInput
-            width="100%"
             placeholder="Search universities..."
             value={searchQuery}
             onChangeText={onSearchChange}
         />
         {universities.length > 0 && (
-            <FlatListContainer width="100%">
+            <FlatListContainer>
                 <FlatList
                     data={universities}
                     keyExtractor={(item) => item.id.toString()}
