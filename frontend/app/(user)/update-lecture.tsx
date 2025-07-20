@@ -15,7 +15,6 @@ const UpdateLecture = () => {
         rooms,
         setSearchQueryRoom,
         searchQueryRoom,
-        selectedRoom,
         handleRoomSelect,
         setEffectiveFromText,
         setEffectiveUntilText,
@@ -50,7 +49,6 @@ const UpdateLecture = () => {
             rooms={rooms}
             setSearchQueryRoom={setSearchQueryRoom}
             searchQueryRoom={searchQueryRoom}
-            selectedRoom={selectedRoom}
             handleRoomSelect={handleRoomSelect}
             setEffectiveFromText={setEffectiveFromText}
             setEffectiveUntilText={setEffectiveUntilText}

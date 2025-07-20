@@ -16,14 +16,10 @@ export const useMicrosoftAuth = () => {
 
     const handleAuthPress = async () => {
         try {
-
             if (isMobile) {
                 await WebBrowser.warmUpAsync();
             }
-
             const result = await promptAsync();
-
-
             if (isMobile && result.type !== 'cancel') {
                 await WebBrowser.coolDownAsync();
             }

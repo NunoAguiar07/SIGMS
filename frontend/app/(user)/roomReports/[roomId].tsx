@@ -15,7 +15,7 @@ const RoomId = () => {
         return <LoadingPresentation />;
     }
 
-    return <RoomReportsScreen reports={reports} room={room }  />;
+    return <RoomReportsScreen reports={reports} room={room}  />;
 };
 
 export default RoomId;
