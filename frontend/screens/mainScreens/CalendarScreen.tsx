@@ -6,41 +6,20 @@ import {theme} from "../css_styling/common/Theme";
 import {BodyText, Subtitle} from "../css_styling/common/Typography";
 import {ActionButton, Button} from "../css_styling/common/Buttons";
 import {isMobile} from "../../utils/DeviceType";
-import {useState} from "react";
 import {Ionicons} from "@expo/vector-icons";
 
 
 
-const CalendarScreen = ({ schedule, onClickProfile, onClickRoom }: CalendarScreenType) => {
-
-    const getEventsForDay = (dayName: string) => {
-        // @ts-ignore
-        return schedule.filter(item => item.lecture.weekDay === dayName)
-            .map(item => ({
-                time: `${item.lecture.startTime} ➜ ${item.lecture.endTime}`,
-                title: `${item.lecture.schoolClass.subject.name} (${item.lecture.type}), ${item.lecture.schoolClass.name}: ${item.lecture.room.name}`,
-                roomId: item.lecture.room.id, // add this
-                teachers: item.teacher.map(t => ({ name: t.user.username, id: t.user.id })),
-            }));
-    };
-
-    const getCurrentDay = (): string => {
-        const days = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
-        return days[new Date().getDay()];
-    };
-
-    const [selectedDay, setSelectedDay] = useState<string>(getCurrentDay());
-    const daysOrder = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
-
-    const navigateDay = (direction: 'prev' | 'next') => {
-        const currentIndex = daysOrder.indexOf(selectedDay);
-        if (direction === 'prev' && currentIndex > 0) {
-            setSelectedDay(daysOrder[currentIndex - 1]);
-        } else if (direction === 'next' && currentIndex < daysOrder.length - 1) {
-            setSelectedDay(daysOrder[currentIndex + 1]);
-        }
-    };
-
+const CalendarScreen = ({
+                            onClickProfile,
+                            onClickRoom,
+                            getEventsForDay,
+                            getCurrentDay,
+                            selectedDay,
+                            setSelectedDay,
+                            daysOrder,
+                            navigateDay
+                        }: CalendarScreenType) => {
 
     if (isMobile) {
         return (
@@ -126,7 +105,7 @@ const DaySection = ({ day, events, onClickProfile, onClickRoom } : DayType) => (
         {events.length > 0 && (
             <Container backgroundColor={theme.colors.background.cream} padding="md" margin="sm" borderRadius={"large"} width={"98%"} gap={"md"}>
                 {events.map((event: any) => (
-                    <ColumnContainer borderRadius={"small"} gap="sm"> {/* Changed to ColumnContainer */}
+                    <ColumnContainer borderRadius={"small"} gap="sm">
                         <RowContainer justifyContent={"space-between"}>
                             <ColumnContainer gap={"sm"}>
                                 <BodyText family={"bold"}>{event.time}</BodyText>

@@ -235,14 +235,14 @@ const SubjectSearchList = ({
 );
 
 const ClassSelection = ({
-                            subjects,
-                            subjectClasses,
-                            selectedSubject,
-                            searchQuery,
-                            onSearchChange,
-                            onSubjectSelect,
-                            onClassSelect
-                        }: {
+    subjects,
+    subjectClasses,
+    selectedSubject,
+    searchQuery,
+    onSearchChange,
+    onSubjectSelect,
+    onClassSelect
+}: {
     subjects: SubjectInterface[];
     subjectClasses: SchoolClassInterface[];
     selectedSubject: SubjectInterface | null;
@@ -263,7 +263,7 @@ const ClassSelection = ({
             <CenteredContainer>
                 <Subtitle>Classes for {selectedSubject.name}</Subtitle>
                 {subjectClasses.length > 0 ? (
-                    <FlatListContainer position={"static"}>
+                    <FlatListContainer position={"static"} width={"100%"}>
                         <FlatList
                             data={subjectClasses}
                             keyExtractor={(item) => item.id.toString()}
@@ -285,11 +285,11 @@ const ClassSelection = ({
 );
 
 const RoomSearchList = ({
-                            rooms,
-                            searchQuery,
-                            onSearchChange,
-                            onRoomSelect
-                        }: {
+    rooms,
+    searchQuery,
+    onSearchChange,
+    onRoomSelect
+}: {
     rooms: RoomInterface[];
     searchQuery: string;
     onSearchChange: (query: string) => void;

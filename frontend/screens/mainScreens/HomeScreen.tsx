@@ -8,7 +8,7 @@ import {NotificationsScreen} from "./NotificationsScreen";
 import {Logo} from "../components/Logo";
 import {isMobile} from "../../utils/DeviceType";
 
-export const HomeScreen = ({ shouldShowCalendar, onLogout, username, schedule, notifications, clearNotification, onClickProfile, onClickRoom }: HomeScreenType) => {
+export const HomeScreen = ({ shouldShowCalendar, onLogout, username, notifications, clearNotification, onClickProfile, onClickRoom, getEventsForDay, getCurrentDay, selectedDay, setSelectedDay, daysOrder, navigateDay }: HomeScreenType) => {
     if (isMobile) {
         return (
             <ScreenContainer backgroundColor={"transparent"}>
@@ -35,7 +35,16 @@ export const HomeScreen = ({ shouldShowCalendar, onLogout, username, schedule, n
 
                 {shouldShowCalendar && (
                     <GridColumn widthPercent={shouldShowCalendar ? 65 : 0}>
-                        <CalendarScreen schedule={schedule} onClickProfile={onClickProfile} onClickRoom={onClickRoom}/>
+                        <CalendarScreen
+                            onClickProfile={onClickProfile}
+                            onClickRoom={onClickRoom}
+                            getEventsForDay={getEventsForDay}
+                            getCurrentDay={getCurrentDay}
+                            selectedDay={selectedDay}
+                            setSelectedDay={setSelectedDay}
+                            daysOrder={daysOrder}
+                            navigateDay={navigateDay}
+                        />
                     </GridColumn>
                 )}
 

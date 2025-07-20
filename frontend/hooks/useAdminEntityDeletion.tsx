@@ -95,15 +95,12 @@ export const useAdminEntityDeletion = () => {
             try {
                 if (lectureFilter === 'all') {
                     const data = await fetchLectures();
-                    console.log(data);
                     setLectures(data);
                 } else if (lectureFilter === 'class' && selectedClass && selectedSubject) {
                     const data = await fetchLecturesByClass(selectedSubject.id, selectedClass.id);
-                    console.log(data);
                     setLectures(data);
                 } else if (lectureFilter === 'room' && selectedRoom) {
                     const data = await fetchLecturesByRoom(selectedRoom.id);
-                    console.log(data);
                     setLectures(data);
                 }
             } catch (err) {
