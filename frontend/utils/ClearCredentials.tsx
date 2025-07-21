@@ -1,5 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as SecureStore from 'expo-secure-store';
+import api from "../services/interceptors/DeviceInterceptor";
+import {apiUrl} from "../services/fetchWelcome";
 
 
 /**
@@ -11,6 +13,9 @@ import * as SecureStore from 'expo-secure-store';
 export const clearWebStorage = async () => {
     await AsyncStorage.removeItem('refreshToken');
     await AsyncStorage.multiRemove(['userId', 'universityId', 'userRole']);
+    await api.post(
+        `${apiUrl}auth/logout`,{},{withCredentials: true}
+    );
 };
 
 

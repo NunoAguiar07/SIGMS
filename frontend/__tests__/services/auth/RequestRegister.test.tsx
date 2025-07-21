@@ -32,9 +32,9 @@ describe("requestRegister", () => {
     };
 
     it("returns token on 201 Created", async () => {
-        const mockToken = "test-token-123";
+        const mockMessage = "message";
         mock.onPost(`${apiUrl}auth/register`, testPayload)
-            .reply(201, { token: mockToken });
+            .reply(201, { message: mockMessage });
 
         const result = await requestRegister(
             testPayload.email,
@@ -44,7 +44,7 @@ describe("requestRegister", () => {
             testPayload.universityId
         );
 
-        expect(result).toBe(mockToken);
+        expect(result).toBe(mockMessage);
     });
 
     it("returns undefined for non-201 status", async () => {
