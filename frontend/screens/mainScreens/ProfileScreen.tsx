@@ -74,9 +74,9 @@ const ProfileInfo = ({username, email, university, officeRoomName, image}: Profi
                 <Subtitle color={theme.colors.text.black}>{email}</Subtitle>
                 <Subtitle color={theme.colors.text.black}>{university}</Subtitle>
                 {officeRoomName && (
-                    <Title color={theme.colors.text.black}>
+                    <Subtitle color={theme.colors.text.black}>
                         Office: {officeRoomName}
-                    </Title>
+                    </Subtitle>
                 )}
             </CenteredContainer>
         )}
